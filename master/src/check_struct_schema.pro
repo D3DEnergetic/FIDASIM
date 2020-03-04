@@ -25,8 +25,8 @@ PRO check_struct_schema, schema, s, err_status, desc=desc
     if not keyword_set(struct_name) then desc = 'structure'
 
     err_status = 0
-    schema_tags = strlowcase(TAG_NAMES(schema)) 
-    tags = strlowcase(TAG_NAMES(s)) 
+    schema_tags = strlowcase(TAG_NAMES(schema))
+    tags = strlowcase(TAG_NAMES(s))
 
     for i=0,n_elements(tags)-1 do begin
         w=where(tags[i] eq schema_tags,nw)
@@ -42,7 +42,7 @@ PRO check_struct_schema, schema, s, err_status, desc=desc
             err_status = 1
         endif else begin
             ;; Check dimensions
-            ww = where((size(s.(w),/dim) eq schema.(i).dims) ne 1,nww) 
+            ww = where((size(s.(w),/dim) eq schema.(i).dims) ne 1,nww)
             if nww ne 0 then begin
                 error,'"'+schema_tags[i]+'" has the wrong dimensions. Expected ('+ $
                       strjoin(strcompress(string(schema.(i).dims),/remove_all),',')+')'
@@ -58,7 +58,7 @@ PRO check_struct_schema, schema, s, err_status, desc=desc
             endif
             ;; Check for NaNs or Inf
             if tname ne 'STRING' and tname ne 'STRUCT' then begin
-                ww = where(finite(s.(w)) eq 0,nww) 
+                ww = where(finite(s.(w)) eq 0,nww)
             endif else nww = 0
             if nww ne 0 then begin
                 error,'NaN or Infinity detected in "'+schema_tags[i]+'"'

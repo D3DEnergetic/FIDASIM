@@ -176,7 +176,7 @@ However, this approach makes several assumptions that may not be true in non-tok
 The default settings of FIDASIM are to map the plasma parameters and fields onto the 2D R-Z grid. If the user inputs any Phi variable information, the plasma parameters and fields will be mapped onto a 3D R-Z-Phi cylindrical grid. Furthermore, a boolean mask is used to indicate where the plasma and fields are well defined.</p>
 <p>FIDASIM reads the plasma parameters and fields from an HDF5 file structured as follows...</p>
 <div class="codehilite"><pre><span></span><span class="o">[</span><span class="n">runid</span><span class="o">]</span><span class="n">_equilibrium</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-<span class="err">├──</span><span class="w"> </span><span class="n">plasma</span><span class="w">          </span>
+<span class="err">├──</span><span class="w"> </span><span class="n">plasma</span><span class="w"></span>
 <span class="err">└──</span><span class="w"> </span><span class="n">fields</span><span class="w"></span>
 </pre></div>
 
@@ -219,6 +219,30 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 <td align="left">Number of phi values (Optional)</td>
 </tr>
 <tr>
+<td align="center"><code>nthermal</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of hydrogenic, thermal ion species</td>
+</tr>
+<tr>
+<td align="center"><code>impurity_charge</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Main impurity charge number</td>
+</tr>
+<tr>
+<td align="center"><code>species_mass</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nthermal</code>]</td>
+<td align="center">amu</td>
+<td align="left">Thermal ion species mass</td>
+</tr>
+<tr>
 <td align="center"><code>r</code></td>
 <td align="center">Float64</td>
 <td align="center">1</td>
@@ -245,18 +269,18 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 <tr>
 <td align="center"><code>r2d</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm</td>
-<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+<td align="left">2D/3D array of radii <code>r = r2d(r,z[,phi])</code></td>
 </tr>
 <tr>
 <td align="center"><code>z2d</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm</td>
-<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+<td align="left">2D/3D array of z values <code>z = z2d(r,z,[phi])</code></td>
 </tr>
 <tr>
 <td align="center"><code>time</code></td>
@@ -277,72 +301,88 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 <tr>
 <td align="center"><code>mask</code></td>
 <td align="center">Int16</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">NA</td>
 <td align="left">Boolean mask that indicates where the plasma is well defined</td>
 </tr>
 <tr>
 <td align="center"><code>te</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">keV</td>
 <td align="left">Electron temperature</td>
 </tr>
 <tr>
 <td align="center"><code>ti</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">keV</td>
 <td align="left">Ion temperature</td>
 </tr>
 <tr>
 <td align="center"><code>dene</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm^-3</td>
 <td align="left">Electron density</td>
 </tr>
 <tr>
+<td align="center"><code>denimp</code></td>
+<td align="center">Float64</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
+<td align="center">cm^-3</td>
+<td align="left">Impurity density</td>
+</tr>
+<tr>
+<td align="center"><code>deni</code></td>
+<td align="center">Float64</td>
+<td align="center">3/4</td>
+<td align="center">[<code>nthermal</code>,<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
+<td align="center">cm^-3</td>
+<td align="left">Ion density for each thermal species</td>
+</tr>
+<tr>
 <td align="center"><code>denn</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm^-3</td>
 <td align="left">Cold neutral density</td>
 </tr>
 <tr>
 <td align="center"><code>zeff</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">NA</td>
 <td align="left">Z-effective</td>
 </tr>
 <tr>
 <td align="center"><code>vr</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm/s</td>
 <td align="left">Radial component of the bulk plasma rotation/flow</td>
 </tr>
 <tr>
 <td align="center"><code>vt</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm/s</td>
 <td align="left">Torodial/Phi component of the bulk plasma rotation/flow</td>
 </tr>
 <tr>
 <td align="center"><code>vz</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm/s</td>
 <td align="left">Z component of the bulk plasma rotation/flow</td>
 </tr>
@@ -428,18 +468,18 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 <tr>
 <td align="center"><code>r2d</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm</td>
-<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+<td align="left">2D/3D array of radii <code>r = r2d(r,z[,phi])</code></td>
 </tr>
 <tr>
 <td align="center"><code>z2d</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm</td>
-<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+<td align="left">2D/3D array of z values <code>z = z2d(r,z,[phi])</code></td>
 </tr>
 <tr>
 <td align="center"><code>time</code></td>
@@ -460,56 +500,56 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 <tr>
 <td align="center"><code>mask</code></td>
 <td align="center">Int16</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">NA</td>
 <td align="left">Boolean mask that indicates where the fields are well defined</td>
 </tr>
 <tr>
 <td align="center"><code>br</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">T</td>
 <td align="left">Radial component of the magnetic field</td>
 </tr>
 <tr>
 <td align="center"><code>bt</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">T</td>
 <td align="left">Torodial/Phi component of the magnetic field</td>
 </tr>
 <tr>
 <td align="center"><code>bz</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">T</td>
 <td align="left">Z component of the magnetic field</td>
 </tr>
 <tr>
 <td align="center"><code>er</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">V/m</td>
 <td align="left">Radial component of the electric field</td>
 </tr>
 <tr>
 <td align="center"><code>et</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">V/m</td>
 <td align="left">Torodial/Phi component of the electric field</td>
 </tr>
 <tr>
 <td align="center"><code>ez</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">2/3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">V/m</td>
 <td align="left">Z component of the electric field</td>
 </tr>
@@ -807,7 +847,7 @@ The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, wher
 </tbody>
 </table>
 <p>The sum(<code>weight</code>) = # of Fast-ions in phase space sampled by the MC particles.</p>
-<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>. 
+<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>.
 If there are multiple classes of particles the FIDA signal for each class will be calculated.</p>
 <h2 id="full-orbit-monte-carlo-distribution">Full-orbit Monte Carlo Distribution</h2>
 <table>
@@ -990,12 +1030,7 @@ If there are multiple classes of particles the FIDA signal for each class will b
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
             
             </li>
             
@@ -1064,6 +1099,11 @@ If there are multiple classes of particles the FIDA signal for each class will b
             
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
             
             </li>
             

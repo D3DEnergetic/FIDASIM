@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
 
-    <title>Visualization &ndash; FIDASIM</title>
+    <title>Advanced Settings &ndash; FIDASIM</title>
 
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/pygments.css" rel="stylesheet">
@@ -113,7 +113,7 @@
     <div class="container">
     
   <div class="row">
-    <h1>Visualization</h1>
+    <h1>Advanced Settings</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
@@ -128,9 +128,9 @@
       
          <li><a href='../../page/index.html'>User Guide</a></li>
       
-         <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
+         <li><a href='../../page/03_technical/index.html'>Technical Details</a></li>
       
-         <li class="active">Visualization</li>
+         <li class="active">Advanced Settings</li>
       </ol>
     </div>
     </div>
@@ -139,62 +139,60 @@
   
   <div class="row">
     <div class="col-md-9 col-md-push-3" id='text'>
-      <h1 id="visualizing-inputs-and-outputs">Visualizing Inputs and Outputs</h1>
+      <p>This page documents FIDASIMs advanced settings. All settings can be found in the Namelist File.</p>
 <div class="toc">
 <ul>
-<li><a href="#visualizing-inputs-and-outputs">Visualizing Inputs and Outputs</a><ul>
-<li><a href="#visualization-inputs">Visualization: Inputs</a></li>
-<li><a href="#visualization-outputs">Visualization: Outputs</a></li>
-</ul>
-</li>
+<li><a href="#setting-random-number-generator-seed">Setting Random Number Generator Seed</a></li>
+<li><a href="#verbose-output">Verbose Output</a></li>
+<li><a href="#loading-pre-computed-neutrals-file">Loading Pre-computed Neutrals File</a></li>
+<li><a href="#output-individual-stark-components">Output Individual Stark Components</a></li>
+<li><a href="#control-finite-larmor-radius-correction-order">Control Finite Larmor Radius Correction Order</a></li>
+<li><a href="#output-npa-particles">Output NPA Particles</a></li>
+<li><a href="#spatially-averaged-fida-velocity-space-weight-functions">Spatially Averaged FIDA Velocity-space Weight Functions</a></li>
+<li><a href="#output-extra-npa-velocity-space-weight-function-variables">Output Extra NPA Velocity-space Weight Function Variables</a></li>
 </ul>
 </div>
 <hr>
-<h2 id="visualization-inputs">Visualization: Inputs</h2>
-<p>Visualizing your inputs can be done by executing <code>plot_inputs</code> found in <code>lib/scripts/</code></p>
-<p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
-Below are brief descriptions and examples of what the script can currently handle:</p>
-<p>To plot all of your inputs, simply indicate the directory and run ID.</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a
+<h1 id="setting-random-number-generator-seed">Setting Random Number Generator Seed</h1>
+<div class="codehilite"><pre><span></span><span class="err">seed = -1 ! -1 = Default (pick random seed)</span>
 </pre></div>
 
 
-<p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -g
+<h1 id="verbose-output">Verbose Output</h1>
+<div class="codehilite"><pre><span></span><span class="err">verbose = 1</span>
 </pre></div>
 
 
-<p>In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.</p>
-<p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
-<p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
-For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz <span class="m">170</span>
+<h1 id="loading-pre-computed-neutrals-file">Loading Pre-computed Neutrals File</h1>
+<div class="codehilite"><pre><span></span><span class="err">load_neutrals = 1 ! Default = 0</span>
+<span class="err">neutral_file = &#39;neutrals.h5&#39;</span>
 </pre></div>
 
 
-<p>There are many more possible lineouts that can be viewed, so run <code>plot_inputs -h</code> to look at the help documentation.</p>
-<h2 id="visualization-outputs">Visualization: Outputs</h2>
-<p>Visualizing your outputs can be done by executing <code>plot_outputs</code> found in <code>lib/scripts/</code></p>
-<p>Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
-Let's start with the easiest method first.
-Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
-Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
-Furthermore, it will also print out the neutron rate.</p>
-<div class="codehilite"><pre><span></span>plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
+<h1 id="output-individual-stark-components">Output Individual Stark Components</h1>
+<div class="codehilite"><pre><span></span><span class="err">stark_components = 1 ! Default = 0</span>
 </pre></div>
 
 
-<p>If you are interested in only one shot, e.g. test_1a, add <code>-r test_1a</code> to your command.</p>
-<p>Let's now consider a more specific example.
-What if your files are scattered around in different folders?
-What if you are only interested in the active FIDA emission?
-What if you only want to view channels 1 and 3?
-The example below does this for two different files located in different folders.</p>
-<div class="codehilite"><pre><span></span>plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls <span class="m">1</span> <span class="m">3</span>
+<h1 id="control-finite-larmor-radius-correction-order">Control Finite Larmor Radius Correction Order</h1>
+<div class="codehilite"><pre><span></span><span class="err">flr = 2 !! 0 =&gt; No correction, 1 =&gt; First order correction, 2 =&gt; Second Order correction (Default)</span>
 </pre></div>
 
 
-<p>Now that you have a grasp on how the script works, take a look at the help documentation <code>plot_outputs -h</code> to see what else the code is capable of.</p>
+<h1 id="output-npa-particles">Output NPA Particles</h1>
+<div class="codehilite"><pre><span></span><span class="err">calc_npa = 2</span>
+<span class="err">calc_pnpa = 2</span>
+</pre></div>
+
+
+<h1 id="spatially-averaged-fida-velocity-space-weight-functions">Spatially Averaged FIDA Velocity-space Weight Functions</h1>
+<div class="codehilite"><pre><span></span><span class="err">calc_fida_wght = 2</span>
+</pre></div>
+
+
+<h1 id="output-extra-npa-velocity-space-weight-function-variables">Output Extra NPA Velocity-space Weight Function Variables</h1>
+<div class="codehilite"><pre><span></span><span class="err">calc_npa_wght = 2</span>
+</pre></div>
     </div>
     
     <div class="col-md-3 col-md-pull-9">
@@ -232,12 +230,7 @@ The example below does this for two different files located in different folders
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
-            
-            </li>
-            
-            <li role="presentation" class="disabled">
-            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
             
             </li>
             
@@ -306,6 +299,11 @@ The example below does this for two different files located in different folders
             
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
             
             </li>
             

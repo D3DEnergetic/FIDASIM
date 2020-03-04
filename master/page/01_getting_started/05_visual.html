@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
 
-    <title>Devices using FIDASIM &ndash; FIDASIM</title>
+    <title>Visualization &ndash; FIDASIM</title>
 
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/pygments.css" rel="stylesheet">
@@ -113,7 +113,7 @@
     <div class="container">
     
   <div class="row">
-    <h1>Devices using FIDASIM</h1>
+    <h1>Visualization</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
@@ -130,7 +130,7 @@
       
          <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
       
-         <li class="active">Devices using FIDASIM</li>
+         <li class="active">Visualization</li>
       </ol>
     </div>
     </div>
@@ -139,19 +139,58 @@
   
   <div class="row">
     <div class="col-md-9 col-md-push-3" id='text'>
-      <h1 id="diii-d">DIII-D</h1>
-<p>FIDASIM is being used at DIII-D for simulating and validating their FIDA, NPA and neutron diagnostics.
-It it also being used in charge exchange recombination spectroscopy to validate deuterium density measurements.</p>
-<p>The routines for running a DIII-D FIDASIM run are available <a href="https://github.com/D3DEnergetic/d3d-fidasim">here</a></p>
-<p>A FIDASIM module containing the DIII-D specific routines is available on the Iris cluster.</p>
-<div class="codehilite"><pre><span></span>module load fidasim
-fidasim
+      <div class="toc">
+<ul>
+<li><a href="#visualizing-inputs">Visualizing Inputs</a></li>
+<li><a href="#visualizing-outputs">Visualizing Outputs</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="visualizing-inputs">Visualizing Inputs</h1>
+<p>Visualizing your inputs can be done by executing <code>plot_inputs</code> found in <code>lib/scripts/</code></p>
+<p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
+Below are brief descriptions and examples of what the script can currently handle:</p>
+<p>To plot all of your inputs, simply indicate the directory and run ID.</p>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a
 </pre></div>
 
 
-<h1 id="nstx-u">NSTX-U</h1>
-<p>FIDASIM is being used at NSTX-U for simulating and validating their FIDA and NPA diagnostics.</p>
-<p>The routines for running a NSTX-U FIDASIM run are available <a href="https://github.com/D3DEnergetic/nstx-fidasim">here</a></p>
+<p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -g
+</pre></div>
+
+
+<p>In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.</p>
+<p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
+<p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
+For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz <span class="m">170</span>
+</pre></div>
+
+
+<p>There are many more possible lineouts that can be viewed, so run <code>plot_inputs -h</code> to look at the help documentation.</p>
+<h1 id="visualizing-outputs">Visualizing Outputs</h1>
+<p>Visualizing your outputs can be done by executing <code>plot_outputs</code> found in <code>lib/scripts/</code></p>
+<p>Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
+Let's start with the easiest method first.
+Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
+Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
+Furthermore, it will also print out the neutron rate.</p>
+<div class="codehilite"><pre><span></span>plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
+</pre></div>
+
+
+<p>If you are interested in only one shot, e.g. test_1a, add <code>-r test_1a</code> to your command.</p>
+<p>Let's now consider a more specific example.
+What if your files are scattered around in different folders?
+What if you are only interested in the active FIDA emission?
+What if you only want to view channels 1 and 3?
+The example below does this for two different files located in different folders.</p>
+<div class="codehilite"><pre><span></span>plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls <span class="m">1</span> <span class="m">3</span>
+</pre></div>
+
+
+<p>Now that you have a grasp on how the script works, take a look at the help documentation <code>plot_outputs -h</code> to see what else the code is capable of.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">
@@ -189,12 +228,7 @@ fidasim
             </li>
             
             <li role="presentation" class="disabled">
-            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
             
             </li>
             
@@ -263,6 +297,11 @@ fidasim
             
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
             
             </li>
             

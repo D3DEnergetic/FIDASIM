@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">26 statements</a>
+    title=" 0.2% of total for procedures.">27 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine gyro_surface(fields, energy, pitch, gs)
+public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
     
     
    
@@ -272,6 +272,21 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ai%7E2"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Ion atomic mass</p></td>
   
 </tr>
 
@@ -518,7 +533,7 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
     <span class="c">!+ Calculates the surface of all possible trajectories</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electromagnetic fields at guiding center</span>
@@ -526,6 +541,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
         <span class="c">!+ Energy of particle</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">pitch</span>
         <span class="c">!+ Particle pitch w.r.t the magnetic field</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">Ai</span>
+        <span class="c">!+ Ion atomic mass</span>
     <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">gs</span>
         <span class="c">!+ Gyro-surface</span>
 
@@ -533,8 +550,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">omega</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">s</span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
-    <span class="n">omega</span><span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">beam_mass</span><span class="o">*</span><span class="n">mass_u</span><span class="p">)</span>
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">Ai</span><span class="p">))</span>
+    <span class="n">omega</span><span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="p">)</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">vabs</span><span class="o">/</span><span class="n">omega</span>
 
     <span class="n">gs</span><span class="p">%</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega</span>

@@ -382,8 +382,8 @@
   <td><span class="anchor" id="variable-dcx"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcx(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcx(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -396,8 +396,8 @@
   <td><span class="anchor" id="variable-halo"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -410,8 +410,8 @@
   <td><span class="anchor" id="variable-cold"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: cold(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -469,12 +469,12 @@
         <span class="c">!+ Half energy beam emission stark components: half(n_stark,lambda,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">third</span>
         <span class="c">!+ Third energy beam emission stark components: third(n_stark,lambda,chan)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">dcx</span>
-        <span class="c">!+ Direct CX emission stark components: dcx(n_stark,lambda,chan)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">halo</span>
-        <span class="c">!+ Thermal halo emission stark components: halo(n_stark,lambda,chan)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">cold</span>
-        <span class="c">!+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dcx</span>
+        <span class="c">!+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">halo</span>
+        <span class="c">!+ Thermal halo emission stark components: halo(n_stark,lambda,chan,species)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">cold</span>
+        <span class="c">!+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fida</span>
         <span class="c">!+ Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">pfida</span>

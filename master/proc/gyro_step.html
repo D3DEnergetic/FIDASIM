@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.4% of total for procedures.">48 statements</a>
+    title=" 0.4% of total for procedures.">49 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine gyro_step(vi, fields, r_gyro)
+public subroutine gyro_step(vi, fields, Ai, r_gyro)
     
     
    
@@ -261,6 +261,21 @@ public subroutine gyro_step(vi, fields, r_gyro)
   
   <td></td><td>::</td>
   <td><strong>fields</strong></td><td><p>Electro-magnetic fields</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ai%7E3"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic mass of ion</p></td>
   
 </tr>
 
@@ -716,7 +731,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
     <span class="c">!+ Calculates gyro-step</span>
     <span class="c">!+</span>
     <span class="c">!+###References</span>
@@ -727,6 +742,8 @@ public subroutine gyro_step(vi, fields, r_gyro)
         <span class="c">!+ Ion velocity</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electro-magnetic fields</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">Ai</span>
+        <span class="c">!+ Atomic mass of ion</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_gyro</span>
         <span class="c">!+ Gyro-step</span>
         <span class="c">!+ Gyro-radius vector from particle position to guiding center</span>
@@ -738,7 +755,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <span class="k">        </span><span class="n">uvw</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">uvw</span>
         <span class="n">R</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">phi</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">one_over_omega</span><span class="o">=</span><span class="n">beam_mass</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span>
+        <span class="n">one_over_omega</span><span class="o">=</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span>
         <span class="n">vxB</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
         <span class="n">vpar</span> <span class="o">=</span>  <span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
         <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">vxB</span><span class="o">*</span><span class="n">one_over_omega</span> <span class="c">!points towards gyrocenter, in beam coordinates</span>

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.1% of total for procedures.">18 statements</a>
+    title=" 0.1% of total for procedures.">19 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public function gyro_radius(fields, energy, pitch) result(gyro_rad)
+public function gyro_radius(fields, energy, pitch, Ai) result(gyro_rad)
     
     
    
@@ -272,6 +272,21 @@ public function gyro_radius(fields, energy, pitch) result(gyro_rad)
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ai"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic Mass of ion</p></td>
   
 </tr>
 
@@ -471,7 +486,7 @@ public function gyro_radius(fields, energy, pitch) result(gyro_rad)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">gyro_radius</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">gyro_rad</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">gyro_radius</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">Ai</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">gyro_rad</span><span class="p">)</span>
     <span class="c">!+ Calculates mean gyro-radius</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electromagnetic fields at guiding center</span>
@@ -479,6 +494,8 @@ public function gyro_radius(fields, energy, pitch) result(gyro_rad)
         <span class="c">!+ Energy of particle</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">pitch</span>
         <span class="c">!+ Particle pitch w.r.t the magnetic field</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">Ai</span>
+        <span class="c">!+ Atomic Mass of ion</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gyro_rad</span>
         <span class="c">!+ Mean gyro-radius</span>
 
@@ -486,14 +503,14 @@ public function gyro_radius(fields, energy, pitch) result(gyro_rad)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">phi</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">n</span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">Ai</span><span class="p">))</span>
 
     <span class="n">gyro_rad</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
         <span class="n">phi</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span>
         <span class="k">call </span><span class="n">pitch_to_vec</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">vi_norm</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vabs</span><span class="o">*</span><span class="n">vi_norm</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_step</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vabs</span><span class="o">*</span><span class="n">vi_norm</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">r_step</span><span class="p">)</span>
         <span class="n">gyro_rad</span> <span class="o">=</span> <span class="n">gyro_rad</span> <span class="o">+</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">r_step</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
     <span class="n">enddo</span>
 

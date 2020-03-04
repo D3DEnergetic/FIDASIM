@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">22 statements</a>
+    title=" 0.2% of total for procedures.">23 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
+public subroutine gyro_correction(fields, energy, pitch, Ai, rp, vp, theta_in)
     
     
    
@@ -272,6 +272,21 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ai%7E4"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic mass of Ion</p></td>
   
 </tr>
 
@@ -733,7 +748,7 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">theta_in</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">theta_in</span><span class="p">)</span>
     <span class="c">!+ Calculates gyro correction for Guiding Center MC distribution calculation</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electromagnetic fields at guiding center</span>
@@ -741,6 +756,8 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
         <span class="c">!+ Energy of particle</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">pitch</span>
         <span class="c">!+ Particle pitch w.r.t the magnetic field</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">Ai</span>
+        <span class="c">!+ Atomic mass of Ion</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rp</span>
         <span class="c">!+ Particle position</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span>
@@ -751,7 +768,7 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">theta</span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">Ai</span><span class="p">))</span>
 
     <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">theta_in</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta_in</span>
@@ -766,7 +783,7 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     <span class="n">vp</span> <span class="o">=</span> <span class="n">vabs</span><span class="o">*</span><span class="n">vi_norm</span>
 
     <span class="c">!! Move to particle location</span>
-    <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_step</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">r_step</span><span class="p">)</span>
     <span class="n">rp</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">pos</span> <span class="o">-</span> <span class="n">r_step</span>
 
 <span class="k">end subroutine </span><span class="n">gyro_correction</span>

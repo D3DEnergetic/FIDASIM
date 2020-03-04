@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.5% of total for procedures.">70 statements</a>
+    title=" 0.6% of total for procedures.">74 statements</a>
      </li> 
      
      
@@ -971,14 +971,14 @@ public subroutine pfida_mc()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz_vi</span>
     <span class="c">!! Determination of the CX probability</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denn</span>    <span class="c">!!  neutral dens (n=1-4)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>    <span class="c">!! CX rates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span><span class="p">,</span> <span class="n">rates_is</span>    <span class="c">!! CX rates</span>
     <span class="c">!! Collisiional radiative model along track</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">states</span>  <span class="c">! Density of n-states</span>
     <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tracks</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ntrack</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">los_intersect</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">jj</span>      <span class="c">!! counter along track</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">photons</span> <span class="c">!! photon flux</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">jj</span><span class="p">,</span> <span class="k">is</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">photons</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
 
@@ -991,8 +991,8 @@ public subroutine pfida_mc()
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">ngamma</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,&amp;</span>
-    <span class="c">!$OMP&amp; randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)</span>
+    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,is,fast_ion,vi,ri,phi,tracks,s,c,&amp;</span>
+    <span class="c">!$OMP&amp; randomu,plasma,fields,ntrack,jj,rates,rates_is,denn,los_intersect,states,photons,xyz_vi)</span>
     <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span><span class="n">istep</span>
         <span class="n">fast_ion</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">iion</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>
@@ -1017,7 +1017,7 @@ public subroutine pfida_mc()
                 <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">,</span> <span class="n">input_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
                 <span class="c">!! Correct for gyro motion and get particle position and velocity</span>
-                <span class="k">call </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">A</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">)</span>
             <span class="k">else</span> <span class="c">!! Full Orbit</span>
                 <span class="c">!! Calculate velocity vector</span>
                 <span class="n">vi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span> <span class="o">-</span> <span class="n">s</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span>
@@ -1033,7 +1033,11 @@ public subroutine pfida_mc()
 
             <span class="c">!! Calculate CX probability</span>
             <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">,</span> <span class="n">input_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">xyz_vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+            <span class="n">rates</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_thermal</span>
+                <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">(:,</span><span class="k">is</span><span class="p">),</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">),</span> <span class="n">xyz_vi</span><span class="p">,</span> <span class="n">rates_is</span><span class="p">)</span>
+                <span class="n">rates</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">+</span> <span class="n">rates_is</span>
+            <span class="n">enddo</span>
             <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gamma_loop</span>
 
             <span class="c">!! Weight CX rates by ion source density</span>
@@ -1049,7 +1053,7 @@ public subroutine pfida_mc()
             <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntrack</span>
                 <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">input_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-                <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">beam_mass</span><span class="p">,</span> <span class="n">xyz_vi</span><span class="p">,</span> <span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="nb">time</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">A</span><span class="p">,</span> <span class="n">xyz_vi</span><span class="p">,</span> <span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="nb">time</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
 
                 <span class="k">call </span><span class="n">store_fida_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span> <span class="n">xyz_vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">,</span><span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
             <span class="n">enddo</span> <span class="n">loop_along_track</span>

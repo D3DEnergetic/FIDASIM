@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="57.3% of total for modules and submodules.">8242 statements</a>
+    title="57.8% of total for modules and submodules.">8398 statements</a>
      </li> 
      
      
@@ -205,11 +205,15 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-max_species">max_species</a>
       
-      <a class="list-group-item" href="../module/libfida.html#variable-n_species">n_species</a>
-      
-      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
+      <a class="list-group-item" href="../module/libfida.html#variable-n_thermal">n_thermal</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-thermal_mass">thermal_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-impurity_charge">impurity_charge</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-impurity_mass">impurity_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-e_amu">e_amu</a>
       
@@ -540,6 +544,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_npa">read_npa</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-read_plasma">read_plasma</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-read_equilibrium">read_equilibrium</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_f">read_f</a>
@@ -547,6 +553,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-read_mc">read_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_distribution">read_distribution</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-quasineutrality_check">quasineutrality_check</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
@@ -690,7 +698,7 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_photons">store_photons</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-store_bes_photons">store_bes_photons</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-store_nbi_photons">store_nbi_photons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fida_photons">store_fida_photons</a>
       
@@ -1149,11 +1157,15 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-max_species">max_species</a>
       
-      <a class="list-group-item" href="../module/libfida.html#variable-n_species">n_species</a>
-      
-      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
+      <a class="list-group-item" href="../module/libfida.html#variable-n_thermal">n_thermal</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-thermal_mass">thermal_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-impurity_charge">impurity_charge</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-impurity_mass">impurity_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-e_amu">e_amu</a>
       
@@ -1484,6 +1496,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_npa">read_npa</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-read_plasma">read_plasma</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-read_equilibrium">read_equilibrium</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_f">read_f</a>
@@ -1491,6 +1505,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-read_mc">read_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_distribution">read_distribution</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-quasineutrality_check">quasineutrality_check</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
@@ -1634,7 +1650,7 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_photons">store_photons</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-store_bes_photons">store_bes_photons</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-store_nbi_photons">store_nbi_photons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fida_photons">store_fida_photons</a>
       
@@ -1947,7 +1963,7 @@
   
   <td>public,</td>
   <td>parameter</td><td>::</td>
-  <td><strong>max_species</strong></td><td> =</td><td>3</td><td><p>Maximum number of thermal species</p></td>
+  <td><strong>max_species</strong></td><td> =</td><td>3</td><td><p>Maximum number of thermal isotopes</p></td>
   
 </tr>
 
@@ -1957,25 +1973,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_species"></span>integer,</td>
+  <td><span class="anchor" id="variable-n_thermal"></span>integer,</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>n_species</strong></td><td> =</td><td>1</td><td><p>Number of species</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-beam_mass"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>beam_mass</strong></td><td> =</td><td>0.d0</td><td><p>Beam/Fast ion species mass [amu]</p></td>
+  <td><strong>n_thermal</strong></td><td> =</td><td>1</td><td><p>Number of thermal hydrogen species/isotopes</p></td>
   
 </tr>
 
@@ -1990,6 +1992,48 @@
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>thermal_mass</strong>(max_species)</td><td> =</td><td>0.d0</td><td><p>Thermal ion species mass [amu]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-impurity_charge"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>impurity_charge</strong></td><td> =</td><td>1</td><td><p>Charge of main impurity (boron=5, carbon=6,...)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-impurity_mass"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>impurity_mass</strong></td><td> =</td><td>0.d0</td><td><p>Impurity species mass [amu]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-beam_mass"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>beam_mass</strong></td><td> =</td><td>0.d0</td><td><p>Beam species mass [amu]</p></td>
   
 </tr>
 
@@ -6015,11 +6059,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-denp"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-deni"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denp</strong></td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>deni</strong>(max_species)</td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -6145,7 +6189,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denn</strong>(nlevs)</td><td> =</td><td>0.d0</td><td><p>Cold neutral density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>denn</strong>(nlevs,max_species)</td><td> =</td><td>0.d0</td><td><p>Cold neutral densities [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -6202,11 +6246,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-denp"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-deni"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denp</strong></td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>deni</strong>(max_species)</td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -6332,7 +6376,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denn</strong>(nlevs)</td><td> =</td><td>0.d0</td><td><p>Cold neutral density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>denn</strong>(nlevs,max_species)</td><td> =</td><td>0.d0</td><td><p>Cold neutral densities [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -7188,6 +7232,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-a"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>A</strong></td><td> =</td><td>H2_amu</td><td><p>Atomic Mass</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-nenergy"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -7676,6 +7734,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
 
 
 <tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>A</strong></td><td> =</td><td>H2_amu</td><td><p>Fast-ion atomic mass</p></td>
+  
+</tr>
 
   
   
@@ -10087,6 +10159,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-a%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>A</strong></td><td></td><td></td><td><p>Atomic Mass</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-xi"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -10656,8 +10742,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-dcx"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcx(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcx(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -10670,8 +10756,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-halo"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -10684,8 +10770,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-cold"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: cold(n_stark,lambda,chan)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -10982,20 +11068,6 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
 
 
 <tbody>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-amu"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>amu</strong></td><td> =</td><td>H2_amu</td><td><p>Atomic Mass Unit of Neutrals</p></td>
-  
-</tr>
 
   
   
@@ -11920,20 +11992,6 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-impurity_charge"></span>integer(kind=Int32),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>impurity_charge</strong></td><td></td><td></td><td><p>Impurity proton number</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-dist_type"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -12287,7 +12345,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-a"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-a%7E4"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(3,3)</td><td>::</td>
@@ -14670,7 +14728,7 @@ public function <a href='../proc/in_passive_grid.html'>in_passive_grid</a>(uvw) 
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_radius"></span><h3>
-public function <a href='../proc/gyro_radius.html'>gyro_radius</a>(fields, energy, pitch) result(gyro_rad)
+public function <a href='../proc/gyro_radius.html'>gyro_radius</a>(fields, energy, pitch, Ai) result(gyro_rad)
     
     
    
@@ -14742,6 +14800,21 @@ public function <a href='../proc/gyro_radius.html'>gyro_radius</a>(fields, energ
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic Mass of ion</p></td>
   
 </tr>
 
@@ -16054,6 +16127,36 @@ public subroutine <a href='../proc/read_npa.html'>read_npa</a>()
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_plasma"></span><h3>
+public subroutine <a href='../proc/read_plasma.html'>read_plasma</a>()
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Reads in Plasma composition e.g. the thermal, fast-ion, and impurity species</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-read_equilibrium"></span><h3>
 public subroutine <a href='../proc/read_equilibrium.html'>read_equilibrium</a>()
     
@@ -16250,6 +16353,36 @@ public subroutine <a href='../proc/read_distribution.html'>read_distribution</a>
 
 
 <p>Reads in the fast-ion distribution</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-quasineutrality_check"></span><h3>
+public subroutine <a href='../proc/quasineutrality_check.html'>quasineutrality_check</a>()
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Checks whether quasi-neutrality is satisfied to some tol</p>
     
     <h4>Arguments</h4>
     
@@ -17830,7 +17963,7 @@ public subroutine <a href='../proc/boundary_edge.html'>boundary_edge</a>(bplane,
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_surface"></span><h3>
-public subroutine <a href='../proc/gyro_surface.html'>gyro_surface</a>(fields, energy, pitch, gs)
+public subroutine <a href='../proc/gyro_surface.html'>gyro_surface</a>(fields, energy, pitch, Ai, gs)
     
     
    
@@ -17902,6 +18035,21 @@ public subroutine <a href='../proc/gyro_surface.html'>gyro_surface</a>(fields, e
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Ion atomic mass</p></td>
   
 </tr>
 
@@ -20848,7 +20996,7 @@ public subroutine <a href='../proc/merge_reservoirs.html'>merge_reservoirs</a>(r
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-init_neutral_population"></span><h3>
-public subroutine <a href='../proc/init_neutral_population.html'>init_neutral_population</a>(pop, amu)
+public subroutine <a href='../proc/init_neutral_population.html'>init_neutral_population</a>(pop)
     
     
    
@@ -20890,21 +21038,6 @@ public subroutine <a href='../proc/init_neutral_population.html'>init_neutral_po
   
   <td></td><td>::</td>
   <td><strong>pop</strong></td><td><p>Neutral Population to initialize</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
-  <td><strong>amu</strong></td><td><p>Neutral Particle Atomic Mass</p></td>
   
 </tr>
 
@@ -22861,8 +22994,8 @@ public subroutine <a href='../proc/store_photons.html'>store_photons</a>(pos, vi
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-store_bes_photons"></span><h3>
-public subroutine <a href='../proc/store_bes_photons.html'>store_bes_photons</a>(pos, vi, photons, neut_type)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-store_nbi_photons"></span><h3>
+public subroutine <a href='../proc/store_nbi_photons.html'>store_nbi_photons</a>(pos, vi, photons, neut_type)
     
     
    
@@ -23769,7 +23902,7 @@ public subroutine <a href='../proc/pitch_to_vec.html'>pitch_to_vec</a>(pitch, gy
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_step"></span><h3>
-public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, r_gyro)
+public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, Ai, r_gyro)
     
     
    
@@ -23836,6 +23969,21 @@ public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, r_g
 <tr>
   
   <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic mass of ion</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
@@ -23859,7 +24007,7 @@ public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, r_g
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_correction"></span><h3>
-public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fields, energy, pitch, rp, vp, theta_in)
+public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fields, energy, pitch, Ai, rp, vp, theta_in)
     
     
    
@@ -23931,6 +24079,21 @@ public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fie
   
   <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Ai</strong></td><td><p>Atomic mass of Ion</p></td>
   
 </tr>
 

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">41 statements</a>
+    title=" 0.4% of total for procedures.">46 statements</a>
      </li> 
      
      
@@ -568,15 +568,14 @@ public subroutine get_neutron_rate(plasma, eb, rate)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">rate</span>
         <span class="c">!+ Neutron reaction rate [1/s]</span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">err_status</span><span class="p">,</span> <span class="n">neb</span><span class="p">,</span> <span class="n">nt</span><span class="p">,</span> <span class="n">ebi</span><span class="p">,</span> <span class="n">tii</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogE</span><span class="p">,</span> <span class="n">dlogT</span><span class="p">,</span> <span class="n">logEmin</span><span class="p">,</span> <span class="n">logTmin</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">logeb</span><span class="p">,</span> <span class="n">logti</span><span class="p">,</span> <span class="n">lograte</span><span class="p">,</span> <span class="n">denp</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">err_status</span><span class="p">,</span> <span class="n">neb</span><span class="p">,</span> <span class="n">nt</span><span class="p">,</span> <span class="n">ebi</span><span class="p">,</span> <span class="n">tii</span><span class="p">,</span> <span class="k">is</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogE</span><span class="p">,</span> <span class="n">dlogT</span><span class="p">,</span> <span class="n">logEmin</span><span class="p">,</span> <span class="n">logTmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">logeb</span><span class="p">,</span> <span class="n">logti</span><span class="p">,</span> <span class="n">lograte</span>
     <span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs2D</span><span class="p">)</span> <span class="kd">::</span> <span class="n">c</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b11</span><span class="p">,</span> <span class="n">b12</span><span class="p">,</span> <span class="n">b21</span><span class="p">,</span> <span class="n">b22</span>
 
     <span class="n">logeb</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span>
     <span class="n">logti</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">ti</span><span class="p">)</span>
-    <span class="n">denp</span> <span class="o">=</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denp</span>
 
     <span class="c">!!D_D</span>
     <span class="n">err_status</span> <span class="o">=</span> <span class="mi">1</span>
@@ -600,8 +599,9 @@ public subroutine get_neutron_rate(plasma, eb, rate)
             <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;eb = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">eb</span>
             <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;ti = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">plasma</span><span class="p">%</span><span class="n">ti</span>
         <span class="n">endif</span>
-        <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="n">endif</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
 
     <span class="n">lograte</span> <span class="o">=</span> <span class="p">(</span><span class="n">b11</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(</span><span class="n">ebi</span><span class="p">,</span><span class="n">tii</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>   <span class="o">+</span> <span class="p">&amp;</span>
                <span class="n">b12</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(</span><span class="n">ebi</span><span class="p">,</span><span class="n">tii</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
@@ -611,7 +611,12 @@ public subroutine get_neutron_rate(plasma, eb, rate)
     <span class="k">if</span> <span class="p">(</span><span class="n">lograte</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">minlog_rate</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="n">denp</span> <span class="o">*</span> <span class="nb">exp</span><span class="p">(</span><span class="n">lograte</span><span class="o">*</span><span class="n">log_10</span><span class="p">)</span>
+<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_thermal</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">).</span><span class="n">eq</span><span class="p">.</span><span class="n">H2_amu</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span> <span class="o">+</span> <span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">(</span><span class="k">is</span><span class="p">)</span> <span class="o">*</span> <span class="nb">exp</span><span class="p">(</span><span class="n">lograte</span><span class="o">*</span><span class="n">log_10</span><span class="p">)</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span>
     <span class="n">endif</span>
 
 <span class="k">end subroutine </span><span class="n">get_neutron_rate</span>

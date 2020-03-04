@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.5% of total for procedures.">71 statements</a>
+    title=" 0.6% of total for procedures.">82 statements</a>
      </li> 
      
      
@@ -1604,6 +1604,18 @@ public subroutine neutron_f()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vnet_square</span><span class="p">,</span> <span class="n">factor</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span>
 
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="nb">any</span><span class="p">(</span><span class="n">thermal_mass</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">H2_amu</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;NEUTRON_F: Thermal Deuterium is not present in plasma&#39;</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">thermal_mass</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">H3_amu</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;NEUTRON_F: D-T neutron production is not implemented&#39;</span>
+    <span class="n">endif</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">beam_mass</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">H2_amu</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;NEUTRON_F: Fast-ion species is not Deuterium&#39;</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        allocate</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
         <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span> <span class="o">=</span> <span class="mf">0.d0</span>
@@ -1642,7 +1654,7 @@ public subroutine neutron_f()
                     <span class="n">energy_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ie</span> <span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span>
                         <span class="n">eb</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="n">ie</span><span class="p">)</span>
                         <span class="n">gyro_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">igamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ngamma</span>
-                            <span class="k">call </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">eb</span><span class="p">,</span><span class="n">pitch</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">vi</span><span class="p">)</span>
+                            <span class="k">call </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">eb</span><span class="p">,</span><span class="n">pitch</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">A</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">vi</span><span class="p">)</span>
 
                             <span class="c">!! Get plasma parameters at particle position</span>
                             <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
@@ -1650,7 +1662,7 @@ public subroutine neutron_f()
 
                             <span class="c">!! Calculate effective beam energy</span>
                             <span class="n">vnet_square</span><span class="o">=</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="o">-</span><span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span><span class="p">,</span><span class="n">vi</span><span class="o">-</span><span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span><span class="p">)</span>  <span class="c">![cm/s]</span>
-                            <span class="n">erel</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="o">*</span><span class="n">vnet_square</span> <span class="c">![kev]</span>
+                            <span class="n">erel</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">fbm</span><span class="p">%</span><span class="n">A</span><span class="o">*</span><span class="n">vnet_square</span> <span class="c">![kev]</span>
 
                             <span class="c">!! Get neutron production rate</span>
                             <span class="k">call </span><span class="n">get_neutron_rate</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">erel</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>

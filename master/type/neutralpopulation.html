@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 1.0% of total for derived types.</p>Including implementation: 5 statements,  1.0% of total for derived types.">5 statements</a>
+    title="<p> 0.8% of total for derived types.</p>Including implementation: 4 statements,  0.8% of total for derived types.">4 statements</a>
      </li> 
      
      
@@ -176,8 +176,6 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
   <div id="vars-0" class="panel-collapse collapse">
     <div class="list-group">
-      
-      <a class="list-group-item" href="../type/neutralpopulation.html#variable-amu">amu</a>
       
       <a class="list-group-item" href="../type/neutralpopulation.html#variable-dens%7E2">dens</a>
       
@@ -399,8 +397,6 @@
   <div id="vars-1" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/neutralpopulation.html#variable-amu">amu</a>
-      
       <a class="list-group-item" href="../type/neutralpopulation.html#variable-dens%7E2">dens</a>
       
       <a class="list-group-item" href="../type/neutralpopulation.html#variable-res">res</a>
@@ -459,20 +455,6 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-amu"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>amu</strong></td><td> =</td><td>H2_amu</td><td><p>Atomic Mass Unit of Neutrals</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-dens%7E2"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -512,8 +494,6 @@
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">NeutralPopulation</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">amu</span> <span class="o">=</span> <span class="n">H2_amu</span>
-        <span class="c">!+ Atomic Mass Unit of Neutrals</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dens</span>
         <span class="c">!+ Neutral density: dens(lev,x,y,z)</span>
     <span class="k">type</span><span class="p">(</span><span class="n">NeutralParticleReservoir</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">res</span>

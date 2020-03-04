@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">31 statements</a>
+    title=" 0.3% of total for procedures.">34 statements</a>
      </li> 
      
      
@@ -907,17 +907,17 @@ public subroutine dcx_spec()
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">dcx_spec</span>
     <span class="c">!+ Calculates DCX emission from user supplied neutrals file</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ic</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">it</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vhalo</span><span class="p">,</span> <span class="n">random3</span><span class="p">,</span> <span class="n">rc</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ic</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="k">is</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vhalo</span><span class="p">,</span> <span class="n">random3</span><span class="p">,</span> <span class="n">rc</span>
     <span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
     <span class="c">!! Determination of the CX probability</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dcx_photons</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dcx_photons</span><span class="p">,</span> <span class="n">wght</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
 
-    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &amp;</span>
-    <span class="c">!$OMP&amp; dcx_photons, rc, ri, inp, vhalo, random3, plasma)</span>
+    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,ind, &amp;</span>
+    <span class="c">!$OMP&amp; dcx_photons, wght, rc, ri, inp, vhalo, random3, plasma)</span>
     <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span><span class="p">,</span> <span class="n">istep</span>
         <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">ic</span><span class="p">),</span><span class="n">ind</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -937,10 +937,13 @@ public subroutine dcx_spec()
         <span class="n">enddo</span>
 
         <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
-        <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
-            <span class="c">!! DCX Spectra</span>
-            <span class="k">call </span><span class="n">mc_halo</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">vhalo</span><span class="p">)</span>
-            <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vhalo</span><span class="p">,</span> <span class="n">dcx_photons</span><span class="o">/</span><span class="n">n</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">dcx</span><span class="p">)</span>
+        <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_thermal</span>
+            <span class="n">wght</span> <span class="o">=</span> <span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">(</span><span class="k">is</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">)</span>
+            <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+                <span class="c">!! DCX Spectra</span>
+                <span class="k">call </span><span class="n">mc_halo</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">),</span> <span class="n">vhalo</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vhalo</span><span class="p">,</span> <span class="n">wght</span><span class="o">*</span><span class="n">dcx_photons</span><span class="o">/</span><span class="n">n</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">dcx</span><span class="p">(:,:,:,</span><span class="k">is</span><span class="p">))</span>
+            <span class="n">enddo</span>
         <span class="n">enddo</span>
     <span class="n">enddo</span> <span class="n">loop_over_cells</span>
     <span class="c">!$OMP END PARALLEL DO</span>

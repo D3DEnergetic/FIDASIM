@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.4% of total for procedures.">51 statements</a>
+    title=" 0.3% of total for procedures.">42 statements</a>
      </li> 
      
      
@@ -705,13 +705,8 @@ public subroutine read_tables()
 
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">impname</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">imp_amu</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b_amu</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy2</span>
-
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Atomic tables settings ----&quot;</span>
-    <span class="n">endif</span>
 
     <span class="c">!!Initialize HDF5 interface</span>
     <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
@@ -733,16 +728,13 @@ public subroutine read_tables()
 
     <span class="c">!!Read Hydrogen-Impurity Transitions</span>
     <span class="n">impname</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">select case</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span><span class="p">)</span>
+    <span class="k">select case</span> <span class="p">(</span><span class="n">impurity_charge</span><span class="p">)</span>
         <span class="k">case</span> <span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="n">impname</span> <span class="o">=</span> <span class="s2">&quot;B5&quot;</span>
-            <span class="n">imp_amu</span> <span class="o">=</span> <span class="n">B5_amu</span>
         <span class="k">case</span> <span class="p">(</span><span class="mi">6</span><span class="p">)</span>
             <span class="n">impname</span> <span class="o">=</span> <span class="s2">&quot;C6&quot;</span>
-            <span class="n">imp_amu</span> <span class="o">=</span> <span class="n">C6_amu</span>
         <span class="k">case </span><span class="n">DEFAULT</span>
             <span class="n">impname</span> <span class="o">=</span> <span class="s2">&quot;Aq&quot;</span>
-            <span class="n">imp_amu</span> <span class="o">=</span> <span class="mf">2.d0</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span>
     <span class="k">end select</span>
 
 <span class="k">    call </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_&quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">impname</span><span class="p">)),</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_Aq</span><span class="p">)</span>
@@ -768,10 +760,8 @@ public subroutine read_tables()
     <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Maximum n/m: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">nlevs</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Beam/Fast-ion mass: &quot;,f6.3,&quot; [amu]&quot;)&#39;</span><span class="p">)</span> <span class="n">beam_mass</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Thermal/Bulk-ion masses: &quot;,f6.3,&quot; [amu]&quot;)&#39;</span><span class="p">)</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Impurity mass: &quot;,f6.3,&quot; [amu]&quot;)&#39;</span><span class="p">)</span> <span class="n">imp_amu</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Atomic tables settings ----&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Maximum n/m: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">nlevs</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
     <span class="n">endif</span>
 

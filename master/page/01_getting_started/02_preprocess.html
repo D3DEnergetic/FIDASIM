@@ -150,7 +150,6 @@
 <li><a href="#translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</a></li>
 <li><a href="#extracting-the-fast-ion-distribution-function-from-transpnubeam">Extracting the Fast-ion Distribution Function from TRANSP/NUBEAM</a></li>
 <li><a href="#reading-nubeamspiral-fast-ion-distributions">Reading NUBEAM/SPIRAL Fast-ion Distributions</a></li>
-<li><a href="#visualization-inputs">Visualization: Inputs</a></li>
 </ul>
 </div>
 <h1 id="create-fidasim-input-files-using-prefida">Create FIDASIM input files using PREFIDA</h1>
@@ -303,31 +302,6 @@ IDL<span class="o">&gt;</span> s <span class="o">=</span> read_spiral(spiral_fil
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_nubeam</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">read_nubeam</span><span class="p">(</span><span class="n">nubeam_distribution_file</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
-
-
-<h1 id="visualization-inputs">Visualization: Inputs</h1>
-<p>Visualizing your inputs can be done by executing <code>plot_inputs</code> found in <code>lib/scripts/</code></p>
-<p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
-Below are brief descriptions and examples of what the script can currently handle:</p>
-<p>To plot all of your inputs, simply indicate the directory and run ID.</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a
-</pre></div>
-
-
-<p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -g
-</pre></div>
-
-
-<p>In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.</p>
-<p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
-<p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
-For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
-<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz <span class="m">170</span>
-</pre></div>
-
-
-<p>There are many more possible lineouts that can be viewed, so run <code>plot_inputs -h</code> to look at the help documentation.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">
@@ -365,12 +339,7 @@ For example, if you are interested in seeing what the plasma lineout looks like 
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
             
             </li>
             
@@ -439,6 +408,11 @@ For example, if you are interested in seeing what the plasma lineout looks like 
             
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
             
             </li>
             

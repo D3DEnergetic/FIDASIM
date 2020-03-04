@@ -99,6 +99,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     if not keyword_set(species) then species = 1
 
     sstr = string((read_ncdf(filename,vars=["SPECIES_"+strcompress(species,/r)])).(1))
+    print, 'Species: ' + sstr
     vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_"+sstr,"A_"+sstr, $
                                     "F_"+sstr,"RSURF","ZSURF","BMVOL"])
     ngrid=n_elements(vars.r2d)

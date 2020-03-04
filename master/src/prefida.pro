@@ -67,7 +67,7 @@ PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
 
     ;;WRITE EQUILIBRIUM FILE
     write_equilibrium, inputs.equilibrium_file, plasma, fields
-  
+
     ;;WRITE DISTRIBUTION FILE
     write_distribution, inputs.distribution_file, fbm
 

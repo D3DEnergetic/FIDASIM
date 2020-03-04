@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for procedures.">92 statements</a>
+    title=" 0.7% of total for procedures.">93 statements</a>
      </li> 
      
      
@@ -1152,9 +1152,9 @@ public subroutine ndmc()
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">err</span>
 
     <span class="c">!! Initialize Neutral Population</span>
-    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">full</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">half</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">third</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">full</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">half</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">init_neutral_population</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">third</span><span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10)&#39;</span><span class="p">)</span> <span class="n">inputs</span><span class="p">%</span><span class="n">n_nbi</span>
@@ -1192,7 +1192,8 @@ public subroutine ndmc()
                 <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
 
                 <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="nb">time</span><span class="p">,</span><span class="n">states</span><span class="p">,</span><span class="n">dens</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
-                <span class="k">call </span><span class="n">store_neutrals</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">dens</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">)</span>
+                <span class="n">dens</span> <span class="o">=</span> <span class="n">dens</span><span class="o">/</span><span class="n">nlaunch</span>
+                <span class="k">call </span><span class="n">store_neutrals</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">dens</span><span class="p">)</span>
                 <span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">flux</span> <span class="o">=</span> <span class="p">(</span><span class="n">iflux</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">states</span><span class="p">))</span><span class="o">/</span><span class="n">nlaunch</span>
                 <span class="n">flux_tot</span> <span class="o">=</span> <span class="n">flux_tot</span> <span class="o">+</span> <span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">flux</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dv</span>
 
@@ -1201,7 +1202,7 @@ public subroutine ndmc()
                 <span class="n">endif</span>
 
                 <span class="k">if</span><span class="p">((</span><span class="n">photons</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">                    call </span><span class="n">store_bes_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">,</span><span class="n">neut_type</span><span class="p">)</span>
+<span class="k">                    call </span><span class="n">store_nbi_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">,</span><span class="n">neut_type</span><span class="p">)</span>
                 <span class="n">endif</span>
             <span class="n">enddo</span> <span class="n">loop_along_track</span>
             <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_birth</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">flux_tot</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">))</span> <span class="k">then</span>
@@ -1220,7 +1221,7 @@ public subroutine ndmc()
 
                     <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
                     <span class="n">birth</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="n">birth</span><span class="p">%</span><span class="n">cnt</span><span class="p">)%</span><span class="n">pitch</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">,</span><span class="n">vnbi</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vnbi</span><span class="p">))</span>
-                    <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vnbi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">r_gyro</span><span class="p">)</span>
+                    <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vnbi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">,</span><span class="n">r_gyro</span><span class="p">)</span>
                     <span class="n">birth</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="n">birth</span><span class="p">%</span><span class="n">cnt</span><span class="p">)%</span><span class="n">ri_gc</span> <span class="o">=</span> <span class="n">ri</span> <span class="o">+</span> <span class="n">r_gyro</span>
                     <span class="n">birth</span><span class="p">%</span><span class="n">cnt</span> <span class="o">=</span> <span class="n">birth</span><span class="p">%</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">enddo</span>

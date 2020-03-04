@@ -25,8 +25,8 @@ PRO check_inputs, inputs
               alpha:zero_double, beta:zero_double, gamma:zero_double, $
               origin:three_double, xmin:zero_double, xmax:zero_double, $
               ymin:zero_double, ymax:zero_double, zmin:zero_double, zmax:zero_double, $
-              ab:zero_double, ai:zero_double, current_fractions:three_double, $
-              pinj:zero_double, einj:zero_double, impurity_charge:zero_int, $
+              ab:zero_double, current_fractions:three_double, $
+              pinj:zero_double, einj:zero_double, $
               n_fida:zero_long, n_pfida:zero_long, n_nbi:zero_long, n_dcx:zero_long, $
               n_npa:zero_long, n_pnpa:zero_long,n_halo:zero_long, n_birth:zero_long, $
               ne_wght:zero_int, np_wght:zero_int, nphi_wght:zero_int, $
@@ -36,7 +36,7 @@ PRO check_inputs, inputs
               calc_dcx:zero_int, calc_halo:zero_int, calc_cold:zero_int, $
 	      calc_pnpa:zero_int, calc_pfida:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
-              calc_fida_wght:zero_int, calc_npa_wght:zero_int, stark_components:zero_int }
+              calc_fida_wght:zero_int, calc_npa_wght:zero_int}
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
     if err_status eq 1 then begin
@@ -91,11 +91,6 @@ PRO check_inputs, inputs
         err_status = 1
     endif
 
-    if inputs.impurity_charge le 1 then begin
-        error,'Invalid impurity charge. Expected impurity charge > 1'
-        err_status = 1
-    endif
-
     ps = path_sep()
     input_file = inputs.result_dir+ps+inputs.runid+'_inputs.dat'
     equilibrium_file = inputs.result_dir+ps+inputs.runid+'_equilibrium.h5'
@@ -111,6 +106,7 @@ PRO check_inputs, inputs
                                   'flr',2, $
                                   'verbose', 1, $
                                   'seed', -1, $
+                                  'stark_components', 0, $
                                   'neutrals_file',neutrals_file)
 
     GET_OUT:

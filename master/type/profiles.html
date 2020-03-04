@@ -179,7 +179,7 @@
       
       <a class="list-group-item" href="../type/profiles.html#variable-dene">dene</a>
       
-      <a class="list-group-item" href="../type/profiles.html#variable-denp">denp</a>
+      <a class="list-group-item" href="../type/profiles.html#variable-deni">deni</a>
       
       <a class="list-group-item" href="../type/profiles.html#variable-denimp">denimp</a>
       
@@ -343,7 +343,7 @@
       
       <a class="list-group-item" href="../type/profiles.html#variable-dene">dene</a>
       
-      <a class="list-group-item" href="../type/profiles.html#variable-denp">denp</a>
+      <a class="list-group-item" href="../type/profiles.html#variable-deni">deni</a>
       
       <a class="list-group-item" href="../type/profiles.html#variable-denimp">denimp</a>
       
@@ -431,11 +431,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-denp"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-deni"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denp</strong></td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>deni</strong>(max_species)</td><td> =</td><td>0.d0</td><td><p>Ion density [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -561,7 +561,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>denn</strong>(nlevs)</td><td> =</td><td>0.d0</td><td><p>Cold neutral density [<script type="math/tex">cm^{-3}</script>]</p></td>
+  <td><strong>denn</strong>(nlevs,max_species)</td><td> =</td><td>0.d0</td><td><p>Cold neutral densities [<script type="math/tex">cm^{-3}</script>]</p></td>
   
 </tr>
 
@@ -585,7 +585,7 @@
     <span class="c">!+ Torodial symmetric plasma parameters at a given R-Z</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dene</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Electron density [\(cm^{-3}\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">deni</span><span class="p">(</span><span class="n">max_species</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Ion density [\(cm^{-3}\)]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denimp</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Impurity density [\(cm^{-3}\)]</span>
@@ -603,8 +603,8 @@
         <span class="c">!+ Plasma rotation in torodial/phi direction</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Plasma rotation in z direction</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denn</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
-        <span class="c">!+ Cold neutral density [\(cm^{-3}\)]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denn</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">max_species</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Cold neutral densities [\(cm^{-3}\)]</span>
 <span class="k">end type </span><span class="n">Profiles</span>
 </pre></div>
 

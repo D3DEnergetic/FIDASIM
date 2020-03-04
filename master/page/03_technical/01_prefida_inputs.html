@@ -148,7 +148,6 @@
 <li><a href="#simulation-switches">Simulation Switches</a></li>
 <li><a href="#monte-carlo-settings">Monte Carlo Settings</a></li>
 <li><a href="#neutral-beam-settings">Neutral Beam Settings</a></li>
-<li><a href="#plasma-settings">Plasma Settings</a></li>
 <li><a href="#beam-grid-settings">Beam Grid Settings</a></li>
 <li><a href="#wavelength-grid-settings">Wavelength Grid Settings</a></li>
 <li><a href="#weight-function-settings">Weight Function Settings</a></li>
@@ -367,14 +366,6 @@ A value of two will turn on additional functionality.</p>
 <td align="center">NA</td>
 <td align="left">Calculate NPA weight functions</td>
 </tr>
-<tr>
-<td align="center"><code>stark_components</code></td>
-<td align="center">Int16</td>
-<td align="center">0</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="left">Output spectral stark components</td>
-</tr>
 </tbody>
 </table>
 <h2 id="monte-carlo-settings">Monte Carlo Settings</h2>
@@ -521,40 +512,6 @@ Click <a href="../02_physics/04_neutrals.html#neutral-beam-density">here</a> for
 </tr>
 </tbody>
 </table>
-<h2 id="plasma-settings">Plasma Settings</h2>
-<p>These variables define the properties of the thermal plasma species.
-Like the <code>ab</code> variable, <code>ai</code> can only be the mass of either protium or deuterium
-Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
-<table>
-<thead>
-<tr>
-<th align="center">Variable</th>
-<th align="center">Type</th>
-<th align="center">Rank</th>
-<th align="center">Dimensions</th>
-<th align="center">Units</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center"><code>ai</code></td>
-<td align="center">Float64</td>
-<td align="center">0</td>
-<td align="center">NA</td>
-<td align="center">amu</td>
-<td align="left">Thermal Ion species mass</td>
-</tr>
-<tr>
-<td align="center"><code>impurity_charge</code></td>
-<td align="center">Int16</td>
-<td align="center">0</td>
-<td align="center">NA</td>
-<td align="center">NA</td>
-<td align="left">Impurity Charge</td>
-</tr>
-</tbody>
-</table>
 <h2 id="beam-grid-settings">Beam Grid Settings</h2>
 <p>These variables define a rotated coordinate system.
 Click <a href="../02_physics/04_neutrals.html#beam-grid">here</a> for more details.</p>
@@ -656,7 +613,7 @@ Click <a href="../02_physics/04_neutrals.html#beam-grid">here</a> for more detai
 <td align="center">0</td>
 <td align="center">NA</td>
 <td align="center">rad</td>
-<td align="left">Tait-Bryan rotation angle about y'-axis</td>
+<td align="left">Tait-Bryan rotation angle about yp-axis</td>
 </tr>
 <tr>
 <td align="center"><code>gamma</code></td>
@@ -664,7 +621,7 @@ Click <a href="../02_physics/04_neutrals.html#beam-grid">here</a> for more detai
 <td align="center">0</td>
 <td align="center">NA</td>
 <td align="center">rad</td>
-<td align="left">Tait-Bryan rotation angle about x"-axis</td>
+<td align="left">Tait-Bryan rotation angle about xpp-axis</td>
 </tr>
 <tr>
 <td align="center"><code>origin</code></td>
@@ -1830,12 +1787,7 @@ Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
             
             </li>
             
@@ -1904,6 +1856,11 @@ Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p
             
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
             
             </li>
             

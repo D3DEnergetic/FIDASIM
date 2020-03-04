@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.8% of total for procedures.">109 statements</a>
+    title=" 0.9% of total for procedures.">117 statements</a>
      </li> 
      
      
@@ -1242,11 +1242,11 @@ public subroutine pnpa_mc()
     <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fast_ion</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">dtheta</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span><span class="p">,</span> <span class="n">rf</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">vi</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">det</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">ichan</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">nrange</span><span class="p">,</span><span class="n">it</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">det</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">ichan</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">nrange</span><span class="p">,</span><span class="n">it</span><span class="p">,</span><span class="k">is</span>
+<span class="k">    type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
     <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gs</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span><span class="p">,</span> <span class="n">rates_is</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">states</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">flux</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
@@ -1265,7 +1265,7 @@ public subroutine pnpa_mc()
     <span class="n">endif</span>
 
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &amp;</span>
-    <span class="c">!$OMP&amp; randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)</span>
+    <span class="c">!$OMP&amp; randomu,rg,fields,uvw,uvw_vi,rates,rates_is,is,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)</span>
     <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span><span class="n">istep</span>
         <span class="n">fast_ion</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">iion</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>
@@ -1290,7 +1290,7 @@ public subroutine pnpa_mc()
                 <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">uvw</span><span class="p">,</span> <span class="n">input_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
                 <span class="c">!! Correct for gyro motion and get position and velocity</span>
-                <span class="k">call </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">A</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
 
                 <span class="n">detector_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ichan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
                     <span class="k">call </span><span class="n">npa_gyro_range</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">gyrange</span><span class="p">,</span> <span class="n">nrange</span><span class="p">)</span>
@@ -1312,7 +1312,11 @@ public subroutine pnpa_mc()
 
                         <span class="c">!! Calculate CX probability with beam and halo neutrals</span>
                         <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
-                        <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+                        <span class="n">rates</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                        <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_thermal</span>
+                            <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">(:,</span><span class="k">is</span><span class="p">),</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates_is</span><span class="p">)</span>
+                            <span class="n">rates</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">+</span> <span class="n">rates_is</span>
+                        <span class="n">enddo</span>
                         <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gyro_range_loop</span>
 
                         <span class="c">!! Weight CX rates by ion source density</span>
@@ -1356,9 +1360,13 @@ public subroutine pnpa_mc()
                 <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span> <span class="p">,</span><span class="n">det</span><span class="p">,</span> <span class="n">rf</span><span class="p">)</span>
                 <span class="k">if</span><span class="p">(</span><span class="n">det</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gamma_loop</span>
 
-                <span class="c">!! Calculate CX probability with beam and halo neutrals</span>
+                <span class="c">!! Calculate CX probability with edge neutrals</span>
                 <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
-                <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+                <span class="n">rates</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_thermal</span>
+                    <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">(:,</span><span class="k">is</span><span class="p">),</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates_is</span><span class="p">)</span>
+                    <span class="n">rates</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">+</span> <span class="n">rates_is</span>
+                <span class="n">enddo</span>
                 <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gamma_loop</span>
 
                 <span class="c">!! Weight CX rates by ion source density</span>

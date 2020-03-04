@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.4% of total for procedures.">186 statements</a>
+    title=" 1.4% of total for procedures.">188 statements</a>
      </li> 
      
      
@@ -1889,8 +1889,8 @@ public subroutine fida_weights_los()
     <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tracks</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nwav</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ienergy</span><span class="p">,</span> <span class="n">cid</span><span class="p">,</span> <span class="n">cind</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ipitch</span><span class="p">,</span> <span class="n">igyro</span><span class="p">,</span> <span class="n">icell</span><span class="p">,</span> <span class="n">ichan</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">ebarr</span><span class="p">,</span><span class="n">ptcharr</span><span class="p">,</span><span class="n">phiarr</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ipitch</span><span class="p">,</span> <span class="n">igyro</span><span class="p">,</span> <span class="n">icell</span><span class="p">,</span> <span class="n">ichan</span><span class="p">,</span> <span class="k">is</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">ebarr</span><span class="p">,</span><span class="n">ptcharr</span><span class="p">,</span><span class="n">phiarr</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">mean_f</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span><span class="p">,</span> <span class="n">vi_norm</span><span class="p">,</span> <span class="n">vp</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vnbi_f</span><span class="p">,</span> <span class="n">vnbi_h</span><span class="p">,</span> <span class="n">vnbi_t</span><span class="p">,</span> <span class="n">vhalo</span>
@@ -2039,7 +2039,7 @@ public subroutine fida_weights_los()
 
         <span class="c">!$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &amp;</span>
         <span class="c">!$OMP&amp; r_enter,r_exit,length,max_dens,ind,tracks,ntrack,dt,icell,states,rates, &amp;</span>
-        <span class="c">!$OMP&amp; vhalo,denn,denf,photons,ienergy,ipitch,igyro)</span>
+        <span class="c">!$OMP&amp; vhalo,denn,denf,photons,ienergy,ipitch,igyro,is)</span>
         <span class="k">do </span><span class="n">ienergy</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">inputs</span><span class="p">%</span><span class="n">ne_wght</span><span class="p">,</span><span class="n">istep</span>
             <span class="k">do </span><span class="n">ipitch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">inputs</span><span class="p">%</span><span class="n">np_wght</span>
                 <span class="k">do </span><span class="n">igyro</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">inputs</span><span class="p">%</span><span class="n">nphi_wght</span>
@@ -2076,8 +2076,10 @@ public subroutine fida_weights_los()
                     <span class="n">states</span> <span class="o">=</span> <span class="n">states</span> <span class="o">+</span> <span class="n">rates</span>
                     <span class="k">call </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">tdens</span><span class="p">,</span><span class="n">vnbi_t</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
                     <span class="n">states</span> <span class="o">=</span> <span class="n">states</span> <span class="o">+</span> <span class="n">rates</span>
-                    <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">dcxdens</span> <span class="o">+</span> <span class="n">halodens</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
-                    <span class="n">states</span> <span class="o">=</span> <span class="n">states</span> <span class="o">+</span> <span class="n">rates</span>
+                    <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_thermal</span>
+                        <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">dcxdens</span> <span class="o">+</span> <span class="n">halodens</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+                        <span class="n">states</span> <span class="o">=</span> <span class="n">states</span> <span class="o">+</span> <span class="n">rates</span><span class="o">*</span><span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">(</span><span class="k">is</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">)</span>
+                    <span class="n">enddo</span>
 
                     <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">beam_mass</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">states</span><span class="p">,</span><span class="n">denn</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
                     <span class="n">denf</span> <span class="o">=</span> <span class="n">mean_f</span><span class="p">(</span><span class="n">ienergy</span><span class="p">,</span><span class="n">ipitch</span><span class="p">)</span><span class="o">*</span><span class="n">dEdP</span>

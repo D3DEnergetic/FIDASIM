@@ -1954,7 +1954,7 @@ public subroutine npa_weights()
                             <span class="n">vabs</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
                             <span class="n">vi</span> <span class="o">=</span> <span class="n">vi_norm</span><span class="o">*</span><span class="n">vabs</span>
                             <span class="c">!!Correct for gyro orbit</span>
-                            <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">r_gyro</span><span class="p">)</span>
+                            <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">A</span><span class="p">,</span><span class="n">r_gyro</span><span class="p">)</span>
 
                             <span class="n">fbm_denf</span><span class="o">=</span><span class="mi">0</span>
                             <span class="k">if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>

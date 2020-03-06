@@ -85,7 +85,7 @@ def check_dict_schema(schema, dic, desc=None):
 
     return err
 
-def check_inputs(inputs):
+def check_inputs(inputs, use_abs_path=True):
     """
     #+#check_inputs
     #+Checks if input dictionary is valid
@@ -180,7 +180,8 @@ def check_inputs(inputs):
         error('Invalid simulation settings. Exiting...', halt=True)
 
     # Normalize File Paths
-    inputs['result_dir'] = os.path.abspath(inputs['result_dir'])
+    if use_abs_path:
+        inputs['result_dir'] = os.path.abspath(inputs['result_dir'])
 
     if (inputs['alpha'] > 2. * np.pi) or (inputs['beta'] > 2. * np.pi) or (inputs['gamma'] > 2. * np.pi):
         error('Angles must be in radians')
@@ -218,22 +219,22 @@ def check_inputs(inputs):
         err = True
 
     ps = os.path.sep
-    input_file = inputs['result_dir'] + ps + inputs['runid'] + '_inputs.dat'
-    equilibrium_file = inputs['result_dir'] + ps + inputs['runid'] + '_equilibrium.h5'
-    geometry_file = inputs['result_dir'] + ps + inputs['runid'] + '_geometry.h5'
-    distribution_file = inputs['result_dir'] + ps + inputs['runid'] + '_distribution.h5'
-    neutrals_file = inputs['result_dir'] + ps + inputs['runid'] + '_neutrals.h5'
+    input_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_inputs.dat'
+    equilibrium_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_equilibrium.h5'
+    geometry_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_geometry.h5'
+    distribution_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_distribution.h5'
+    neutrals_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_neutrals.h5'
 
     inputs['input_file'] = input_file
     inputs['equilibrium_file'] = equilibrium_file
     inputs['geometry_file'] = geometry_file
     inputs['distribution_file'] = distribution_file
-    inputs['load_neutrals'] = 0
-    inputs['stark_components'] = 0
-    inputs['flr'] = 2
-    inputs['seed'] = -1
-    inputs['verbose'] = 1
-    inputs['neutrals_file'] = neutrals_file
+    inputs.setdefault('load_neutrals', 0)
+    inputs.setdefault('stark_components', 0)
+    inputs.setdefault('flr', 2)
+    inputs.setdefault('seed', -1)
+    inputs.setdefault('verbose',1)
+    inputs.setdefault('neutrals_file',neutrals_file)
 
     if err:
         error('Invalid simulation settings. Exiting...', halt=True)
@@ -1588,7 +1589,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
+def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -1617,7 +1618,7 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     #+```
     """
     # CHECK INPUTS
-    inputs = check_inputs(inputs)
+    inputs = check_inputs(inputs, use_abs_path=use_abs_path)
 
     # MAKE DIRECTORIES IF THEY DONT EXIST
     if not os.path.isdir(inputs['result_dir']):

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for procedures.">92 statements</a>
+    title=" 0.7% of total for procedures.">93 statements</a>
      </li> 
      
      
@@ -1191,12 +1191,12 @@ public subroutine dcx()
     <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">ncell</span><span class="p">,</span> <span class="n">istep</span>
         <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">cell_ind</span><span class="p">(</span><span class="n">ic</span><span class="p">),</span><span class="n">ind</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-        <span class="c">!! Loop over the markers</span>
-        <span class="n">loop_over_dcx</span><span class="p">:</span> <span class="k">do </span><span class="n">idcx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
-            <span class="c">!! Calculate ri,vhalo and track</span>
-            <span class="k">call </span><span class="n">mc_beam_grid</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">ri</span><span class="p">)</span>
-            <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
-            <span class="n">loop_over_species</span><span class="p">:</span> <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_thermal</span>
+        <span class="n">loop_over_species</span><span class="p">:</span> <span class="k">do is</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_thermal</span> <span class="c">!This loop has to come first</span>
+            <span class="c">!! Loop over the markers</span>
+            <span class="n">loop_over_dcx</span><span class="p">:</span> <span class="k">do </span><span class="n">idcx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+                <span class="c">!! Calculate ri,vhalo and track</span>
+                <span class="k">call </span><span class="n">mc_beam_grid</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">ri</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
                 <span class="k">call </span><span class="n">mc_halo</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">thermal_mass</span><span class="p">(</span><span class="k">is</span><span class="p">),</span> <span class="n">vihalo</span><span class="p">)</span>
                 <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">tracks</span><span class="p">,</span><span class="n">ntrack</span><span class="p">)</span>
                 <span class="k">if</span><span class="p">(</span><span class="n">ntrack</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_dcx</span>
@@ -1216,6 +1216,7 @@ public subroutine dcx()
 <span class="k">                    </span><span class="n">states</span> <span class="o">=</span> <span class="n">rates</span><span class="o">*</span><span class="n">plasma</span><span class="p">%</span><span class="n">deni</span><span class="p">(</span><span class="k">is</span><span class="p">)</span>
                     <span class="n">fi_correction</span> <span class="o">=</span> <span class="mf">1.d0</span>
                 <span class="n">endif</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">states</span><span class="p">).</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_dcx</span>
 
                 <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntrack</span>
                     <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
@@ -1228,8 +1229,8 @@ public subroutine dcx()
                         <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span><span class="n">spec</span><span class="p">%</span><span class="n">dcx</span><span class="p">(:,:,:,</span><span class="k">is</span><span class="p">))</span>
                     <span class="n">endif</span>
                 <span class="n">enddo</span> <span class="n">loop_along_track</span>
-            <span class="n">enddo</span> <span class="n">loop_over_species</span>
-        <span class="n">enddo</span> <span class="n">loop_over_dcx</span>
+            <span class="n">enddo</span> <span class="n">loop_over_dcx</span>
+        <span class="n">enddo</span> <span class="n">loop_over_species</span>
     <span class="n">enddo</span> <span class="n">loop_over_cells</span>
     <span class="c">!$OMP END PARALLEL DO</span>
 

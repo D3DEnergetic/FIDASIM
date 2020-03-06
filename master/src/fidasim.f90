@@ -3058,7 +3058,7 @@ subroutine read_plasma
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Plasma Composition ----'
-        write(*,'(T2,"Thermal-ion masses: ",f6.3," [amu]")') thermal_mass(1:n_thermal)
+        write(*,'(T2,"Thermal-ion mass: ",f6.3," [amu]")') thermal_mass(1:n_thermal)
         write(*,'(T2,"Impurity mass: ",f6.3," [amu]")') impurity_mass
         write(*,'(T2,"Beam-ion mass: ",f6.3," [amu]")') beam_mass
         write(*,'(T2,"Fast-ion mass: ",f6.3," [amu]")') beam_mass
@@ -8398,7 +8398,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
         if(err_status.eq.1) then
             if(inputs%verbose.ge.0) then
                 write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
-                write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb
+                write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb/ab
                 write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/thermal_mass(i)
             endif
         else
@@ -9750,12 +9750,12 @@ subroutine dcx
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        !! Loop over the markers
-        loop_over_dcx: do idcx=1, nlaunch(i,j,k)
-            !! Calculate ri,vhalo and track
-            call mc_beam_grid(ind, ri)
-            call get_plasma(plasma, pos=ri)
-            loop_over_species: do is=1, n_thermal
+        loop_over_species: do is=1, n_thermal !This loop has to come first
+            !! Loop over the markers
+            loop_over_dcx: do idcx=1, nlaunch(i,j,k)
+                !! Calculate ri,vhalo and track
+                call mc_beam_grid(ind, ri)
+                call get_plasma(plasma, pos=ri)
                 call mc_halo(plasma, thermal_mass(is), vihalo)
                 call track(ri,vihalo,tracks,ntrack)
                 if(ntrack.eq.0) cycle loop_over_dcx
@@ -9775,6 +9775,7 @@ subroutine dcx
                     states = rates*plasma%deni(is)
                     fi_correction = 1.d0
                 endif
+                if(sum(states).eq.0) cycle loop_over_dcx
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -9787,8 +9788,8 @@ subroutine dcx
                         call store_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),spec%dcx(:,:,:,is))
                     endif
                 enddo loop_along_track
-            enddo loop_over_species
-        enddo loop_over_dcx
+            enddo loop_over_dcx
+        enddo loop_over_species
     enddo loop_over_cells
     !$OMP END PARALLEL DO
 
@@ -9890,12 +9891,12 @@ subroutine halo
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
-            !! Loop over the markers
-            loop_over_halos: do ihalo=1, nlaunch(i,j,k)
-                !! Calculate ri,vhalo and track
-                call mc_beam_grid(ind, ri)
-                call get_plasma(plasma, pos=ri)
-                loop_over_species: do is=1,n_thermal
+            loop_over_species: do is=1,n_thermal !This loop has to come first
+                !! Loop over the markers
+                loop_over_halos: do ihalo=1, nlaunch(i,j,k)
+                    !! Calculate ri,vhalo and track
+                    call mc_beam_grid(ind, ri)
+                    call get_plasma(plasma, pos=ri)
                     call mc_halo(plasma, thermal_mass(is), vihalo)
                     call track(ri,vihalo,tracks,ntrack)
                     if(ntrack.eq.0)cycle loop_over_halos
@@ -9920,6 +9921,7 @@ subroutine halo
                         states = rates*plasma%deni(is)
                         fi_correction = 1.d0
                     endif
+                    if(sum(states).eq.0) cycle loop_over_halos
 
                     loop_along_track: do it=1,ntrack
                         call get_plasma(plasma,pos=tracks(it)%pos)
@@ -9934,8 +9936,8 @@ subroutine halo
                             call store_photons(tracks(it)%pos,vihalo,photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
                         endif
                     enddo loop_along_track
-                enddo loop_over_species
-            enddo loop_over_halos
+                enddo loop_over_halos
+            enddo loop_over_species
         enddo loop_over_cells
         !$OMP END PARALLEL DO
 

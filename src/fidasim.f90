@@ -1011,6 +1011,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_proton
+        !+ Calculate 3 MeV proton flux: 0 = off, 1=on, 2=on++
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1154,6 +1156,8 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
+type(NeutronRate), save         :: proton
+    !+ Variable for storing the 3 MeV proton rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
@@ -1869,7 +1873,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed
+    integer            :: pathlen, calc_neutron, seed, calc_proton
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
@@ -1890,7 +1894,7 @@ subroutine read_inputs
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
-        calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_neutron, calc_proton, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -1935,6 +1939,7 @@ subroutine read_inputs
     output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
+    calc_proton=0
     n_fida=0
     n_pfida=0
     n_npa=0
@@ -2042,6 +2047,7 @@ subroutine read_inputs
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
+    inputs%calc_proton=calc_proton
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -4042,6 +4048,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
+        inputs%calc_proton=0
         return
     endif
 
@@ -4069,6 +4076,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
+        inputs%calc_proton=0
         return
     endif
 
@@ -4154,7 +4162,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_proton.ge.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
     endif
 
@@ -5338,6 +5346,57 @@ subroutine write_neutrons
     endif
 
 end subroutine write_neutrons
+
+subroutine write_protons
+    !+ Writes [[libfida:proton]] to a HDF5 file
+    integer(HID_T) :: fid
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(3) :: dim3
+    integer(HSIZE_T), dimension(5) :: dim5
+    integer :: error
+
+    character(charlim) :: filename
+
+    !! write to file
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_protons.h5"
+
+    !Open HDF5 interface
+    call h5open_f(error)
+
+    !Create file overwriting any existing file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+    !Write variables
+    if(particles%nclass.gt.1) then
+        dim1(1) = 1
+        call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
+        dim1(1) = particles%nclass
+        call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, proton%rate, error)
+        call h5ltset_attribute_string_f(fid,"/rate","description", &
+             "proton rate: rate(orbit_class)", error)
+    else
+        dim1(1) = 1
+        call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, proton%rate, error)
+        call h5ltset_attribute_string_f(fid,"/rate","description", &
+             "proton rate", error)
+    endif
+    call h5ltset_attribute_string_f(fid,"/rate","units","protons/s",error )
+
+    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+    call h5ltset_attribute_string_f(fid,"/","description",&
+         "proton rate calculated by FIDASIM", error)
+
+    !Close file
+    call h5fclose_f(fid, error)
+
+    !Close HDF5 interface
+    call h5close_f(error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'protons written to: ', trim(filename)
+    endif
+
+end subroutine write_protons
 
 subroutine write_fida_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
@@ -8370,6 +8429,134 @@ subroutine get_neutron_rate(plasma, eb, rate)
 
 end subroutine get_neutron_rate
 
+subroutine get_proton_rate(plasma, v1, v3, rate)
+    !+ Gets proton rate for a beam with velocity `v1` interacting with a target plasma
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters
+    real(Float64), dimension(3), intent(in) :: v1
+        !+ Beam velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v3
+        !+ 3 MeV proton velocity [cm/s]
+    real(Float64), intent(out)              :: rate
+        !+ 3 MeV proton reaction rate [1/s]
+
+    integer :: err_status, neb, nt, ebi, tii, is
+    real(Float64) :: dlogE, dlogT, logEmin, logTmin
+    real(Float64) :: logeb, logti, lograte
+    type(InterpolCoeffs2D) :: c2D
+    real(Float64) :: b11, b12, b21, b22
+
+    real(Float64) :: eb, ti, e1com, vnet_square, cos_theta, k, KE, q, mp, v3mag, k0
+    real(Float64) :: cosphi, sinphi, v
+    real(Float64), dimension(3) :: vcm, v3cm, vrot, vrel
+    real(Float64), dimension(13) :: bhcor !!!TODO 13?
+    real(Float64), dimension(12) :: e, a, b, c
+    real(Float64), dimension(3,12) :: abc
+    integer :: ei, i
+    type(InterpolCoeffs1D) :: c1D
+    real(Float64) :: ai, bi, ci, b1, b2
+
+    !! Calculate effective beam energy
+ !!!vrot = plasma%vrot  ![cm/s]
+    vrot = [0.0, 0.0, 0.0]
+    vrel = v1-vrot
+    vnet_square=dot_product(vrel,vrel)  ![cm/s]
+    eb = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+    ti = plasma%ti
+    write(*,'(T2,"ti = ",ES10.3)') ti
+    write(*,'(T2,"eb = ",ES10.3)') eb
+
+    logeb = log10(eb)
+    logti = log10(ti)
+
+    !!D_D
+    err_status = 1
+    logEmin = tables%D_D%logemin
+    logTmin = tables%D_D%logtmin
+    dlogE = tables%D_D%dlogE
+    dlogT = tables%D_D%dlogT
+    neb = tables%D_D%nenergy
+    nt = tables%D_D%ntemp
+    call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
+                        logeb, logti, c2D, err_status)
+    ebi = c2D%i
+    tii = c2D%j
+    b11 = c2D%b11
+    b12 = c2D%b12
+    b21 = c2D%b21
+    b22 = c2D%b22
+    if(err_status.eq.1) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_PROTON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') ti
+        endif
+        rate = 0.d0
+        return
+    endif
+
+    lograte = (b11*tables%D_D%log_rate(ebi,tii,1)   + &
+               b12*tables%D_D%log_rate(ebi,tii+1,1) + &
+               b21*tables%D_D%log_rate(ebi+1,tii,1) + &
+               b22*tables%D_D%log_rate(ebi+1,tii+1,1))
+
+    if (lograte.lt.tables%D_D%minlog_rate) then
+        rate = 0.d0
+    else
+        rate = 0.d0
+        do is=1,n_thermal
+            if(thermal_mass(is).eq.H2_amu) then
+             !!!rate = rate + plasma%deni(is) * exp(lograte*log_10)
+                rate = rate + exp(lograte*log_10)
+            endif
+        enddo
+    endif
+
+    !!Calculate anisotropy enhancement/deficit factor
+    mp = H1_amu*mass_u  ! kg
+    q = 4.04*1.6e-13       ! J
+
+    vcm = 0.5*(v1+vrot)
+    KE=0.5*mp*(vrel(1)**2+vrel(2)**2+vrel(3)**2)  ! com kinetic energy [J] 
+    v=norm2(vcm)     ! com speed [m/s]
+    v3mag=norm2(v3)       ! [m/s]
+    k0=v*sqrt(2*mp/(3*1.e6*(q+KE)))
+    cosphi=(vcm(1)*v3(1) + vcm(2)*v3(2) + vcm(3)*v3(3))/(v*v3mag)
+    sinphi=sin(acos(cosphi))
+    cos_theta=cosphi*sqrt(1-(k0*sinphi)**2) - k0**2*sinphi**2
+
+    !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
+    e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
+    a = [0.0,0.0208,0.0886,0.1882,0.3215,0.4636,0.6055,0.7528,0.8976,1.041,1.166,1.243]
+    b = [0.0,0.0023,0.0184,0.0659,0.076,0.168,0.251,0.250,0.378,0.367,0.521,0.55]
+    c = [0.0,0.0,0.0,0.0,0.048,0.021,0.039,0.162,0.142,0.276,0.203,0.34]
+    e(1) = 10.0
+    a(1) = 0.00903775/(4*pi)
+    abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
+
+    !Correction factor to make it consistent with Bosch & Hale
+    bhcor=[1.0,1.02614,.98497,1.006,1.015,1.012,1.0115,1.021,1.012,1.012,1.016,1.018,1.012]
+    do i=1,12
+        abc(:,i) = abc(:,i)*bhcor(i)
+    enddo
+
+    e1com=0.5*eb
+    call interpol_coeff(e, e1com, c1D, err_status)
+    ei = c1D%i
+    b1 = c1D%b1
+    b2 = c1D%b2
+
+    ai = b1*abc(1,ei) + b2*abc(1,ei+1)
+    bi = b1*abc(2,ei) + b2*abc(2,ei+1)
+    ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+
+    k = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
+    k = 1
+
+    rate = k * rate
+
+end subroutine get_proton_rate
+
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
     !+ population within cell
@@ -8997,6 +9184,27 @@ subroutine store_neutrons(rate, orbit_class)
     !$OMP END ATOMIC
 
 end subroutine store_neutrons
+
+subroutine store_protons(rate, orbit_class)
+    !+ Store proton rate in [[libfida:proton]]
+    real(Float64), intent(in)     :: rate
+        !+ Proton rate [sproton/sec]
+    integer, intent(in), optional :: orbit_class
+        !+ Orbit class ID
+
+    integer :: iclass
+
+    if(present(orbit_class)) then
+        iclass = min(orbit_class,particles%nclass)
+    else
+        iclass = 1
+    endif
+
+    !$OMP ATOMIC UPDATE
+    proton%rate(iclass)= proton%rate(iclass) + rate
+    !$OMP END ATOMIC
+
+end subroutine store_protons
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
@@ -11491,6 +11699,56 @@ subroutine neutron_f
 
 end subroutine neutron_f
 
+subroutine bench_sigmav
+    !+ Calculate proton emission rate using an axisymmetric fast-ion distribution function F(E,p,r,z)
+    integer :: ir, iz, ie, ip
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb,pitch
+    real(Float64) :: rate
+    real(Float64), dimension(3) :: ri, vi, v3, uvw, vi_uvw
+
+    rate = 0.d0
+
+    !! Get position near the core
+    iz = fbm%nz/2
+    ir = fbm%nr/2
+    uvw(1) = fbm%r(ir)
+    uvw(2) = 0.d0
+    uvw(3) = fbm%z(iz)
+
+    !! Get plasma parameters
+    call get_plasma(plasma,pos=uvw,input_coords=1)
+
+    !! Get proton production rate
+    vi = 2.7e6*[1.d0, 0.d0, 0.d0]
+    v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
+    call get_proton_rate(plasma, vi, v3, rate)
+
+    !! Store neutrons
+    call store_protons(rate)
+
+#ifdef _MPI
+    call parallel_sum(proton%rate)
+#endif
+
+    write(*,'(T2,"v1 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vi(1)/100,vi(2)/100,vi(3)/100
+    write(*,'(T2,"v3 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') v3(1)/100,v3(2)/100,v3(3)/100
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,A,ES14.5," [protons/s]")') 'Rate:   ',sum(proton%rate)
+        write(*,'(30X,a)') ''
+        write(*,*) 'write protons:    ' , time(time_start)
+    endif
+
+#ifdef _MPI
+    if(my_rank().eq.0) call write_protons()
+#else
+    call write_protons()
+#endif
+
+end subroutine bench_sigmav
+
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
     integer :: iion, ngamma, igamma
@@ -12400,6 +12658,11 @@ program fidasim
         neutron%rate = 0.d0
     endif
 
+    if(inputs%calc_proton.ge.1)then
+        allocate(proton%rate(particles%nclass))
+        proton%rate = 0.d0
+    endif
+
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
     !! -----------------------------------------------------------------------
@@ -12587,6 +12850,14 @@ program fidasim
         else
             call neutron_mc()
         endif
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    if(inputs%calc_proton.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'proton rate:    ', time(time_start)
+        endif
+        call bench_sigmav()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

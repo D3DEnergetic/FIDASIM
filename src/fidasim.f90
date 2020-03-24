@@ -8367,20 +8367,28 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
 
 end subroutine bt_cx_rates
 
-subroutine get_neutron_rate(plasma, eb, rate)
-    !+ Gets neutron rate for a beam with energy `eb` interacting with a target plasma
+subroutine get_ddpt_rate(plasma, eb, rate, branch)
+    !+ Gets d(d,p)T rate for a beam with energy `eb` interacting with a target plasma
     type(LocalProfiles), intent(in) :: plasma
         !+ Plasma Paramters
     real(Float64), intent(in)       :: eb
         !+ Beam energy [keV]
     real(Float64), intent(out)      :: rate
         !+ Neutron reaction rate [1/s]
+    integer, intent(in), optional   :: branch
+        !+ Indicates 1 for proton rate and 2 for neutron rate
 
-    integer :: err_status, neb, nt, ebi, tii, is
+    integer :: err_status, neb, nt, ebi, tii, is, ib
     real(Float64) :: dlogE, dlogT, logEmin, logTmin
     real(Float64) :: logeb, logti, lograte
     type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22
+
+    if(present(branch)) then
+        ib = branch
+    else
+        ib = 2
+    endif
 
     logeb = log10(eb)
     logti = log10(plasma%ti)
@@ -8403,7 +8411,7 @@ subroutine get_neutron_rate(plasma, eb, rate)
     b22 = c%b22
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            write(*,'(a)') "get_ddpt_rate: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
             write(*,'("eb = ",ES10.3," [keV]")') eb
             write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
         endif
@@ -8411,10 +8419,10 @@ subroutine get_neutron_rate(plasma, eb, rate)
         return
     endif
 
-    lograte = (b11*tables%D_D%log_rate(ebi,tii,2)   + &
-               b12*tables%D_D%log_rate(ebi,tii+1,2) + &
-               b21*tables%D_D%log_rate(ebi+1,tii,2) + &
-               b22*tables%D_D%log_rate(ebi+1,tii+1,2))
+    lograte = (b11*tables%D_D%log_rate(ebi,tii,ib)   + &
+               b12*tables%D_D%log_rate(ebi,tii+1,ib) + &
+               b21*tables%D_D%log_rate(ebi+1,tii,ib) + &
+               b22*tables%D_D%log_rate(ebi+1,tii+1,ib))
 
     if (lograte.lt.tables%D_D%minlog_rate) then
         rate = 0.d0
@@ -8422,33 +8430,32 @@ subroutine get_neutron_rate(plasma, eb, rate)
         rate = 0.d0
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
-                rate = rate + plasma%deni(is) * exp(lograte*log_10)
+                rate = rate + exp(lograte*log_10)
+             !!!rate = rate + plasma%deni(is) * exp(lograte*log_10)
             endif
         enddo
     endif
 
-end subroutine get_neutron_rate
+end subroutine get_ddpt_rate
 
-subroutine get_proton_rate(plasma, v1, v3, rate)
-    !+ Gets proton rate for a beam with velocity `v1` interacting with a target plasma
+subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
+    !+ Gets d(d,p)T anisotropy defecit/enhancement factor for a beam interacting with a target plasma
     type(LocalProfiles), intent(in)         :: plasma
         !+ Plasma Paramters
     real(Float64), dimension(3), intent(in) :: v1
         !+ Beam velocity [cm/s]
     real(Float64), dimension(3), intent(in) :: v3
         !+ 3 MeV proton velocity [cm/s]
-    real(Float64), intent(out)              :: rate
-        !+ 3 MeV proton reaction rate [1/s]
+    real(Float64), intent(out)              :: kappa
+        !+ Anisotropy factor
+    !!!TODO put reference
 
-    integer :: err_status, neb, nt, ebi, tii, is
-    real(Float64) :: dlogE, dlogT, logEmin, logTmin
-    real(Float64) :: logeb, logti, lograte
-    type(InterpolCoeffs2D) :: c2D
+    integer :: err_status
     real(Float64) :: b11, b12, b21, b22
 
-    real(Float64) :: eb, ti, e1com, vnet_square, cos_theta, k, KE, q, mp, v3mag, k0
-    real(Float64) :: cosphi, sinphi, v
-    real(Float64), dimension(3) :: vcm, v3cm, vrot, vrel
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, q, mp, k0
+    real(Float64) :: cos_phi, sin_phi
+    real(Float64), dimension(3) :: vcm, v3cm, vrel
     real(Float64), dimension(13) :: bhcor !!!TODO 13?
     real(Float64), dimension(12) :: e, a, b, c
     real(Float64), dimension(3,12) :: abc
@@ -8457,73 +8464,20 @@ subroutine get_proton_rate(plasma, v1, v3, rate)
     real(Float64) :: ai, bi, ci, b1, b2
 
     !! Calculate effective beam energy
- !!!vrot = plasma%vrot  ![cm/s]
-    vrot = [0.0, 0.0, 0.0]
-    vrel = v1-vrot
+    vrel = v1-plasma%vrot
     vnet_square=dot_product(vrel,vrel)  ![cm/s]
     eb = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
-    ti = plasma%ti
-    write(*,'(T2,"ti = ",ES10.3)') ti
-    write(*,'(T2,"eb = ",ES10.3)') eb
-
-    logeb = log10(eb)
-    logti = log10(ti)
-
-    !!D_D
-    err_status = 1
-    logEmin = tables%D_D%logemin
-    logTmin = tables%D_D%logtmin
-    dlogE = tables%D_D%dlogE
-    dlogT = tables%D_D%dlogT
-    neb = tables%D_D%nenergy
-    nt = tables%D_D%ntemp
-    call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, c2D, err_status)
-    ebi = c2D%i
-    tii = c2D%j
-    b11 = c2D%b11
-    b12 = c2D%b12
-    b21 = c2D%b21
-    b22 = c2D%b22
-    if(err_status.eq.1) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a)') "GET_PROTON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
-            write(*,'("ti = ",ES10.3," [keV]")') ti
-        endif
-        rate = 0.d0
-        return
-    endif
-
-    lograte = (b11*tables%D_D%log_rate(ebi,tii,1)   + &
-               b12*tables%D_D%log_rate(ebi,tii+1,1) + &
-               b21*tables%D_D%log_rate(ebi+1,tii,1) + &
-               b22*tables%D_D%log_rate(ebi+1,tii+1,1))
-
-    if (lograte.lt.tables%D_D%minlog_rate) then
-        rate = 0.d0
-    else
-        rate = 0.d0
-        do is=1,n_thermal
-            if(thermal_mass(is).eq.H2_amu) then
-             !!!rate = rate + plasma%deni(is) * exp(lograte*log_10)
-                rate = rate + exp(lograte*log_10)
-            endif
-        enddo
-    endif
 
     !!Calculate anisotropy enhancement/deficit factor
     mp = H1_amu*mass_u  ! kg
     q = 4.04*1.6e-13       ! J
 
-    vcm = 0.5*(v1+vrot)
-    KE=0.5*mp*(vrel(1)**2+vrel(2)**2+vrel(3)**2)  ! com kinetic energy [J] 
-    v=norm2(vcm)     ! com speed [m/s]
-    v3mag=norm2(v3)       ! [m/s]
-    k0=v*sqrt(2*mp/(3*1.e6*(q+KE)))
-    cosphi=(vcm(1)*v3(1) + vcm(2)*v3(2) + vcm(3)*v3(3))/(v*v3mag)
-    sinphi=sin(acos(cosphi))
-    cos_theta=cosphi*sqrt(1-(k0*sinphi)**2) - k0**2*sinphi**2
+    vcm = 0.5*(v1+plasma%vrot)
+    KE = 0.5*mp*vnet_square  ! com kinetic energy [J] 
+    k0 = norm2(vcm) * sqrt(2*mp/(3*1.e6*(q+KE)))
+    cos_phi = dot_product(vcm,v3) / (norm2(vcm)*norm2(v3))
+    sin_phi = sin(acos(cos_phi))
+    cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0**2*sin_phi**2
 
     !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
     e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
@@ -8550,12 +8504,10 @@ subroutine get_proton_rate(plasma, v1, v3, rate)
     bi = b1*abc(2,ei) + b2*abc(2,ei+1)
     ci = b1*abc(3,ei) + b2*abc(3,ei+1)
 
-    k = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
-    k = 1
+    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
+    write(*,'(T2,"k  = ",ES10.3)') k
 
-    rate = k * rate
-
-end subroutine get_proton_rate
+end subroutine get_ddpt_anisotropy
 
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
@@ -11654,7 +11606,7 @@ subroutine neutron_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
-                            call get_neutron_rate(plasma, erel, rate)
+                            call get_ddpt_rate(plasma, erel, rate)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
@@ -11704,9 +11656,10 @@ subroutine bench_sigmav
     integer :: ir, iz, ie, ip
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: eb,pitch
-    real(Float64) :: rate
+    real(Float64) :: erel,pitch
+    real(Float64) :: rate, vnet_square, ti, kappa
     real(Float64), dimension(3) :: ri, vi, v3, uvw, vi_uvw
+    real(Float64), dimension(3) :: vrot,vrel
 
     rate = 0.d0
 
@@ -11720,10 +11673,25 @@ subroutine bench_sigmav
     !! Get plasma parameters
     call get_plasma(plasma,pos=uvw,input_coords=1)
 
-    !! Get proton production rate
     vi = 2.7e6*[1.d0, 0.d0, 0.d0]
+
+    !! Calculate effective beam energy
+    vrot = plasma%vrot  ![cm/s]
+    vrel = vi-vrot
+    vnet_square=dot_product(vrel,vrel)  ![cm/s]
+    erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+    ti = plasma%ti
+    write(*,'(T2,"ti = ",ES10.3)') ti
+    write(*,'(T2,"eb = ",ES10.3)') erel
+    write(*,'(T2,"vr = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vrot(1)/100,vrot(2)/100,vrot(3)/100
+
+    !! Get proton production rate
     v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
-    call get_proton_rate(plasma, vi, v3, rate)
+
+    call get_ddpt_rate(plasma, erel, rate, branch=1)
+    call get_ddpt_anisotropy(plasma, vi, v3, kappa)
+
+    rate = kappa * rate
 
     !! Store neutrons
     call store_protons(rate)
@@ -11828,7 +11796,7 @@ subroutine neutron_mc
                 eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
-                call get_neutron_rate(plasma, eb, rate)
+                call get_ddpt_rate(plasma, eb, rate)
                 rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
@@ -11848,7 +11816,7 @@ subroutine neutron_mc
             eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
-            call get_neutron_rate(plasma, eb, rate)
+            call get_ddpt_rate(plasma, eb, rate)
             rate = rate*fast_ion%weight*factor
 
             !! Store neutrons

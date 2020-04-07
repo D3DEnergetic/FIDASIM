@@ -8509,6 +8509,128 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
 end subroutine get_ddpt_anisotropy
 
+subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
+    !+ Returns fraction of gyroangles that can produce a reaction with given inputs
+    real(Float64), intent(in) :: E3
+        !+ E3 proton energy (MeV)
+    real(Float64), intent(in) :: phi
+        !+ phi  lab-frame angle (presently relative to the field)
+    real(Float64), intent(in) :: E1
+        !+ E1 fast-ion energy (keV)
+    real(Float64), intent(in) :: pitch
+        !+ pitch  fast ion pitch relative to the field
+    real(Float64), dimension(3), intent(in) :: vrot
+        !+ vrot rotation velocity vector [m/s] (bhat,ahat,chat) coordinates
+    real(Float64), intent(in), optional :: DeltaE3
+        !+ DeltaE3  (MeV)
+    real(Float64), intent(out) :: pgyro
+        !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
+
+    real(Float64), dimension(3) :: v3,Vcm_pos,v3_prime_pos,v1_pos,v1_neg
+    real(Float64), dimension(3) :: Vcm_neg,v3_prime_neg,v4
+    real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,vc
+    real(Float64) :: aa,bb,cc,v3plus,v3minus,E3plus,E3minus,E3max,E3min
+    real(Float64) :: bracket,rhs0,cosgam0,gam_pos,rhs,dE3
+    real(Float64) :: gam_neg,costheta_pos,costheta_neg,dgamdE3,delta_gam
+    logical :: docheck
+
+    if (present(DeltaE3)) then
+        dE3 = DeltaE3
+    else
+        dE3 = 0.02
+    endif
+
+    ! Preliminaries [SI units]
+    JMeV = 1.60218d-13
+    JkeV = 1.60218d-16
+    mp = 1.6726219d-27 ! [kg]
+    Q = 4.04*JMeV
+    norm_v3 = sqrt(2*E3*JMeV/mp)
+    norm_v1 = sqrt(E1*JkeV/mp) ! m1 = 2m3 = 2mp
+    vpar = norm_v1*pitch
+    vperp = norm_v1*sqrt(1.-pitch**2)
+    v3 = norm_v3*[cos(phi), sin(phi), 0.d0]
+    vb = vrot(1)
+    va = vrot(2)
+    vc = vrot(3)
+
+    ! Find E3 limits for these parameters first
+    aa = 1.5*Q/mp + 0.5*(vpar**2+vperp**2)
+    bb = vpar*cos(phi)
+    cc = vperp*sin(phi)
+    v3plus = 0.5*(bb-cc+sqrt((bb-cc)**2+4*aa))
+    v3minus = 0.5*(bb+cc+sqrt((bb+cc)**2+4*aa))
+    E3plus = 0.5*mp*v3plus**2/JMeV
+    E3minus = 0.5*mp*v3minus**2/JMeV
+    E3max = max(E3plus,E3minus)
+    E3min = min(E3plus,E3minus)
+
+    ! Check that the selected value of E3 is satisfied for these inputs
+    if ((E3.ge.E3max).or.(E3.le.E3min)) then
+        print*,'E3 out of range!',E3min,E3,E3max
+        pgyro = 0.0
+        return
+    endif
+
+    ! Gyroangle
+    bracket = vperp*(sin(phi)-2*va/norm_v3)
+    rhs0 = norm_v3 - 1.5*Q/(norm_v3*mp) - (vpar+vb)*cos(phi) - va*sin(phi) &
+                   - 0.5*(norm_v1**2 + dot_product(vrot, vrot))/norm_v3 + 2*vb*vpar/norm_v3
+    cosgam0 = rhs0/bracket
+
+    rhs = rhs0 + 2*vc*vperp*sqrt(1-cosgam0**2)/norm_v3
+    gam_pos = acos(rhs/bracket)
+    rhs = rhs0 - 2*vc*vperp*sqrt(1-cosgam0**2)/norm_v3
+    gam_neg = acos(rhs/bracket)
+
+    !----------
+    ! costheta
+    v1_pos = [vpar, vperp*cos(gam_pos), vperp*sin(gam_pos)]
+    Vcm_pos = 0.5*(v1_pos + vrot)
+    v3_prime_pos = v3 - Vcm_pos
+    costheta_pos = dot_product(Vcm_pos,v3_prime_pos) / (norm2(Vcm_pos)*norm2(v3_prime_pos))
+
+    v1_neg = [vpar, vperp*cos(gam_neg), vperp*sin(gam_neg)]
+    Vcm_neg = 0.5*(v1_neg + vrot)
+    v3_prime_neg = v3 - Vcm_neg
+    costheta_neg = dot_product(Vcm_neg,v3_prime_neg) / (norm2(Vcm_neg)*norm2(v3_prime_neg))
+
+    ! Check energy conservation
+    docheck = .False.
+    if (docheck) then
+        v4 = 2*(v1_pos+vrot)/3 - v3/3
+        print*,'v1_pos:',v1_pos
+        print*,'v2:',vrot
+        print*,'v3:',v3
+        print*,'v4:',v4
+        print*,'Energy:', (2*(dot_product(v1_pos,v1_pos)+dot_product(vrot, vrot)) + 2*Q/mp &
+                           - dot_product(v3,v3) - 3*dot_product(v4,v4)) / (2*Q/mp)
+        print*,'v1_neg:',v1_neg
+    endif ! docheck
+
+    ! \partial\gam/\partial E3
+    if ((abs(vperp*sin(phi)).lt.1.d-10).or.(1-cosgam0**2.lt.1.d-10)) then
+        dgamdE3 = 0.
+        print*,'Tiny denominator:',vperp*sin(phi),cosgam0
+        pgyro = 0.0
+        return
+    endif
+
+    dgamdE3 = abs((1 + (0.5*norm_v1**2+1.5*Q/mp) / norm_v3**2) / &
+                  (norm_v3*mp*sqrt(1-cosgam0**2)*vperp*sin(phi)))
+
+    delta_gam = dgamdE3*dE3*JMeV
+    if ((E3-0.5*dE3).lt.E3min) delta_gam = dgamdE3*(0.5*dE3+E3-E3min)*JMeV
+    if ((E3+0.5*dE3).gt.E3max) delta_gam = dgamdE3*(0.5*dE3+E3max-E3)*JMeV
+
+    pgyro = delta_gam/pi
+    write(*,'(T2,"g+ = ",F7.5)') gam_pos
+    write(*,'(T2,"g- = ",F7.5)') gam_neg
+    write(*,'(T2,"c+ = ",F7.5)') costheta_pos
+    write(*,'(T2,"c- = ",F7.5)') costheta_neg
+
+endsubroutine get_pgyro
+
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
     !+ population within cell
@@ -11656,8 +11778,7 @@ subroutine bench_sigmav
     integer :: ir, iz, ie, ip
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: erel,pitch
-    real(Float64) :: rate, vnet_square, ti, kappa
+    real(Float64) :: erel, pitch, rate, vnet_square, ti, kappa, E3, phi, E1, pgyro
     real(Float64), dimension(3) :: ri, vi, v3, uvw, vi_uvw
     real(Float64), dimension(3) :: vrot,vrel
 
@@ -11676,7 +11797,8 @@ subroutine bench_sigmav
     vi = 2.7e6*[1.d0, 0.d0, 0.d0]
 
     !! Calculate effective beam energy
-    vrot = plasma%vrot  ![cm/s]
+   !vrot = plasma%vrot  ![cm/s]
+    vrot = 0.d0
     vrel = vi-vrot
     vnet_square=dot_product(vrel,vrel)  ![cm/s]
     erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
@@ -11688,8 +11810,17 @@ subroutine bench_sigmav
     !! Get proton production rate
     v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
 
+    !! Test reaction rate
     call get_ddpt_rate(plasma, erel, rate, branch=1)
     call get_ddpt_anisotropy(plasma, vi, v3, kappa)
+
+    !! Test pgyro
+    E3 = 3.0287
+    phi = pi/10
+    E1 = 80.
+    pitch = .25
+ !!!vrot = 0.*[1.,0,0]
+    call get_pgyro(E3,phi,E1,pitch,vrot,pgyro)
 
     rate = kappa * rate
 
@@ -11702,6 +11833,7 @@ subroutine bench_sigmav
 
     write(*,'(T2,"v1 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vi(1)/100,vi(2)/100,vi(3)/100
     write(*,'(T2,"v3 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') v3(1)/100,v3(2)/100,v3(3)/100
+    write(*,'(T2,"pg = ",F7.5)') pgyro
 
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [protons/s]")') 'Rate:   ',sum(proton%rate)

@@ -10,7 +10,8 @@ The visualization scripts are located in `FIDASIM/lib/scripts/`.
 
 #Visualizing Inputs
 
-Please install the following modules with `pip install` or `conda install`.
+The following Python packages are required for plotting the inputs.
+If you are computing on a cluster, this is probably already done for you.
 
 * numpy
 * h5py
@@ -19,13 +20,14 @@ Please install the following modules with `pip install` or `conda install`.
 * mpl_toolkits
 * f90nml
 
-Below is a brief step-by-step tutorial on how to visualize FIDASIM inputs inside an example directory `/u/garciaav/test` with runid `330LT` and `LHD`.
+Below is a brief step-by-step tutorial on how to visualize FIDASIM inputs inside an example directory `/u/garciaav/test` with run ID `330LT` and `LHD`.
 
-To plot all of your inputs (plasma, fields, distribution function and geometry) execute:
+The simplest command will plot of your inputs (plasma, fields, distribution function and geometry):
 ```bash
 plot_inputs /u/garciaav/test/ 330LT
 ```
 
+If you are interested in being more specific, then use optional arguments `-p`, `-f`, `-d` or `-g`.
 Plotting the plasma from the equilibrium file:
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -p

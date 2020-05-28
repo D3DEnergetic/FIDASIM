@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import matplotlib.pyplot as plt
@@ -12,12 +12,12 @@ f90 = True
 try:
     import f90nml
 except:
-    print('Import error: f90nml module not found. Beam grid will not be plotted')
+    print('Import WARNING: f90nml module not found. Beam grid will not be plotted')
     f90 = False
 try:
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 except:
-    print('Import error: mpl_toolkits module not found. Beam grid will not be plotted')
+    print('Import WARNING: mpl_toolkits module not found. Beam grid will not be plotted')
     f90 = False
 
 def tb_zyx(alpha, beta, gamma):
@@ -153,6 +153,9 @@ def main():
     parser.add_argument('-l','--legend',
                         default = True, action='store_false',
                         help='Turns off the legend')
+    parser.add_argument('-si','--saveimportant',
+                        default='', type=str,
+                        help='Indicates the path where important plots will be saved')
 
     args = parser.parse_args()
 
@@ -163,7 +166,7 @@ def main():
             nml_file = os.path.join(args.directory, args.runid+'_inputs.dat')
             nml = f90nml.read(nml_file)['fidasim_inputs']
         except:
-            print('Error: Check your directory, runid and/or path. The *_inputs.dat file was not found')
+            print('ERROR: Check your directory, runid or path. The *_inputs.dat file was not found')
             raise SystemExit
 
     if args.geometry or plot_all:
@@ -171,30 +174,31 @@ def main():
             geo_file = os.path.join(args.directory, args.runid+'_geometry.h5')
             geo = h5.File(geo_file, 'r')
         except:
-            print('Error: Check your directory, runid and/or path. The *_geometry.h5 file was not found')
+            print('ERROR: Check your directory, runid or path. The *_geometry.h5 file was not found')
             raise SystemExit
 
     if args.distribution or args.plasma or args.fields or args.geometry or plot_all:
         try:
             eq_file = os.path.join(args.directory, args.runid+'_equilibrium.h5')
             eq = h5.File(eq_file, 'r')
+            pmask = eq["/plasma/mask"][()]
+            fmask = eq["/fields/mask"][()]
+            mask = np.multiply(pmask, fmask)
         except:
-            print('Error: Check your directory, runid and/or path. The *_equilibrium.h5 file was not found')
-            raise SystemExit
-
-        pmask = eq["/plasma/mask"][()]
-        fmask = eq["/fields/mask"][()]
-        mask = np.multiply(pmask, fmask)
+            mask = None
+            if args.plasma or args.fields or args.geometry or plot_all: #Don't exit if -d only
+                print('ERROR: Check your directory, runid or path. The *_equilibrium.h5 file was not found')
+                raise SystemExit
 
     if args.distribution or plot_all:
         try:
             dist_file = os.path.join(args.directory, args.runid+'_distribution.h5')
             dist = h5.File(dist_file, 'r')
         except:
-            print('Error: Check your directory, runid and/or path. The *_distribution.h5 file was not found')
+            print('ERROR: Check your directory, runid or path. The *_distribution.h5 file was not found')
             raise SystemExit
 
-        if 'mask' in locals(): #Use mask from equilibrium
+        if (mask!=None).all(): #Use mask from equilibrium
             dmask = mask.copy()
         else:                   #Or use no mask
             if dist['nphi'][()]>1:
@@ -204,22 +208,22 @@ def main():
 
     # Error checks for attempting to simultaneously plot two line outs on the same figure
     if args.eplineout!=None and args.pelineout!=None:
-        print('Error: Cannot simultaneously plot both ep and pe line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both ep and pe line outs. Pick one.')
         raise SystemExit
     if args.erlineout!=None and args.relineout!=None:
-        print('Error: Cannot simultaneously plot both er and re line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both er and re line outs. Pick one.')
         raise SystemExit
     if args.prlineout!=None and args.rplineout!=None:
-        print('Error: Cannot simultaneously plot both pr and rp line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both pr and rp line outs. Pick one.')
         raise SystemExit
     if args.zelineout!=None and args.ezlineout!=None:
-        print('Error: Cannot simultaneously plot both ez and ze line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both ez and ze line outs. Pick one.')
         raise SystemExit
     if args.zplineout!=None and args.pzlineout!=None:
-        print('Error: Cannot simultaneously plot both pz and zp line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both pz and zp line outs. Pick one.')
         raise SystemExit
     if args.rzlineout!=None and args.zrlineout!=None: 
-        print('Error: Cannot simultaneously plot both rz and zr line outs. Pick one.')
+        print('ERROR: Cannot simultaneously plot both rz and zr line outs. Pick one.')
         raise SystemExit
 
     # Distribution function flags
@@ -352,17 +356,15 @@ def main():
 
         ax.plot_surface(X, Y, Z, color='indigo', rstride=1, cstride=1, alpha=0.25)
 
-        # Plot FIDA, NPA and NC chords
-        n_nchan = 0 ; f_nchan = 0 ; nc_nchan = 0
+        # Plot FIDA and NPA
+        n_nchan = 0 ; f_nchan = 0
         if 'npa' in geo:
             n_nchan = geo['/npa/nchan'][()]
         if 'spec' in geo:
             f_nchan = geo['/spec/nchan'][()]
-        if 'nc' in geo:
-            nc_nchan = geo['/nc/nchan'][()]
 
-        if n_nchan + f_nchan + nc_nchan > 0:
-            colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan+nc_nchan))
+        if n_nchan + f_nchan > 0:
+            colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan))
         t = np.linspace(0,1e8,2)
 
         if 'spec' in geo:
@@ -381,15 +383,6 @@ def main():
                 los = d_cent + t.reshape(2,1)*axis
                 ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan],label = "NPA {0}".format(i+1))
                 ax.scatter(d_cent[0],d_cent[1],d_cent[2],color='k', s=1)
-        if 'nc' in geo:
-            for i in range(nc_nchan):          # NC loop
-                d_cent = geo['/nc/d_cent'][()]
-                a_cent = geo['/nc/a_cent'][()]
-                axis = a_cent - d_cent
-                axis /= np.sqrt(axis[0]**2 + axis[1]**2 + axis[2]**2)
-                los = d_cent + t.reshape(2,1)*axis
-                ax.plot(los[:,0],los[:,1],los[:,2],
-                        color=colors[i+f_nchan+n_nchan],label = "NC {0}".format(i+1),alpha=0.2)
 
         # Set axes limits for an equal aspect ratio visualization
         X = np.array([-(r_midpoint + 2*rho), r_midpoint + 2*rho])
@@ -406,7 +399,7 @@ def main():
         ax.set_xlabel('X [cm]')
         ax.set_ylabel('Y [cm]')
         ax.set_zlabel('Z [cm]')
-        if n_nchan + f_nchan + nc_nchan > 0 and args.legend:
+        if n_nchan + f_nchan > 0 and args.legend:
             l = ax.legend(ncol=2,loc='upper left')
             for i, txt in enumerate(l.get_texts()):
                 txt.set_color(colors[i])
@@ -491,6 +484,11 @@ def main():
             fig.canvas.set_window_title(fig_labels[i])
             plt.tight_layout()
 
+            #Save
+            important_labels = ['Te','Ti','Ne','Nn']
+            if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
+                plt.savefig(args.saveimportant+fig_labels[i])
+
     # Plot fields
     if args.fields or plot_all:
 
@@ -570,6 +568,11 @@ def main():
             fig.canvas.set_window_title(fig_labels[i])
             plt.tight_layout()
 
+            #Save
+            important_labels = [t.capitalize() for t in to_plt[:3]]
+            if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
+                plt.savefig(args.saveimportant+fig_labels[i])
+
     # Plot distribution function
     if args.distribution or plot_all:
 
@@ -643,8 +646,13 @@ def main():
                         ax[1].set_xlabel(f2_labels[1].capitalize() + ' [%s]'%ax_specs[f2_labels[1]]['units'],
                                          fontsize=18)
                         unit = ax_specs[f2_labels[0]]['units']
-                        if unit=='unity': unit = ''                        # Remove unity from lineout title
-                        ax[1].set_title(r'%s $\approx$ %s %s'% (f2_labels[0].capitalize(), str(round(x[ix],1)), 
+                        #Reformat pitch labels
+                        if unit=='unity':
+                            unit = ''
+                            title = 'Pitch w.r.t. B'
+                        else:
+                            title = f2_labels[0].capitalize()
+                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(x[ix],1)),
                                                                 unit), fontsize=20)
                     elif hline!=None:                                      # Y lineout index
                         iy = np.abs(y-hline).argmin()
@@ -654,8 +662,13 @@ def main():
                         ax[1].set_xlabel(f2_labels[0].capitalize() + ' [%s]'%ax_specs[f2_labels[0]]['units'],
                                          fontsize=18)
                         unit = ax_specs[f2_labels[1]]['units']
-                        if unit=='unity': unit = ''                        # Remove unity from lineout title
-                        ax[1].set_title(r'%s $\approx$ %s %s'% (f2_labels[1].capitalize(), str(round(y[iy],1)), 
+                        #Reformat pitch labels
+                        if unit=='unity': 
+                            unit = ''
+                            title = 'Pitch w.r.t. B'
+                        else:
+                            title = f2_labels[1].capitalize()
+                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(y[iy],1)), 
                                                                 unit), fontsize=20)
 
                     ax[0].plot(linex, liney, 'w--')
@@ -672,8 +685,18 @@ def main():
                 c = ax[0].contourf(x, y, f2, levs, cmap="inferno")
                 ax[0].set_xlim(xmin,xmax)
                 ax[0].set_ylim(ymin,ymax)
-                ax[0].set_xlabel(f2_labels[0].capitalize() + ' [%s]'%ax_specs[f2_labels[0]]['units'],fontsize=18)
-                ax[0].set_ylabel(f2_labels[1].capitalize() + ' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=18)
+                #Reformat pitch labels
+                xlabel, ylabel = f2_labels
+                if xlabel=='pitch': 
+                    xlabel = 'Pitch w.r.t. B'
+                else:
+                    xlabel = f2_labels[0].capitalize()
+                if ylabel=='pitch': 
+                    ylabel = 'Pitch w.r.t. B'
+                else:
+                    ylabel = f2_labels[1].capitalize()
+                ax[0].set_xlabel(xlabel+' [%s]'%ax_specs[f2_labels[0]]['units'],fontsize=18)
+                ax[0].set_ylabel(ylabel+' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=18)
 
                 ip = np.argwhere('pitch'==f2_labels.T) #R-Pitch plot
                 if len(ip)>0 and ip==0: 
@@ -699,6 +722,12 @@ def main():
                 fig.canvas.set_window_title('Fast-ion distribution: %s vs. %s' % (f2_labels[1].capitalize(),
                                                                                   f2_labels[0].capitalize()))
                 plt.tight_layout()
+
+                #Save
+                iimp = np.array([(f2_labels==['r','z']).all(), (f2_labels==['energy','pitch']).all()])
+                save_labels = np.array(['Fzr', 'Fpe'])
+                if len(args.saveimportant)>0 and iimp.any():
+                    plt.savefig(args.saveimportant+save_labels[iimp][0])
 
         # Fast-ion density
 
@@ -774,6 +803,10 @@ def main():
 
         fig.canvas.set_window_title('Fast-ion Density')
         plt.tight_layout()
+
+        #Save
+        if len(args.saveimportant)>0:
+            plt.savefig(args.saveimportant+'Nf')
 
     plt.show()
 

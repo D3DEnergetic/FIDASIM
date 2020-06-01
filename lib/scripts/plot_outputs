@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import re
@@ -170,11 +170,11 @@ def check_channel_list(lc, rc, Nch, sflag, nflag):
         raise SystemExit
     return
 
-def get_leg_label_locations(subplot_dim):
-    if subplot_dim==3: ileg, ix, iy = 3, 9, 4
-    if subplot_dim==2: ileg, ix, iy = 2, 3, 3
-    if subplot_dim==1: ileg, ix, iy = None, 0, 0
-    return ileg, ix, iy
+def get_ileg_label_pos(subplot_dim):
+    if subplot_dim==3: ileg, xy, xx, yx = 3, 0.064, 0.415, 0.06
+    if subplot_dim==2: ileg, xy, xx, yx = 2, 0.05, 0.37, 0.04
+    if subplot_dim==1: ileg, xy, xx, yx = None, None, None, None
+    return ileg, xy, xx, yx
 
 def get_labelsize(subplot_dim):
     if subplot_dim==3: labelsize = 11
@@ -228,19 +228,30 @@ def check_inputs(fpath, mask, plot_all, ac, rc, lc, xlim, ylim, data_types):
 
     return
 
-def plot_spectra(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
+def check_files(directory, path, runids):
+    if path!=None and directory!=None:
+        print('ERROR: -d/--directory and -p/--path arguments were both provided... choose one')
+        raise SystemExit
+
+    if path!=None and runids!=None:
+        print('ERROR: -r/--runids can only be used with -d/--directory')
+        raise SystemExit
+    return
+
+
+def plot_spectra(fpath, savespectra, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
     spec_types = np.array(['fida', 'pfida', 'brems', 'cold', 'dcx', 'full', 'half', 'third', 'halo'])
     check_inputs(fpath, mask, plot_all, ac, rc, lc, xlim, ylim, spec_types) #Error check
 
     # Plotting
     all_spectra, all_lambda, all_spec_labels = get_data(fpath, mask, plot_all, lc, rc, spec_types)
-    fig_cnt = 0
+    cnt_fig = 0
     Nch, ich, subplot_dim = get_figure_parameters(ac, lc, rc, all_spectra)
     colors = get_colors(all_spectra)
     for ifig, jch in enumerate(ich):           # Channel Loop
         imod = ifig%9
         if imod==0:
-            fig_cnt += 1
+            cnt_fig += 1
             if subplot_dim==3:
                 fig,ax = plt.subplots(3,4,figsize=(12,9))
             elif subplot_dim==2:
@@ -249,15 +260,17 @@ def plot_spectra(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False,
                 fig,ax = plt.subplots(1,figsize=(6,6))
                 ax = np.array(ax)
             ax = ax.flatten()
-            fig.canvas.set_window_title('Spectral Plots %s' % str(fig_cnt))
+            fig.canvas.set_window_title('Spectral Plots %s' % str(cnt_fig))
 
-        # Figure labels
-        ileg, ix, iy = get_leg_label_locations(subplot_dim)
-        ax[ix].set_xlabel("Wavelength [nm]", fontsize=18)
-        ax[iy].set_ylabel("Radiance [Ph s$^{-1}$ nm$^{-1}$ sr$^{-1}$ m$^{-2}$]", fontsize=18)
-        if subplot_dim==2: #Re-center x and y labels for the 2x2 grid
-            ax[ix].xaxis.set_label_coords(1.1,-0.1)
-            ax[iy].yaxis.set_label_coords(-0.19,1.1)
+            # Labels
+            ileg, xy, xx, yx = get_ileg_label_pos(subplot_dim)
+            if subplot_dim>1:
+                fig.text(xx, yx, "Wavelength [nm]", ha='center', fontsize=18)
+                fig.text(xy, 0.5, "Radiance [Ph s$^{-1}$ nm$^{-1}$ sr$^{-1}$ m$^{-2}$]", va='center',
+                         rotation='vertical', fontsize=18)
+            else:
+                ax[0].set_xlabel("Wavelength [nm]", fontsize=18)
+                ax[0].set_ylabel("Radiance [Ph s$^{-1}$ nm$^{-1}$ sr$^{-1}$ m$^{-2}$]", fontsize=18)
 
         # Leave final column of figure empty for legend
         imod = increase_imod(subplot_dim, imod)
@@ -269,6 +282,8 @@ def plot_spectra(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False,
         for i in range(all_spectra.shape[0]):
             for d,data in enumerate(all_spectra[i]):
                 ax[imod].plot(all_lambda[i], data[jch],label=all_spec_labels[i,d], color=colors[i,d])
+                #Set y limits on subplots where all data is zero to avoid lots of digits on the y axis
+                if np.isclose(all_spectra[i,:,jch,:].sum(), 0): ax[imod].set_ylim([0, np.max(all_spectra)])
 
         # Legends
         handles, labels = ax[imod].get_legend_handles_labels()
@@ -298,7 +313,11 @@ def plot_spectra(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False,
             ax[imod].ticklabel_format(style='sci', axis='y', useMathText=True)
             ax[imod].set_ylim(ymin=0)
         ax[imod].yaxis.set_minor_locator(minLocatorY)
+        ax[imod].yaxis.set_major_locator(MaxNLocator(5, integer=True))
         ax[imod].tick_params(axis='y', which='both', labelsize=labelsize, direction='in',right=1)
+
+        #Save
+        if len(savespectra)>0: plt.savefig(savespectra+ 'spectra%s' % str(cnt_fig))
 
     # Hide ticks for unused subplots
     extra_dim = get_extra_dim(subplot_dim)
@@ -309,19 +328,19 @@ def plot_spectra(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False,
 
     return
 
-def plot_npa(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
+def plot_npa(fpath, savenpa, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
     npa_types = np.array(['flux', 'pflux'])
     check_inputs(fpath, mask, plot_all, ac, rc, lc, xlim, ylim, npa_types)  #Error check
 
     # Plotting
     all_npa, all_energy, all_npa_labels = get_data(fpath, mask, plot_all, lc, rc, npa_types)
-    fig_cnt = 0
+    cnt_fig = 0
     Nch, ich, subplot_dim = get_figure_parameters(ac, lc, rc, all_npa)
     colors = get_colors(all_npa)
     for ifig, jch in enumerate(ich):           # Channel Loop
         imod = ifig%9
         if imod==0:
-            fig_cnt += 1
+            cnt_fig += 1
             if subplot_dim==3:
                 fig,ax = plt.subplots(3,4,figsize=(12,9))
             elif subplot_dim==2:
@@ -330,15 +349,17 @@ def plot_npa(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xli
                 fig,ax = plt.subplots(1,figsize=(6,6))
                 ax = np.array(ax)
             ax = ax.flatten()
-            fig.canvas.set_window_title('NPA Plots %s' % str(fig_cnt))
+            fig.canvas.set_window_title('NPA Plots %s' % str(cnt_fig))
 
-        # Figure labels
-        ileg, ix, iy = get_leg_label_locations(subplot_dim)
-        ax[ix].set_xlabel("Energy [keV]", fontsize=18)
-        ax[iy].set_ylabel("Flux [neutrals s$^{-1}$ dE$^{-1}$]", fontsize=18)
-        if subplot_dim==2: #Re-center x and y labels for the 2x2 grid
-            ax[ix].xaxis.set_label_coords(1.1,-0.1)
-            ax[iy].yaxis.set_label_coords(-0.19,1.1)
+            # Labels
+            ileg, xy, xx, yx = get_ileg_label_pos(subplot_dim)
+            if subplot_dim>1:
+                fig.text(xx, yx, "Energy [keV]", ha='center', fontsize=18)
+                fig.text(xy, 0.5, "Flux [neutrals s$^{-1}$ dE$^{-1}$]", va='center',
+                         rotation='vertical', fontsize=18)
+            else:
+                ax[0].set_xlabel("Energy [keV]", fontsize=18)
+                ax[0].set_ylabel("Flux [neutrals s$^{-1}$ dE$^{-1}$]", fontsize=18)
 
         # Leave final column of figure empty for legend
         imod = increase_imod(subplot_dim, imod)
@@ -350,6 +371,8 @@ def plot_npa(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xli
         for i in range(all_npa.shape[0]):
             for d,data in enumerate(all_npa[i]):
                 ax[imod].plot(all_energy[i], data[jch],label=all_npa_labels[i,d], color=colors[i,d])
+                #Set y limits on subplots where all data is zero to avoid lots of digits on the y axis
+                if np.isclose(all_npa[i,:,jch,:].sum(), 0): ax[imod].set_ylim([0, np.max(all_npa)])
 
         # Legends
         handles, labels = ax[imod].get_legend_handles_labels()
@@ -379,7 +402,11 @@ def plot_npa(fpath, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xli
             ax[imod].ticklabel_format(style='sci', axis='y', useMathText=True)
             ax[imod].set_ylim(ymin=0)
         ax[imod].yaxis.set_minor_locator(minLocatorY)
+        ax[imod].yaxis.set_major_locator(MaxNLocator(5, integer=True))
         ax[imod].tick_params(axis='y', which='both', labelsize=labelsize, direction='in',right=1)
+
+        #Save
+        if len(savenpa)>0: plt.savefig(savenpa+ 'npa%s' % str(cnt_fig))
 
     # Hide ticks for unused subplots
     extra_dim = get_extra_dim(subplot_dim)
@@ -461,6 +488,12 @@ def main():
     parser.add_argument('-sl', '--slog',
                         default = False, action='store_true',
                         help='Set the radiance axis to a log scale')
+    parser.add_argument('-os', '--onlyspectra',
+                        default = False, action='store_true',
+                        help='Only plot spectra related data')
+    parser.add_argument('-ss','--savespectra',
+                        default='', type=str,
+                        help='Indicates the path where spectral plots will be saved')
 
     parser.add_argument('-np', '--activenpa',
                         default = False, action='store_true',
@@ -489,12 +522,16 @@ def main():
     parser.add_argument('-nl', '--nlog',
                         default = False, action='store_true',
                         help='Set the flux axis to a log scale')
+    parser.add_argument('-on', '--onlynpa',
+                        default = False, action='store_true',
+                        help='Only plot NPA related data')
+    parser.add_argument('-sn','--savenpa',
+                        default='', type=str,
+                        help='Indicates the path where NPA plots will be saved')
 
     args = parser.parse_args()
 
-    if args.path!=None and args.directory!=None:
-        print('ERROR: Inputting -d/--directory and -p/--path simultaneously is not allowed')
-        raise SystemExit
+    check_files(args.directory, args.path, args.runids)
 
     ## Get fpaths from -d or -p input
     ## fpaths is [[spectra filename(s)], [npa filename(s)], [neutron filename(s)]]
@@ -524,18 +561,18 @@ def main():
         fpaths = get_file_paths(args.path)
 
     ## Call plotting functions
-    if len(fpaths[0])>0:
+    if len(fpaths[0])>0 and not args.onlynpa:
         spec_flags = np.array([args.fida,args.pfida,args.brems,args.cold,args.dcx,args.full,args.half,args.third,
                                args.halo])
-        plot_spectra(fpaths[0],spec_flags, plot_all=args.spectra,log=args.slog,ac=args.allschan,
+        plot_spectra(fpaths[0],args.savespectra,spec_flags, plot_all=args.spectra,log=args.slog,ac=args.allschan,
                      lc=args.listschan,rc=args.rangeschan,xlim=args.sxlim,ylim=args.sylim)
 
-    if len(fpaths[1])>0:
+    if len(fpaths[1])>0 and not args.onlyspectra:
         npa_flags= np.array([args.activenpa, args.passivenpa])
-        plot_npa(fpaths[1], npa_flags, plot_all=args.npa, log=args.nlog, ac=args.allnchan, lc=args.listnchan,
-                 rc=args.rangenchan, xlim=args.nxlim, ylim=args.nylim)
+        plot_npa(fpaths[1],args.savenpa,npa_flags,plot_all=args.npa,log=args.nlog,ac=args.allnchan,
+                 lc=args.listnchan,rc=args.rangenchan,xlim=args.nxlim,ylim=args.nylim)
 
-    if len(fpaths[2])>0:
+    if len(fpaths[2])>0 and not args.onlyspectra and not args.onlynpa:
         get_neutron_rate(fpaths[2])
 
     plt.show()

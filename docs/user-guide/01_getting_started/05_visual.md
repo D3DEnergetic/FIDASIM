@@ -6,7 +6,7 @@ title: Visualization
 
 These visualization tools can be used straight from the command line window.
 They require an installation of Python 2.7 or higher.
-The visualization scripts are located in `FIDASIM/lib/scripts/`.
+The visualization scripts are located in `FIDASIM/lib/scripts/`
 
 #Visualizing Inputs
 
@@ -22,20 +22,21 @@ If you are computing on a cluster, this is probably already done for you.
 
 Below is a brief step-by-step tutorial on how to visualize FIDASIM inputs inside an example directory `/u/garciaav/test` with run ID `330LT` and `LHD`.
 
-The simplest command will plot of your inputs (plasma, fields, distribution function and geometry):
+The simplest command will plot all of your inputs (plasma, fields, distribution function and geometry):
 ```bash
 plot_inputs /u/garciaav/test/ 330LT
 ```
 
 If you are interested in being more specific, then use optional arguments `-p`, `-f`, `-d` or `-g`.
-Plotting the plasma from the equilibrium file:
+
+Plot the plasma
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -p
 ```
 ![](|media|/visualize1.png){: width="200"}
 {: style="text-align: center"}
 
-and the fields:
+and the fields
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -f
 ```
@@ -43,7 +44,7 @@ plot_inputs /u/garciaav/test/ 330LT -f
 {: style="text-align: center"}
 Note: Similar to the FIDASIM code, plots of the plasma and fields use the mask variable to define the edge of the plasma.
 
-Similarly, 2D projections of the distribution function can be plotted by executing:
+Similarly, 2D projections of the distribution function can be plotted
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -d
 ```
@@ -59,7 +60,7 @@ plot_inputs /u/garciaav/test/ 330LT -g
 {: style="text-align: center"}
 
 If you are using many channels, then your legend is probably crowding the plot.
-The following command hides the legend:
+The following command hides the legend
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -g -l
 ```
@@ -72,7 +73,7 @@ Several things to note:
 * Plasma boundary is approximated with a purple torus
 
 Lineouts for the 2D plots of the plasma, fields and distribution function are available.
-For example, use the following command to plot lineouts at R = 153.4 cm:
+For example, use the following command to plot lineouts at R = 153.4 cm
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -p -f -d -rz 153.4
 ```
@@ -95,7 +96,6 @@ plot_inputs /u/garciaav/test/ 330LT -p -f -d -zr -10.8
 {: style="text-align: center"}
 
 Since the distribution function is defined with 2 more coordinates (Energy and Pitch), more lineouts are available.
-See the example below:
 ```bash
 plot_inputs /u/garciaav/test/ 330LT -d -pz .2 -pr -.25 -ez 80 -er 40 -ep 18
 ```
@@ -120,9 +120,12 @@ plot_inputs /u/garciaav/test/ LHD -p -f -d -ph 0.157
 
 You can change the number of contour levels used in the 2D plots with `-nl`
 
-Always remember that you can execute `plot_inputs -h` to display the help message.
-You are all set to explore FIDASIM inputs!
+You can save important plots as png files in a specified folder
+`-si /u/garciaav/test/figs/`
 
+Always remember that you can execute `plot_inputs -h` to display the help message.
+
+You are all set to explore FIDASIM inputs!
 
 #Visualizing Outputs
 
@@ -135,7 +138,7 @@ The following Python packages are required for plotting the outputs.
 * numpy
 * matplotlib
 
-Below is a brief step-by-step tutorial on how to visualize FIDASIM outputs inside example directories `/u/garciaav/test/` with run IDs `BAAE_1575`, `BAAE_1875`, `test_1` and `test_2` and `/u/garciaav/different/` with run ID `diff_1575`
+Below is a brief step-by-step tutorial on how to visualize FIDASIM outputs inside example directory `/u/garciaav/test/` with run IDs `BAAE_1575`, `BAAE_1875`, `test_1` and `test_2`, and directory `/u/garciaav/different/` with run ID `diff_1575`
 
 The code executes in one of the following two cases:
 
@@ -145,7 +148,6 @@ The code executes in one of the following two cases:
 ##Case 1: Plotting data from a single directory
 
 The simplest command is to plot everything located in a single folder with the `-d` argument.
-The code will search the provided directory and attempt to plot all available spectral and NPA data.
 
 If the code finds `*_spectra.h5` files in the `-d` folder, you must indicate emission and channel information.
 
@@ -155,10 +157,10 @@ or select individually with `-fi` (FIDA), `-pf` (pFIDA), `-f` (Full), `-hf` (Hal
 Use `-as`, `-rs` or `-ls` to indicate all spectral channels, range of channels or list of channels.
 Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0”.
 
-Similarly, if the code finds `*_npa.h5` files in the `-d` folder, you must indicate flux and channel information.
+Similarly, if the code finds any `*_npa.h5` files in the `-d` folder, you must indicate flux and channel information.
 The syntax of the NPA arguments is similar to the spectral arguments.
 
-Use `-n` to plot all emission,
+Use `-n` to plot all NPA flux,
 or select individually with `-np` (NPA) and `-pn` (pNPA).
 
 Use `-an`, `-rn` or `-ln` to indicate all NPA channels, range of channels or list of channels.
@@ -255,7 +257,11 @@ Plots NPA data, list of NPA channels (1), sets flux limits (4$\times$10$^8$-2$\t
 ![](|media|/visualize18.png "NPA ylim log"){: width="200"}
 {: style="text-align: center"}
 
-Lastly, execute `plot_inputs -h` to display the help message.
+You can save spectral and NPA plots as png files in a specified folder
+`-ss -sn /u/garciaav/test/figs/`
+
+Lastly, execute `plot_outputs -h` to display the help message.
+
 Congrats, you made it to the end of the tutorial!
 
 If you have any questions or find a bug, please let us know on [GitHub](https://github.com/D3DEnergetic/FIDASIM/issues)

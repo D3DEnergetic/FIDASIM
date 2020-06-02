@@ -126,25 +126,128 @@ You are all set to explore FIDASIM inputs!
 
 #Visualizing Outputs
 
-Visualizing your outputs can be done by executing `plot_outputs` found in `lib/scripts/`
+The following Python packages are required for plotting the outputs.
 
-Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
-Let's start with the easiest method first.
-Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
-Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
-Furthermore, it will also print out the neutron rate.
-```bash
-plot_outputs -d /u/garciaav/test/ -s -as -n -an
-```
-If you are interested in only one shot, e.g. 330LT, add `-r 330LT` to your command.
+* os
+* re
+* h5py
+* argparse
+* numpy
+* matplotlib
 
-Let's now consider a more specific example.
-What if your files are scattered around in different folders?
-What if you are only interested in the active FIDA emission?
-What if you only want to view channels 1 and 3?
-The example below does this for two different files located in different folders.
-```bash
-plot_outputs -p /u/garciaav/test/330LT_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls 1 3
-```
+Below is a brief step-by-step tutorial on how to visualize FIDASIM outputs inside example directories `/u/garciaav/test/` with run IDs `BAAE_1575`, `BAAE_1875`, `test_1` and `test_2` and `/u/garciaav/different/` with run ID `diff_1575`
 
-Now that you have a grasp on how the script works, take a look at the help documentation `plot_outputs -h` to see what else the code is capable of.
+The code executes in one of the following two cases:
+
+* Plotting all available `*_spectra.h5` and `*_npa.h5` files located in a single directory
+* Plotting selected files located anywhere
+
+##Case 1: Plotting data from a single directory
+The simplest command is to plot everything located in a single folder with the `-d` argument.
+The code will search the provided directory and attempt to plot all available spectral and NPA data.
+
+If the code finds `*_spectra.h5` files in the `-d` folder, you must indicate emission and channel information.
+
+Use `-s` to plot all emission.
+Or select individually with `-fi`, `-pf`, `-f`, `-hf`, `-t`, `-b`, `-c`, `-hl`, `-dc` for FIDA, pFIDA, Full, Half, Third, Bremsstrahlung, Cold, Halo and DCX, respectively.
+
+Use `-as`, `-rs` or `-ls` to indicate all spectral channels, range of channels or list of channels.
+Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0”.
+
+Similarly, if the code finds `*_npa.h5` files in the `-d` folder, you must indicate flux and channel information.
+The syntax of the NPA arguments is similar to the spectral arguments.
+
+Use `-n` to plot all emission.
+Or select individually with `-np` and `-pn` for active and passive NPA flux, respectively.
+
+Use `-an`, `-rn` or `-ln` to indicate all NPA channels, range of channels or list of channels.
+
+If you have many FIDASIM outputs in the `-d` folder, below are two ways you can filter what the visualization script plots.
+
+Filter out the NPA files and plot only spectral data by using the `-os` argument.
+On the other hand, filter out the spectral files and plot only NPA data by using the `-on` argument.
+
+Also, you can filter files by defining the run IDs with the `-r` argument.
+
+###Below is a summary of examples for Case 1:
+
+`plot_outputs -d /u/garciaav/test/`
+
+`-s -as -n -an`
+Note: Plots all spectral data, spectral channels, NPA data and NPA channels.
+![](|media|/visualize10-1.png "Spectra 1-9"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize10-2.png "Spectra 10-18"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize10-3.png "Spectra 19-24"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize10-4.png "NPA 1-3"){: width="200"}
+{: style="text-align: center"}
+
+`-s -rs 11 19 -n -rn 1 2`
+Note: Plots all spectral data, range of spectral channels (11-19), all NPA data and range of NPA channels (1-2).
+![](|media|/visualize11-1.png "Spectra 11-19"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize11-2.png "NPA 1-2"){: width="200"}
+{: style="text-align: center"}
+
+`-fi -ls 1 14 22 -np -ln 2`
+Note: Plots active FIDA data, list of spectral channels (1, 14 & 19), active NPA data and list of NPA channels (2).
+![](|media|/visualize12-1.png "Spectra 1, 14 & 22"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize12-2.png "NPA 2"){: width="200"}
+{: style="text-align: center"}
+
+`-r BAAE_1875 -fi -ls 12 14 22 -os`
+Note: Plots active FIDA data, list of spectral channels (1, 14 & 19), with run ID BAAE_1875 and ignores NPA files.
+![](|media|/visualize13.png "FIDA runid 12, 14 & 22"){: width="200"}
+{: style="text-align: center"}
+
+##Case 2: Plotting data from user defined file paths
+Alternatively, the code accepts specific file paths from the `-p` argument.
+
+Similar to Case 1, specifying emission type and flux type is required when plotting data from `*_spectra.h5` and `*_npa.h5 files`, respectively.
+Of course, channel information is also a requirement.
+
+###Below is a summary of examples for Case 2:
+
+`plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5`
+
+`-s -rs 10 18 -n -rn 2 3`
+Note: Plots all spectral data, range of spectral channels (10-18), all NPA data and range of NPA channels (2-3).
+![](|media|/visualize14-1.png "Spectra 10-18"){: width="200"}
+{: style="text-align: center"}
+![](|media|/visualize14-2.png "NPA 2-3"){: width="200"}
+{: style="text-align: center"}
+
+`-fi -ls 1`
+Note: Plots active FIDA data and list of spectral channels (1).
+![](|media|/visualize15.png "FIDA 1"){: width="200"}
+{: style="text-align: center"}
+
+##Changing subplot parameters (applies to Case 1 & 2)
+You can change the x and y limits of the spectral plot with `-sx` and `-sy` arguments.
+Also, you can use `-sl` to plot the y axis on a log-scale.
+
+Similarly, change the NPA plots with the `-nx`, `-ny` and `-nl` arguments.
+
+###Below are some examples:
+
+`plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5`
+
+`-fi -ls 1 -sx 649 663`
+Note: Plots active FIDA data, list of spectral channels (1) and sets x-axis limits (649-663).
+![](|media|/visualize16.png "FIDA xlim"){: width="200"}
+{: style="text-align: center"}
+
+`-fi -ls 1 -sx 649 663 -sy 3e11 3e16 -sl`
+Note: Plots active FIDA data, list of spectral channels (1), sets wavelength limits (649-663), sets radiance limits (3$\times$10$^11$-3$\times$10$^16$) and turns on the log scale.
+![](|media|/visualize17.png "FIDA xlim ylim log"){: width="200"}
+{: style="text-align: center"}
+
+`-p /u/garciaav/test/test_1_npa.h5`
+
+`-n -ln 1 -ny 4e8 2e11 -nl`
+Note: Plots NPA data, list of NPA channels (1), sets flux limits (4$\times$10$^8$-2$\times$10$^11$) and turns on the log scale.
+![](|media|/visualize18.png "NPA ylim log"){: width="200"}
+{: style="text-align: center"}

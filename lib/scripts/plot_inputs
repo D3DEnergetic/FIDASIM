@@ -405,6 +405,15 @@ def main():
                 txt.set_color(colors[i])
         fig.canvas.set_window_title('Geometry')
 
+        #Save
+        if len(args.saveimportant)>0:
+            ax.view_init(0, -90)
+            plt.savefig(args.saveimportant+'geo_elev')
+            ax.view_init(zmax/2, -45)
+            plt.savefig(args.saveimportant+'geo_top1')
+            ax.view_init(zmax/2, 45)
+            plt.savefig(args.saveimportant+'geo_top2')
+
     # Plot plasma
     if args.plasma or plot_all:
 

@@ -1,24 +1,25 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# Import libraries
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from scipy.linalg import norm
-import h5py as h5
+import matplotlib.ticker as ticker
 import numpy as np
+from numpy.linalg import norm
+import h5py as h5
 import os
 
+f90 = True
 try:
-    f90 = True
-    import f90nml   # Portal does not have f90nml capabilities
+    import f90nml
 except:
+    print('Import WARNING: f90nml module not found. Beam grid will not be plotted')
     f90 = False
-    print('Warning: f90nml library not found. Beam grid will NOT be plotted')
+try:
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+except:
+    print('Import WARNING: mpl_toolkits module not found. Beam grid will not be plotted')
+    f90 = False
 
-# Define functions needed for beam grid transformations
 def tb_zyx(alpha, beta, gamma):
     # Refer to utils.py for more documentation
     sa = np.sin(alpha)
@@ -38,38 +39,63 @@ def tb_zyx(alpha, beta, gamma):
     r[2, 1] = cb * sg
     r[2, 2] = cb * cg
     return r
+
 def xyz_to_uvw(alpha, beta, gamma, xyz, origin = np.zeros(3)):
     # Refer to utils.py for more documentation
     xyz = np.array(xyz)
     if xyz.ndim == 2:
         s = xyz.shape
-        if s[0] != 3:
+        if s[0]!=3:
             raise ValueError('xyz must be (3, n), but it has shape {}'.format(uvw.shape))
         n = s[1]
     elif xyz.ndim == 1:
-        if xyz.size != 3:
+        if xyz.size!=3:
             raise ValueError('xyz must have length 3, but it has length {}'.format(uvw.size))
         n = 1
     else:
         raise ValueError('xyz must be (3) or (3, n)')
 
-    if origin.ndim != 1:
+    if origin.ndim!=1:
         raise ValueError('origin must be 1D, but it has shape {}'.format(origin.shape))
 
-    if origin.size != 3:
+    if origin.size!=3:
         raise ValueError('origin must have length 3, but it has length {}'.format(origin.size))
     R = tb_zyx(alpha,beta,gamma)
     uvw = np.dot(R, xyz)
     return uvw + np.squeeze(np.tile(origin, (n, 1)).T)
 
+def get_arr_lim(arr):
+    #! Find the lower and upper bounds of N-dimensional `arr`
+    arr_min = np.min(arr)
+    if arr_min<0: 
+        arr_min = arr_min*1.1
+    else:
+        arr_min = arr_min*0.9
+    arr_max = np.max(arr)
+    if arr_max<0: 
+        arr_max = arr_max*0.9
+    else:
+        arr_max = arr_max*1.1
+    return arr_min, arr_max
 
+def get_nlevs(arr, nlevels):
+    #! Determine the number of levels used in a contour plot for `arr`
+    if np.isclose(np.std(arr), 0.0):  #Case where `arr` is constant
+        nlevs = 2
+    else:
+        nlevs = nlevels
+    return nlevs
+
+
+
+#! Main program
 def main():
     parser = argparse.ArgumentParser(description="Plots FIDASIM inputs")
 
     parser.add_argument('directory',
                         help='Directory that contains FIDASIM input files')
     parser.add_argument('runid',
-                        help='FIDASIM run ID')
+                        help='FIDASIM inputs run ID')
     parser.add_argument('-g','--geometry',
                         action='store_true',
                         help='Plot geometry')
@@ -83,166 +109,200 @@ def main():
                         action='store_true',
                         help='Plot fast-ion distribution')
     parser.add_argument('-rz','--rzlineout',
-                        type=float,
-                        help='Plot line-out along r value on z-r selected contours figures (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant R on Z vs. R plot')
     parser.add_argument('-zr','--zrlineout',
-                        type=float,
-                        help='Plot line-out along z value on z-r selected contour figures (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant Z on Z vs. R plot')
     parser.add_argument('-ze','--zelineout',
-                        type=float,
-                        help='Plot line-out along z value on z-energy distribution contour figure (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant Z on Z vs. Energy plot')
     parser.add_argument('-ez','--ezlineout',
-                        type=float,
-                        help='Plot line-out along e value on z-energy distribution contour figure (unit in keV)')
+                        default=None, type=float,
+                        help='Plot slice at constant Energy on Z vs. Energy plot')
     parser.add_argument('-re','--relineout',
-                        type=float,
-                        help='Plot line-out along r value on energy-r distribution contour figure (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant R on Energy vs. R plot')
     parser.add_argument('-er','--erlineout',
-                        type=float,
-                        help='Plot line-out along e value on energy-r distribution contour figure (unit in keV)')
+                        default=None, type=float,
+                        help='Plot slice at constant Energy on Energy vs. R plot')
     parser.add_argument('-zp','--zplineout',
-                        type=float,
-                        help='Plot line-out along z value on z-pitch distribution contour figure (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant Z on Z vs. Pitch plot')
     parser.add_argument('-pz','--pzlineout',
-                        type=float,
-                        help='Plot line-out along p value on z-pitch distribution contour figure')
+                        default=None, type=float,
+                        help='Plot slice at constant Pitch on Z vs. Pitch plot')
     parser.add_argument('-rp','--rplineout',
-                        type=float,
-                        help='Plot line-out along r value on pitch-r distribution contour figure (unit in centimeters)')
+                        default=None, type=float,
+                        help='Plot slice at constant R on Pitch vs. R plot')
     parser.add_argument('-pr','--prlineout',
-                        type=float,
-                        help='Plot line-out along p value on pitch-r distribution contour figure')
+                        default=None, type=float,
+                        help='Plot slice at constant Pitch on Pitch vs. R plot')
     parser.add_argument('-ep','--eplineout',
-                        type=float,
-                        help='Plot line-out along e value on pitch-energy distribution contour figure (unit in meters)')
+                        default=None, type=float,
+                        help='Plot slice at constant Energy on Pitch vs. Energy plot')
     parser.add_argument('-pe','--pelineout',
-                        type=float,
-                        help='Plot line-out along p value on pitch-energy distribution contour figure')
+                        default=None, type=float,
+                        help='Plot slice at constant Pitch on Pitch vs. Energy plot')
+    parser.add_argument('-ph','--phi',
+                        default=0.0, type=float,
+                        help='Indicates the toroidal angle to plot the contour plots')
+    parser.add_argument('-nl','--nlevels',
+                        default=40, type=int,
+                        help='Indicates the number of contour surfaces')
     parser.add_argument('-l','--legend',
                         default = True, action='store_false',
                         help='Turns off the legend')
+    parser.add_argument('-si','--saveimportant',
+                        default='', type=str,
+                        help='Indicates the path where important plots will be saved')
 
     args = parser.parse_args()
 
-
     plot_all = (not args.geometry) and (not args.plasma) and (not args.fields) and (not args.distribution)
-
-### Test this
-    # Read hdf5 files
+    #! Read hdf5 files
     if f90 and (args.geometry or plot_all):
         try:
             nml_file = os.path.join(args.directory, args.runid+'_inputs.dat')
             nml = f90nml.read(nml_file)['fidasim_inputs']
         except:
-            print('Error: Double check your directory, runid and/or path. The inputs file was not found')
+            print('ERROR: Check your directory, runid or path. The *_inputs.dat file was not found')
             raise SystemExit
+
     if args.geometry or plot_all:
         try:
             geo_file = os.path.join(args.directory, args.runid+'_geometry.h5')
             geo = h5.File(geo_file, 'r')
         except:
-            print('Error: Double check your directory, runid and/or path. The geometry file was not found')
+            print('ERROR: Check your directory, runid or path. The *_geometry.h5 file was not found')
             raise SystemExit
-    if args.plasma or args.fields or args.geometry or args.distribution or plot_all:
+
+    if args.distribution or args.plasma or args.fields or args.geometry or plot_all:
         try:
             eq_file = os.path.join(args.directory, args.runid+'_equilibrium.h5')
             eq = h5.File(eq_file, 'r')
+            pmask = eq["/plasma/mask"][()]
+            fmask = eq["/fields/mask"][()]
+            mask = np.multiply(pmask, fmask)
         except:
-            print('Error: Double check your directory, runid and/or path. The equilibrium file was not found')
-            raise SystemExit
+            mask = None
+            if args.plasma or args.fields or args.geometry or plot_all: #Don't exit if -d only
+                print('ERROR: Check your directory, runid or path. The *_equilibrium.h5 file was not found')
+                raise SystemExit
+
     if args.distribution or plot_all:
         try:
             dist_file = os.path.join(args.directory, args.runid+'_distribution.h5')
             dist = h5.File(dist_file, 'r')
         except:
-            print('Error: Double check your directory, runid and/or path. The distribution file was not found')
+            print('ERROR: Check your directory, runid or path. The *_distribution.h5 file was not found')
             raise SystemExit
 
-    # Define the limiting mask
-    if args.fields or args.plasma or args.distribution or plot_all:
-        pmask = eq["/plasma/mask"].value
-        fmask = eq["/fields/mask"].value
-        mask = np.multiply(pmask, fmask)
+        if (mask!=None).all(): #Use mask from equilibrium
+            dmask = mask.copy()
+        else:                   #Or use no mask
+            if dist['nphi'][()]>1:
+                dmask = np.ones((len(dist['phi']), len(dist['z']), len(dist['r'])))
+            else:
+                dmask = np.ones((len(dist['z']), len(dist['r'])))
 
     # Error checks for attempting to simultaneously plot two line outs on the same figure
-    if args.eplineout is not None and args.pelineout is not None:
-        print('Error: Cannot plot both ep and pe line outs. Pick one only')
+    if args.eplineout!=None and args.pelineout!=None:
+        print('ERROR: Cannot simultaneously plot both ep and pe line outs. Pick one.')
         raise SystemExit
-    if args.erlineout is not None and args.relineout is not None:
-        print('Error: Cannot plot both er and re line outs. Pick one only')
+    if args.erlineout!=None and args.relineout!=None:
+        print('ERROR: Cannot simultaneously plot both er and re line outs. Pick one.')
         raise SystemExit
-    if args.prlineout is not None and args.rplineout is not None:
-        print('Error: Cannot plot both pr and rp line outs. Pick one only')
+    if args.prlineout!=None and args.rplineout!=None:
+        print('ERROR: Cannot simultaneously plot both pr and rp line outs. Pick one.')
         raise SystemExit
-    if args.zelineout is not None and args.ezlineout is not None:
-        print('Error: Cannot plot both ez and ze line outs. Pick one only')
+    if args.zelineout!=None and args.ezlineout!=None:
+        print('ERROR: Cannot simultaneously plot both ez and ze line outs. Pick one.')
         raise SystemExit
-    if args.zplineout is not None and args.pzlineout is not None:
-        print('Error: Cannot plot both pz and zp line outs. Pick one only')
+    if args.zplineout!=None and args.pzlineout!=None:
+        print('ERROR: Cannot simultaneously plot both pz and zp line outs. Pick one.')
         raise SystemExit
-    if args.rzlineout is not None and args.zrlineout is not None: 
-        print('Error: Cannot plot both rz and zr line outs. Pick one only')
+    if args.rzlineout!=None and args.zrlineout!=None: 
+        print('ERROR: Cannot simultaneously plot both rz and zr line outs. Pick one.')
         raise SystemExit
 
-    # Define lineout flags that will be called in the big plot distribution loop
-    lout_flag = {}
-    if args.eplineout is not None or args.pelineout is not None:
-        lout_flag['pitchenergy'] = [args.pelineout, args.eplineout]
-    if args.erlineout is not None or args.relineout is not None:
-        lout_flag['energyr'] = [args.erlineout, args.relineout]
-    if args.prlineout is not None or args.rplineout is not None:
-        lout_flag['pitchr'] = [args.prlineout, args.rplineout]
-    if args.zelineout is not None or args.ezlineout is not None:
-        lout_flag['zenergy'] = [args.zelineout, args.ezlineout]
-    if args.zplineout is not None or args.pzlineout is not None:
-        lout_flag['zpitch'] = [args.zplineout, args.pzlineout]
-    if args.zrlineout is not None or args.rzlineout is not None:
-        lout_flag['zr'] = [args.zrlineout, args.rzlineout]
+    # Distribution function flags
+    lineouts = np.empty((4,4,2), dtype=object) #Initialize all elements as None
+    # Verticl slices
+    lineouts[2,3,0] = args.rzlineout
+    lineouts[1,3,0] = args.pzlineout
+    lineouts[1,2,0] = args.prlineout 
+    lineouts[0,3,0] = args.ezlineout
+    lineouts[0,2,0] = args.erlineout 
+    lineouts[0,1,0] = args.eplineout 
+    # Horizontal slices
+    lineouts[0,3,1] = args.zelineout 
+    lineouts[1,3,1] = args.zplineout 
+    lineouts[2,3,1] = args.zrlineout 
+    lineouts[0,1,1] = args.pelineout
+    lineouts[0,2,1] = args.relineout
+    lineouts[1,2,1] = args.rplineout
 
     # Plot geometry
     if args.geometry or plot_all:
 
-        r = eq["/plasma/r"].value
-        z = eq["/plasma/z"].value
+        r = eq["/plasma/r"][()]
+        z = eq["/plasma/z"][()]
+        try:
+            phi = eq["/plasma/phi"][()]
+        except:
+            phi = [0.0]
+
+
+        #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
+        phimin = np.min(phi)
+
+        if len(phi)>1:
+            phimax = np.max(phi)
+            axisym = False
+        else:
+            phimax = phimin + 2*np.pi
+            axisym = True
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.set_aspect('equal')
 
         # Define beam grid parameters
         if f90:
-            angles = np.array([nml['alpha'], nml['beta'], nml['gamma']])
+            tb_ang = np.array([nml['alpha'], nml['beta'], nml['gamma']])
             xlist = [nml['xmin'], nml['xmax']]
             ylist = [nml['ymin'], nml['ymax']]
             zlist = [nml['zmin'], nml['zmax']]
+
             xyz_vertices = []
-            for x in xlist:
-                for y in ylist:
-                    for z in zlist:
-                        xyz_vertices.append([x, y, z])
-            xyz_vertices = np.array(xyz_vertices)
-            uvw_vertices = []
-            for i in range(len(xyz_vertices)):
-                uvw_vertices.append(xyz_to_uvw(angles[0], angles[1], angles[2], xyz_vertices[i], origin = np.array(nml['origin'])))
-            uvw_vertices = np.array(uvw_vertices)
-            uvw_origin = np.array(nml['origin'])
+            for xl in xlist:
+                for yl in ylist:
+                    for zl in zlist:
+                        xyz_vertices.append([xl, yl, zl])
+            xyz_vertices = np.asarray(xyz_vertices)
+
+            origin = np.array(nml['origin'])
+            uvw_vertices = np.zeros_like(xyz_vertices)
+            for i,v in enumerate(xyz_vertices):
+                uvw_vertices[i] = xyz_to_uvw(tb_ang[0], tb_ang[1], tb_ang[2], v, origin=origin)
 
         # Plot neutral beam
         if 'nbi' in geo:
-            src = geo['nbi/src'].value
+            src = geo['nbi/src'][()]
             mag = 2000
-            t = np.linspace(0,mag,2)
-            axis = geo['nbi/axis'].value
+            t = np.linspace(0, mag, 2)
+            axis = geo['nbi/axis'][()]
+
             # Plot beam axis
-            centerline = src + t.reshape(2,1)*axis
-            ax.plot(centerline[:,0],centerline[:,1],centerline[:,2],color='red')
-            ax.text(centerline[0,0],centerline[0,1],centerline[0,2],'NBI',color='red')
+            baxis = src + t.reshape(2,1)*axis
+            ax.plot(baxis[:,0],baxis[:,1],baxis[:,2],color='k')
+            ax.text(baxis[0,0],baxis[0,1],baxis[0,2],'NBI',color='k')
+
             # Plot beam
-            origin = np.array([0, 0, 0])
-            ry = geo['nbi/awidy'].value
-            rz = geo['nbi/awidz'].value
+            ry = geo['nbi/awidy'][()]
+            rz = geo['nbi/awidz'][()]
             not_axis = np.array([1, 0, 0])   #Create new axes coordinate system
             if (np.cross(axis,not_axis)==0).all():
                 not_axis = np.array([0, 1, 0])
@@ -253,68 +313,80 @@ def main():
             t = np.linspace(0, mag, 2)
             theta = np.linspace(0, 2 * np.pi, 1000)
             t, theta = np.meshgrid(t, theta)
-            u, v, w = [centerline[0,i] + axis[i] * t + rz * np.sin(theta) * n1[i] +
-                    ry * np.cos(theta) * n2[i] for i in [0, 1, 2]]
+            u, v, w = [baxis[0,i] + axis[i]*t + rz*np.sin(theta)*n1[i] + ry*np.cos(theta)*n2[i] for i in [0,1,2]]
+
             # Plot
-            ax.plot_surface(u, v, w, color='white',alpha=0.1)
+            ax.plot_surface(u, v, w, color='k',alpha=0.1)
             if f90:
                 # Beam Grid
-                # Plot beam grid origin
-                ax.scatter3D(uvw_origin[0], uvw_origin[1], uvw_origin[2], s=25, c='darkgreen')
+                ax.scatter3D(origin[0], origin[1], origin[2], s=25, c='darkgreen') # Plot beam grid origin
                 # Plot vertices
-                ax.scatter3D(uvw_vertices[:, 0], uvw_vertices[:, 1], uvw_vertices[:, 2], s=1, c='darkgreen')
+                ax.scatter3D(uvw_vertices[:, 0], uvw_vertices[:, 1], uvw_vertices[:, 2], s=5, c='darkgreen')
+                # Plot sides
                 verts = [[uvw_vertices[0],uvw_vertices[1],uvw_vertices[3],uvw_vertices[2]],
                         [uvw_vertices[4],uvw_vertices[5],uvw_vertices[7],uvw_vertices[6]],
                         [uvw_vertices[0],uvw_vertices[1],uvw_vertices[5],uvw_vertices[4]],
                         [uvw_vertices[2],uvw_vertices[3],uvw_vertices[7],uvw_vertices[6]],
                         [uvw_vertices[5],uvw_vertices[1],uvw_vertices[3],uvw_vertices[7]],
                         [uvw_vertices[4],uvw_vertices[6],uvw_vertices[2],uvw_vertices[0]],]
-                # Plot sides
-                ax.add_collection3d(Poly3DCollection(verts, facecolors='lime', linewidths=1, edgecolors='darkgreen', alpha=0.1))
+                ax.add_collection3d(Poly3DCollection(verts, facecolors='lime', linewidths=1, edgecolors='darkgreen',
+                                                     alpha=0.1))
 
-        # Plot machine min/max major radius
-        th = np.linspace(0,2*np.pi,100)
-        xrmax = rmax*np.cos(th)
-        xrmin = rmin*np.cos(th)
-        yrmax = rmax*np.sin(th)
-        yrmin = rmin*np.sin(th)
-        zr = 0.0*xrmax
-        ax.plot(xrmax,yrmax,zr,color='black')
-        ax.plot(xrmin,yrmin,zr,color='black')
+        # Approximate plasma with a torus, where minor radius = max(max_length_R, max_length_Z)/2
+        # Find first and last nonzero index in R and Z
+        if axisym:
+            ir = [i for i,mr in enumerate(mask.sum(0)) if mr>0]
+            iz = [i for i,mz in enumerate(mask.sum(1)) if mz>0]
+        else:
+            ir = [i for i,mr in enumerate(mask.sum((-1,0))) if mr>0]
+            iz = [i for i,mz in enumerate(mask.sum((-1,1))) if mz>0]
+        lr = r[ir[-1]]-r[ir[0]]
+        lz = z[iz[-1]]-z[iz[0]]
+        rho = max(lr,lz) / 2.
 
-        # Plot FIDA and NPA chords
+        # Generate torus mesh
+        npts = 32
+        ph = np.linspace(phimin, phimax, npts) #depends on user inputs, phimin and phimax
+        phi, theta = np.meshgrid(ph, np.linspace(0, 2*np.pi, npts))
+        r_midpoint = r.mean()
+
+        X = (r_midpoint + rho * np.cos(theta)) * np.cos(phi)
+        Y = (r_midpoint + rho * np.cos(theta)) * np.sin(phi)
+        Z = rho * np.sin(theta)
+
+        ax.plot_surface(X, Y, Z, color='indigo', rstride=1, cstride=1, alpha=0.25)
+
+        # Plot FIDA and NPA
+        n_nchan = 0 ; f_nchan = 0
         if 'npa' in geo:
-            n_nchan = geo['/npa/nchan'].value
-        else:
-            n_nchan = 0
-
+            n_nchan = geo['/npa/nchan'][()]
         if 'spec' in geo:
-            f_nchan = geo['/spec/nchan'].value
-        else:
-            f_nchan = 0
+            f_nchan = geo['/spec/nchan'][()]
 
         if n_nchan + f_nchan > 0:
-            colors = plt.cm.jet(np.linspace(0,1,n_nchan+f_nchan))
-        t = np.linspace(0,2.1*rmax,2)
+            colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan))
+        t = np.linspace(0,1e8,2)
 
         if 'spec' in geo:
             for i in range(f_nchan):          # FIDA loop
-                lens = geo['/spec/lens'].value[i,:]
-                axis = geo['/spec/axis'].value[i,:]
+                lens = geo['/spec/lens'][()][i,:]
+                axis = geo['/spec/axis'][()][i,:]
                 los = lens + t.reshape(2,1)*axis
-                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i],label = "FIDA Ch. {0}".format(i+1))
+                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i],label = "FIDA {0}".format(i+1))
+                ax.scatter(lens[0],lens[1],lens[2],color='k', s=1)
         if 'npa' in geo:
             for i in range(n_nchan):          # NPA loop
-                d_cent = geo['/npa/d_cent'].value[i,:]
-                a_cent = geo['/npa/a_cent'].value[i,:]
+                d_cent = geo['/npa/d_cent'][()][i,:]
+                a_cent = geo['/npa/a_cent'][()][i,:]
                 axis = a_cent - d_cent
                 axis /= np.sqrt(axis[0]**2 + axis[1]**2 + axis[2]**2)
                 los = d_cent + t.reshape(2,1)*axis
-                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan],label = "NPA Ch. {0}".format(i+1))
+                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan],label = "NPA {0}".format(i+1))
+                ax.scatter(d_cent[0],d_cent[1],d_cent[2],color='k', s=1)
 
         # Set axes limits for an equal aspect ratio visualization
-        X = np.array([-rmax,rmax])
-        Y = np.array([-rmax,rmax])
+        X = np.array([-(r_midpoint + 2*rho), r_midpoint + 2*rho])
+        Y = np.array([-(r_midpoint + 2*rho), r_midpoint + 2*rho])
         Z = np.array([-zmax,zmax])
         max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max() / 2.0
         mid_x = (X.max()+X.min()) * 0.5
@@ -323,268 +395,428 @@ def main():
         ax.set_xlim(mid_x - max_range, mid_x + max_range)
         ax.set_ylim(mid_y - max_range, mid_y + max_range)
         ax.set_zlim(mid_z - max_range, mid_z + max_range)
-        ax.set_xlabel('X (cm)')
-        ax.set_ylabel('Y (cm)')
-        ax.set_zlabel('Z (cm)')
+
+        ax.set_xlabel('X [cm]')
+        ax.set_ylabel('Y [cm]')
+        ax.set_zlabel('Z [cm]')
         if n_nchan + f_nchan > 0 and args.legend:
-            l = ax.legend(ncol=2,loc=0)
+            l = ax.legend(ncol=2,loc='upper left')
             for i, txt in enumerate(l.get_texts()):
                 txt.set_color(colors[i])
         fig.canvas.set_window_title('Geometry')
 
+        #Save
+        if len(args.saveimportant)>0:
+            ax.view_init(0, -90)
+            plt.savefig(args.saveimportant+'geo_elev')
+            ax.view_init(zmax/2, -45)
+            plt.savefig(args.saveimportant+'geo_top1')
+            ax.view_init(zmax/2, 45)
+            plt.savefig(args.saveimportant+'geo_top2')
+
+    # Plot plasma
     if args.plasma or plot_all:
 
-        r = eq["/plasma/r"].value
-        z = eq["/plasma/z"].value
-        if args.rzlineout is not None:
-            ri = np.abs(r-args.rzlineout).argmin()       # R lineout index
-        if args.zrlineout is not None:
-            zi = np.abs(z-args.zrlineout).argmin()       # Z lineout index
+        r = eq["/plasma/r"][()]
+        z = eq["/plasma/z"][()]
+        try: 
+            phi = eq["/plasma/phi"][()]
+        except:
+            phi = [0.0]
+        iphi = np.abs(phi-args.phi).argmin()  # R lineout index
 
         #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
 
-        # Plot Electron Temperature
         to_plt = ['te','ti','dene','denn','zeff']
-        labels = ['T$_{e}$ (keV)','T$_{i}$ (keV)','n$_e$ (cm$^{-3}$)','n$_n$ (cm$^{-3}$)','Z$_{eff}$']
-        fig_labels = ['Te','Ti','ne','nn','Zeff']
+        labels = ['T$_{e}$ [keV]','T$_{i}$ [keV]','n$_e$ [cm$^{-3}$]','n$_n$ [cm$^{-3}$]','Z$_{eff}$']
+        fig_labels = ['Te','Ti','Ne','Nn','Zeff']
         for i in range(len(to_plt)):
-            plasma = eq["/plasma/"+to_plt[i]].value
+            plasma = eq["/plasma/"+to_plt[i]][()]
             plasma_masked = np.ma.array(plasma)
             plasma_masked[mask < 0.5] = np.ma.masked
-            if args.rzlineout is not None:
-                # R line out plots
-                fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
+            if len(phi)>1: plasma_masked = plasma_masked[iphi,:,:]
+
+            nlevs = get_nlevs(plasma_masked, args.nlevels)
+
+            pmin, pmax = get_arr_lim(plasma_masked) #In case data is close to, but not exactly constant
+
+            levs = np.linspace(pmin, pmax, nlevs)
+            if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero plasma 
+
+            if (args.rzlineout or args.zrlineout)!=None:
+                fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
                 ax = ax.flatten()
-                linex = [r[ri], r[ri]]
-                liney = [zmin, zmax]
-                ax[0].plot(linex,liney,'b--')
-                ax[1].plot(z,plasma_masked[:,ri], 'b')
-                ax[1].set_xlabel("Z (cm)",fontsize="large")
-                ax[1].set_ylabel(labels[i],fontsize="large")
-            elif args.zrlineout is not None:
-                # Z line out plots
-                fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
-                ax = ax.flatten()
-                linex = [rmin, rmax]
-                liney = [z[zi], z[zi]]
-                ax[0].plot(linex,liney,'b--')
-                ax[1].plot(r,plasma_masked[zi,:], 'b')
-                ax[1].set_xlabel("R (cm)",fontsize="large")
-                ax[1].set_ylabel(labels[i],fontsize="large")
+                if args.rzlineout!=None:   # R line out plots
+                    ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
+                    linex = [r[ir], r[ir]]
+                    liney = [zmin, zmax]
+                    ax[1].plot(z,plasma_masked[:,ir], 'indigo')
+                    ax[1].set_xlabel("Z [cm]",fontsize=18)
+                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+                elif args.zrlineout!=None:  # Z line out plots
+                    iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
+                    linex = [rmin, rmax]
+                    liney = [z[iz], z[iz]]
+                    ax[1].plot(r,plasma_masked[iz,:], 'indigo')
+                    ax[1].set_xlabel("R [cm]",fontsize=18)
+                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+                ax[0].plot(linex,liney,'w--')
+                ax[1].set_ylim([levs[0], levs[-1]])
+                ax[1].set_ylabel(labels[i],fontsize=18)
+                if pmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
             else:
                 fig, ax = plt.subplots(figsize=(4.8,4.8))
                 ax = np.array(ax)
                 ax = ax.flatten()
+
             # Contour plot
-            c = ax[0].contourf(r,z,plasma_masked,15,cmap="inferno")
+            c = ax[0].contourf(r,z,plasma_masked,levs,cmap="inferno")
             ax[0].set_xlim(rmin,rmax)
             ax[0].set_ylim(zmin,zmax)
-            ax[0].set_xlabel("R (cm)",fontsize="large")
-            ax[0].set_ylabel("Z (cm)",fontsize="large")
-            ax[0].tick_params(direction="out",length=2)
-            ax[0].set_title(labels[i],fontsize=20)
-            fig.colorbar(c,shrink=0.87,format='%0.2e', ax=ax[0])
+            ax[0].set_xlabel("R [cm]",fontsize=18)
+            ax[0].set_ylabel("Z [cm]",fontsize=18)
+            ax[0].set_aspect('equal')
+
+            if len(phi)>1: 
+                degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+            else:
+                degree = ''
+            ax[0].set_title(labels[i]+degree,fontsize=20)
+
+            if np.mean(plasma_masked)<10.0:
+                fig.colorbar(c,format='%.2f', ax=ax[0])
+            else:
+                fig.colorbar(c,format='%1.1e', ax=ax[0])
 
             fig.canvas.set_window_title(fig_labels[i])
-            fig.tight_layout()
+            plt.tight_layout()
+
+            #Save
+            important_labels = ['Te','Ti','Ne','Nn']
+            if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
+                plt.savefig(args.saveimportant+fig_labels[i])
 
     # Plot fields
     if args.fields or plot_all:
 
-        r = eq["/fields/r"].value
-        z = eq["/fields/z"].value
-        if args.rzlineout is not None:
-            ri = np.abs(r-args.rzlineout).argmin()       # R lineout index
-        if args.zrlineout is not None:
-            zi = np.abs(z-args.zrlineout).argmin()       # Z lineout index
+        r = eq["/fields/r"][()]
+        z = eq["/fields/z"][()]
+        try: 
+            phi = eq["/fields/phi"][()]
+        except:
+            phi = [0.0]
+        iphi = np.abs(phi-args.phi).argmin()  # R lineout index
 
-        # Interpolation grid ranges
+        #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
 
         to_plt = ['br','bt','bz','er','et','ez']
-        labels = ['B$_{r}$ (T)','B$_{t}$ (T)','B$_{z}$ (T)','E$_{r}$ (V/m)','E$_{t}$ (V/m)','E$_{z}$ (V/m)']
-        fig_labels = ['Br','Bt','Bz','Er','Et','Ez']
+        labels = ['B$_{r}$ [T]','B$_{t}$ [T]','B$_{z}$ [T]','E$_{r}$ [V/m]','E$_{t}$ [V/m]','E$_{z}$ [V/m]']
+        fig_labels = [t.capitalize() for t in to_plt]
         for i in range(len(to_plt)):
-            fld = eq["/fields/"+to_plt[i]].value
+            fld = eq["/fields/"+to_plt[i]][()]
             fld_masked = np.ma.array(fld)
             fld_masked[mask < 0.5] = np.ma.masked
-            if args.rzlineout is not None:
-                # R line out plots
-                fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
+            if len(phi)>1: fld_masked = fld_masked[iphi,:,:]
+
+            nlevs = get_nlevs(fld_masked, args.nlevels)
+
+            fmin, fmax = get_arr_lim(fld_masked) #In case data is close to, but not exactly constant
+
+            levs = np.linspace(fmin, fmax, nlevs)
+            if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero fields
+
+            if (args.rzlineout or args.zrlineout)!=None:
+                fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
                 ax = ax.flatten()
-                linex = [r[ri], r[ri]]
-                liney = [zmin, zmax]
-                ax[0].plot(linex,liney,'b--')
-                ax[1].plot(z,fld_masked[:,ri], 'b')
-                ax[1].set_xlabel("Z (cm)",fontsize="large")
-                ax[1].set_ylabel(labels[i],fontsize="large")
-            elif args.zrlineout is not None:
-                # Z line out plots
-                fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
-                ax = ax.flatten()
-                linex = [rmin, rmax]
-                liney = [z[zi], z[zi]]
-                ax[0].plot(linex,liney,'b--')
-                ax[1].plot(r,fld_masked[zi,:], 'b')
-                ax[1].set_xlabel("R (cm)",fontsize="large")
-                ax[1].set_ylabel(labels[i],fontsize="large")
+                if args.rzlineout!=None:   # R line out plots
+                    ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
+                    linex = [r[ir], r[ir]]
+                    liney = [zmin, zmax]
+                    ax[1].plot(z,fld_masked[:,ir], 'indigo')
+                    ax[1].set_xlabel("Z [cm]",fontsize=18)
+                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+                elif args.zrlineout!=None:  # Z line out plots
+                    iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
+                    linex = [rmin, rmax]
+                    liney = [z[iz], z[iz]]
+                    ax[1].plot(r,fld_masked[iz,:], 'indigo')
+                    ax[1].set_xlabel("R [cm]",fontsize=18)
+                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+                ax[0].plot(linex,liney,'w--')
+                ax[1].set_ylim([levs[0], levs[-1]])
+                ax[1].set_ylabel(labels[i],fontsize=18)
+                if fmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
             else:
                 fig, ax = plt.subplots(figsize=(4.8,4.8))
                 ax = np.array(ax)
                 ax = ax.flatten()
+
             # Contour plot
-            c = ax[0].contourf(r,z,fld_masked,15,cmap="inferno")
+            c = ax[0].contourf(r,z,fld_masked,levs,cmap="inferno")
             ax[0].set_xlim(rmin,rmax)
             ax[0].set_ylim(zmin,zmax)
-            ax[0].set_xlabel("R (cm)",fontsize="large")
-            ax[0].set_ylabel("Z (cm)",fontsize="large")
-            ax[0].tick_params(direction="out",length=2)
-            ax[0].set_title(labels[i],fontsize=20)
-            fig.colorbar(c,shrink=0.87,format='%0.2e', ax=ax[0])
+            ax[0].set_xlabel("R [cm]",fontsize=18)
+            ax[0].set_ylabel("Z [cm]",fontsize=18)
+            ax[0].set_aspect('equal')
+
+            if len(phi)>1: 
+                degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+            else:
+                degree = ''
+            ax[0].set_title(labels[i]+degree,fontsize=20)
+
+            if np.mean(fld_masked)<10.0:
+                fig.colorbar(c,format='%.2f', ax=ax[0])
+            else:
+                fig.colorbar(c,format='%1.1e', ax=ax[0])
+
             fig.canvas.set_window_title(fig_labels[i])
-            fig.tight_layout()
+            plt.tight_layout()
 
+            #Save
+            important_labels = [t.capitalize() for t in to_plt[:3]]
+            if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
+                plt.savefig(args.saveimportant+fig_labels[i])
 
+    # Plot distribution function
     if args.distribution or plot_all:
 
-        # Fast-ion distibution function
-        f = dist["f"].value
-        ndim = f.ndim
-        par = ['energy', 'pitch', 'r', 'z']
-        units = [' (keV)', '', ' (cm)', ' (cm)']
-        del_par = []
-        par_data = {}
-        lims_keys = ['min', 'max', 'units']
-        lims_dict = {}
+        f = dist["f"][()].T  # Read F
+        try: 
+            phi = dist["phi"][()]
+        except:
+            phi = [0.0]
+        iphi = np.abs(phi-args.phi).argmin()  # R lineout index
+        if f.ndim>4: f = f[:,:,:,:,iphi]
+        ndim = 4
 
-        for i in reversed(range(ndim)):
-            p = dist[par[i]].value      # Read in f parameters
-            dp = np.abs(p[1] - p[0])    # Create parameter intervals
-            del_par.append(dp)
-            par_data[par[i]] = p        # Store in dictionary for plots
-            lims_vals = [np.min(p), np.max(p), units[i]]
-            lims_dict[par[i]] = dict(zip(lims_keys, lims_vals))
-            # Dictionary for units on plots
+        # Read in coordinates of distribution function
+        labels = ['energy', 'pitch', 'r', 'z']
+        units = ['keV', 'unity', 'cm', 'cm']
+        dcoord = np.zeros(ndim) ; dist_coords = {} ; ax_specs = {}
+        for i in range(ndim):
+            coord = dist[labels[i]][()]
+            dcoord[i] = (coord[1]-coord[0])
+            dist_coords[labels[i]] = coord
+            ax_specs[labels[i]] = dict(zip(['min', 'max', 'units'], [min(coord), max(coord), units[i]]))
 
-        par.reverse()                   # Python reads things in reverse
         for i in range(ndim-1):         # Loop over parameters
-            a = par[:]                  # Copy parameter list
-            del a[i]
-            for j in range(i+1,ndim):
-                f1 = np.trapz(f,dx=del_par[i],axis=i)
-                f2 = np.trapz(f1,dx=del_par[j],axis=j-1)
-                # Integrate indexed variables
-                b = a[:]
-                del b[j-1]              # Delete integrated variables
-                if b[0] == 'r':
-                    b[0] = b[1]
-                    b[1] = 'r'
-                    f2 = np.transpose(f2)
-                if b[0] == 'z' and b[1] == 'r':
+            for j in range(i+1, ndim):
+                f1 = np.trapz(f, dx=dcoord[i], axis=i)
+                f2 = np.trapz(f1, dx=dcoord[j], axis=j-1).T
+
+                if labels[i]=='energy' and labels[j]=='pitch': #Mask for R-Z plot
                     f2 = np.ma.array(f2)
-                    f2[mask < 0.5] = np.ma.masked
-                # Define x and y data to plot
-                x = par_data[b[1]]
-                y = par_data[b[0]]
-                xmin, xmax = lims_dict[b[1]]['min'],lims_dict[b[1]]['max']
-                ymin, ymax = lims_dict[b[0]]['min'],lims_dict[b[0]]['max']
+                    if len(phi)>1:
+                        f2[dmask[iphi,:,:] < 0.5] = np.ma.masked
+                    else:
+                        f2[dmask < 0.5] = np.ma.masked
+
+                nlevs = get_nlevs(f2, args.nlevels)
+
+                dmin, dmax = get_arr_lim(f2) #In case data is close to, but not exactly constant
+
+                levs = np.linspace(dmin, dmax, nlevs)
+                if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero distribution
+
+                # Define x and y data for contour plots
+                integrated_labels = [labels[i],labels[j]]
+                f2_labels = np.setdiff1d(labels,integrated_labels)
+                x = dist_coords[f2_labels[0]]
+                y = dist_coords[f2_labels[1]]
+                iyl = labels.index(f2_labels[1])
+                ixl = labels.index(f2_labels[0])
+
+                #Also define lineouts
+                vline = lineouts[ixl,iyl,0]
+                hline = lineouts[ixl,iyl,1]
+                if f2_labels[1]=='r': #Enfore R to x axis
+                    x, y = y, x
+                    vline, hline = hline , vline
+                    f2 = f2.T
+                    f2_labels = np.flip(f2_labels)
+
+                xmin, xmax = ax_specs[f2_labels[0]]['min'],ax_specs[f2_labels[0]]['max']
+                ymin, ymax = ax_specs[f2_labels[1]]['min'],ax_specs[f2_labels[1]]['max']
 
                 # Plot lineouts
-                if b[0]+b[1] in lout_flag:
-                    if lout_flag[b[0]+b[1]][1] is not None:
-                        xi = np.abs(x-lout_flag[b[0]+b[1]][1]).argmin()       # X lineout index
-                    if lout_flag[b[0]+b[1]][0] is not None:
-                        yi = np.abs(y-lout_flag[b[0]+b[1]][0]).argmin()       # Y lineout index
-
-                    if lout_flag[b[0]+b[1]][1] is not None:
-                        # X line out plots
-                        fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
-                        ax = ax.flatten()
-                        linex = [x[xi], x[xi]]
+                if (vline or hline)!=None:
+                    fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
+                    ax = ax.flatten()
+                    if vline!=None:                                        # X lineout index
+                        ix = np.abs(x-vline).argmin()
+                        linex = [x[ix], x[ix]]
                         liney = [ymin, ymax]
-                        ax[0].plot(linex,liney,'b--')
-                        ax[1].plot(y,f2[:,xi], 'b')
-                        ax[1].set_xlabel(b[0].capitalize() + lims_dict[b[0]]['units'],fontsize="large")
-                        ax[1].set_ylabel('Fast-ion distribution',fontsize="large")
-                    elif lout_flag[b[0]+b[1]][0] is not None:
-                        # Y line out plots
-                        fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
-                        ax = ax.flatten()
+                        ax[1].plot(y, f2[:,ix], 'indigo')
+                        ax[1].set_xlabel(f2_labels[1].capitalize() + ' [%s]'%ax_specs[f2_labels[1]]['units'],
+                                         fontsize=18)
+                        unit = ax_specs[f2_labels[0]]['units']
+                        #Reformat pitch labels
+                        if unit=='unity':
+                            unit = ''
+                            title = 'Pitch w.r.t. B'
+                        else:
+                            title = f2_labels[0].capitalize()
+                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(x[ix],1)),
+                                                                unit), fontsize=20)
+                    elif hline!=None:                                      # Y lineout index
+                        iy = np.abs(y-hline).argmin()
                         linex = [xmin, xmax]
-                        liney = [y[yi], y[yi]]
-                        ax[0].plot(linex,liney,'b--')
-                        ax[1].plot(x,f2[yi,:], 'b')
-                        ax[1].set_xlabel(b[1].capitalize() + lims_dict[b[1]]['units'],fontsize="large")
-                        ax[1].set_ylabel('Fast-ion distribution',fontsize="large")
+                        liney = [y[iy], y[iy]]
+                        ax[1].plot(x, f2[iy,:], 'indigo')
+                        ax[1].set_xlabel(f2_labels[0].capitalize() + ' [%s]'%ax_specs[f2_labels[0]]['units'],
+                                         fontsize=18)
+                        unit = ax_specs[f2_labels[1]]['units']
+                        #Reformat pitch labels
+                        if unit=='unity': 
+                            unit = ''
+                            title = 'Pitch w.r.t. B'
+                        else:
+                            title = f2_labels[1].capitalize()
+                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(y[iy],1)), 
+                                                                unit), fontsize=20)
+
+                    ax[0].plot(linex, liney, 'w--')
+                    ax[1].set_ylim([levs[0], levs[-1]])
+                    ax[1].set_ylabel(r'$\left< F \right>_{%s,%s}$' % (labels[i].capitalize(),
+                                                                      labels[j].capitalize()),fontsize=18)
+                    if dmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
                 else:
                     fig, ax = plt.subplots(figsize=(4.8,4.8))
                     ax = np.array(ax)
                     ax = ax.flatten()
+
                 # Contour plot
-                c = ax[0].contourf(par_data[b[1]],par_data[b[0]],f2,15,cmap="inferno")
+                c = ax[0].contourf(x, y, f2, levs, cmap="inferno")
                 ax[0].set_xlim(xmin,xmax)
                 ax[0].set_ylim(ymin,ymax)
-                ax[0].set_xlabel(b[1].capitalize() + lims_dict[b[1]]['units'],fontsize="large")
-                ax[0].set_ylabel(b[0].capitalize() + lims_dict[b[0]]['units'],fontsize="large")
-                ax[0].tick_params(direction="out",length=2)
-                ax[0].set_title('Fast-ion distribution',fontsize=20)
-                fig.canvas.set_window_title('Fast-ion distribution: '+b[0]+' vs. '+b[1])
-                fig.colorbar(c,shrink=0.87,format='%0.2e', ax=ax[0])
-                fig.tight_layout()
+                #Reformat pitch labels
+                xlabel, ylabel = f2_labels
+                if xlabel=='pitch': 
+                    xlabel = 'Pitch w.r.t. B'
+                else:
+                    xlabel = f2_labels[0].capitalize()
+                if ylabel=='pitch': 
+                    ylabel = 'Pitch w.r.t. B'
+                else:
+                    ylabel = f2_labels[1].capitalize()
+                ax[0].set_xlabel(xlabel+' [%s]'%ax_specs[f2_labels[0]]['units'],fontsize=18)
+                ax[0].set_ylabel(ylabel+' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=18)
+
+                ip = np.argwhere('pitch'==f2_labels.T) #R-Pitch plot
+                if len(ip)>0 and ip==0: 
+                    ax[0].set_xticks(np.round(np.linspace(x[1], x[-2], 6), 1))
+                else:
+                    plt.locator_params(axis='x', nbins=8)
+
+                if labels[i]=='energy' and labels[j]=='pitch': #R-Z plot
+                    ax[0].set_aspect('equal') 
+
+                if len(phi)>1: 
+                    degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+                else:
+                    degree = ''
+                ax[0].set_title(r'$\left< F \right>_{%s,%s}$' % (labels[i].capitalize(),labels[j].capitalize()) +
+                                                                 degree,fontsize=20)
+
+                if np.mean(f2)<10.0: #Colorbar formatting
+                    fig.colorbar(c,format='%.2f', ax=ax[0])
+                else:
+                    fig.colorbar(c,format='%1.1e', ax=ax[0])
+
+                fig.canvas.set_window_title('Fast-ion distribution: %s vs. %s' % (f2_labels[1].capitalize(),
+                                                                                  f2_labels[0].capitalize()))
+                plt.tight_layout()
+
+                #Save
+                iimp = np.array([(f2_labels==['r','z']).all(), (f2_labels==['energy','pitch']).all()])
+                save_labels = np.array(['Fzr', 'Fpe'])
+                if len(args.saveimportant)>0 and iimp.any():
+                    plt.savefig(args.saveimportant+save_labels[iimp][0])
 
         # Fast-ion density
-        r = dist["/r"].value
-        z = dist["/z"].value
-        if args.rzlineout is not None:
-            ri = np.abs(r-args.rzlineout).argmin()       # R lineout index
-        if args.zrlineout is not None:
-            zi = np.abs(z-args.zrlineout).argmin()       # Z lineout index
+
+
+        r = dist["/r"][()]
+        z = dist["/z"][()]
+        try: 
+            phi = dist["phi"][()]
+        except:
+            phi = [0.0]
+        iphi = np.abs(phi-args.phi).argmin()  # R lineout index
+
+        #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
 
-        denf = dist["denf"].value
+        denf = dist["denf"][()]
         denf_masked = np.ma.array(denf)
-        denf_masked[mask < 0.5] = np.ma.masked
-        if args.rzlineout is not None:
-            # R line out plots
-            fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
+        denf_masked[dmask < 0.5] = np.ma.masked
+        if len(phi)>1: denf_masked = denf_masked[iphi,:,:]
+
+        nlevs = get_nlevs(denf_masked, args.nlevels)
+
+        dmin, dmax = get_arr_lim(denf_masked) #In case data is close to, but not exactly constant
+
+        levs = np.linspace(dmin, dmax, nlevs)
+        if (levs==0).all(): levs = [-0.1, 0.1] #In case zero fields
+
+        if (args.rzlineout or args.zrlineout)!=None:
+            fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
             ax = ax.flatten()
-            linex = [r[ri], r[ri]]
-            liney = [zmin, zmax]
-            ax[0].plot(linex,liney,'b--')
-            ax[1].plot(z,denf_masked[:,ri], 'b')
-            ax[1].set_xlabel("Z (cm)",fontsize="large")
-            ax[1].set_ylabel('Fast-ion Density (cm$^{-3}$)',fontsize="large")
-        elif args.zrlineout is not None:
-            # Z line out plots
-            fig, ax = plt.subplots(2,1,figsize=(4.8,9.6))
-            ax = ax.flatten()
-            linex = [rmin, rmax]
-            liney = [z[zi], z[zi]]
-            ax[0].plot(linex,liney,'b--')
-            ax[1].plot(r,denf_masked[zi,:], 'b')
-            ax[1].set_xlabel("R (cm)",fontsize="large")
-            ax[1].set_ylabel('Fast-ion Density (cm$^{-3}$)',fontsize="large")
+            if args.rzlineout!=None: # R line out plots
+                ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
+                linex = [r[ir], r[ir]]
+                liney = [zmin, zmax]
+                ax[1].plot(z,denf_masked[:,ir], 'indigo')
+                ax[1].set_xlabel("Z [cm]",fontsize=18)
+                ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+            elif args.zrlineout!=None: # Z line out plots
+                iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
+                linex = [rmin, rmax]
+                liney = [z[iz], z[iz]]
+                ax[1].plot(r,denf_masked[iz,:], 'indigo')
+                ax[1].set_xlabel("R [cm]",fontsize=18)
+                ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+            ax[0].plot(linex,liney,'w--')
+            ax[1].set_ylim([levs[0], levs[-1]])
+            ax[1].set_ylabel('n$_F$ [cm$^{-3}$]',fontsize=18)
+            if dmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
         else:
             fig, ax = plt.subplots(figsize=(4.8,4.8))
             ax = np.array(ax)
             ax = ax.flatten()
+
         # Contour plot
-        c = ax[0].contourf(r,z,denf_masked,15,cmap="inferno")
+        c = ax[0].contourf(r,z,denf_masked,levs,cmap="inferno")
         ax[0].set_xlim(rmin,rmax)
         ax[0].set_ylim(zmin,zmax)
-        ax[0].set_xlabel("R (cm)",fontsize="large")
-        ax[0].set_ylabel("Z (cm)",fontsize="large")
-        ax[0].tick_params(direction="out",length=2)
-        ax[0].set_title('Fast-ion Density (cm$^{-3}$)',fontsize=20)
-        fig.colorbar(c,shrink=0.87,format='%0.2e', ax=ax[0])
+        ax[0].set_xlabel("R [cm]",fontsize=18)
+        ax[0].set_ylabel("Z [cm]",fontsize=18)
+        ax[0].set_aspect('equal')
+
+        if len(phi)>1: 
+            degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+        else:
+            degree = ''
+        ax[0].set_title('n$_F$ [cm$^{-3}$]' + degree,fontsize=20)
+
+        if np.mean(denf_masked)<10.0:
+            fig.colorbar(c,format='%.2f', ax=ax[0])
+        else:
+            fig.colorbar(c,format='%1.1e', ax=ax[0])
+
         fig.canvas.set_window_title('Fast-ion Density')
-        fig.tight_layout()
+        plt.tight_layout()
+
+        #Save
+        if len(args.saveimportant)>0:
+            plt.savefig(args.saveimportant+'Nf')
 
     plt.show()
 
-if __name__=='__main__':
-    main()
+if __name__=='__main__': main()

@@ -1087,6 +1087,32 @@ type GyroSurface
         !+ Basis of coordinate system of gyrosurface
 end type GyroSurface
 
+type OrbProtonTable
+    !+ Defines MAST 3 MeV proton table data
+    integer :: ne3 = 0
+        !+ Number of proton energies
+    real(Float64), dimension(:), allocatable :: earray = 0
+        !+ Energies of proton orbits [keV]
+    type(ProtonOrbit), dimension(:), allocatable :: orb = 0
+        !+ Proton orbits
+end type OrbProtonTable
+
+type Orbit
+    !+ Defines 3 MeV proton orbit trajectories
+    integer :: nch = 0
+        !+ Number of detector channels
+    integer :: nrays = 0
+        !+ Number of "rays"
+    integer :: nstep = 0
+        !+ Number of total steps
+    integer, dimension(:,:), allocatable :: nactual = 0
+        !+ Number of spatial steps of a given orbit and detector
+    real(Float64), dimension(:,:), allocatable :: daomega = 0
+        !+ Differntial area times solid angle of a given velocity vector [cm^-2] !!!TODO convert
+    real(Float64), dimension(:,:,:,:), allocatable :: sightline = 0
+        !+ Contains velocities and positions for a given detector channel, ray and step [cm/s cm]
+end type Orbit
+
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
     !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], [[NPAParticle]], and [[BirthParticle]]
@@ -1162,6 +1188,8 @@ type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
+type(OrbProtonTable), save       :: ptable
+    !+ Variable for storing the calculated 3 MeV proton orbits
 
 contains
 

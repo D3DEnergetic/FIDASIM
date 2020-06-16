@@ -851,6 +851,14 @@ type NeutronRate
         !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
+type Proton
+    !+ Proton storage structure
+    real(Float64), dimension(:), allocatable :: rate
+        !+ Proton rate: rate(orbit_type) [proton/sec]
+    real(Float64), dimension(:,:,:,:,:,:), allocatable :: weight
+        !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
+end type Proton
+
 type NeutralParticle
     real(Float64) :: w = 1.d0
         !+ Neutral particle weight
@@ -1182,7 +1190,7 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(NeutronRate), save         :: proton
+type(Proton), save              :: proton
     !+ Variable for storing the 3 MeV proton rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
@@ -5375,12 +5383,12 @@ subroutine write_neutrons
 
 end subroutine write_neutrons
 
-subroutine write_protons
+subroutine write_proton_weights
     !+ Writes [[libfida:proton]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(3) :: dim3
-    integer(HSIZE_T), dimension(5) :: dim5
+    integer(HSIZE_T), dimension(6) :: dim6
     integer :: error
 
     character(charlim) :: filename
@@ -5401,18 +5409,62 @@ subroutine write_protons
         dim1(1) = particles%nclass
         call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, proton%rate, error)
         call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "proton rate: rate(orbit_class)", error)
+             "Proton rate: rate(orbit_class)", error)
     else
         dim1(1) = 1
         call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, proton%rate, error)
         call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "proton rate", error)
+             "Proton rate", error)
     endif
     call h5ltset_attribute_string_f(fid,"/rate","units","protons/s",error )
 
+    if((inputs%dist_type.eq.1).and.(inputs%calc_proton.ge.2)) then
+        dim1(1) = 1
+        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
+        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
+        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
+        dim6 = shape(proton%weight)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 6, dim6, proton%weight, error)
+
+
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim6(2:2), fbm%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim6(3:3), fbm%pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim6(4:4), fbm%r, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim6(5:5), fbm%z, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/phi", 1, dim6(6:6), fbm%phi, error)
+
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of pitch values", error)
+        call h5ltset_attribute_string_f(fid,"/nr", "description", &
+             "Number of R values", error)
+        call h5ltset_attribute_string_f(fid,"/nz", "description", &
+             "Number of Z values", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "description", &
+             "Proton Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
+
+
+
+
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/r","description", &
+             "Radius array", error)
+        call h5ltset_attribute_string_f(fid,"/r", "units","cm", error)
+        call h5ltset_attribute_string_f(fid,"/z","description", &
+             "Z array", error)
+        call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+    endif
+
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
-         "proton rate calculated by FIDASIM", error)
+         "Proton rate calculated by FIDASIM", error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -5421,10 +5473,10 @@ subroutine write_protons
     call h5close_f(error)
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'protons written to: ', trim(filename)
+        write(*,'(T4,a,a)') 'Protons written to: ', trim(filename)
     endif
 
-end subroutine write_protons
+end subroutine write_proton_weights
 
 subroutine write_fida_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
@@ -8439,9 +8491,9 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
     b22 = c%b22
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "get_ddpt_rate: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
-            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+            write(*,'(a)') "GET_DDPT_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+         !!!write(*,'("eb = ",ES10.3," [keV]")') eb        !!!used for bench_sigmav
+         !!!write(*,'("ti = ",ES10.3," [keV]")') plasma%ti !!!used for bench_sigmav
         endif
         rate = 0.d0
         return
@@ -8458,8 +8510,8 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
         rate = 0.d0
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
-                rate = rate + exp(lograte*log_10)
-             !!!rate = rate + plasma%deni(is) * exp(lograte*log_10)
+             !!!rate = rate + exp(lograte*log_10) !!!used for bench_sigmav
+                rate = rate + plasma%deni(is) * exp(lograte*log_10)
             endif
         enddo
     endif
@@ -8533,7 +8585,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     ci = b1*abc(3,ei) + b2*abc(3,ei+1)
 
     kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
-    write(*,'(T2,"k  = ",ES10.3)') k
+ !!!write(*,'(T2,"k  = ",ES10.3)') k !!!used for bench_sigmav
 
 end subroutine get_ddpt_anisotropy
 
@@ -8652,10 +8704,10 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
     if ((E3+0.5*dE3).gt.E3max) delta_gam = dgamdE3*(0.5*dE3+E3max-E3)*JMeV
 
     pgyro = delta_gam/pi
-    write(*,'(T2,"g+ = ",F7.5)') gam_pos
-    write(*,'(T2,"g- = ",F7.5)') gam_neg
-    write(*,'(T2,"c+ = ",F7.5)') costheta_pos
-    write(*,'(T2,"c- = ",F7.5)') costheta_neg
+ !!!write(*,'(T2,"g+ = ",F7.5)') gam_pos
+ !!!write(*,'(T2,"g- = ",F7.5)') gam_neg
+ !!!write(*,'(T2,"c+ = ",F7.5)') costheta_pos
+ !!!write(*,'(T2,"c- = ",F7.5)') costheta_neg
 
 endsubroutine get_pgyro
 
@@ -9287,7 +9339,8 @@ subroutine store_neutrons(rate, orbit_class)
 
 end subroutine store_neutrons
 
-subroutine store_protons(rate, orbit_class)
+!!! Merge with store_neutrons
+subroutine store_proton_rate(rate, orbit_class)
     !+ Store proton rate in [[libfida:proton]]
     real(Float64), intent(in)     :: rate
         !+ Proton rate [sproton/sec]
@@ -9306,7 +9359,7 @@ subroutine store_protons(rate, orbit_class)
     proton%rate(iclass)= proton%rate(iclass) + rate
     !$OMP END ATOMIC
 
-end subroutine store_protons
+end subroutine store_proton_rate
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
@@ -11756,7 +11809,7 @@ subroutine neutron_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
-                            call get_ddpt_rate(plasma, erel, rate)
+                            call get_ddpt_rate(plasma, erel, rate, branch=2)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
@@ -11853,7 +11906,7 @@ subroutine bench_sigmav
     rate = kappa * rate
 
     !! Store neutrons
-    call store_protons(rate)
+    call store_proton_rate(rate)
 
 #ifdef _MPI
     call parallel_sum(proton%rate)
@@ -11870,9 +11923,9 @@ subroutine bench_sigmav
     endif
 
 #ifdef _MPI
-    if(my_rank().eq.0) call write_protons()
+    if(my_rank().eq.0) call write_proton_weights()
 #else
-    call write_protons()
+    call write_proton_weights()
 #endif
 
 end subroutine bench_sigmav
@@ -11956,7 +12009,7 @@ subroutine neutron_mc
                 eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
-                call get_ddpt_rate(plasma, eb, rate)
+                call get_ddpt_rate(plasma, eb, rate, branch=2)
                 rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
@@ -11976,7 +12029,7 @@ subroutine neutron_mc
             eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
-            call get_ddpt_rate(plasma, eb, rate)
+            call get_ddpt_rate(plasma, eb, rate, branch=2)
             rate = rate*fast_ion%weight*factor
 
             !! Store neutrons
@@ -12786,11 +12839,6 @@ program fidasim
         neutron%rate = 0.d0
     endif
 
-    if(inputs%calc_proton.ge.1)then
-        allocate(proton%rate(particles%nclass))
-        proton%rate = 0.d0
-    endif
-
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
     !! -----------------------------------------------------------------------
@@ -12982,9 +13030,6 @@ program fidasim
     endif
 
     if(inputs%calc_proton.ge.1) then
-        if(inputs%verbose.ge.1) then
-            write(*,*) 'proton rate:    ', time(time_start)
-        endif
         call bench_sigmav()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

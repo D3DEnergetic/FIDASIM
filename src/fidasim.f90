@@ -789,6 +789,16 @@ type NPAResults
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
+type CFPDChords
+    !+ Defines a NPA system
+    integer :: nchan = 0
+         !+ Number of channels
+    type(NPADetector), dimension(:), allocatable          :: det
+         !+ NPA detector array
+    real(Float64), dimension(:), allocatable              :: radius
+         !+ Radius [cm]
+end type CFPDChords
+
 type BirthParticle
     !+ Defines a Birth particle
     integer :: neut_type = 0
@@ -851,13 +861,13 @@ type NeutronRate
         !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
-type Proton
+type ProtonRate
     !+ Proton storage structure
     real(Float64), dimension(:), allocatable :: rate
         !+ Proton rate: rate(orbit_type) [proton/sec]
     real(Float64), dimension(:,:,:,:,:,:), allocatable :: weight
         !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
-end type Proton
+end type ProtonRate
 
 type NeutralParticle
     real(Float64) :: w = 1.d0
@@ -1096,30 +1106,22 @@ type GyroSurface
 end type GyroSurface
 
 type OrbProtonTable
-    !+ Defines MAST 3 MeV proton table data
-    integer :: ne3 = 0
-        !+ Number of proton energies
-    real(Float64), dimension(:), allocatable :: earray = 0
-        !+ Energies of proton orbits [keV]
-    type(ProtonOrbit), dimension(:), allocatable :: orb = 0
-        !+ Proton orbits
-end type OrbProtonTable
-
-type Orbit
     !+ Defines 3 MeV proton orbit trajectories
-    integer :: nch = 0
-        !+ Number of detector channels
+    integer :: nenergy = 0
+        !+ Number of proton energies
     integer :: nrays = 0
         !+ Number of "rays"
-    integer :: nstep = 0
+    integer :: nsteps = 0
         !+ Number of total steps
-    integer, dimension(:,:), allocatable :: nactual = 0
+    real(Float64), dimension(:), allocatable :: earray
+        !+ Energies of proton orbits [keV]
+    real(Float64), dimension(:,:,:), allocatable :: nactual
         !+ Number of spatial steps of a given orbit and detector
-    real(Float64), dimension(:,:), allocatable :: daomega = 0
+    real(Float64), dimension(:,:,:), allocatable :: daomega
         !+ Differntial area times solid angle of a given velocity vector [cm^-2] !!!TODO convert
-    real(Float64), dimension(:,:,:,:), allocatable :: sightline = 0
+    real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
         !+ Contains velocities and positions for a given detector channel, ray and step [cm/s cm]
-end type Orbit
+end type OrbProtonTable
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
@@ -1180,6 +1182,8 @@ type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
+type(CFPDChords), save          :: cfpd_chords
+    !+ Variable containing the CFPD system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
@@ -1190,7 +1194,7 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(Proton), save              :: proton
+type(ProtonRate), save              :: proton
     !+ Variable for storing the 3 MeV proton rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
@@ -3117,6 +3121,137 @@ subroutine read_npa
     deallocate(d_cent,d_redge,d_tedge)
 
 end subroutine read_npa
+
+subroutine read_cfpd
+    !+ Reads the CFPD geometry and stores the quantities in [[libfida:cfpd_chords]]
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(2) :: dims
+    integer(HSIZE_T), dimension(3) :: dims3
+    integer(HSIZE_T), dimension(5) :: dims5
+    logical :: path_valid
+
+    real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
+    real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
+    character(len=20) :: system = ''
+
+    real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
+    real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
+    real(Float64), dimension(3,3) :: basis, inv_basis
+    real(Float64) :: hh, hw
+    integer :: ichan
+    integer :: error
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
+
+    !!Check if CFPD group exists
+    call h5ltpath_valid_f(fid, "/cfpd", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'CFPD geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without CFPD diagnostics'
+        endif
+        inputs%calc_proton = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
+        return
+    endif
+
+    !!Open CFPD group
+    call h5gopen_f(fid, "/cfpd", gid, error)
+
+    call h5ltread_dataset_string_f(gid, "/cfpd/system", system, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", cfpd_chords%nchan, error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- CFPD settings ----"
+        write(*,'(T2,"CFPD System: ", a)') trim(adjustl(system))
+        write(*,'(T2,"Number of channels: ",i3)') cfpd_chords%nchan
+    endif
+
+    allocate(a_tedge(3, cfpd_chords%nchan))
+    allocate(a_redge(3, cfpd_chords%nchan))
+    allocate(a_cent(3,  cfpd_chords%nchan))
+    allocate(d_tedge(3, cfpd_chords%nchan))
+    allocate(d_redge(3, cfpd_chords%nchan))
+    allocate(d_cent(3,  cfpd_chords%nchan))
+    allocate(cfpd_chords%radius(cfpd_chords%nchan))
+    allocate(cfpd_chords%det(cfpd_chords%nchan))
+
+    dims = [3,spec_chords%nchan]
+    call h5ltread_dataset_double_f(gid,"/cfpd/radius", cfpd_chords%radius, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/cfpd/a_shape", cfpd_chords%det%aperture%shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/a_tedge", a_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/a_redge", a_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/a_cent",  a_cent, dims, error)
+
+    call h5ltread_dataset_int_f(gid, "/cfpd/d_shape", cfpd_chords%det%detector%shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/d_tedge", d_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/d_redge", d_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/d_cent",  d_cent, dims, error)
+
+    !Read orbits information
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ptable%nenergy, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ptable%nrays, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ptable%nsteps, error)
+
+    allocate(ptable%nactual(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
+    allocate(ptable%daomega(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
+    allocate(ptable%sightline(ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan))
+
+    dims3 = [ptable%nenergy, ptable%nrays, cfpd_chords%nchan]
+    dims5 = [ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan]
+    call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ptable%nactual, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ptable%daomega, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/sightline", ptable%sightline, dims5, error)
+
+    !!Close CFPD group
+    call h5gclose_f(gid, error)
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    chan_loop: do ichan=1,cfpd_chords%nchan
+        ! Convert to beam grid coordinates
+        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
+        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
+        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
+        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
+        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
+        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
+
+        ! Define detector/aperture hh/hw
+        cfpd_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
+        cfpd_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
+
+        cfpd_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
+        cfpd_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
+
+        ! Define detector/aperture origin
+        cfpd_chords%det(ichan)%detector%origin = xyz_d_cent
+        cfpd_chords%det(ichan)%aperture%origin = xyz_a_cent
+
+        ! Define detector/aperture basis
+        call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
+             cfpd_chords%det(ichan)%detector%basis, &
+             cfpd_chords%det(ichan)%detector%inv_basis)
+        call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
+             cfpd_chords%det(ichan)%aperture%basis, &
+             cfpd_chords%det(ichan)%aperture%inv_basis)
+    enddo chan_loop
+
+    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+
+    deallocate(a_cent,a_redge,a_tedge)
+    deallocate(d_cent,d_redge,d_tedge)
+
+end subroutine read_cfpd
 
 subroutine read_plasma
     !+ Reads in Plasma composition e.g. the thermal, fast-ion, and impurity species

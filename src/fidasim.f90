@@ -1194,7 +1194,7 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(ProtonRate), save              :: proton
+type(ProtonRate), save          :: proton
     !+ Variable for storing the 3 MeV proton rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
@@ -3198,12 +3198,14 @@ subroutine read_cfpd
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ptable%nrays, error)
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ptable%nsteps, error)
 
+    allocate(ptable%earray(ptable%nenergy))
     allocate(ptable%nactual(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
     allocate(ptable%daomega(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
     allocate(ptable%sightline(ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan))
 
     dims3 = [ptable%nenergy, ptable%nrays, cfpd_chords%nchan]
     dims5 = [ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan]
+    call h5ltread_dataset_double_f(gid, "/cfpd/earray", ptable%earray, dims3(1:1), error)
     call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ptable%nactual, dims3, error)
     call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ptable%daomega, dims3, error)
     call h5ltread_dataset_double_f(gid, "/cfpd/sightline", ptable%sightline, dims5, error)
@@ -5518,6 +5520,7 @@ subroutine write_neutrons
 
 end subroutine write_neutrons
 
+!!!Need to write outt E3 energy
 subroutine write_proton_weights
     !+ Writes [[libfida:proton]] to a HDF5 file
     integer(HID_T) :: fid
@@ -5553,7 +5556,7 @@ subroutine write_proton_weights
     endif
     call h5ltset_attribute_string_f(fid,"/rate","units","protons/s",error )
 
-    if((inputs%dist_type.eq.1).and.(inputs%calc_proton.ge.2)) then
+    if(inputs%dist_type.eq.1) then
         dim1(1) = 1
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
@@ -7166,6 +7169,58 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
     enddo
 
 end subroutine get_passive_grid_indices
+
+!!!Slightly redundant
+subroutine get_interpolation_grid_indices(pos, ind, input_coords)
+    !+ Find closest [[libfida:inter_grid]] indices `ind` to position `pos`
+    real(Float64),  dimension(3), intent(in)  :: pos
+        !+ Position [cm]
+    integer(Int32), dimension(3), intent(out) :: ind
+        !+ Closest indices to position
+    integer, intent(in), optional             :: input_coords
+        !+ Indicates coordinate system of `pos`. Beam grid (0), machine (1) and cylindrical (2)
+
+    real(Float64),  dimension(3) :: mini, differentials, loc
+    integer(Int32), dimension(3) :: maxind
+    integer :: i, ics
+
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 2
+    endif
+
+    if(ics.eq.1) then
+        loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        loc(2) = pos(3)
+        loc(3) = atan2(pos(2),pos(1))
+    endif
+
+    if(ics.eq.2) then
+        loc(1) = pos(1)
+        loc(2) = pos(2)
+        loc(3) = pos(3)
+    endif
+
+    maxind(1) = inter_grid%nr
+    maxind(2) = inter_grid%nz
+    maxind(3) = inter_grid%nphi
+
+    mini(1) = minval(inter_grid%r)
+    mini(2) = minval(inter_grid%z)
+    mini(3) = minval(inter_grid%phi)
+
+    differentials(1) = inter_grid%dr
+    differentials(2) = inter_grid%dz
+    differentials(3) = inter_grid%dphi
+
+    do i=1,3
+        ind(i) = floor((loc(i)-mini(i))/differentials(i)) + 1
+        if (ind(i).gt.maxind(i)) ind(i)=maxind(i)
+        if (ind(i).lt.1) ind(i)=1
+    enddo
+
+end subroutine get_interpolation_grid_indices
 
 subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     !+ Returns extrema points where line(s) parametrized by `r0` and `v0` intersect the plasma boudnary
@@ -8782,7 +8837,8 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! Check that the selected value of E3 is satisfied for these inputs
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
-        print*,'E3 out of range!',E3min,E3,E3max
+        !!!TODO need to figure this out
+     !!!print*,'E3 out of range!',E3min,E3,E3max
         pgyro = 0.0
         return
     endif
@@ -8826,7 +8882,7 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
     ! \partial\gam/\partial E3
     if ((abs(vperp*sin(phi)).lt.1.d-10).or.(1-cosgam0**2.lt.1.d-10)) then
         dgamdE3 = 0.
-        print*,'Tiny denominator:',vperp*sin(phi),cosgam0
+     !!!print*,'Tiny denominator:',vperp*sin(phi),cosgam0
         pgyro = 0.0
         return
     endif
@@ -12019,9 +12075,9 @@ subroutine bench_sigmav
     vnet_square=dot_product(vrel,vrel)  ![cm/s]
     erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
     ti = plasma%ti
-    write(*,'(T2,"ti = ",ES10.3)') ti
-    write(*,'(T2,"eb = ",ES10.3)') erel
-    write(*,'(T2,"vr = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vrot(1)/100,vrot(2)/100,vrot(3)/100
+ !!!write(*,'(T2,"ti = ",ES10.3)') ti
+ !!!write(*,'(T2,"eb = ",ES10.3)') erel
+ !!!write(*,'(T2,"vr = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vrot(1)/100,vrot(2)/100,vrot(3)/100
 
     !! Get proton production rate
     v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
@@ -12047,9 +12103,123 @@ subroutine bench_sigmav
     call parallel_sum(proton%rate)
 #endif
 
-    write(*,'(T2,"v1 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vi(1)/100,vi(2)/100,vi(3)/100
-    write(*,'(T2,"v3 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') v3(1)/100,v3(2)/100,v3(3)/100
-    write(*,'(T2,"pg = ",F7.5)') pgyro
+ !!!write(*,'(T2,"v1 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vi(1)/100,vi(2)/100,vi(3)/100
+ !!!write(*,'(T2,"v3 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') v3(1)/100,v3(2)/100,v3(3)/100
+ !!!write(*,'(T2,"pg = ",F7.5)') pgyro
+ !!!write(*,'(30X,a)') ''
+
+end subroutine bench_sigmav
+
+subroutine proton_f
+    !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
+    real(Float64), dimension(3) :: ri, vi, rpz, v3_xyz, v3_rpz, uvw, v3_uvw
+    integer, dimension(3) :: ind
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: pgyro, cosphi, phi, bphi, vnet_square
+    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa
+    integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(any(thermal_mass.eq.H3_amu)) then
+        write(*,'(T2,a)') 'PROTON_F: D-T proton production is not implemented'
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'PROTON_F: Fast-ion species is not Deuterium'
+        return
+    endif
+
+    allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
+    proton%weight = 0.d0
+
+    rate = 0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,bphi,E1,E3)
+    channel_loop: do ich=1, cfpd_chords%nchan
+        E3_loop: do ie3=1, ptable%nenergy
+            E3 = ptable%earray(ie3)*1d-3 !MeV
+            ray_loop: do iray=1, ptable%nrays
+                step_loop: do ist=1, ptable%nsteps
+                    !! Calculate position and velocity in machine coordinates
+                    rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
+                    rpz(2) = ptable%sightline(ie3,5,ist,iray,ich)
+                    rpz(3) = ptable%sightline(ie3,6,ist,iray,ich)
+
+                    phi = rpz(2)
+                    uvw(1) = rpz(1)*cos(phi)
+                    uvw(2) = rpz(1)*sin(phi)
+                    uvw(3) = rpz(3)
+
+                    v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
+                    v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
+                    v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
+                    if (norm2(v3_rpz).le.1d-4) cycle ray_loop !!!assumes 0 along entire ray
+
+                    v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
+                    v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
+                    v3_uvw(3) = v3_rpz(3)
+
+                    v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
+
+                    !! Get fields
+                    call get_fields(fields, pos=uvw, input_coords=1)
+                    if(.not.fields%in_plasma) cycle step_loop
+
+                    !! Loop over energy/pitch/gamma
+                    pitch_loop: do ip = 1, fbm%npitch
+                        pitch = fbm%pitch(ip)
+                        energy_loop: do ie =1, fbm%nenergy
+                            eb = fbm%energy(ie)
+                            call gyro_correction(fields, eb, pitch, fbm%A, ri, vi)
+
+                            !! Get plasma parameters at particle position
+                            call get_plasma(plasma,pos=ri)
+                            if(.not.plasma%in_plasma) cycle energy_loop
+
+                            !! Calculate effective beam energy
+                            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                            erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+
+                            !! Get proton production rate
+                            call get_ddpt_rate(plasma, erel, rate, branch=1)
+
+                            !! Account for anisotropy
+                            call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
+                            rate = rate*kappa
+
+                            E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
+
+                            cosphi = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
+                            bphi = acos(cosphi)
+                            call get_pgyro(E3,bphi,E1,pitch,plasma%vrot,pgyro)
+                            rate = rate*pgyro
+
+                            rate = rate*ptable%daomega(ie3,iray,ich) !!!TODO not sure on daomega
+
+                            call get_interpolation_grid_indices(uvw, ind, input_coords=1)
+                            ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+
+                            proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
+
+                            !!Store counts
+                            !!!At some point need to handle all of this
+                            !!!SHould be binned liked the NPA
+                         !!!rate = rate*fbm%f(ie,ip,ir,iz,iphi)*fbm%dE*fbm%dp
+                         !!!call store_protons(rate, E3)
+                        enddo energy_loop
+                    enddo pitch_loop
+                enddo step_loop
+            enddo ray_loop
+        enddo E3_loop
+    enddo channel_loop
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(proton%rate)
+    call parallel_sum(proton%weight)
+#endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [protons/s]")') 'Rate:   ',sum(proton%rate)
@@ -12063,7 +12233,7 @@ subroutine bench_sigmav
     call write_proton_weights()
 #endif
 
-end subroutine bench_sigmav
+end subroutine proton_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
@@ -12886,6 +13056,10 @@ program fidasim
         call read_npa()
     endif
 
+    if(inputs%calc_proton.ge.1) then
+        call read_cfpd()
+    endif
+
     call make_diagnostic_grids()
 
     !! ----------------------------------------------------------
@@ -12972,6 +13146,11 @@ program fidasim
     if(inputs%calc_neutron.ge.1)then
         allocate(neutron%rate(particles%nclass))
         neutron%rate = 0.d0
+    endif
+
+    if(inputs%calc_proton.ge.1)then
+        allocate(proton%rate(particles%nclass))
+        proton%rate = 0.d0
     endif
 
     !! -----------------------------------------------------------------------
@@ -13165,7 +13344,11 @@ program fidasim
     endif
 
     if(inputs%calc_proton.ge.1) then
-        call bench_sigmav()
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'proton rate:    ', time(time_start)
+        endif
+     !!!call bench_sigmav()
+        call proton_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

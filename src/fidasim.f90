@@ -1118,7 +1118,7 @@ type OrbProtonTable
     real(Float64), dimension(:,:,:), allocatable :: nactual
         !+ Number of spatial steps of a given orbit and detector
     real(Float64), dimension(:,:,:), allocatable :: daomega
-        !+ Differntial area times solid angle of a given velocity vector [cm^-2] !!!TODO convert
+        !+ Differntial area times solid angle of a given velocity vector [cm^-2]
     real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
         !+ Contains velocities and positions for a given detector channel, ray and step [cm/s cm]
 end type OrbProtonTable
@@ -5520,7 +5520,6 @@ subroutine write_neutrons
 
 end subroutine write_neutrons
 
-!!!Need to write outt E3 energy
 subroutine write_proton_weights
     !+ Writes [[libfida:proton]] to a HDF5 file
     integer(HID_T) :: fid
@@ -8682,8 +8681,6 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "GET_DDPT_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-         !!!write(*,'("eb = ",ES10.3," [keV]")') eb        !!!used for bench_sigmav
-         !!!write(*,'("ti = ",ES10.3," [keV]")') plasma%ti !!!used for bench_sigmav
         endif
         rate = 0.d0
         return
@@ -8700,7 +8697,6 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
         rate = 0.d0
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
-             !!!rate = rate + exp(lograte*log_10) !!!used for bench_sigmav
                 rate = rate + plasma%deni(is) * exp(lograte*log_10)
             endif
         enddo
@@ -8718,34 +8714,30 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
         !+ 3 MeV proton velocity [cm/s]
     real(Float64), intent(out)              :: kappa
         !+ Anisotropy factor
-    !!!TODO put reference
+    !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
 
-    integer :: err_status
-    real(Float64) :: b11, b12, b21, b22
-
-    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, q, mp, k0
-    real(Float64) :: cos_phi, sin_phi
-    real(Float64), dimension(3) :: vcm, v3cm, vrel
-    real(Float64), dimension(13) :: bhcor !!!TODO 13?
-    real(Float64), dimension(12) :: e, a, b, c
     real(Float64), dimension(3,12) :: abc
-    integer :: ei, i
+    real(Float64), dimension(13)   :: bhcor !!! 13?
+    real(Float64), dimension(12)   :: e, a, b, c
+    real(Float64), dimension(3)    :: vcm, v3cm, vrel
     type(InterpolCoeffs1D) :: c1D
-    real(Float64) :: ai, bi, ci, b1, b2
+
+    real(Float64) :: ai, bi, ci, b1, b2, b11, b12, b21, b22, cos_phi, sin_phi
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, q, mp, k0
+    integer :: ei, i, err_status
 
     !! Calculate effective beam energy
     vrel = v1-plasma%vrot
-    vnet_square=dot_product(vrel,vrel)  ![cm/s]
+    vnet_square=dot_product(vrel, vrel)
     eb = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
     !!Calculate anisotropy enhancement/deficit factor
     mp = H1_amu*mass_u  ! kg
     q = 4.04*1.6e-13       ! J
-
     vcm = 0.5*(v1+plasma%vrot)
-    KE = 0.5*mp*vnet_square  ! com kinetic energy [J] 
+    KE = 0.5*mp*vnet_square  ! COM kinetic energy [J]
     k0 = norm2(vcm) * sqrt(2*mp/(3*1.e6*(q+KE)))
-    cos_phi = dot_product(vcm,v3) / (norm2(vcm)*norm2(v3))
+    cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
     sin_phi = sin(acos(cos_phi))
     cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0**2*sin_phi**2
 
@@ -8766,6 +8758,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
     e1com=0.5*eb
     call interpol_coeff(e, e1com, c1D, err_status)
+
     ei = c1D%i
     b1 = c1D%b1
     b2 = c1D%b2
@@ -8775,7 +8768,6 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     ci = b1*abc(3,ei) + b2*abc(3,ei+1)
 
     kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
- !!!write(*,'(T2,"k  = ",ES10.3)') k !!!used for bench_sigmav
 
 end subroutine get_ddpt_anisotropy
 
@@ -8837,8 +8829,6 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! Check that the selected value of E3 is satisfied for these inputs
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
-        !!!TODO need to figure this out
-     !!!print*,'E3 out of range!',E3min,E3,E3max
         pgyro = 0.0
         return
     endif
@@ -8881,8 +8871,6 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! \partial\gam/\partial E3
     if ((abs(vperp*sin(phi)).lt.1.d-10).or.(1-cosgam0**2.lt.1.d-10)) then
-        dgamdE3 = 0.
-     !!!print*,'Tiny denominator:',vperp*sin(phi),cosgam0
         pgyro = 0.0
         return
     endif
@@ -8895,10 +8883,6 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
     if ((E3+0.5*dE3).gt.E3max) delta_gam = dgamdE3*(0.5*dE3+E3max-E3)*JMeV
 
     pgyro = delta_gam/pi
- !!!write(*,'(T2,"g+ = ",F7.5)') gam_pos
- !!!write(*,'(T2,"g- = ",F7.5)') gam_neg
- !!!write(*,'(T2,"c+ = ",F7.5)') costheta_pos
- !!!write(*,'(T2,"c- = ",F7.5)') costheta_neg
 
 endsubroutine get_pgyro
 
@@ -9529,28 +9513,6 @@ subroutine store_neutrons(rate, orbit_class)
     !$OMP END ATOMIC
 
 end subroutine store_neutrons
-
-!!! Merge with store_neutrons
-subroutine store_proton_rate(rate, orbit_class)
-    !+ Store proton rate in [[libfida:proton]]
-    real(Float64), intent(in)     :: rate
-        !+ Proton rate [sproton/sec]
-    integer, intent(in), optional :: orbit_class
-        !+ Orbit class ID
-
-    integer :: iclass
-
-    if(present(orbit_class)) then
-        iclass = min(orbit_class,particles%nclass)
-    else
-        iclass = 1
-    endif
-
-    !$OMP ATOMIC UPDATE
-    proton%rate(iclass)= proton%rate(iclass) + rate
-    !$OMP END ATOMIC
-
-end subroutine store_proton_rate
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
@@ -12075,9 +12037,6 @@ subroutine bench_sigmav
     vnet_square=dot_product(vrel,vrel)  ![cm/s]
     erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
     ti = plasma%ti
- !!!write(*,'(T2,"ti = ",ES10.3)') ti
- !!!write(*,'(T2,"eb = ",ES10.3)') erel
- !!!write(*,'(T2,"vr = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vrot(1)/100,vrot(2)/100,vrot(3)/100
 
     !! Get proton production rate
     v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
@@ -12091,22 +12050,9 @@ subroutine bench_sigmav
     phi = pi/10
     E1 = 80.
     pitch = .25
- !!!vrot = 0.*[1.,0,0]
     call get_pgyro(E3,phi,E1,pitch,vrot,pgyro)
 
     rate = kappa * rate
-
-    !! Store neutrons
-    call store_proton_rate(rate)
-
-#ifdef _MPI
-    call parallel_sum(proton%rate)
-#endif
-
- !!!write(*,'(T2,"v1 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') vi(1)/100,vi(2)/100,vi(3)/100
- !!!write(*,'(T2,"v3 = [",ES10.3,",",ES10.3,",",ES10.3,"]")') v3(1)/100,v3(2)/100,v3(3)/100
- !!!write(*,'(T2,"pg = ",F7.5)') pgyro
- !!!write(*,'(30X,a)') ''
 
 end subroutine bench_sigmav
 
@@ -12141,6 +12087,7 @@ subroutine proton_f
         E3_loop: do ie3=1, ptable%nenergy
             E3 = ptable%earray(ie3)*1d-3 !MeV
             ray_loop: do iray=1, ptable%nrays
+                !!!Need to add cycle for empty sight lines
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12155,7 +12102,6 @@ subroutine proton_f
                     v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
                     v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
                     v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
-                    if (norm2(v3_rpz).le.1d-4) cycle ray_loop !!!assumes 0 along entire ray
 
                     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
                     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
@@ -12196,18 +12142,14 @@ subroutine proton_f
                             call get_pgyro(E3,bphi,E1,pitch,plasma%vrot,pgyro)
                             rate = rate*pgyro
 
-                            rate = rate*ptable%daomega(ie3,iray,ich) !!!TODO not sure on daomega
+                            rate = rate*ptable%daomega(ie3,iray,ich)
 
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)
                             ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
                             proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
 
-                            !!Store counts
-                            !!!At some point need to handle all of this
-                            !!!SHould be binned liked the NPA
-                         !!!rate = rate*fbm%f(ie,ip,ir,iz,iphi)*fbm%dE*fbm%dp
-                         !!!call store_protons(rate, E3)
+                            !!!Store counts
                         enddo energy_loop
                     enddo pitch_loop
                 enddo step_loop

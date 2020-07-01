@@ -83,9 +83,9 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ra=sqrt(nubeam.RTCENA^2.0 + pdat^2.0)
     beta_s=acos(nubeam.RTCENA/rs)
     beta_a=acos(nubeam.RTCENA/ra)
-    phi_a=phi_s + nubeam.NLJCCW*nubeam.NLCO*(beta_s-beta_a)
+    phi_a=phi_s + nubeam.NLJCCW*nubeam.NLCO*beta_a
 
-    src=[rs*cos(phi_s),rs*sin(phi_s),zs]
+    src=[rs*cos(phi_s+beta_s),rs*sin(phi_s+beta_s),zs]
     aper_src=[ra*cos(phi_a),ra*sin(phi_a),za]
     axis=(aper_src-src)
     axis=axis/sqrt(total(axis^2))

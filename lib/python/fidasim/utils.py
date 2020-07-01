@@ -1197,9 +1197,9 @@ def nubeam_geometry(nubeam, angle=0.0, verbose=False):
     ra = np.sqrt(nubeam["RTCENA"]**2 + pdat**2.0)
     beta_s = np.arccos(nubeam["RTCENA"]/rs)
     beta_a = np.arccos(nubeam["RTCENA"]/ra)
-    phi_a = phi_s + nubeam["NLJCCW"]*nubeam["NLCO"]*(beta_s-beta_a)
+    phi_a = phi_s + nubeam["NLJCCW"]*nubeam["NLCO"]*beta_a
 
-    src = np.array([rs*np.cos(phi_s), rs*np.sin(phi_s),zs])
+    src = np.array([rs*np.cos(phi_s+beta_s), rs*np.sin(phi_s+beta_s),zs])
     aper_src = np.array([ra*np.cos(phi_a), ra*np.sin(phi_a),za])
     axis = (aper_src - src)
     axis = axis/np.sqrt(np.sum(axis**2))

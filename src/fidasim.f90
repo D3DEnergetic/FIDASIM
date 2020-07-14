@@ -12062,7 +12062,7 @@ subroutine proton_f
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, cosphi, phi, bphi, vnet_square
+    real(Float64) :: pgyro, cosphi, phi, phi_b, vnet_square
     real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
@@ -12082,7 +12082,7 @@ subroutine proton_f
 
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
-    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,bphi,E1,E3)
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             E3 = ptable%earray(ie3)*1d-3 !MeV
@@ -12138,8 +12138,8 @@ subroutine proton_f
                             E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
 
                             cosphi = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
-                            bphi = acos(cosphi)
-                            call get_pgyro(E3,bphi,E1,pitch,plasma%vrot,pgyro)
+                            phi_b = acos(cosphi)
+                            call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
                             rate = rate*pgyro
 
                             rate = rate*ptable%daomega(ie3,iray,ich)

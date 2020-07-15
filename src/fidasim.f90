@@ -5580,7 +5580,7 @@ subroutine write_proton_weights
         call h5ltset_attribute_string_f(fid,"/nz", "description", &
              "Number of Z values", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
-             "Proton Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
+             "Proton Weight Function: weight(E3,E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
 
 
@@ -8734,6 +8734,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     !!Calculate anisotropy enhancement/deficit factor
     mp = H1_amu*mass_u  ! kg
     q = 4.04*1.6e-13       ! J
+
     vcm = 0.5*(v1+plasma%vrot)
     KE = 0.5*mp*vnet_square  ! COM kinetic energy [J]
     k0 = norm2(vcm) * sqrt(2*mp/(3*1.e6*(q+KE)))
@@ -8829,6 +8830,7 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! Check that the selected value of E3 is satisfied for these inputs
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
+     !!!print*,'E3 out of range!',E3min,E3,E3max
         pgyro = 0.0
         return
     endif
@@ -8871,6 +8873,8 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! \partial\gam/\partial E3
     if ((abs(vperp*sin(phi)).lt.1.d-10).or.(1-cosgam0**2.lt.1.d-10)) then
+        dgamdE3 = 0.
+     !!!print*,'Tiny denominator:',vperp*sin(phi),cosgam0
         pgyro = 0.0
         return
     endif
@@ -9513,6 +9517,27 @@ subroutine store_neutrons(rate, orbit_class)
     !$OMP END ATOMIC
 
 end subroutine store_neutrons
+
+subroutine store_proton_rate(rate, orbit_class) !!! Merge with store_neutrons
+    !+ Store proton rate in [[libfida:proton]]
+    real(Float64), intent(in)     :: rate
+        !+ Proton rate [sproton/sec]
+    integer, intent(in), optional :: orbit_class
+        !+ Orbit class ID
+
+    integer :: iclass
+
+    if(present(orbit_class)) then
+        iclass = min(orbit_class,particles%nclass)
+    else
+        iclass = 1
+    endif
+
+    !$OMP ATOMIC UPDATE
+    proton%rate(iclass)= proton%rate(iclass) + rate
+    !$OMP END ATOMIC
+
+end subroutine store_proton_rate
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
@@ -12054,6 +12079,13 @@ subroutine bench_sigmav
 
     rate = kappa * rate
 
+    !! Store neutrons
+    call store_proton_rate(rate)
+
+#ifdef _MPI
+    call parallel_sum(proton%rate)
+#endif
+
 end subroutine bench_sigmav
 
 subroutine proton_f
@@ -12063,7 +12095,7 @@ subroutine proton_f
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, cosphi, phi, phi_b, vnet_square
-    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa
+    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa, daomega
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
@@ -12082,12 +12114,13 @@ subroutine proton_f
 
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
-    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3)
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3,&
+    !$OMP& daomega)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             E3 = ptable%earray(ie3)*1d-3 !MeV
             ray_loop: do iray=1, ptable%nrays
-                !!!Need to add cycle for empty sight lines
+                daomega = ptable%daomega(ie3,iray,ich)
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12102,6 +12135,7 @@ subroutine proton_f
                     v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
                     v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
                     v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
+                    if (norm2(v3_rpz).le.1d-4) cycle ray_loop !!!assumes 0 along entire ray
 
                     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
                     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
@@ -12142,14 +12176,14 @@ subroutine proton_f
                             call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
                             rate = rate*pgyro
 
-                            rate = rate*ptable%daomega(ie3,iray,ich)
+                            rate = rate*daomega
 
+                            !!!Store
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)
                             ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
                             proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
 
-                            !!!Store counts
                         enddo energy_loop
                     enddo pitch_loop
                 enddo step_loop

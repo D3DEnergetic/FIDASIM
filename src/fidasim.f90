@@ -12095,7 +12095,7 @@ subroutine proton_f
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, cosphi, phi, phi_b, vnet_square
-    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa, daomega
+    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
@@ -12114,13 +12114,11 @@ subroutine proton_f
 
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
-    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3,&
-    !$OMP& daomega)
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             E3 = ptable%earray(ie3)*1d-3 !MeV
             ray_loop: do iray=1, ptable%nrays
-                daomega = ptable%daomega(ie3,iray,ich)
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12176,7 +12174,7 @@ subroutine proton_f
                             call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
                             rate = rate*pgyro
 
-                            rate = rate*daomega
+                            rate = rate*ptable%daomega(ie3,iray,ich)
 
                             !!!Store
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)

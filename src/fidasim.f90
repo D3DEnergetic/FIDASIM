@@ -12090,6 +12090,7 @@ end subroutine bench_sigmav
 
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
+    logical, dimension(:,:), allocatable :: mask
     real(Float64), dimension(3) :: ri, vi, rpz, v3_xyz, v3_rpz, uvw, v3_uvw
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
@@ -12109,16 +12110,19 @@ subroutine proton_f
         return
     endif
 
+    allocate(mask(3,ptable%nsteps))
     allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     proton%weight = 0.d0
 
     rate = 0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,mask,&
     !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             E3 = ptable%earray(ie3)*1d-3 !MeV
             ray_loop: do iray=1, ptable%nrays
+                mask = ptable%sightline(ie3,1:3,:,iray,ich)
+                if (count(mask).eq.0.d0) cycle ray_loop
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12133,7 +12137,6 @@ subroutine proton_f
                     v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
                     v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
                     v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
-                    if (norm2(v3_rpz).le.1d-4) cycle ray_loop !!!assumes 0 along entire ray
 
                     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
                     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
@@ -12161,20 +12164,21 @@ subroutine proton_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get proton production rate
-                            call get_ddpt_rate(plasma, erel, rate, branch=1)
+                         !!!call get_ddpt_rate(plasma, erel, rate, branch=1)
 
                             !! Account for anisotropy
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
-                            rate = rate*kappa
+                         !!!rate = rate*kappa
+                            rate = kappa
 
                             E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
 
                             cosphi = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
                             phi_b = acos(cosphi)
                             call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
-                            rate = rate*pgyro
+                         !!!rate = rate*pgyro
 
-                            rate = rate*ptable%daomega(ie3,iray,ich)
+                         !!!rate = rate*ptable%daomega(ie3,iray,ich)
 
                             !!!Store
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)

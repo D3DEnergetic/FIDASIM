@@ -77,26 +77,17 @@ real(Float64), parameter :: v2_to_E_per_amu = mass_u/(2.*e0*1.d3)*1.d-4
 real(Float64), parameter :: log_10 = log(10.d0)
     !+ Natural log of 10.0
 
-real(Float64), parameter :: balmer_alpha(3)   = [656.28d0, 656.104d0, 656.045d0]
-    !+ H/D/T-alpha emission lines [nm]
-    !+"Tritium Diagnostics by Balmer-alpha emission" CH Skinner 1993
-integer, parameter ::n_stark = 15
+real(Float64) :: line_lambda0(3)   = [0.00000d0, 0.00000d0, 0.00000d0]
+    !+ H/D/T emission lines [nm]
+integer :: n_stark = 0
     !+ Number of Stark lines
-real(Float64), parameter, dimension(n_stark) :: stark_wavel = &
-     [-2.20200d-07,-1.65200d-07,-1.37700d-07,-1.10200d-07, &
-      -8.26400d-08,-5.51000d-08,-2.75600d-08, 0.00000d0,   &
-       2.75700d-08, 5.51500d-08, 8.27400d-08, 1.10300d-07, &
-       1.38000d-07, 1.65600d-07, 2.20900d-07               ]
+real(Float64), dimension(:), allocatable :: stark_wavel
     !+ Stark wavelengths [nm*m/V]
-real(Float64), parameter, dimension(n_stark) :: stark_intens= &
-     [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
-       729.0d0, 1936.d0, 5490.d0, 1936.d0, 729.0d0, &
-       2304.d0, 1681.d0, 16.00d0, 18.00d0, 1.000d0  ]
-    !+ Stark Intensities
-integer, parameter, dimension(n_stark) :: stark_pi= &
-     [1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+real(Float64), dimension(:), allocatable :: stark_intens
+   !+ Stark Intensities
+integer, dimension(:), allocatable :: stark_pi
     !+ Pi line indicators
-integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
+integer, dimension(:), allocatable :: stark_sigma
     !+ Sigma line indicators
 
 !!Numerical Settings
@@ -2181,8 +2172,76 @@ subroutine read_inputs
     if(error) then
         stop
     endif
-
+    
+    !+ Identify the transition from lambdamax and lambdamin    
+    call identify_transition(n_stark, stark_pi, stark_sigma, &
+                                stark_intens, stark_wavel, line_lambda0)
+  
 end subroutine read_inputs
+
+subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
+                                stark_intens, stark_wavel, line_lambda0)
+    !+ Determines the type of transition from user defined inputs
+    
+    ! real(Float64), intent(in)                                :: lambda_max, lambda_min
+    !+ maximum and minimum wavelength from user defined inputs
+    integer, intent(out)                                     :: n_stark
+    integer, dimension(:), allocatable, intent(out)          :: stark_pi, stark_sigma
+    real(FLoat64), dimension(:), allocatable, intent(out)    :: stark_intens, stark_wavel
+    real(Float64), dimension(3), intent(out)                 :: line_lambda0
+
+    if (inputs%lambdamin > 620.0d0 .and. inputs%lambdamax < 680.0d0 ) then
+        !+ Assigns stark variables to balmer alpha transition
+        n_stark = 15
+        line_lambda0 = [ 656.28d0, 656.104d0, 656.045d0 ]
+         !+"Tritium Diagnostics by Balmer-alpha emission" CH Skinner 1993
+        allocate(stark_intens(n_stark))
+        stark_intens = &
+            [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
+              729.0d0, 1936.d0, 5490.d0, 1936.d0, 729.0d0, &
+              2304.d0, 1681.d0, 16.00d0, 18.00d0, 1.000d0  ]
+       
+        allocate(stark_wavel(n_stark))
+        stark_wavel = &
+            [-2.20200d-07,-1.65200d-07,-1.37700d-07,-1.10200d-07, &
+             -8.26400d-08,-5.51000d-08,-2.75600d-08, 0.00000d0,   &
+              2.75700d-08, 5.51500d-08, 8.27400d-08, 1.10300d-07, &
+              1.38000d-07, 1.65600d-07, 2.20900d-07               ]
+        
+        allocate(stark_pi(n_stark))
+        stark_pi = &
+            [1, 0 , 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+
+        allocate(stark_sigma(n_stark))
+        stark_sigma = 1 - stark_pi
+        
+        write(*, '(a)') "---- Identify Transition ----"
+        write(*, '(a)') "The Transition is Balmer-alpha."
+        write(*,*) ''
+
+    else if (inputs%lambdamin > 103.0d0 .and. inputs%lambdamax < 136.0d0) then
+        !+ Assigns stark varibales to Lyman alpha transition
+        n_stark = 3
+        line_lambda0 = [ 121.57d0, 121.53d0, 121.52d0 ]
+
+        allocate(stark_intens(n_stark))
+        stark_intens = [ 1.00d0, 500.00d0, 1.00d0 ]
+
+        allocate(stark_wavel(n_stark))
+        stark_wavel = [ -8.25800d-8, 0.00000d0, 8.25800d-8 ]
+        
+        allocate(stark_pi(n_stark))
+        stark_pi = [1, 0, 1]
+
+        allocate(stark_sigma(n_stark))
+        stark_sigma = 1 - stark_pi
+       
+        write(*, '(a)') "---- Identify Transition ----"
+        write(*, '(a)') "The Transition is Lyman-alpha."
+        write(*,*) ''
+   endif
+  
+end subroutine identify_transition
 
 subroutine make_beam_grid
     !+ Makes [[libfida:beam_grid] from user defined inputs
@@ -3038,7 +3097,7 @@ subroutine read_plasma
         stop
     else
         beam_mass = supported_masses(w)
-        beam_lambda0 = balmer_alpha(w)
+        beam_lambda0 = line_lambda0(w)
     endif
 
     do i=1, n_thermal
@@ -3049,7 +3108,7 @@ subroutine read_plasma
             stop
         else
             thermal_mass(i) = supported_masses(w)
-            thermal_lambda0(i) = balmer_alpha(w)
+            thermal_lambda0(i) = line_lambda0(w)
         endif
     enddo
 
@@ -8547,7 +8606,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     real(Float64), dimension(nlevs), intent(out) :: dens
         !+ Density of neutrals
     real(Float64), intent(out)                   :: photons
-        !+ Emitted photons(3->2)
+        !+ Emitted photons
 
     real(Float64), dimension(nlevs,nlevs) :: matrix  !! Matrix
     real(Float64) :: vnet_square    !! net velocity of neutrals squared
@@ -8590,8 +8649,14 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     where (dens.lt.0)
         dens = 0.d0
     endwhere
-
-    photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
+    
+    if (n_stark == 15) then
+        !+ Emitted photons 3->2
+        photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
+    else if (n_stark == 3) then
+        !+ Emitted photos 2->1
+        photons = dens(2)*tables%einstein(1,2)
+    end if
 
 end subroutine colrad
 
@@ -8707,7 +8772,9 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, cos_los_Efield, lambda_shifted
-    integer, parameter, dimension(n_stark) :: stark_sign= +1*stark_sigma -1*stark_pi
+    integer, dimension(n_stark) :: stark_sign
+
+    stark_sign = +1*stark_sigma - 1*stark_pi
 
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)

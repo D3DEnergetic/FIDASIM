@@ -7855,6 +7855,7 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
         if(ocs.eq.0) then
+            plasma%vrot_uvw = vrot_uvw
             plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
             plasma%pos = xyz
         endif
@@ -8784,6 +8785,7 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
         !+ pitch  fast ion pitch relative to the field
     real(Float64), dimension(3), intent(in) :: vrot
         !+ vrot rotation velocity vector [m/s] (bhat,ahat,chat) coordinates
+        !!!need to transform vrot from rzphi to bhat,ahat,chat
     real(Float64), intent(in), optional :: DeltaE3
         !+ DeltaE3  (MeV)
     real(Float64), intent(out) :: pgyro
@@ -8806,10 +8808,10 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
     ! Preliminaries [SI units]
     JMeV = 1.60218d-13
     JkeV = 1.60218d-16
-    mp = 1.6726219d-27 ! [kg]
+    mp = H1_amu*mass_u  ! kg
     Q = 4.04*JMeV
     norm_v3 = sqrt(2*E3*JMeV/mp)
-    norm_v1 = sqrt(E1*JkeV/mp) ! m1 = 2m3 = 2mp
+    norm_v1 = sqrt(E1*JkeV/mp) ! m1 = 2mp
     vpar = norm_v1*pitch
     vperp = norm_v1*sqrt(1.-pitch**2)
     v3 = norm_v3*[cos(phi), sin(phi), 0.d0]
@@ -8830,7 +8832,7 @@ subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
 
     ! Check that the selected value of E3 is satisfied for these inputs
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
-     !!!print*,'E3 out of range!',E3min,E3,E3max
+        print*,'E3 out of range!',E3min,E3,E3max
         pgyro = 0.0
         return
     endif
@@ -12164,21 +12166,20 @@ subroutine proton_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get proton production rate
-                         !!!call get_ddpt_rate(plasma, erel, rate, branch=1)
+                            call get_ddpt_rate(plasma, erel, rate, branch=1)
 
                             !! Account for anisotropy
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
-                         !!!rate = rate*kappa
-                            rate = kappa
+                            rate = rate*kappa
 
                             E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
 
                             cosphi = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
                             phi_b = acos(cosphi)
                             call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
-                         !!!rate = rate*pgyro
+                            rate = rate*pgyro
 
-                         !!!rate = rate*ptable%daomega(ie3,iray,ich)
+                            rate = rate*ptable%daomega(ie3,iray,ich)
 
                             !!!Store
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)

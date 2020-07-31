@@ -8773,122 +8773,94 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
 end subroutine get_ddpt_anisotropy
 
-subroutine get_pgyro(E3,phi,E1,pitch,vrot,pgyro,DeltaE3)
+subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
     !+ Returns fraction of gyroangles that can produce a reaction with given inputs
-    real(Float64), intent(in) :: E3
-        !+ E3 proton energy (MeV)
-    real(Float64), intent(in) :: phi
-        !+ phi  lab-frame angle (presently relative to the field)
+    type(LocalEMFields), intent(in) :: fields
+        !+ Electromagneticfields at guiding
+    integer, intent(in)       :: ie3
+        !+ E3 proton energy index
     real(Float64), intent(in) :: E1
         !+ E1 fast-ion energy (keV)
     real(Float64), intent(in) :: pitch
         !+ pitch  fast ion pitch relative to the field
     real(Float64), dimension(3), intent(in) :: vrot
-        !+ vrot rotation velocity vector [m/s] (bhat,ahat,chat) coordinates
-        !!!need to transform vrot from rzphi to bhat,ahat,chat
-    real(Float64), intent(in), optional :: DeltaE3
-        !+ DeltaE3  (MeV)
+        !+ Rotation velocity vector [cm/s] in beam coordinates !!!check that the
+        !unitis are ok
+    real(Float64), dimension(3), intent(in) :: v3_xyz
+        !+ Proton velocity in beam coorindates
     real(Float64), intent(out) :: pgyro
         !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
 
-    real(Float64), dimension(3) :: v3,Vcm_pos,v3_prime_pos,v1_pos,v1_neg
-    real(Float64), dimension(3) :: Vcm_neg,v3_prime_neg,v4
-    real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,vc
-    real(Float64) :: aa,bb,cc,v3plus,v3minus,E3plus,E3minus,E3max,E3min
-    real(Float64) :: bracket,rhs0,cosgam0,gam_pos,rhs,dE3
-    real(Float64) :: gam_neg,costheta_pos,costheta_neg,dgamdE3,delta_gam
-    logical :: docheck
-
-    if (present(DeltaE3)) then
-        dE3 = DeltaE3
-    else
-        dE3 = 0.02
-    endif
+    real(Float64), dimension(3) :: a_xyz
+    real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va
+    real(Float64) :: A,B,C,v3pp,v3pm,v3mp,v3mm,E3pp,E3pm,E3mp,E3mm,E3max,E3min
+    real(Float64) :: lhs0,rhs0,cosgam0,deltaE3,dgamdE3
+    real(Float64) :: phip,cosphip,cosphib,cosphia
 
     ! Preliminaries [SI units]
     JMeV = 1.60218d-13
     JkeV = 1.60218d-16
     mp = H1_amu*mass_u  ! kg
     Q = 4.04*JMeV
-    norm_v3 = sqrt(2*E3*JMeV/mp)
-    norm_v1 = sqrt(E1*JkeV/mp) ! m1 = 2mp
+    norm_v3 = sqrt(ptable%earray(ie3)/(H1_amu*v2_to_E_per_amu)) / 100 ! [m/s]
+    norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ! [m/s]
     vpar = norm_v1*pitch
-    vperp = norm_v1*sqrt(1.-pitch**2)
-    v3 = norm_v3*[cos(phi), sin(phi), 0.d0]
-    vb = vrot(1)
-    va = vrot(2)
-    vc = vrot(3)
+    vperp = norm_v1*sqrt(1-pitch**2)
 
     ! Find E3 limits for these parameters first
-    aa = 1.5*Q/mp + 0.5*(vpar**2+vperp**2)
-    bb = vpar*cos(phi)
-    cc = vperp*sin(phi)
-    v3plus = 0.5*(bb-cc+sqrt((bb-cc)**2+4*aa))
-    v3minus = 0.5*(bb+cc+sqrt((bb+cc)**2+4*aa))
-    E3plus = 0.5*mp*v3plus**2/JMeV
-    E3minus = 0.5*mp*v3minus**2/JMeV
-    E3max = max(E3plus,E3minus)
-    E3min = min(E3plus,E3minus)
+    cosphip = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
+    phip = acos(cosphip) !angle between proton and magnetic field
+    A = 1.5*Q/mp + 0.5*norm_v1**2
+    B = vpar*cos(phip)
+    C = vperp*sin(phip)
+    v3pp = 0.5 * ( (B+C) + sqrt( (B+C)**2 + 4*A) ) !!!check the +4A
+    v3pm = 0.5 * ( (B+C) - sqrt( (B+C)**2 + 4*A) )
+    v3mp = 0.5 * ( (B-C) + sqrt( (B-C)**2 + 4*A) )
+    v3mm = 0.5 * ( (B-C) - sqrt( (B-C)**2 + 4*A) )
+    E3pp = H1_amu*v2_to_E_per_amu*(v3pp*100)**2
+    E3pm = H1_amu*v2_to_E_per_amu*(v3pm*100)**2
+    E3mp = H1_amu*v2_to_E_per_amu*(v3mp*100)**2
+    E3mm = H1_amu*v2_to_E_per_amu*(v3mm*100)**2
+    E3max = max(E3pp,E3pm,E3mp,E3mm) ![keV]
+    E3min = min(E3pp,E3pm,E3mp,E3mm) ![keV]
 
     ! Check that the selected value of E3 is satisfied for these inputs
-    if ((E3.ge.E3max).or.(E3.le.E3min)) then
-        print*,'E3 out of range!',E3min,E3,E3max
+    if ((ptable%earray(ie3).ge.E3max).or.(ptable%earray(ie3).le.E3min)) then
         pgyro = 0.0
         return
     endif
 
     ! Gyroangle
-    bracket = vperp*(sin(phi)-2*va/norm_v3)
-    rhs0 = norm_v3 - 1.5*Q/(norm_v3*mp) - (vpar+vb)*cos(phi) - va*sin(phi) &
-                   - 0.5*(norm_v1**2 + dot_product(vrot, vrot))/norm_v3 + 2*vb*vpar/norm_v3
-    cosgam0 = rhs0/bracket
+    cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
+    vb = norm2(vrot)/100*cosphib ! [m/s]
+ !!!va = norm2(vrot)/100*sin(acos(cosphib)) ! [m/s] !!!verify at some point
+    a_xyz = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
+    cosphia = dot_product(vrot, a_xyz) / norm2(vrot)
+    va = norm2(vrot)/100*cosphia ! [m/s]
+    lhs0 = vperp*(sin(phip)-2*va/norm_v3)
+    rhs0 = norm_v3 - 1.5*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) - va*sin(phip) &
+                   - 0.5*(norm_v1**2 + dot_product(vrot,vrot))/norm_v3 + 2*vb*vpar/norm_v3
+    cosgam0 = rhs0/lhs0
+    if (abs(cosgam0).gt.1) then
+        pgyro = 0
+        return
+    endif
 
-    rhs = rhs0 + 2*vc*vperp*sqrt(1-cosgam0**2)/norm_v3
-    gam_pos = acos(rhs/bracket)
-    rhs = rhs0 - 2*vc*vperp*sqrt(1-cosgam0**2)/norm_v3
-    gam_neg = acos(rhs/bracket)
-
-    !----------
-    ! costheta
-    v1_pos = [vpar, vperp*cos(gam_pos), vperp*sin(gam_pos)]
-    Vcm_pos = 0.5*(v1_pos + vrot)
-    v3_prime_pos = v3 - Vcm_pos
-    costheta_pos = dot_product(Vcm_pos,v3_prime_pos) / (norm2(Vcm_pos)*norm2(v3_prime_pos))
-
-    v1_neg = [vpar, vperp*cos(gam_neg), vperp*sin(gam_neg)]
-    Vcm_neg = 0.5*(v1_neg + vrot)
-    v3_prime_neg = v3 - Vcm_neg
-    costheta_neg = dot_product(Vcm_neg,v3_prime_neg) / (norm2(Vcm_neg)*norm2(v3_prime_neg))
-
-    ! Check energy conservation
-    docheck = .False.
-    if (docheck) then
-        v4 = 2*(v1_pos+vrot)/3 - v3/3
-        print*,'v1_pos:',v1_pos
-        print*,'v2:',vrot
-        print*,'v3:',v3
-        print*,'v4:',v4
-        print*,'Energy:', (2*(dot_product(v1_pos,v1_pos)+dot_product(vrot, vrot)) + 2*Q/mp &
-                           - dot_product(v3,v3) - 3*dot_product(v4,v4)) / (2*Q/mp)
-        print*,'v1_neg:',v1_neg
-    endif ! docheck
-
-    ! \partial\gam/\partial E3
-    if ((abs(vperp*sin(phi)).lt.1.d-10).or.(1-cosgam0**2.lt.1.d-10)) then
-        dgamdE3 = 0.
-     !!!print*,'Tiny denominator:',vperp*sin(phi),cosgam0
+    !!! shouldn't the check be for lhs0?
+    ! Check singularity limit
+    if ((abs(vperp*sin(phip)).lt.1d-4).or.(sqrt(1-cosgam0**2).lt.1d-4)) then
         pgyro = 0.0
         return
     endif
 
-    dgamdE3 = abs((1 + (0.5*norm_v1**2+1.5*Q/mp) / norm_v3**2) / &
-                  (norm_v3*mp*sqrt(1-cosgam0**2)*vperp*sin(phi)))
-
-    delta_gam = dgamdE3*dE3*JMeV
-    if ((E3-0.5*dE3).lt.E3min) delta_gam = dgamdE3*(0.5*dE3+E3-E3min)*JMeV
-    if ((E3+0.5*dE3).gt.E3max) delta_gam = dgamdE3*(0.5*dE3+E3max-E3)*JMeV
-
-    pgyro = delta_gam/pi
+    ! Put it altogether
+    dgamdE3 = abs( (1 + (0.5*norm_v1**2 + 1.5*Q/mp) / norm_v3**2) / &
+                   (mp*norm_v3*sqrt(1-cosgam0**2)*vperp*sin(phip)) )
+    deltaE3 = ptable%earray(2)-ptable%earray(1) ! [keV]
+    if ((ptable%earray(ie3)-0.5*deltaE3).lt.E3min) deltaE3 = 0.5*deltaE3+ptable%earray(ie3)-E3min
+    if ((ptable%earray(ie3)+0.5*deltaE3).gt.E3max) deltaE3 = 0.5*deltaE3+E3max-ptable%earray(ie3)
+    !!!test deltaE3 values
+    pgyro = dgamdE3*deltaE3*JkeV/pi
 
 endsubroutine get_pgyro
 
@@ -12077,7 +12049,7 @@ subroutine bench_sigmav
     phi = pi/10
     E1 = 80.
     pitch = .25
-    call get_pgyro(E3,phi,E1,pitch,vrot,pgyro)
+ !!!call get_pgyro(E3,phi,E1,pitch,vrot,pgyro)
 
     rate = kappa * rate
 
@@ -12097,8 +12069,8 @@ subroutine proton_f
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, cosphi, phi, phi_b, vnet_square
-    real(Float64) :: eb, pitch, erel, rate, E1, E3, kappa
+    real(Float64) :: pgyro, phi, vnet_square
+    real(Float64) :: eb, pitch, erel, rate, E1, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
@@ -12118,13 +12090,12 @@ subroutine proton_f
 
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,mask,&
-    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,cosphi,phi,phi_b,E1,E3)
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,E1)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
-            E3 = ptable%earray(ie3)*1d-3 !MeV
             ray_loop: do iray=1, ptable%nrays
                 mask = ptable%sightline(ie3,1:3,:,iray,ich)
-                if (count(mask).eq.0.d0) cycle ray_loop
+                if (count(mask).eq.0.d0) cycle ray_loop !skip if entire ray is zero
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12139,6 +12110,7 @@ subroutine proton_f
                     v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
                     v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
                     v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
+                    if (all(v3_rpz.eq.0)) cycle step_loop !skip to nonzero step
 
                     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
                     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
@@ -12174,9 +12146,7 @@ subroutine proton_f
 
                             E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
 
-                            cosphi = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
-                            phi_b = acos(cosphi)
-                            call get_pgyro(E3,phi_b,E1,pitch,plasma%vrot,pgyro)
+                            call get_pgyro(fields,ie3,E1,pitch,plasma%vrot,v3_xyz,pgyro)
                             rate = rate*pgyro
 
                             rate = rate*ptable%daomega(ie3,iray,ich)

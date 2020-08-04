@@ -1129,32 +1129,33 @@ interface assignment(=)
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
                      fast_ion_assign,npa_part_assign,birth_part_assign, &
-                     neutral_part_assign, npr_assign, np_assign
+                     neutral_part_assign, npr_assign, np_assign, oo_assign
 end interface
 
 interface operator(+)
     !+ Allows for adding [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], and [[LocalEMFields]]
-    module procedure pp_add,lplp_add,ff_add,lflf_add
+    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]]
+    module procedure pp_add,lplp_add,ff_add,lflf_add,oo_add
 end interface
 
 interface operator(-)
     !+ Allows for subtracting [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], and [[LocalEMFields]]
-    module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract
+    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]]
+    module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract,oo_subtract
 end interface
 
 interface operator(*)
     !+ Allows for multiplying [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], and [[LocalEMFields]] by scalars
+    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]] by scalars
     module procedure sp_multiply, ps_multiply, lps_multiply, slp_multiply, &
-                     sf_multiply, fs_multiply, lfs_multiply, slf_multiply
+                     sf_multiply, fs_multiply, lfs_multiply, slf_multiply, &
+                     soo_multiply, oos_multiply
 end interface
 
 interface operator(/)
     !+ Allows for dividing [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], and [[LocalEMFields]] by scalars
-    module procedure ps_divide, lps_divide, fs_divide, lfs_divide
+    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]] by scalars
+    module procedure ps_divide, lps_divide, fs_divide, lfs_divide, oos_divide
 end interface
 
 !! definition of the structures:
@@ -1903,6 +1904,89 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
     p3 = p1*(1.d0/real_scalar)
 
 end function lfs_divide
+
+!!!TODO if inputs change, more rules
+elemental function oo_add(p1, p2) result (p3)
+    !+ Defines how to add two [[OrbProtonTable]] types
+    type(OrbProtonTable), intent(in) :: p1,p2
+    type(OrbProtonTable)             :: p3
+
+    p3%nenergy   = p1%nenergy   + p2%nenergy
+    p3%nrays     = p1%nrays     + p2%nrays
+    p3%nsteps    = p1%nsteps    + p2%nsteps
+    p3%earray    = p1%earray    + p2%earray
+    p3%nactual   = p1%nactual   + p2%nactual
+    p3%daomega   = p1%daomega   + p2%daomega
+    p3%sightline = p1%sightline + p2%sightline
+
+end function oo_add
+
+elemental function oo_subtract(p1, p2) result (p3)
+    !+ Defines how to subtract two [[OrbProtonTable]] types
+    type(OrbProtonTable), intent(in) :: p1,p2
+    type(OrbProtonTable)             :: p3
+
+    p3%nenergy   = p1%nenergy   - p2%nenergy
+    p3%nrays     = p1%nrays     - p2%nrays
+    p3%nsteps    = p1%nsteps    - p2%nsteps
+    p3%earray    = p1%earray    - p2%earray
+    p3%nactual   = p1%nactual   - p2%nactual
+    p3%daomega   = p1%daomega   - p2%daomega
+    p3%sightline = p1%sightline - p2%sightline
+
+end function oo_subtract
+
+elemental function oos_multiply(p1, real_scalar) result (p3)
+    !+ Defines how to multiply two [[OrbProtonTable]] types
+    type(OrbProtonTable), intent(in) :: p1
+    real(Float64), intent(in)  :: real_scalar
+    type(OrbProtonTable)             :: p3
+
+    p3%nenergy   = p1%nenergy   * real_scalar
+    p3%nrays     = p1%nrays     * real_scalar
+    p3%nsteps    = p1%nsteps    * real_scalar
+    p3%earray    = p1%earray    * real_scalar
+    p3%nactual   = p1%nactual   * real_scalar
+    p3%daomega   = p1%daomega   * real_scalar
+    p3%sightline = p1%sightline * real_scalar
+
+end function oos_multiply
+
+elemental function soo_multiply(real_scalar, p1) result (p3)
+    !+ Defines how to multiply [[OrbProtonTable]] types by a scalar
+    type(OrbProtonTable), intent(in) :: p1
+    real(Float64), intent(in)  :: real_scalar
+    type(OrbProtonTable)             :: p3
+
+    p3 = p1*real_scalar
+
+end function soo_multiply
+
+elemental function oos_divide(p1, real_scalar) result (p3)
+    !+ Defines how to divide [[OrbProtonTable]] types by a scalar
+    type(OrbProtonTable), intent(in) :: p1
+    real(Float64), intent(in)  :: real_scalar
+    type(OrbProtonTable)             :: p3
+
+    p3 = p1*(1.d0/real_scalar)
+
+end function oos_divide
+
+
+pure subroutine oo_assign(p1, p2)
+    !+ Defines how to assign [[OrbProtonTable]] types to eachother
+    type(OrbProtonTable), intent(in)  :: p2
+    type(OrbProtonTable), intent(out) :: p1
+
+    p1%nenergy   = p2%nenergy
+    p1%nrays     = p2%nrays
+    p1%nsteps    = p2%nsteps
+    p1%earray    = p2%earray
+    p1%nactual   = p2%nactual
+    p1%daomega   = p2%daomega
+    p1%sightline = p2%sightline
+
+end subroutine oo_assign
 
 !============================================================================
 !-------------------------------I/O Routines---------------------------------
@@ -8793,73 +8877,75 @@ subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
 
     real(Float64), dimension(3) :: a_xyz
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va
-    real(Float64) :: A,B,C,v3pp,v3pm,v3mp,v3mm,E3pp,E3pm,E3mp,E3mm,E3max,E3min
+    real(Float64) :: A,B,C,v3pp,v3pm,v3mp,v3mm,E3pp,E3pm,E3mp,E3mm,E3max,E3min,E3
     real(Float64) :: lhs0,rhs0,cosgam0,deltaE3,dgamdE3
     real(Float64) :: phip,cosphip,cosphib,cosphia
 
     ! Preliminaries [SI units]
-    JMeV = 1.60218d-13
-    JkeV = 1.60218d-16
-    mp = H1_amu*mass_u  ! kg
-    Q = 4.04*JMeV
-    norm_v3 = sqrt(ptable%earray(ie3)/(H1_amu*v2_to_E_per_amu)) / 100 ! [m/s]
-    norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ! [m/s]
-    vpar = norm_v1*pitch
-    vperp = norm_v1*sqrt(1-pitch**2)
+    E3 = ptable%earray(ie3)
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 4.04*JMeV ![J]
+    norm_v3 = sqrt(E3/(H1_amu*v2_to_E_per_amu)) / 100 ![m/s]
+    norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
+    vpar = norm_v1*pitch ![m/s]
+    vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
 
-    ! Find E3 limits for these parameters first
+    !! First, find and check the E3 limits are valid for the given inputs
+    !! Assumes cos(gamma) = +/- 1 and vrot = 0
     cosphip = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
-    phip = acos(cosphip) !angle between proton and magnetic field
+    phip = acos(cosphip)
     A = 1.5*Q/mp + 0.5*norm_v1**2
     B = vpar*cos(phip)
     C = vperp*sin(phip)
-    v3pp = 0.5 * ( (B+C) + sqrt( (B+C)**2 + 4*A) ) !!!check the +4A
-    v3pm = 0.5 * ( (B+C) - sqrt( (B+C)**2 + 4*A) )
-    v3mp = 0.5 * ( (B-C) + sqrt( (B-C)**2 + 4*A) )
-    v3mm = 0.5 * ( (B-C) - sqrt( (B-C)**2 + 4*A) )
-    E3pp = H1_amu*v2_to_E_per_amu*(v3pp*100)**2
-    E3pm = H1_amu*v2_to_E_per_amu*(v3pm*100)**2
-    E3mp = H1_amu*v2_to_E_per_amu*(v3mp*100)**2
-    E3mm = H1_amu*v2_to_E_per_amu*(v3mm*100)**2
+    v3pp = 0.5 * ( (B+C) + sqrt( (B+C)**2 + 4*A) ) ![m/s]
+    v3pm = 0.5 * ( (B+C) - sqrt( (B+C)**2 + 4*A) ) ![m/s]
+    v3mp = 0.5 * ( (B-C) + sqrt( (B-C)**2 + 4*A) ) ![m/s]
+    v3mm = 0.5 * ( (B-C) - sqrt( (B-C)**2 + 4*A) ) ![m/s]
+    E3pp = H1_amu*v2_to_E_per_amu*(v3pp*100)**2 ![keV]
+    E3pm = H1_amu*v2_to_E_per_amu*(v3pm*100)**2 ![keV]
+    E3mp = H1_amu*v2_to_E_per_amu*(v3mp*100)**2 ![keV]
+    E3mm = H1_amu*v2_to_E_per_amu*(v3mm*100)**2 ![keV]
     E3max = max(E3pp,E3pm,E3mp,E3mm) ![keV]
     E3min = min(E3pp,E3pm,E3mp,E3mm) ![keV]
 
-    ! Check that the selected value of E3 is satisfied for these inputs
-    if ((ptable%earray(ie3).ge.E3max).or.(ptable%earray(ie3).le.E3min)) then
+    if ((E3.ge.E3max).or.(E3.le.E3min)) then
         pgyro = 0.0
         return
     endif
 
-    ! Gyroangle
+    !! Calculate pgyro
     cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
-    vb = norm2(vrot)/100*cosphib ! [m/s]
- !!!va = norm2(vrot)/100*sin(acos(cosphib)) ! [m/s] !!!verify at some point
+    vb = norm2(vrot)/100*cosphib ![m/s]
     a_xyz = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
+    a_xyz = a_xyz / norm2(a_xyz)
     cosphia = dot_product(vrot, a_xyz) / norm2(vrot)
-    va = norm2(vrot)/100*cosphia ! [m/s]
+    va = norm2(vrot)/100*cosphia ![m/s]
     lhs0 = vperp*(sin(phip)-2*va/norm_v3)
     rhs0 = norm_v3 - 1.5*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) - va*sin(phip) &
                    - 0.5*(norm_v1**2 + dot_product(vrot,vrot))/norm_v3 + 2*vb*vpar/norm_v3
     cosgam0 = rhs0/lhs0
+
+    !! Check for singularities
     if (abs(cosgam0).gt.1) then
         pgyro = 0
         return
     endif
-
-    !!! shouldn't the check be for lhs0?
-    ! Check singularity limit
-    if ((abs(vperp*sin(phip)).lt.1d-4).or.(sqrt(1-cosgam0**2).lt.1d-4)) then
+    if (abs(vperp*sin(phip)*sqrt(1-cosgam0**2)).lt.1d-4) then
         pgyro = 0.0
         return
     endif
 
-    ! Put it altogether
+    !! Put it altogether
     dgamdE3 = abs( (1 + (0.5*norm_v1**2 + 1.5*Q/mp) / norm_v3**2) / &
                    (mp*norm_v3*sqrt(1-cosgam0**2)*vperp*sin(phip)) )
-    deltaE3 = ptable%earray(2)-ptable%earray(1) ! [keV]
-    if ((ptable%earray(ie3)-0.5*deltaE3).lt.E3min) deltaE3 = 0.5*deltaE3+ptable%earray(ie3)-E3min
-    if ((ptable%earray(ie3)+0.5*deltaE3).gt.E3max) deltaE3 = 0.5*deltaE3+E3max-ptable%earray(ie3)
-    !!!test deltaE3 values
+    deltaE3 = ptable%earray(2)-ptable%earray(1) ![keV]
+
+    !! Check again for E3 boundaries
+    if ((E3-0.5*deltaE3).lt.E3min) deltaE3 = 0.5*deltaE3+E3-E3min
+    if ((E3+0.5*deltaE3).gt.E3max) deltaE3 = 0.5*deltaE3+E3max-E3
+
     pgyro = dgamdE3*deltaE3*JkeV/pi
 
 endsubroutine get_pgyro
@@ -12064,12 +12150,12 @@ end subroutine bench_sigmav
 
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
-    logical, dimension(:,:), allocatable :: mask
+    logical, dimension(:,:), allocatable :: ray_velocities
     real(Float64), dimension(3) :: ri, vi, rpz, v3_xyz, v3_rpz, uvw, v3_uvw
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, phi, vnet_square
+    real(Float64) :: pgyro, phi, vnet_square, daomega
     real(Float64) :: eb, pitch, erel, rate, E1, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
@@ -12084,18 +12170,20 @@ subroutine proton_f
         return
     endif
 
-    allocate(mask(3,ptable%nsteps))
+    allocate(ray_velocities(3,ptable%nsteps))
     allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     proton%weight = 0.d0
 
     rate = 0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,mask,&
-    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,E1)
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
+    !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,E1,daomega, &
+    !$OMP& ray_velocities)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             ray_loop: do iray=1, ptable%nrays
-                mask = ptable%sightline(ie3,1:3,:,iray,ich)
-                if (count(mask).eq.0.d0) cycle ray_loop !skip if entire ray is zero
+                daomega = ptable%daomega(ie3,iray,ich)
+                ray_velocities = ptable%sightline(ie3,1:3,:,iray,ich)
+                if (count(ray_velocities).eq.0.d0) cycle ray_loop !skip if entire ray is zero
                 step_loop: do ist=1, ptable%nsteps
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
@@ -12149,7 +12237,7 @@ subroutine proton_f
                             call get_pgyro(fields,ie3,E1,pitch,plasma%vrot,v3_xyz,pgyro)
                             rate = rate*pgyro
 
-                            rate = rate*ptable%daomega(ie3,iray,ich)
+                            rate = rate*daomega
 
                             !!!Store
                             call get_interpolation_grid_indices(uvw, ind, input_coords=1)

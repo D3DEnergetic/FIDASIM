@@ -34,6 +34,16 @@ This is the documentation for the current release version of FIDASIM.
 ## Citing FIDASIM Source Code
 Along with the FIDASIM paper, please cite the source code.
 ```
+@article{FIDASIMpaper,
+  author       = {Benedikt Geiger and Luke Stagner and William W Heidbrink and Ralph Dux and Rainer Fischer and Yutaka Fujiwara and Alvin Garcia and Asger Schou Jacobsen and Anton Jansen vanVuuren and Alexander N Karpushov and Deyong Liu and Philip Adrian Schneider and Igor Sfiligoi and Peter Zsolt Poloskei and Markus Weiland},
+  title        = {Progress in modelling fast-ion D-alpha spectra and neutral particle analyzer fluxes using FIDASIM},
+  journal      = {Plasma Physics and Controlled Fusion},
+  url          = {http://iopscience.iop.org/10.1088/1361-6587/aba8d7},
+  year         = {2020}
+}
+```
+
+```
 @misc{FIDASIMcode,
   author       = {Stagner, L. and Geiger, B. and Heidbrink, W.W.},
   title        = {{FIDASIM: A Neutral Beam and Fast-ion Diagnostic Modeling Suite}},

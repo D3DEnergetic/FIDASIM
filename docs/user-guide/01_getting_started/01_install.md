@@ -19,7 +19,7 @@ FIDASIM has the following dependencies:
 * Linux because all other operating systems are inferior
 * [Make](https://www.gnu.org/software/make/) for building FIDASIM. (Required)
 * Fortran, C, and C++ compilers. (Required)
-  [GNU(>v5)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
+  [GNU(v5-v8)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
   Note you cannot mix and match different compilers.
 * [zlib](http://zlib.net/) for file compression. (Required)
 * [Anaconda Python](https://www.anaconda.com/) for python scripts and pre-processing. (Optional)

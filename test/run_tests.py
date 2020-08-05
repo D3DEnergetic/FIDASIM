@@ -143,7 +143,7 @@ def test_profiles(filename, grid, rhogrid):
     denn = zeff*0 + 1e8
     max_rho = np.max(np.abs(rho))
 
-    mask = np.where(rhogrid <= max_rho, 1, 0)
+    mask = np.where(rhogrid <= max_rho, np.int64(1), np.int64(0))
 
     profiles = {"time":1.0, "data_source":filename, "mask":mask,
                 "deni":deni,"denimp":denimp,"species_mass":species_mass,

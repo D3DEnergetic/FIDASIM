@@ -867,6 +867,8 @@ type ProtonRate
         !+ Proton rate: rate(orbit_type) [proton/sec]
     real(Float64), dimension(:,:,:,:,:,:), allocatable :: weight
         !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
+    real(Float64), dimension(:,:), allocatable         :: flux
+        !+ Proton flux: flux(E3,chan) [protons/(s*dE)]
 end type ProtonRate
 
 type NeutralParticle
@@ -5608,6 +5610,7 @@ subroutine write_proton_weights
     !+ Writes [[libfida:proton]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(6) :: dim6
     integer :: error
@@ -5645,7 +5648,9 @@ subroutine write_proton_weights
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
         call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
         call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
+        dim2 = [ptable%nenergy, cfpd_chords%nchan]
         dim6 = shape(proton%weight)
+        call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 6, dim6, proton%weight, error)
 
 
@@ -5663,6 +5668,10 @@ subroutine write_proton_weights
              "Number of R values", error)
         call h5ltset_attribute_string_f(fid,"/nz", "description", &
              "Number of Z values", error)
+        call h5ltset_attribute_string_f(fid,"/flux", "description", &
+             "Proton flux: flux(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/flux", "units", &
+             "protons/(s*dE)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
              "Proton Weight Function: weight(E3,E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
@@ -12155,7 +12164,7 @@ subroutine proton_f
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, phi, vnet_square, daomega
+    real(Float64) :: pgyro, phi, vnet_square, daomega, factor
     real(Float64) :: eb, pitch, erel, rate, E1, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
     if(.not.any(thermal_mass.eq.H2_amu)) then
@@ -12171,13 +12180,16 @@ subroutine proton_f
     endif
 
     allocate(ray_velocities(3,ptable%nsteps))
+    allocate(proton%flux(ptable%nenergy, cfpd_chords%nchan))
     allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
+    ray_velocities = 0.d0
+    proton%flux = 0.d0
     proton%weight = 0.d0
 
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
     !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,E1,daomega, &
-    !$OMP& ray_velocities)
+    !$OMP& ray_velocities,factor)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             ray_loop: do iray=1, ptable%nrays
@@ -12210,6 +12222,9 @@ subroutine proton_f
                     call get_fields(fields, pos=uvw, input_coords=1)
                     if(.not.fields%in_plasma) cycle step_loop
 
+                    call get_interpolation_grid_indices(uvw, ind, input_coords=1)
+                    ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+                    factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi*1.0 !!!dl=0.01m
                     !! Loop over energy/pitch/gamma
                     pitch_loop: do ip = 1, fbm%npitch
                         pitch = fbm%pitch(ip)
@@ -12239,11 +12254,12 @@ subroutine proton_f
 
                             rate = rate*daomega
 
-                            !!!Store
-                            call get_interpolation_grid_indices(uvw, ind, input_coords=1)
-                            ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
-
+                            !! Store
                             proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
+                            !$OMP CRITICAL(proton_weight)
+                            proton%flux(ie3,ich) = proton%flux(ie3,ich) + rate * fbm%f(ie,ip,ir,iz,iphi) &
+                                                                               * factor
+                            !$OMP END CRITICAL(proton_weight)
 
                         enddo energy_loop
                     enddo pitch_loop
@@ -12255,6 +12271,7 @@ subroutine proton_f
 
 #ifdef _MPI
     call parallel_sum(proton%rate)
+    call parallel_sum(proton%flux)
     call parallel_sum(proton%weight)
 #endif
 

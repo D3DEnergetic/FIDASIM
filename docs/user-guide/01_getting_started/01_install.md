@@ -22,7 +22,7 @@ FIDASIM has the following dependencies:
   [GNU(>v5)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
   Note you cannot mix and match different compilers.
 * [zlib](http://zlib.net/) for file compression. (Required)
-* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts and pre-processing. (Optional)
+* [Anaconda Python](https://www.anaconda.com/) for python scripts and pre-processing. (Optional)
 * [IDL](http://www.harrisgeospatial.com/ProductsandSolutions/GeospatialProducts/IDL.aspx) for pre-processing (Optional)
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)

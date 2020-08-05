@@ -47,29 +47,6 @@ integer, parameter :: brems_type = 7
 integer, parameter :: ntypes     = 7
     !+ Number of different types of neutrals
 
-integer, parameter :: beam_ion = 1
-    !+ Identifier for a beam ion
-integer, parameter :: thermal_ion = 2
-    !+ Identifier for a thermal ion
-
-!! Plasma Composition
-integer, parameter :: max_species = 3
-    !+ Maximum number of thermal isotopes
-integer :: n_thermal = 1
-    !+ Number of thermal hydrogen species/isotopes
-real(Float64) :: thermal_mass(max_species) = 0.d0
-    !+ Thermal ion species mass [amu]
-integer :: impurity_charge = 1
-    !+ Charge of main impurity (boron=5, carbon=6,...)
-real(Float64) :: impurity_mass = 0.d0
-    !+ Impurity species mass [amu]
-real(Float64) :: beam_mass = 0.d0
-    !+ Beam species mass [amu]
-!integer :: n_fast = 1
-!    !+ Number of Fast hydrogen species/isotopes
-!real(Float64) :: fast_mass(max_species) = 0.d0
-!    !+ Fast ion species mass [amu]
-
 !! Physical units
 real(Float64), parameter :: e_amu = 5.48579909070d-4
     !+ Atomic mass of an electron [amu]
@@ -95,13 +72,14 @@ real(Float64), parameter :: c0        = 2.99792458d+08
     !+ Speed of light [m/s]
 real(Float64), parameter :: h_planck  = 4.135667516d-15
     !+ Planck's constant [eV*s]
-real(Float64), parameter :: lambda0   = 656.1d0
-    !+ D-alpha emission line [nm]
 real(Float64), parameter :: v2_to_E_per_amu = mass_u/(2.*e0*1.d3)*1.d-4
     !+ \(cm^2/s^2\) to keV conversion factor
 real(Float64), parameter :: log_10 = log(10.d0)
     !+ Natural log of 10.0
 
+real(Float64), parameter :: balmer_alpha(3)   = [656.28d0, 656.104d0, 656.045d0]
+    !+ H/D/T-alpha emission lines [nm]
+    !+"Tritium Diagnostics by Balmer-alpha emission" CH Skinner 1993
 integer, parameter ::n_stark = 15
     !+ Number of Stark lines
 real(Float64), parameter, dimension(n_stark) :: stark_wavel = &
@@ -134,6 +112,34 @@ integer :: istart = 1
     !+ Starting loop counter (1 if OpenMP, processor number if MPI)
 integer :: istep = 1
     !+ Loop step size (1 if OpenMP, number of processes if MPI)
+
+!! Plasma Composition
+integer, parameter :: max_species = 3
+    !+ Maximum number of thermal isotopes
+real(Float64), parameter :: supported_masses(max_species) = [H1_amu, H2_amu, H3_amu]
+    !+ Supported Hydrogen isotopes masses [amu]
+
+integer :: n_thermal = 1
+    !+ Number of thermal hydrogen species/isotopes
+real(Float64) :: thermal_mass(max_species) = 0.d0
+    !+ Thermal ion species mass [amu]
+real(Float64) :: thermal_lambda0(max_species) = 0.d0
+    !+ Reference wavelengths for thermal species/isotopes
+integer :: impurity_charge = 1
+    !+ Charge of main impurity (boron=5, carbon=6,...)
+real(Float64) :: impurity_mass = 0.d0
+    !+ Impurity species mass [amu]
+real(Float64) :: beam_mass = 0.d0
+    !+ Beam species mass [amu]
+real(Float64) :: beam_lambda0 = 0.d0
+    !+ Reference wavelength for beam species
+
+!integer :: n_fast = 1
+!    !+ Number of Fast hydrogen species/isotopes
+!real(Float64) :: fast_mass(max_species) = 0.d0
+!    !+ Fast ion species mass [amu]
+!real(Float64) :: fast_lambda0(max_species) = 0.d0
+!    !+ Reference wavelength for fast species
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
@@ -1315,7 +1321,7 @@ subroutine np_assign(n1, n2)
 
 end subroutine np_assign
 
-subroutine pp_assign(p1, p2)
+pure subroutine pp_assign(p1, p2)
     !+ Defines how to assign [[Profiles]] types to eachother
     type(Profiles), intent(in)    :: p2
     type(Profiles), intent(inout) :: p1
@@ -1334,7 +1340,7 @@ subroutine pp_assign(p1, p2)
 
 end subroutine pp_assign
 
-subroutine lpp_assign(p1, p2)
+pure subroutine lpp_assign(p1, p2)
     !+ Defines how to assign a [[Profiles]] type to a [[LocalProfiles]] type
     type(Profiles), intent(in)         :: p2
     type(LocalProfiles), intent(inout) :: p1
@@ -1353,7 +1359,7 @@ subroutine lpp_assign(p1, p2)
 
 end subroutine lpp_assign
 
-subroutine plp_assign(p1, p2)
+pure subroutine plp_assign(p1, p2)
     !+ Defines how to assign a [[LocalProfiles]] type to a [[Profiles]] type
     type(LocalProfiles), intent(in) :: p2
     type(Profiles), intent(inout)   :: p1
@@ -1372,7 +1378,7 @@ subroutine plp_assign(p1, p2)
 
 end subroutine plp_assign
 
-subroutine lplp_assign(p1, p2)
+pure subroutine lplp_assign(p1, p2)
     !+ Defines how to assign [[LocalProfiles]] types to eachother
     type(LocalProfiles), intent(in)    :: p2
     type(LocalProfiles), intent(inout) :: p1
@@ -1394,7 +1400,7 @@ subroutine lplp_assign(p1, p2)
 
 end subroutine lplp_assign
 
-subroutine ff_assign(p1, p2)
+pure subroutine ff_assign(p1, p2)
     !+ Defines how to assign [[EMFields]] types to eachother
     type(EMFields), intent(in)    :: p2
     type(EMFields), intent(inout) :: p1
@@ -1415,7 +1421,7 @@ subroutine ff_assign(p1, p2)
 
 end subroutine ff_assign
 
-subroutine lff_assign(p1, p2)
+pure subroutine lff_assign(p1, p2)
     !+ Defines how to assign a [[EMFields]] type to a [[LocalEMFields]] type
     type(EMFields), intent(in)         :: p2
     type(LocalEMFields), intent(inout) :: p1
@@ -1436,7 +1442,7 @@ subroutine lff_assign(p1, p2)
 
 end subroutine lff_assign
 
-subroutine flf_assign(p1, p2)
+pure subroutine flf_assign(p1, p2)
     !+ Defines how to assign a [[LocalEMFields]] type to a [[EMFields]] type
     type(LocalEMFields), intent(in) :: p2
     type(EMFields), intent(inout)   :: p1
@@ -1457,7 +1463,7 @@ subroutine flf_assign(p1, p2)
 
 end subroutine flf_assign
 
-subroutine lflf_assign(p1, p2)
+pure subroutine lflf_assign(p1, p2)
     !+ Defines how to assign [[LocalEMFields]] types to eachother
     type(LocalEMFields), intent(in)    :: p2
     type(LocalEMFields), intent(inout) :: p1
@@ -1486,7 +1492,7 @@ subroutine lflf_assign(p1, p2)
 
 end subroutine lflf_assign
 
-function pp_add(p1, p2) result (p3)
+elemental function pp_add(p1, p2) result (p3)
     !+ Defines how to add two [[Profiles]] types
     type(Profiles), intent(in) :: p1,p2
     type(Profiles)             :: p3
@@ -1505,7 +1511,7 @@ function pp_add(p1, p2) result (p3)
 
 end function pp_add
 
-function pp_subtract(p1, p2) result (p3)
+elemental function pp_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[Profiles]] types
     type(Profiles), intent(in) :: p1,p2
     type(Profiles)             :: p3
@@ -1524,7 +1530,7 @@ function pp_subtract(p1, p2) result (p3)
 
 end function pp_subtract
 
-function lplp_add(p1, p2) result (p3)
+elemental function lplp_add(p1, p2) result (p3)
     !+ Defines how to add two [[LocalProfiles]] types
     type(LocalProfiles), intent(in) :: p1,p2
     type(LocalProfiles)             :: p3
@@ -1546,7 +1552,7 @@ function lplp_add(p1, p2) result (p3)
 
 end function lplp_add
 
-function lplp_subtract(p1, p2) result (p3)
+elemental function lplp_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[LocalProfiles]] types
     type(LocalProfiles), intent(in) :: p1,p2
     type(LocalProfiles)             :: p3
@@ -1568,7 +1574,7 @@ function lplp_subtract(p1, p2) result (p3)
 
 end function lplp_subtract
 
-function ps_multiply(p1, real_scalar) result (p3)
+elemental function ps_multiply(p1, real_scalar) result (p3)
     !+ Defines how to multiply [[Profiles]] types by a scalar
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1588,7 +1594,7 @@ function ps_multiply(p1, real_scalar) result (p3)
 
 end function ps_multiply
 
-function sp_multiply(real_scalar, p1) result (p3)
+elemental function sp_multiply(real_scalar, p1) result (p3)
     !+ Defines how to multiply [[Profiles]] types by a scalar
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1598,7 +1604,7 @@ function sp_multiply(real_scalar, p1) result (p3)
 
 end function sp_multiply
 
-function ps_divide(p1, real_scalar) result (p3)
+elemental function ps_divide(p1, real_scalar) result (p3)
     !+ Defines how to divide [[Profiles]] types by a scalar
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1608,7 +1614,7 @@ function ps_divide(p1, real_scalar) result (p3)
 
 end function ps_divide
 
-function lps_multiply(p1, real_scalar) result (p3)
+elemental function lps_multiply(p1, real_scalar) result (p3)
     !+ Defines how to multiply [[LocalProfiles]] types by a scalar
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -1631,7 +1637,7 @@ function lps_multiply(p1, real_scalar) result (p3)
 
 end function lps_multiply
 
-function slp_multiply(real_scalar, p1) result (p3)
+elemental function slp_multiply(real_scalar, p1) result (p3)
     !+ Defines how to multiply [[LocalProfiles]] types by a scalar
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -1641,7 +1647,7 @@ function slp_multiply(real_scalar, p1) result (p3)
 
 end function slp_multiply
 
-function lps_divide(p1, real_scalar) result (p3)
+elemental function lps_divide(p1, real_scalar) result (p3)
     !+ Defines how to divide [[LocalProfiles]] types by a scalar
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -1651,7 +1657,7 @@ function lps_divide(p1, real_scalar) result (p3)
 
 end function lps_divide
 
-function ff_add(p1, p2) result (p3)
+elemental function ff_add(p1, p2) result (p3)
     !+ Defines how to add two [[EMFields]] types
     type(EMFields), intent(in) :: p1,p2
     type(EMFields)             :: p3
@@ -1672,7 +1678,7 @@ function ff_add(p1, p2) result (p3)
 
 end function ff_add
 
-function ff_subtract(p1, p2) result (p3)
+elemental function ff_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[EMFields]] types
     type(EMFields), intent(in) :: p1,p2
     type(EMFields)             :: p3
@@ -1693,7 +1699,7 @@ function ff_subtract(p1, p2) result (p3)
 
 end function ff_subtract
 
-function fs_multiply(p1, real_scalar) result (p3)
+elemental function fs_multiply(p1, real_scalar) result (p3)
     !+ Defines how to multiply [[EMFields]] types by a scalar
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1715,7 +1721,7 @@ function fs_multiply(p1, real_scalar) result (p3)
 
 end function fs_multiply
 
-function sf_multiply(real_scalar, p1) result (p3)
+elemental function sf_multiply(real_scalar, p1) result (p3)
     !+ Defines how to multiply [[EMFields]] types by a scalar
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1725,7 +1731,7 @@ function sf_multiply(real_scalar, p1) result (p3)
 
 end function sf_multiply
 
-function fs_divide(p1, real_scalar) result (p3)
+elemental function fs_divide(p1, real_scalar) result (p3)
     !+ Defines how to divide [[EMFields]] types by a scalar
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
@@ -1735,7 +1741,7 @@ function fs_divide(p1, real_scalar) result (p3)
 
 end function fs_divide
 
-function lflf_add(p1, p2) result (p3)
+elemental function lflf_add(p1, p2) result (p3)
     !+ Defines how to add two [[LocalEMFields]] types
     type(LocalEMFields), intent(in) :: p1,p2
     type(LocalEMFields)             :: p3
@@ -1771,7 +1777,7 @@ function lflf_add(p1, p2) result (p3)
 
 end function lflf_add
 
-function lflf_subtract(p1, p2) result (p3)
+elemental function lflf_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[LocalEMFields]] types
     type(LocalEMFields), intent(in) :: p1,p2
     type(LocalEMFields)             :: p3
@@ -1807,7 +1813,7 @@ function lflf_subtract(p1, p2) result (p3)
 
 end function lflf_subtract
 
-function lfs_multiply(p1, real_scalar) result (p3)
+elemental function lfs_multiply(p1, real_scalar) result (p3)
     !+ Defines how to multiply [[LocalEMFields]] types by a scalar
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -1837,7 +1843,7 @@ function lfs_multiply(p1, real_scalar) result (p3)
 
 end function lfs_multiply
 
-function slf_multiply(real_scalar, p1) result (p3)
+elemental function slf_multiply(real_scalar, p1) result (p3)
     !+ Defines how to multiply [[LocalEMFields]] types by a scalar
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -1847,7 +1853,7 @@ function slf_multiply(real_scalar, p1) result (p3)
 
 end function slf_multiply
 
-function lfs_divide(p1, real_scalar) result (p3)
+elemental function lfs_divide(p1, real_scalar) result (p3)
     !+ Defines how to divide [[LocalEMFields]] types by a scalar
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
@@ -2992,7 +2998,6 @@ subroutine read_plasma
     !+ Reads in Plasma composition e.g. the thermal, fast-ion, and impurity species
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(1) :: dims
-    real(Float64) :: supported_masses(3)
     integer :: error,i,w
 
     !!Initialize HDF5 interface
@@ -3026,7 +3031,6 @@ subroutine read_plasma
     call h5close_f(error)
 
     !! Correct misspecified masses
-    supported_masses = [H1_amu, H2_amu, H3_amu]
     w = minloc(abs(supported_masses - beam_mass),1)
     if(abs(beam_mass - supported_masses(w)).gt.0.5) then
         write(*,'("READ_PLASMA: Got unsupported beam ion mass: ",f6.3," amu")') beam_mass
@@ -3034,6 +3038,7 @@ subroutine read_plasma
         stop
     else
         beam_mass = supported_masses(w)
+        beam_lambda0 = balmer_alpha(w)
     endif
 
     do i=1, n_thermal
@@ -3044,6 +3049,7 @@ subroutine read_plasma
             stop
         else
             thermal_mass(i) = supported_masses(w)
+            thermal_lambda0(i) = balmer_alpha(w)
         endif
     enddo
 
@@ -3630,7 +3636,7 @@ subroutine quasineutrality_check
     end where
 
     quasi_cnt = count(abs(quasi).gt.(tol*equil%plasma%dene))
-    if (quasi_cnt.gt.0) then
+    if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Quasi-neutrality Check ----'
         write(*,'(T2, a, f5.2, "%")') 'Tolerance: ',tol*100
         write(*,'(T2, a, f6.2, "%")') 'Percent Failure: ', &
@@ -7021,7 +7027,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             chan_loop: do j=1,inter%nchan
                 id = inter%los_elem(j)%id
                 vp = ri_tmp - spec_chords%los(id)%lens
-                call doppler_stark(vp, vn, fields, lambda)
+                call doppler_stark(vp, vn, fields, beam_lambda0, lambda)
                 los_inter = any((lambda.ge.inputs%lambdamin).and.(lambda.le.inputs%lambdamax))
                 if(los_inter) exit chan_loop
             enddo chan_loop
@@ -7214,7 +7220,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             chan_loop: do j=1,inter%nchan
                 id = inter%los_elem(j)%id
                 vp = ri_tmp - spec_chords%los(id)%lens_uvw
-                call doppler_stark(vp, vn, fields, lambda)
+                call doppler_stark(vp, vn, fields, beam_lambda0, lambda)
                 los_inter = any((lambda.ge.inputs%lambdamin).and.(lambda.le.inputs%lambdamax))
                 if(los_inter) exit chan_loop
             enddo chan_loop
@@ -7439,7 +7445,7 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
 
 end subroutine get_plasma
 
-subroutine calc_perp_vectors(b, a, c)
+pure subroutine calc_perp_vectors(b, a, c)
   !+ Calculates normalized vectors that are perpendicular to b
   !+ such that `a` x `c` = `b_norm`
   real(Float64), dimension(3), intent(in)  :: b
@@ -7705,17 +7711,24 @@ subroutine update_reservoir(res, vn, wght)
     real(Float64), dimension(2) :: randomu
 
     if (res%n.le.res%k) then
+        !$OMP CRITICAL(update_reservoir_1)
+        if (res%n.eq.0) then
+            call init_reservoir(res,reservoir_size)
+        endif
         res%R(res%n) = NeutralParticle(wght, vn)
         res%n = res%n + 1
+        !$OMP END CRITICAL(update_reservoir_1)
         return
     endif
 
     if (res%n.eq.res%i) then
+        !$OMP CRITICAL(update_reservoir_2)
         call randind(res%k, randomi)
         res%R(randomi(1)) = NeutralParticle(wght, vn)
         call randu(randomu)
         res%W = res%W*exp(log(randomu(1))/res%k)
         res%i = res%i + floor(log(randomu(2))/log(1.0-res%W)) + 1
+        !$OMP END CRITICAL(update_reservoir_2)
     endif
 
     res%n = res%n + 1
@@ -7806,12 +7819,9 @@ subroutine update_neutrals(pop, ind, vn, dens)
 
     !$OMP CRITICAL(update_neutrals_1)
     pop%dens(:,i,j,k) = pop%dens(:,i,j,k) + dens
-
-    if (pop%res(i,j,k)%n.eq.0) then
-        call init_reservoir(pop%res(i,j,k),reservoir_size)
-    endif
-    call update_reservoir(pop%res(i,j,k), vn, sum(dens))
     !$OMP END CRITICAL(update_neutrals_1)
+
+    call update_reservoir(pop%res(i,j,k), vn, sum(dens))
 
 end subroutine update_neutrals
 
@@ -8636,7 +8646,7 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
 
 end subroutine attenuate
 
-subroutine doppler_stark(vecp, vi, fields, lambda)
+subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     !+ Calculates doppler shift and stark split wavelengths
     real(Float64), dimension(3), intent(in)        :: vecp
         !+ Vector directing towards optical head
@@ -8644,6 +8654,8 @@ subroutine doppler_stark(vecp, vi, fields, lambda)
         !+ Particle velocity
     type(LocalEMFields), intent(in)                :: fields
         !+ Electro-magnetic fields
+    real(Float64), intent(in)                      :: lambda0
+        !+ Reference wavelength [nm]
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
 
@@ -8671,7 +8683,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda)
     lambda =  lambda_shifted + E * stark_wavel ![nm]
 end
 
-subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intensity)
+subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambda, intensity)
     !+ Calculates doppler shift, stark splitting, and intensities
     real(Float64), dimension(3), intent(in)        :: vecp
         !+ Vector directing towards optical head
@@ -8679,6 +8691,8 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
         !+ Particle velocity
     type(LocalEMFields), intent(in)                :: fields
         !+ Electro-magnetic fields
+    real(Float64), intent(in)                      :: lambda0
+        !+ Reference wavelength [nm]
     real(Float64), intent(in)                      :: sigma_pi
         !+ Sigma-pi ratio
     real(Float64), intent(in)                      :: photons
@@ -8732,12 +8746,14 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_photons(pos, vi, photons, spectra, passive)
+subroutine store_photons(pos, vi, lambda0, photons, spectra, passive)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Position of neutral
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
+    real(Float64), intent(in)                    :: lambda0
+        !+ Reference wavelength [nm]
     real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:,:), intent(inout) :: spectra
@@ -8784,7 +8800,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
             lens_xyz = spec_chords%los(ichan)%lens
         endif
         vp = pos_xyz - lens_xyz
-        call spectrum(vp,vi,fields,sigma_pi,photons, &
+        call spectrum(vp,vi,fields,lambda0,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
         loop_over_stark: do i=1,n_stark
@@ -8799,12 +8815,14 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
 
 end subroutine store_photons
 
-subroutine store_nbi_photons(pos, vi, photons, neut_type)
+subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
     real(Float64), dimension(3), intent(in) :: vi
         !+ Velocitiy of neutral [cm/s]
+    real(Float64), intent(in)               :: lambda0
+        !+ Reference wavelength [nm]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     integer,intent(in)                      :: neut_type
@@ -8812,11 +8830,11 @@ subroutine store_nbi_photons(pos, vi, photons, neut_type)
 
     select case (neut_type)
            case (nbif_type)
-               call store_photons(pos,vi,photons,spec%full)
+               call store_photons(pos,vi,lambda0,photons,spec%full)
            case (nbih_type)
-               call store_photons(pos,vi,photons,spec%half)
+               call store_photons(pos,vi,lambda0,photons,spec%half)
            case (nbit_type)
-               call store_photons(pos,vi,photons,spec%third)
+               call store_photons(pos,vi,lambda0,photons,spec%third)
            case default
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_NBI_PHOTONS: Unknown neutral type: ",i2)') neut_type
@@ -8826,12 +8844,14 @@ subroutine store_nbi_photons(pos, vi, photons, neut_type)
 
 end subroutine store_nbi_photons
 
-subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
+subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
     !+ Store fida photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
     real(Float64), dimension(3), intent(in) :: vi
         !+ Velocitiy of neutral [cm/s]
+    real(Float64), intent(in)               :: lambda0
+        !+ Reference wavelength [nm]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     integer, intent(in), optional           :: orbit_class
@@ -8849,9 +8869,9 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     if(present(passive)) pas = passive
 
     if(pas) then
-        call store_photons(pos, vi, photons, spec%pfida(:,:,:,iclass), passive=.True.)
+        call store_photons(pos, vi, lambda0, photons, spec%pfida(:,:,:,iclass), passive=.True.)
     else
-        call store_photons(pos, vi, photons, spec%fida(:,:,:,iclass))
+        call store_photons(pos, vi, lambda0, photons, spec%fida(:,:,:,iclass))
     endif
 
 end subroutine store_fida_photons
@@ -8877,7 +8897,7 @@ subroutine store_neutrons(rate, orbit_class)
 
 end subroutine store_neutrons
 
-subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_pi,denf,photons)
+subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
     integer, intent(in)                     :: ichan
         !+ Channel index
@@ -8889,6 +8909,8 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
         !+ Vector pointing toward optical head
     real(Float64), dimension(3), intent(in) :: vi
         !+ Velocity of neutral [cm/s]
+    real(Float64), intent(in)               :: lambda0
+        !+ Reference Wavelength [nm]
     type(LocalEMFields), intent(in)         :: fields
         !+ Electro-magnetic fields
     real(Float64), intent(in)               :: dlength
@@ -8907,7 +8929,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
 
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     intens_fac = (1.d0)/(4.d0*pi*dlambda)
-    call spectrum(vp,vi,fields,sigma_pi,photons, &
+    call spectrum(vp,vi,fields, lambda0, sigma_pi,photons, &
                   dlength,lambda,intensity)
 
     !$OMP CRITICAL(fida_wght)
@@ -8928,7 +8950,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
 
 end subroutine store_fw_photons_at_chan
 
-subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
+subroutine store_fw_photons(eind, pind, pos, vi, lambda0, denf, photons)
     !+ Store FIDA weight photons in [[libfida:fweight]]
     integer, intent(in)                     :: eind
         !+ Energy index
@@ -8938,6 +8960,8 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         !+ Position of neutral
     real(Float64), dimension(3), intent(in) :: vi
         !+ Velocity of neutral [cm/s]
+    real(Float64), intent(in)               :: lambda0
+        !+ Reference Wavelength [nm]
     real(Float64), intent(in)               :: denf
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
@@ -8963,7 +8987,7 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call store_fw_photons_at_chan(ichan, eind, pind, &
-             vp, vi, fields, dlength, sigma_pi, denf, photons)
+             vp, vi, lambda0, fields, dlength, sigma_pi, denf, photons)
     enddo loop_over_channels
 
 end subroutine store_fw_photons
@@ -9634,7 +9658,7 @@ subroutine ndmc
                 endif
 
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
-                    call store_nbi_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
+                    call store_nbi_photons(tracks(jj)%pos,vnbi,beam_lambda0, photons/nlaunch,neut_type)
                 endif
             enddo loop_along_track
             if((inputs%calc_birth.ge.1).and.(flux_tot.gt.0.d0)) then
@@ -9785,7 +9809,7 @@ subroutine dcx
 
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                         photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),spec%dcx(:,:,:,is))
+                        call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),spec%dcx(:,:,:,is))
                     endif
                 enddo loop_along_track
             enddo loop_over_dcx
@@ -9933,7 +9957,8 @@ subroutine halo
 
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                             photons = fi_correction*photons !! Correct for including fast-ions in states
-                            call store_photons(tracks(it)%pos,vihalo,photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
+                            call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), &
+                                               photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
                         endif
                     enddo loop_along_track
                 enddo loop_over_halos
@@ -10024,17 +10049,17 @@ subroutine nbi_spec
             !! Full Spectra
             call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
             f_tot = f_tot + f_wght
-            call store_photons(ri, vnbi, f_wght*nbif_photons, full)
+            call store_photons(ri, vnbi, beam_lambda0, f_wght*nbif_photons, full)
 
             !! Half Spectra
             call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
             h_tot = h_tot + h_wght
-            call store_photons(ri, vnbi, h_wght*nbih_photons, half)
+            call store_photons(ri, vnbi, beam_lambda0, h_wght*nbih_photons, half)
 
             !! Third Spectra
             call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
             t_tot = t_tot + t_wght
-            call store_photons(ri, vnbi, t_wght*nbit_photons, third)
+            call store_photons(ri, vnbi, beam_lambda0, t_wght*nbit_photons, third)
         enddo
         !$OMP CRITICAL(nbi_spec_1)
         spec%full = spec%full + full/f_tot
@@ -10090,7 +10115,7 @@ subroutine dcx_spec
             do it=1, n
                 !! DCX Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, wght*dcx_photons/n, spec%dcx(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*dcx_photons/n, spec%dcx(:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -10140,7 +10165,7 @@ subroutine halo_spec
             do it=1, n
                 !! Halo Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, wght*halo_photons/n, spec%halo(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*halo_photons/n, spec%halo(:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -10178,7 +10203,7 @@ subroutine cold_spec
             do it=1, n
                 !! Cold Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, cold_photons/n, spec%cold(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -10364,7 +10389,7 @@ subroutine fida_f
 
                 call colrad(plasma, fbm%A, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k))
+                call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -10473,7 +10498,7 @@ subroutine pfida_f
 
                 call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons/nlaunch(i,j,k), passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -10575,7 +10600,7 @@ subroutine fida_mc
 
                 call colrad(plasma, fast_ion%A, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
+                call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons, fast_ion%class)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -10683,7 +10708,7 @@ subroutine pfida_mc
 
                 call colrad(plasma, fast_ion%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons, fast_ion%class,passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -11635,7 +11660,7 @@ subroutine fida_weights_mc
                 call colrad(plasma, beam_mass, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fw_photons(ienergy(1), ipitch(1), &
-                     tracks(jj)%pos, vi, fbm_denf, photons/nlaunch(i,j,k))
+                     tracks(jj)%pos, vi, beam_lambda0, fbm_denf, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -11865,7 +11890,7 @@ subroutine fida_weights_los
                     denf = mean_f(ienergy,ipitch)*dEdP
                     photons = photons/real(inputs%nphi_wght)
                     call store_fw_photons_at_chan(ichan, ienergy, ipitch, &
-                         vp, vi, fields, dlength, sigma_pi, denf, photons)
+                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, denf, photons)
 
                 enddo
             enddo

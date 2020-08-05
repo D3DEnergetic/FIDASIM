@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.1% of total for procedures.">18 statements</a>
+    title=" 0.1% of total for procedures.">19 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
+public subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
     
     
    
@@ -257,6 +257,21 @@ public subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Velocitiy of neutral [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lambda0%7E5"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lambda0</strong></td><td><p>Reference wavelength [nm]</p></td>
   
 </tr>
 
@@ -606,12 +621,14 @@ public subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fida_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">orbit_class</span><span class="p">,</span> <span class="n">passive</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fida_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">orbit_class</span><span class="p">,</span> <span class="n">passive</span><span class="p">)</span>
     <span class="c">!+ Store fida photons in [[libfida:spectra]]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">pos</span>
         <span class="c">!+ Position of neutral in beam grid coordinates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Velocitiy of neutral [cm/s]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">lambda0</span>
+        <span class="c">!+ Reference wavelength [nm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">photons</span>
         <span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>           <span class="kd">::</span> <span class="n">orbit_class</span>
@@ -629,9 +646,9 @@ public subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">passive</span><span class="p">))</span> <span class="n">pas</span> <span class="o">=</span> <span class="n">passive</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">pas</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">pfida</span><span class="p">(:,:,:,</span><span class="n">iclass</span><span class="p">),</span> <span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+<span class="k">        call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">pfida</span><span class="p">(:,:,:,</span><span class="n">iclass</span><span class="p">),</span> <span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
     <span class="k">else</span>
-<span class="k">        call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">fida</span><span class="p">(:,:,:,</span><span class="n">iclass</span><span class="p">))</span>
+<span class="k">        call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spec</span><span class="p">%</span><span class="n">fida</span><span class="p">(:,:,:,</span><span class="n">iclass</span><span class="p">))</span>
     <span class="n">endif</span>
 
 <span class="k">end subroutine </span><span class="n">store_fida_photons</span>

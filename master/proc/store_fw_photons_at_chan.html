@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">27 statements</a>
+    title=" 0.2% of total for procedures.">28 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dlength, sigma_pi, denf, photons)
+public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, fields, dlength, sigma_pi, denf, photons)
     
     
    
@@ -302,6 +302,21 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Velocity of neutral [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lambda0%7E6"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lambda0</strong></td><td><p>Reference Wavelength [nm]</p></td>
   
 </tr>
 
@@ -659,7 +674,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">dlength</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">denf</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">dlength</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">denf</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
     <span class="c">!+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">ichan</span>
         <span class="c">!+ Channel index</span>
@@ -671,6 +686,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
         <span class="c">!+ Vector pointing toward optical head</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Velocity of neutral [cm/s]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">lambda0</span>
+        <span class="c">!+ Reference Wavelength [nm]</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electro-magnetic fields</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">dlength</span>
@@ -689,7 +706,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
 
     <span class="n">dlambda</span><span class="o">=</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span>
     <span class="n">intens_fac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span> <span class="p">&amp;</span>
+    <span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span> <span class="p">&amp;</span>
                   <span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">)</span>
 
     <span class="c">!$OMP CRITICAL(fida_wght)</span>

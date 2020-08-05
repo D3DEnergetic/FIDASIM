@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">26 statements</a>
+    title=" 0.2% of total for procedures.">27 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
+public subroutine store_fw_photons(eind, pind, pos, vi, lambda0, denf, photons)
     
     
    
@@ -287,6 +287,21 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Velocity of neutral [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lambda0%7E7"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lambda0</strong></td><td><p>Reference Wavelength [nm]</p></td>
   
 </tr>
 
@@ -603,7 +618,7 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span> <span class="n">pind</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">denf</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span> <span class="n">pind</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">denf</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
     <span class="c">!+ Store FIDA weight photons in [[libfida:fweight]]</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">eind</span>
         <span class="c">!+ Energy index</span>
@@ -613,6 +628,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         <span class="c">!+ Position of neutral</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Velocity of neutral [cm/s]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">lambda0</span>
+        <span class="c">!+ Reference Wavelength [nm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">denf</span>
         <span class="c">!+ Fast-ion density [cm^-3]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">photons</span>
@@ -638,7 +655,7 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         <span class="n">sigma_pi</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">sigma_pi</span>
         <span class="n">vp</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">lens</span>
         <span class="k">call </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span> <span class="n">eind</span><span class="p">,</span> <span class="n">pind</span><span class="p">,</span> <span class="p">&amp;</span>
-             <span class="n">vp</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">dlength</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span> <span class="n">denf</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
+             <span class="n">vp</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">dlength</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span> <span class="n">denf</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
     <span class="n">enddo</span> <span class="n">loop_over_channels</span>
 
 <span class="k">end subroutine </span><span class="n">store_fw_photons</span>

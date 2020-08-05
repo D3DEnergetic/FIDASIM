@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.1% of total for procedures.">19 statements</a>
+    title=" 0.2% of total for procedures.">20 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_nbi_photons(pos, vi, photons, neut_type)
+public subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
     
     
    
@@ -257,6 +257,21 @@ public subroutine store_nbi_photons(pos, vi, photons, neut_type)
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Velocitiy of neutral [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lambda0%7E4"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lambda0</strong></td><td><p>Reference wavelength [nm]</p></td>
   
 </tr>
 
@@ -591,12 +606,14 @@ public subroutine store_nbi_photons(pos, vi, photons, neut_type)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_nbi_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">neut_type</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_nbi_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">neut_type</span><span class="p">)</span>
     <span class="c">!+ Store BES photons in [[libfida:spectra]]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">pos</span>
         <span class="c">!+ Position of neutral in beam grid coordinates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Velocitiy of neutral [cm/s]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">lambda0</span>
+        <span class="c">!+ Reference wavelength [nm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">photons</span>
         <span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
     <span class="kt">integer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                      <span class="kd">::</span> <span class="n">neut_type</span>
@@ -604,11 +621,11 @@ public subroutine store_nbi_photons(pos, vi, photons, neut_type)
 
     <span class="k">select case</span> <span class="p">(</span><span class="n">neut_type</span><span class="p">)</span>
            <span class="k">case</span> <span class="p">(</span><span class="n">nbif_type</span><span class="p">)</span>
-               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">full</span><span class="p">)</span>
+               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">full</span><span class="p">)</span>
            <span class="k">case</span> <span class="p">(</span><span class="n">nbih_type</span><span class="p">)</span>
-               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">half</span><span class="p">)</span>
+               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">half</span><span class="p">)</span>
            <span class="k">case</span> <span class="p">(</span><span class="n">nbit_type</span><span class="p">)</span>
-               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">third</span><span class="p">)</span>
+               <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="n">spec</span><span class="p">%</span><span class="n">third</span><span class="p">)</span>
            <span class="k">case </span><span class="n">default</span>
                <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                   write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;STORE_NBI_PHOTONS: Unknown neutral type: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">neut_type</span>

@@ -1,12 +1,12 @@
 !+ This file contains the main routines for FIDASIM {!../VERSION!}
 module libfida
 !+ Main FIDASIM library
+USE ISO_C_BINDING
 USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
 USE utilities
-USE ISO_C_BINDING
 #ifdef _MPI
 USE mpi_utils
 #endif

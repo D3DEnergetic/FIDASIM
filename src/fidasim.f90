@@ -9957,7 +9957,8 @@ subroutine halo
 
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                             photons = fi_correction*photons !! Correct for including fast-ions in states
-                            call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
+                            call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), &
+                                               photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
                         endif
                     enddo loop_along_track
                 enddo loop_over_halos

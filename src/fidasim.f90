@@ -84,11 +84,15 @@ integer :: n_stark = 0
 real(Float64), dimension(:), allocatable :: stark_wavel
     !+ Stark wavelengths [nm*m/V]
 real(Float64), dimension(:), allocatable :: stark_intens
-   !+ Stark Intensities
+    !+ Stark Intensities
 integer, dimension(:), allocatable :: stark_pi
     !+ Pi line indicators
 integer, dimension(:), allocatable :: stark_sigma
     !+ Sigma line indicators
+integer :: initial_state = 0
+    !+ intial state energy level of transition
+integer :: final_state = 0
+    !+ final state energy level of transition
 
 !!Numerical Settings
 integer, parameter :: nlevs=6
@@ -2173,7 +2177,7 @@ subroutine read_inputs
         stop
     endif
     
-    !+ Identify the transition from lambdamax and lambdamin    
+    ! Identify the transition from lambdamax and lambdamin    
     call identify_transition(n_stark, stark_pi, stark_sigma, &
                                 stark_intens, stark_wavel, line_lambda0)
   
@@ -2181,20 +2185,21 @@ end subroutine read_inputs
 
 subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
                                 stark_intens, stark_wavel, line_lambda0)
-    !+ Determines the type of transition from user defined inputs
+    ! Determines the type of transition from user defined inputs
     
-    ! real(Float64), intent(in)                                :: lambda_max, lambda_min
-    !+ maximum and minimum wavelength from user defined inputs
     integer, intent(out)                                     :: n_stark
     integer, dimension(:), allocatable, intent(out)          :: stark_pi, stark_sigma
     real(FLoat64), dimension(:), allocatable, intent(out)    :: stark_intens, stark_wavel
     real(Float64), dimension(3), intent(out)                 :: line_lambda0
 
     if (inputs%lambdamin > 620.0d0 .and. inputs%lambdamax < 680.0d0 ) then
-        !+ Assigns stark variables to balmer alpha transition
+        ! Assigns stark variables to balmer alpha transition
         n_stark = 15
+        initial_state = 3
+        final_state = 2
+
         line_lambda0 = [ 656.28d0, 656.104d0, 656.045d0 ]
-         !+"Tritium Diagnostics by Balmer-alpha emission" CH Skinner 1993
+         !"Tritium Diagnostics by Balmer-alpha emission" CH Skinner 1993
         allocate(stark_intens(n_stark))
         stark_intens = &
             [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
@@ -2220,12 +2225,16 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
         write(*,*) ''
 
     else if (inputs%lambdamin > 103.0d0 .and. inputs%lambdamax < 136.0d0) then
-        !+ Assigns stark varibales to Lyman alpha transition
+        ! Assigns stark varibales to Lyman alpha transition
         n_stark = 3
-        line_lambda0 = [ 121.57d0, 121.53d0, 121.52d0 ]
+        initial_state = 2
+        final_state = 1
 
+        line_lambda0 = [ 121.57d0, 121.53d0, 121.52d0 ]
+        ! "Ultra-sensitive Detection of Hydrogen Isotopes by Lyman-alpha RIS"
+        ! Yasuhiro Miyake et al 2012
         allocate(stark_intens(n_stark))
-        stark_intens = [ 1.00d0, 500.00d0, 1.00d0 ]
+        stark_intens = [ 1.000d0, 2.000d0, 1.000d0 ]
 
         allocate(stark_wavel(n_stark))
         stark_wavel = [ -8.25800d-8, 0.00000d0, 8.25800d-8 ]
@@ -8650,13 +8659,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
         dens = 0.d0
     endwhere
     
-    if (n_stark == 15) then
-        !+ Emitted photons 3->2
-        photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
-    else if (n_stark == 3) then
-        !+ Emitted photos 2->1
-        photons = dens(2)*tables%einstein(1,2)
-    end if
+    photons=dens(initial_state)*tables%einstein(initial_state,final_state) !! - [Ph/(s*cm^3)] - !!
 
 end subroutine colrad
 

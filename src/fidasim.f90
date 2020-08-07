@@ -8659,7 +8659,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
         dens = 0.d0
     endwhere
     
-    photons=dens(initial_state)*tables%einstein(initial_state,final_state) !! - [Ph/(s*cm^3)] - !!
+    photons=dens(initial_state)*tables%einstein(final_state,initial_state) !! - [Ph/(s*cm^3)] - !!
 
 end subroutine colrad
 

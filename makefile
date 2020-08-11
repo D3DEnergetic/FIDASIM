@@ -14,6 +14,7 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
+PYTHON_DIR = $(shell which python)$
 
 #Operating Systems
 OS := $(shell uname)
@@ -148,7 +149,7 @@ export L_FLAGS
 export I_FLAGS
 export NTHREADS
 
-fidasim: deps src tables
+fidasim: deps src tables python
 
 .PHONY: deps
 deps:
@@ -169,6 +170,10 @@ docs:
 		echo "Checking for broken links..."; \
 		linkchecker --ignore-url=/master $(DOCS_DIR)/html/index.html ; \
 	  fi
+
+.PHONY: python
+python:
+	@ln -s $(PYTHON_DIR) $(DEPS_DIR)/python
 
 clean_all: clean clean_deps clean_docs
 

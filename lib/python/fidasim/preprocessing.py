@@ -1,4 +1,5 @@
-#!/fusion/projects/codes/fidasim/anaconda3/bin/python3.7
+#!/bin/sh
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
 # -*- coding: utf-8 -*-
 
 #+#PREFIDA Source

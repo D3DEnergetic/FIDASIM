@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/bin/sh
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
 
 import os
 import re
@@ -16,13 +17,13 @@ def extract_file_type(f):
     return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[-1::])
 
 def get_file_paths(file_path):
-    #! Returns a 3 element list corresponding to files of type string for spectra, npa and neutron
-    #!
-    #! Example input:
-    #! file_path = ['tcv_spectra.h5', '2000_npa.h5', '3200_npa.h5', 'mast_neutrons.h5']
-    #!
-    #! Example return:
-    #! [['tcv_spectra.h5'], ['2000_npa.h5', '3200_npa.h5'], ['mast_neutrons.h5']]
+    #+ Returns a 3 element list corresponding to files of type string for spectra, npa and neutron
+    #+
+    #+ Example input:
+    #+ file_path = ['tcv_spectra.h5', '2000_npa.h5', '3200_npa.h5', 'mast_neutrons.h5']
+    #+
+    #+ Example return:
+    #+ [['tcv_spectra.h5'], ['2000_npa.h5', '3200_npa.h5'], ['mast_neutrons.h5']]
 
     spec, npa ,neut = [], [], []
     fpaths = [spec, npa, neut]
@@ -34,8 +35,8 @@ def get_file_paths(file_path):
     return fpaths
 
 def get_colors(all_data):
-    #! Given all the spectra data, return the colors for plotting
-    #! Note: Reshape at the end is to match for loops in the plot_spectra and plot_npa
+    #+ Given all the spectra data, return the colors for plotting
+    #+ Note: Reshape at the end is to match for loops in the plot_spectra and plot_npa
     Nfiles, Nspectra = all_data.shape[:2]
     Ncolors = Nfiles * Nspectra
 
@@ -47,10 +48,10 @@ def get_colors(all_data):
     return colors.reshape(Nfiles, Nspectra, 4)
 
 def get_figure_parameters(ac, lc, rc, all_data):
-    #! Returns some figure parameters
-    #! Nch is number of channels
-    #! ich is channel indices to plot
-    #! subplot_dim is the `figure` square side length in `subplot` units
+    #+ Returns some figure parameters
+    #+ Nch is number of channels
+    #+ ich is channel indices to plot
+    #+ subplot_dim is the `figure` square side length in `subplot` units
 
     # Define the list of channels to plot
     if ac:
@@ -72,7 +73,7 @@ def get_figure_parameters(ac, lc, rc, all_data):
     return Nch, ich, subplot_dim
 
 def check_shape(all_data):
-    #! Checks to see if all files have the same number of channels
+    #+ Checks to see if all files have the same number of channels
 
     # Make sure all spectra data has the same shape
     n_dataf = np.zeros_like(all_data)
@@ -84,9 +85,9 @@ def check_shape(all_data):
     return
 
 def get_extra_dim(subplot_dim):
-    #! Some figures use a column of subplots for the legend
-    #! This function returns the extended dimensions of that figure
-    #! Note: This is used in the check to determine which ticks to hide
+    #+ Some figures use a column of subplots for the legend
+    #+ This function returns the extended dimensions of that figure
+    #+ Note: This is used in the check to determine which ticks to hide
 
     if subplot_dim==3: # 3x3 plot
         extra_dim = 2
@@ -97,7 +98,7 @@ def get_extra_dim(subplot_dim):
     return extra_dim
 
 def increase_imod(subplot_dim, imod):
-    #! Increas imod to the next row in order to leave the last column of the figure available for the legend
+    #+ Increas imod to the next row in order to leave the last column of the figure available for the legend
     if subplot_dim==3: # 3x3 plot
         if 6<=imod<=8: imod += 2
         if 3<=imod<=5: imod += 1
@@ -106,10 +107,10 @@ def increase_imod(subplot_dim, imod):
     return imod
 
 def get_data(fpath, mask, plot_all, lc, rc, data_types):
-    #! fpath contains list of files
-    #! mask contains flags for what the user would like to plot
-    #! plot_all is the flag to plot all data_types
-    #! data_types is a list of strings containing the names of all FIDASIM spectral or npa types
+    #+ fpath contains list of files
+    #+ mask contains flags for what the user would like to plot
+    #+ plot_all is the flag to plot all data_types
+    #+ data_types is a list of strings containing the names of all FIDASIM spectral or npa types
     sflag, nflag = False, False
     if 'fida' in data_types: sflag = True
     if 'flux' in data_types: nflag = True
@@ -157,7 +158,7 @@ def get_data(fpath, mask, plot_all, lc, rc, data_types):
     return all_data, all_xdata, all_data_labels
 
 def check_channel_list(lc, rc, Nch, sflag, nflag):
-    #! Check the last channel number
+    #+ Check the last channel number
     if len(lc)>0 and max(lc)>Nch:
         if sflag: print('ERROR: Highest spectral channel is %s and the user input %s' % (Nch, max(lc)))
         if nflag: print('ERROR: Highest NPA channel is %s and the user input %s' % (Nch, max(lc)))
@@ -417,7 +418,7 @@ def plot_npa(fpath, savenpa, mask, plot_all=False, ac=False, lc=[], rc=[], log=F
     return
 
 def get_neutron_rate(fpath):
-    #! fpath is list of filenames
+    #+ fpath is list of filenames
     print('\nNeutron rate(s):')
     N = len(fpath)
     data_neutron_set = np.empty(N)

@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/bin/sh
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
 # -*- coding: utf-8 -*-
 
 #+#FIDASIM Utilities

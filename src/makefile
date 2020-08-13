@@ -7,7 +7,7 @@ ifeq ($(USE_MPI),y)
 endif
 
 
-$(FIDASIM_DIR)/fidasim: $(FIDADEPS)
+$(FIDASIM_DIR)/fidasim$(EXEEXT): $(FIDADEPS)
 	$(MPI_FC) $(C_FLAGS) $^ -o $@ $(L_FLAGS)
 
 mpi_utils.o: mpi_utils.f90

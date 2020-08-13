@@ -59,6 +59,14 @@ HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
 ifeq ($(OS),Linux)
 	HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
 endif
+ifneq ($(findstring MINGW, $(OS)),)
+	HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lm -lz -lws2_32
+	U_FLAGS=-static
+	EXEEXT=.exe
+	CFLAGS=-DH5_HAVE_WIN32_API
+	export CFLAGS
+	export EXEEXT
+endif
 ifeq ($(OS),Darwin)
 	HDF5_FLAGS = -L/usr/lib -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
 endif

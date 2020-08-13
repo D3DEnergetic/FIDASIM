@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">35 statements</a>
+    title=" 0.3% of total for procedures.">36 statements</a>
      </li> 
      
      
@@ -646,7 +646,9 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vn</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bfield</span><span class="p">,</span> <span class="n">efield</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">E</span><span class="p">,</span> <span class="n">cos_los_Efield</span><span class="p">,</span> <span class="n">lambda_shifted</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stark_sign</span><span class="o">=</span> <span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">stark_sigma</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">stark_pi</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stark_sign</span>
+
+    <span class="n">stark_sign</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">stark_sigma</span> <span class="o">-</span> <span class="mi">1</span><span class="o">*</span><span class="n">stark_pi</span>
 
     <span class="c">!! vector directing towards the optical head</span>
     <span class="n">vp</span><span class="o">=</span><span class="n">vecp</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vecp</span><span class="p">)</span>

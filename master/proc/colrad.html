@@ -331,7 +331,7 @@ public subroutine colrad(plasma, ab, vn, dt, states, dens, photons)
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>photons</strong></td><td><p>Emitted photons(3-&gt;2)</p></td>
+  <td><strong>photons</strong></td><td><p>Emitted photons</p></td>
   
 </tr>
 
@@ -895,7 +895,7 @@ public subroutine colrad(plasma, ab, vn, dt, states, dens, photons)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dens</span>
         <span class="c">!+ Density of neutrals</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>                   <span class="kd">::</span> <span class="n">photons</span>
-        <span class="c">!+ Emitted photons(3-&gt;2)</span>
+        <span class="c">!+ Emitted photons</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">matrix</span>  <span class="c">!! Matrix</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vnet_square</span>    <span class="c">!! net velocity of neutrals squared</span>
@@ -938,8 +938,8 @@ public subroutine colrad(plasma, ab, vn, dt, states, dens, photons)
     <span class="k">where</span> <span class="p">(</span><span class="n">dens</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dens</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">endwhere</span>
-
-    <span class="n">photons</span><span class="o">=</span><span class="n">dens</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="c">!! - [Ph/(s*cm^3)] - !!</span>
+    
+    <span class="n">photons</span><span class="o">=</span><span class="n">dens</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="n">final_state</span><span class="p">,</span><span class="n">initial_state</span><span class="p">)</span> <span class="c">!! - [Ph/(s*cm^3)] - !!</span>
 
 <span class="k">end subroutine </span><span class="n">colrad</span>
 </pre></div>

@@ -14,7 +14,7 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
-PYTHON_DIR = $(shell which python)$
+PYTHON_EXEC = $(shell which python)
 
 #Operating Systems
 OS := $(shell uname)
@@ -173,7 +173,7 @@ docs:
 
 .PHONY: python
 python:
-	@ln -s $(PYTHON_DIR) $(DEPS_DIR)/python
+	@ln -s $(PYTHON_EXEC) $(DEPS_DIR)/python
 
 clean_all: clean clean_deps clean_docs
 

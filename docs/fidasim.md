@@ -6,7 +6,7 @@ project_download: https://github.com/D3DEnergetic/FIDASIM/releases
 summary: ![FIDASIM](|media|/fidasim-logo.png)
          {: style="text-align: center" }
 author: Luke Stagner
-author_description: ORISE Postdoctoral Fellow
+author_description: General Atomics Scientist
 github: https://github.com/lstagner
 email: stagnerl@fusion.gat.com
 docmark: +
@@ -33,6 +33,7 @@ This is the documentation for the current release version of FIDASIM.
 
 ## Citing FIDASIM Source Code
 Along with the FIDASIM paper, please cite the source code.
+
 ```
 @article{FIDASIMpaper,
   author       = {Benedikt Geiger and Luke Stagner and William W Heidbrink and Ralph Dux and Rainer Fischer and Yutaka Fujiwara and Alvin Garcia and Asger Schou Jacobsen and Anton Jansen vanVuuren and Alexander N Karpushov and Deyong Liu and Philip Adrian Schneider and Igor Sfiligoi and Peter Zsolt Poloskei and Markus Weiland},

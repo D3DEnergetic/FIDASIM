@@ -948,8 +948,8 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
     w_ai = [a in zz for a in ['NH','ND','NT']]
 
     # SAVE IN PROFILES STRUCTURE
-    plasma={"data_source":os.path.abspath(filename),"time":time,"impurity_charge":impurity_charge,
-            "nthermal":np.sum(w_ai).astype('int16'), "species_mass":ai[w_ai], "deni":deni[w_ai,:,:],"profiles":profiles,
+    plasma={"data_source":os.path.abspath(filename),"time":time,"impurity_charge":int(impurity_charge),
+            "nthermal":int(np.sum(w_ai)), "species_mass":ai[w_ai], "deni":deni[w_ai,:,:],"profiles":profiles,
             "mask":mask,"dene":dene,"denimp":denimp,"denn":denn,"te":te,"ti":ti,
             "vr":vr,"vt":vt,"vz":vz,"zeff":zeff}
 

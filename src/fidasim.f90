@@ -869,6 +869,8 @@ type ProtonRate
         !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
     real(Float64), dimension(:,:), allocatable         :: flux
         !+ Proton flux: flux(E3,chan) [protons/(s*dE)]
+    real(Float64), dimension(:,:), allocatable         :: prob
+        !+ Proton flux: probability_gyro(E3,chan) [unity]
 end type ProtonRate
 
 type NeutralParticle
@@ -5651,6 +5653,7 @@ subroutine write_proton_weights
         dim2 = [ptable%nenergy, cfpd_chords%nchan]
         dim6 = shape(proton%weight)
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, proton%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 6, dim6, proton%weight, error)
 
 
@@ -8956,6 +8959,9 @@ subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
     if ((E3+0.5*deltaE3).gt.E3max) deltaE3 = 0.5*deltaE3+E3max-E3
 
     pgyro = dgamdE3*deltaE3*JkeV/pi
+    if(pgyro.gt.1) then
+        pgyro = 0
+    endif
 
 endsubroutine get_pgyro
 
@@ -12167,6 +12173,7 @@ subroutine proton_f
     real(Float64) :: pgyro, phi, vnet_square, daomega, factor
     real(Float64) :: eb, pitch, erel, rate, E1, kappa
     integer :: ir, iphi, iz, ie, ip, ich, ie3, iray, ist
+    integer, dimension(:,:), allocatable :: ntot
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
         return
@@ -12181,15 +12188,19 @@ subroutine proton_f
 
     allocate(ray_velocities(3,ptable%nsteps))
     allocate(proton%flux(ptable%nenergy, cfpd_chords%nchan))
+    allocate(proton%prob(ptable%nenergy, cfpd_chords%nchan))
+    allocate(ntot(ptable%nenergy, cfpd_chords%nchan))
     allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     ray_velocities = 0.d0
     proton%flux = 0.d0
+    proton%prob = 0.d0
+    ntot = 0.d0
     proton%weight = 0.d0
 
-    rate = 0
+    rate = 0.d0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
     !$OMP& ir,iphi,iz,ie,ip,plasma,uvw,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,E1,daomega, &
-    !$OMP& ray_velocities,factor)
+    !$OMP& ray_velocities,factor,ntot)
     channel_loop: do ich=1, cfpd_chords%nchan
         E3_loop: do ie3=1, ptable%nenergy
             ray_loop: do iray=1, ptable%nrays
@@ -12255,8 +12266,10 @@ subroutine proton_f
                             rate = rate*daomega
 
                             !! Store
-                            proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
                             !$OMP CRITICAL(proton_weight)
+                            proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) + rate
+                            proton%prob(ie3,ich) = proton%prob(ie3,ich) + pgyro
+                            if (pgyro.gt.0.d0) ntot(ie3,ich) = ntot(ie3,ich) + 1.d0
                             proton%flux(ie3,ich) = proton%flux(ie3,ich) + rate * fbm%f(ie,ip,ir,iz,iphi) &
                                                                                * factor
                             !$OMP END CRITICAL(proton_weight)
@@ -12265,6 +12278,9 @@ subroutine proton_f
                     enddo pitch_loop
                 enddo step_loop
             enddo ray_loop
+            !$OMP CRITICAL(pweight_ntot)
+            proton%prob(ie3,ich) = proton%prob(ie3,ich) / ntot(ie3,ich)
+            !$OMP END CRITICAL(pweight_ntot)
         enddo E3_loop
     enddo channel_loop
     !$OMP END PARALLEL DO
@@ -12276,7 +12292,6 @@ subroutine proton_f
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [protons/s]")') 'Rate:   ',sum(proton%rate)
         write(*,'(30X,a)') ''
         write(*,*) 'write protons:    ' , time(time_start)
     endif

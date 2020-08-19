@@ -8869,7 +8869,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
 end subroutine get_ddpt_anisotropy
 
-subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
+subroutine get_pgyro(fields,ie3,E1,pitch,vrot_xyz,v3_xyz,pgyro)
     !+ Returns fraction of gyroangles that can produce a reaction with given inputs
     type(LocalEMFields), intent(in) :: fields
         !+ Electromagneticfields at guiding
@@ -8879,22 +8879,21 @@ subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
         !+ E1 fast-ion energy (keV)
     real(Float64), intent(in) :: pitch
         !+ pitch  fast ion pitch relative to the field
-    real(Float64), dimension(3), intent(in) :: vrot
-        !+ Rotation velocity vector [cm/s] in beam coordinates !!!check that the
-        !unitis are ok
+    real(Float64), dimension(3), intent(in) :: vrot_xyz
+        !+ Rotation velocity vector [cm/s] in beam coordinates
     real(Float64), dimension(3), intent(in) :: v3_xyz
         !+ Proton velocity in beam coorindates
     real(Float64), intent(out) :: pgyro
         !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
 
-    real(Float64), dimension(3) :: a_xyz
+    real(Float64), dimension(3) :: a_xyz, vrot
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va
     real(Float64) :: A,B,C,v3pp,v3pm,v3mp,v3mm,E3pp,E3pm,E3mp,E3mm,E3max,E3min,E3
     real(Float64) :: lhs0,rhs0,cosgam0,deltaE3,dgamdE3
     real(Float64) :: phip,cosphip,cosphib,cosphia
 
     ! Preliminaries [SI units]
-    E3 = ptable%earray(ie3)
+    E3 = ptable%earray(ie3) ![keV]
     JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
     JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
     mp = H1_amu*mass_u  ![kg]
@@ -8903,65 +8902,64 @@ subroutine get_pgyro(fields,ie3,E1,pitch,vrot,v3_xyz,pgyro)
     norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
     vpar = norm_v1*pitch ![m/s]
     vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
+    vrot = vrot_xyz*100.d0 ![m/s]
 
     !! First, find and check the E3 limits are valid for the given inputs
     !! Assumes cos(gamma) = +/- 1 and vrot = 0
     cosphip = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
     phip = acos(cosphip)
-    A = 1.5*Q/mp + 0.5*norm_v1**2
+    A = 1.5d0*Q/mp + 0.5d0*norm_v1**2
     B = vpar*cos(phip)
     C = vperp*sin(phip)
-    v3pp = 0.5 * ( (B+C) + sqrt( (B+C)**2 + 4*A) ) ![m/s]
-    v3pm = 0.5 * ( (B+C) - sqrt( (B+C)**2 + 4*A) ) ![m/s]
-    v3mp = 0.5 * ( (B-C) + sqrt( (B-C)**2 + 4*A) ) ![m/s]
-    v3mm = 0.5 * ( (B-C) - sqrt( (B-C)**2 + 4*A) ) ![m/s]
-    E3pp = H1_amu*v2_to_E_per_amu*(v3pp*100)**2 ![keV]
-    E3pm = H1_amu*v2_to_E_per_amu*(v3pm*100)**2 ![keV]
-    E3mp = H1_amu*v2_to_E_per_amu*(v3mp*100)**2 ![keV]
-    E3mm = H1_amu*v2_to_E_per_amu*(v3mm*100)**2 ![keV]
-    E3max = max(E3pp,E3pm,E3mp,E3mm) ![keV]
-    E3min = min(E3pp,E3pm,E3mp,E3mm) ![keV]
+    v3pp = 0.5d0 * ( (B+C) + sqrt( (B+C)**2 + 4.d0*A) ) ![m/s]
+    v3pm = 0.5d0 * ( (B+C) - sqrt( (B+C)**2 + 4.d0*A) ) ![m/s]
+    v3mp = 0.5d0 * ( (B-C) + sqrt( (B-C)**2 + 4.d0*A) ) ![m/s]
+    v3mm = 0.5d0 * ( (B-C) - sqrt( (B-C)**2 + 4.d0*A) ) ![m/s]
+    E3pp = H1_amu*v2_to_E_per_amu*(v3pp*100.d0)**2 ![keV]
+    E3pm = H1_amu*v2_to_E_per_amu*(v3pm*100.d0)**2 ![keV]
+    E3mp = H1_amu*v2_to_E_per_amu*(v3mp*100.d0)**2 ![keV]
+    E3mm = H1_amu*v2_to_E_per_amu*(v3mm*100.d0)**2 ![keV]
+ !!!E3max = max(E3pp,E3pm,E3mp,E3mm) ![keV]
+ !!!E3min = min(E3pp,E3pm,E3mp,E3mm) ![keV]
+    E3max = max(E3pp,E3mp) ![keV] !!! For the moment turn off
+    E3min = min(E3pp,E3mp) ![keV] !!! some to match kinematics.pro
 
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
-        pgyro = 0.0
+        pgyro = 0.0d0
         return
     endif
 
     !! Calculate pgyro
     cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
-    vb = norm2(vrot)/100*cosphib ![m/s]
+    vb = norm2(vrot)*cosphib ![m/s]
     a_xyz = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
-    a_xyz = a_xyz / norm2(a_xyz)
-    cosphia = dot_product(vrot, a_xyz) / norm2(vrot)
-    va = norm2(vrot)/100*cosphia ![m/s]
-    lhs0 = vperp*(sin(phip)-2*va/norm_v3)
-    rhs0 = norm_v3 - 1.5*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) - va*sin(phip) &
-                   - 0.5*(norm_v1**2 + dot_product(vrot,vrot))/norm_v3 + 2*vb*vpar/norm_v3
+    cosphia = dot_product(vrot, a_xyz) / (norm2(vrot)*norm2(a_xyz))
+    va = norm2(vrot)*cosphia ![m/s]
+    lhs0 = vperp*(sin(phip)-2.d0*va/norm_v3)
+    rhs0 = norm_v3 - 1.5d0*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) - va*sin(phip) &
+                   - 0.5d0*(norm_v1**2 + dot_product(vrot,vrot))/norm_v3 + 2.d0*vb*vpar/norm_v3
     cosgam0 = rhs0/lhs0
 
     !! Check for singularities
     if (abs(cosgam0).gt.1) then
-        pgyro = 0
+        pgyro = 0.d0
         return
     endif
-    if (abs(vperp*sin(phip)*sqrt(1-cosgam0**2)).lt.1d-4) then
-        pgyro = 0.0
+    if (abs(vperp*sin(phip)*sqrt(1.d0-cosgam0**2)).lt.1.d-4) then
+        pgyro = 0.d0
         return
     endif
 
     !! Put it altogether
-    dgamdE3 = abs( (1 + (0.5*norm_v1**2 + 1.5*Q/mp) / norm_v3**2) / &
-                   (mp*norm_v3*sqrt(1-cosgam0**2)*vperp*sin(phip)) )
+    dgamdE3 = abs( (1.d0 + (0.5d0*norm_v1**2 + 1.5d0*Q/mp) / norm_v3**2) / &
+                   (mp*norm_v3*sqrt(1.d0-cosgam0**2)*vperp*sin(phip)) )
     deltaE3 = ptable%earray(2)-ptable%earray(1) ![keV]
 
     !! Check again for E3 boundaries
-    if ((E3-0.5*deltaE3).lt.E3min) deltaE3 = 0.5*deltaE3+E3-E3min
-    if ((E3+0.5*deltaE3).gt.E3max) deltaE3 = 0.5*deltaE3+E3max-E3
+    if ((E3-0.5d0*deltaE3).lt.E3min) deltaE3 = 0.5d0*deltaE3+E3-E3min
+    if ((E3+0.5d0*deltaE3).gt.E3max) deltaE3 = 0.5d0*deltaE3+E3max-E3
 
     pgyro = dgamdE3*deltaE3*JkeV/pi
-    if(pgyro.gt.1) then
-        pgyro = 0
-    endif
 
 endsubroutine get_pgyro
 

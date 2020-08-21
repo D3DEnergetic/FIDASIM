@@ -793,10 +793,6 @@ type CFPDChords
     !+ Defines a NPA system
     integer :: nchan = 0
          !+ Number of channels
-    type(NPADetector), dimension(:), allocatable          :: det
-         !+ NPA detector array
-    real(Float64), dimension(:), allocatable              :: radius
-         !+ Radius [cm]
 end type CFPDChords
 
 type BirthParticle
@@ -863,8 +859,6 @@ end type NeutronRate
 
 type ProtonRate
     !+ Proton storage structure
-    real(Float64), dimension(:), allocatable :: rate
-        !+ Proton rate: rate(orbit_type) [proton/sec]
     real(Float64), dimension(:,:,:,:,:,:), allocatable :: weight
         !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
     real(Float64), dimension(:,:), allocatable         :: flux
@@ -1034,7 +1028,7 @@ type SimulationInputs
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_proton
-        !+ Calculate 3 MeV proton flux: 0 = off, 1=on, 2=on++
+        !+ Calculate 3 MeV proton flux: 0 = off, 1=on
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1909,7 +1903,6 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
 
 end function lfs_divide
 
-!!!TODO if inputs change, more rules
 elemental function oo_add(p1, p2) result (p3)
     !+ Defines how to add two [[OrbProtonTable]] types
     type(OrbProtonTable), intent(in) :: p1,p2
@@ -1975,7 +1968,6 @@ elemental function oos_divide(p1, real_scalar) result (p3)
     p3 = p1*(1.d0/real_scalar)
 
 end function oos_divide
-
 
 pure subroutine oo_assign(p1, p2)
     !+ Defines how to assign [[OrbProtonTable]] types to eachother
@@ -3213,20 +3205,12 @@ end subroutine read_npa
 subroutine read_cfpd
     !+ Reads the CFPD geometry and stores the quantities in [[libfida:cfpd_chords]]
     integer(HID_T) :: fid, gid
-    integer(HSIZE_T), dimension(2) :: dims
     integer(HSIZE_T), dimension(3) :: dims3
     integer(HSIZE_T), dimension(5) :: dims5
     logical :: path_valid
 
-    real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
-    real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
     character(len=20) :: system = ''
 
-    real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
-    real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
-    real(Float64), dimension(3,3) :: basis, inv_basis
-    real(Float64) :: hh, hw
-    integer :: ichan
     integer :: error
 
     !!Initialize HDF5 interface
@@ -3260,28 +3244,6 @@ subroutine read_cfpd
         write(*,'(T2,"Number of channels: ",i3)') cfpd_chords%nchan
     endif
 
-    allocate(a_tedge(3, cfpd_chords%nchan))
-    allocate(a_redge(3, cfpd_chords%nchan))
-    allocate(a_cent(3,  cfpd_chords%nchan))
-    allocate(d_tedge(3, cfpd_chords%nchan))
-    allocate(d_redge(3, cfpd_chords%nchan))
-    allocate(d_cent(3,  cfpd_chords%nchan))
-    allocate(cfpd_chords%radius(cfpd_chords%nchan))
-    allocate(cfpd_chords%det(cfpd_chords%nchan))
-
-    dims = [3,spec_chords%nchan]
-    call h5ltread_dataset_double_f(gid,"/cfpd/radius", cfpd_chords%radius, dims(2:2), error)
-    call h5ltread_dataset_int_f(gid, "/cfpd/a_shape", cfpd_chords%det%aperture%shape, dims(2:2), error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/a_tedge", a_tedge, dims, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/a_redge", a_redge, dims, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/a_cent",  a_cent, dims, error)
-
-    call h5ltread_dataset_int_f(gid, "/cfpd/d_shape", cfpd_chords%det%detector%shape, dims(2:2), error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/d_tedge", d_tedge, dims, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/d_redge", d_redge, dims, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/d_cent",  d_cent, dims, error)
-
-    !Read orbits information
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ptable%nenergy, error)
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ptable%nrays, error)
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ptable%nsteps, error)
@@ -3307,39 +3269,7 @@ subroutine read_cfpd
     !!Close HDF5 interface
     call h5close_f(error)
 
-    chan_loop: do ichan=1,cfpd_chords%nchan
-        ! Convert to beam grid coordinates
-        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
-        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
-        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
-        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
-        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
-        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
-
-        ! Define detector/aperture hh/hw
-        cfpd_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
-        cfpd_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
-
-        cfpd_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
-        cfpd_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
-
-        ! Define detector/aperture origin
-        cfpd_chords%det(ichan)%detector%origin = xyz_d_cent
-        cfpd_chords%det(ichan)%aperture%origin = xyz_a_cent
-
-        ! Define detector/aperture basis
-        call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
-             cfpd_chords%det(ichan)%detector%basis, &
-             cfpd_chords%det(ichan)%detector%inv_basis)
-        call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
-             cfpd_chords%det(ichan)%aperture%basis, &
-             cfpd_chords%det(ichan)%aperture%inv_basis)
-    enddo chan_loop
-
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
-
-    deallocate(a_cent,a_redge,a_tedge)
-    deallocate(d_cent,d_redge,d_tedge)
 
 end subroutine read_cfpd
 
@@ -5629,58 +5559,46 @@ subroutine write_proton_weights
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
     !Write variables
-    if(particles%nclass.gt.1) then
-        dim1(1) = 1
-        call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
-        dim1(1) = particles%nclass
-        call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, proton%rate, error)
-        call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "Proton rate: rate(orbit_class)", error)
-    else
-        dim1(1) = 1
-        call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, proton%rate, error)
-        call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "Proton rate", error)
-    endif
-    call h5ltset_attribute_string_f(fid,"/rate","units","protons/s",error )
-
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
-        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
-        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
-        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
-        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
         dim2 = [ptable%nenergy, cfpd_chords%nchan]
         dim6 = shape(proton%weight)
+
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, proton%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 6, dim6, proton%weight, error)
 
-
+        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
+        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
+        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
+        call h5ltmake_dataset_int_f(fid,"/nphi",0,dim1,[fbm%nphi], error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim6(2:2), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim6(3:3), fbm%pitch, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim6(4:4), fbm%r, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim6(5:5), fbm%z, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/phi", 1, dim6(6:6), fbm%phi, error)
 
-        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
-             "Number of energy values", error)
-        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
-             "Number of pitch values", error)
-        call h5ltset_attribute_string_f(fid,"/nr", "description", &
-             "Number of R values", error)
-        call h5ltset_attribute_string_f(fid,"/nz", "description", &
-             "Number of Z values", error)
         call h5ltset_attribute_string_f(fid,"/flux", "description", &
              "Proton flux: flux(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/flux", "units", &
              "protons/(s*dE)", error)
+        call h5ltset_attribute_string_f(fid,"/prob", "description", &
+             "Proton average nonzero probability: prob(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
              "Proton Weight Function: weight(E3,E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
 
-
-
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of distribution function energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of distribution function pitch values", error)
+        call h5ltset_attribute_string_f(fid,"/nr", "description", &
+             "Number of distribution function R values", error)
+        call h5ltset_attribute_string_f(fid,"/nz", "description", &
+             "Number of distribution function Z values", error)
+        call h5ltset_attribute_string_f(fid,"/nphi", "description", &
+             "Number of distribution function Phi values", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
              "Energy array", error)
@@ -5693,11 +5611,14 @@ subroutine write_proton_weights
         call h5ltset_attribute_string_f(fid,"/z","description", &
              "Z array", error)
         call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+        call h5ltset_attribute_string_f(fid,"/phi","description", &
+             "Phi array", error)
+        call h5ltset_attribute_string_f(fid,"/phi", "units","rad", error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
-         "Proton rate calculated by FIDASIM", error)
+         "Proton signals calculated by FIDASIM", error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -12127,6 +12048,7 @@ subroutine proton_f
                 ray_velocities = ptable%sightline(ie3,1:3,:,iray,ich)
                 if (count(ray_velocities).eq.0.d0) cycle ray_loop !skip if entire ray is zero
                 step_loop: do ist=1, ptable%nsteps
+                    if (ist.gt.ptable%nactual(ie3,iray,ich)) cycle ray_loop
                     !! Calculate position and velocity in machine coordinates
                     rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
                     rpz(2) = ptable%sightline(ie3,5,ist,iray,ich)
@@ -12205,7 +12127,6 @@ subroutine proton_f
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call parallel_sum(proton%rate)
     call parallel_sum(proton%flux)
     call parallel_sum(proton%weight)
 #endif
@@ -13134,11 +13055,6 @@ program fidasim
     if(inputs%calc_neutron.ge.1)then
         allocate(neutron%rate(particles%nclass))
         neutron%rate = 0.d0
-    endif
-
-    if(inputs%calc_proton.ge.1)then
-        allocate(proton%rate(particles%nclass))
-        proton%rate = 0.d0
     endif
 
     !! -----------------------------------------------------------------------

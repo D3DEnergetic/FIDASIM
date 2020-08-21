@@ -7265,7 +7265,6 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
 
 end subroutine get_passive_grid_indices
 
-!!!Slightly redundant
 subroutine get_interpolation_grid_indices(pos, ind, input_coords)
     !+ Find closest [[libfida:inter_grid]] indices `ind` to position `pos`
     real(Float64),  dimension(3), intent(in)  :: pos
@@ -9590,27 +9589,6 @@ subroutine store_neutrons(rate, orbit_class)
     !$OMP END ATOMIC
 
 end subroutine store_neutrons
-
-subroutine store_proton_rate(rate, orbit_class) !!! Merge with store_neutrons
-    !+ Store proton rate in [[libfida:proton]]
-    real(Float64), intent(in)     :: rate
-        !+ Proton rate [sproton/sec]
-    integer, intent(in), optional :: orbit_class
-        !+ Orbit class ID
-
-    integer :: iclass
-
-    if(present(orbit_class)) then
-        iclass = min(orbit_class,particles%nclass)
-    else
-        iclass = 1
-    endif
-
-    !$OMP ATOMIC UPDATE
-    proton%rate(iclass)= proton%rate(iclass) + rate
-    !$OMP END ATOMIC
-
-end subroutine store_proton_rate
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
@@ -12105,62 +12083,6 @@ subroutine neutron_f
 
 end subroutine neutron_f
 
-subroutine bench_sigmav
-    !+ Calculate proton emission rate using an axisymmetric fast-ion distribution function F(E,p,r,z)
-    integer :: ir, iz, ie, ip
-    type(LocalProfiles) :: plasma
-    type(LocalEMFields) :: fields
-    real(Float64) :: erel, pitch, rate, vnet_square, ti, kappa, E3, phi, E1, pgyro
-    real(Float64), dimension(3) :: ri, vi, v3, uvw, vi_uvw
-    real(Float64), dimension(3) :: vrot,vrel
-
-    rate = 0.d0
-
-    !! Get position near the core
-    iz = fbm%nz/2
-    ir = fbm%nr/2
-    uvw(1) = fbm%r(ir)
-    uvw(2) = 0.d0
-    uvw(3) = fbm%z(iz)
-
-    !! Get plasma parameters
-    call get_plasma(plasma,pos=uvw,input_coords=1)
-
-    vi = 2.7e6*[1.d0, 0.d0, 0.d0]
-
-    !! Calculate effective beam energy
-   !vrot = plasma%vrot  ![cm/s]
-    vrot = 0.d0
-    vrel = vi-vrot
-    vnet_square=dot_product(vrel,vrel)  ![cm/s]
-    erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
-    ti = plasma%ti
-
-    !! Get proton production rate
-    v3 = 1.9e9*[0.71, 0.71, 0.0] !cm/s
-
-    !! Test reaction rate
-    call get_ddpt_rate(plasma, erel, rate, branch=1)
-    call get_ddpt_anisotropy(plasma, vi, v3, kappa)
-
-    !! Test pgyro
-    E3 = 3.0287
-    phi = pi/10
-    E1 = 80.
-    pitch = .25
- !!!call get_pgyro(E3,phi,E1,pitch,vrot,pgyro)
-
-    rate = kappa * rate
-
-    !! Store neutrons
-    call store_proton_rate(rate)
-
-#ifdef _MPI
-    call parallel_sum(proton%rate)
-#endif
-
-end subroutine bench_sigmav
-
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
     logical, dimension(:,:), allocatable :: ray_velocities
@@ -13413,7 +13335,6 @@ program fidasim
         if(inputs%verbose.ge.1) then
             write(*,*) 'proton rate:    ', time(time_start)
         endif
-     !!!call bench_sigmav()
         call proton_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

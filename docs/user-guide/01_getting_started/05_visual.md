@@ -11,12 +11,7 @@ The scripts are configured to detect and use the default Python installation.
 You can check the default path by running `which python` in the command line prompt.
 If you do not have Python installed, please visit [here](https://www.python.org/downloads/) for more details.
 
-You can skip the next part if the visualization scripts and data are located on your personal device.
-Otherwise we have a few suggestions for users computing on a cluster (e.g. Iris or Portal).
-
-*[NoMachine]( https://www.nomachine.com/download) is a useful application that will allow you to plot figures from within the cluster.
-*If you insist on not using NoMachine, then you will need to set up X11 forwarding.
-For example, Mac users can download [this application]( https://www.xquartz.org/).
+If you are running the visualization scripts from within a computing cluster (e.g. Iris or Portal), you will need X11 forwarding to display the plots on your screen. [NoMachine]( https://www.nomachine.com/download) is a useful application that will securely forward the plots to your display via the NoMachine virtual session.
 
 The scripts depend upon the following packages
 
@@ -78,8 +73,6 @@ plot_inputs /u/garciaav/test/ 330LT -g -l
 ```
 ![](|media|/visualize5.png){: width="200"}
 {: style="text-align: center"}
-
-Notes:
 
 * Black: NBI centerline and the half-widths
 * Green: Beam grid boundaries
@@ -176,8 +169,9 @@ If the code finds `*_spectra.h5` files in the folder, you must indicate emission
 * `-hl` Halo
 * `-dc` DCX
 * `-as` all spectral channels
-* `-rs` range of channels
-* `-ls` list of channels
+* `-rs` range of spectral channels
+* `-ls` list of spectral channels
+
 Note: `-s` cannot be used with any other emission type argument.
 
 Similarly, if the code finds any `*_npa.h5` files in the folder, you must indicate flux and channel information.
@@ -187,8 +181,8 @@ The syntax of the NPA arguments is similar to the spectral arguments.
 * `-np` NPA
 * `-pn` passive NPA
 * `-an` all NPA channels
-* `-rn` range of channels
-* `-ln` list of channels
+* `-rn` range of NPA channels
+* `-ln` list of NPA channels
 
 If you have many output files in the folder, below are two filtering techniques
 
@@ -207,7 +201,7 @@ Plots all spectral data, all spectral channels, all NPA data and all NPA channel
 ![](|media|/visualize10-4.png "NPA 1-3"){: width="200"}
 {: style="text-align: center"}
 
-Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0”.
+Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0.”
 
 `plot_outputs -d /u/garciaav/test/ -s -rs 11 19 -n -rn 1 2`
 Plots all spectral data, range of spectral channels (11-19), all NPA data and range of NPA channels (1-2).
@@ -264,7 +258,7 @@ Below are the arguments to customize the subplots for spectral plots
 * `-sy` change spectral y limits
 * `-sl` spectral log plot
 
-and similarly NPA plots
+and similarly for NPA plots
 * `-nx` change NPA x limits
 * `-ny` change NPA y limits
 * `-nl` NPA log plot
@@ -291,10 +285,10 @@ Plots NPA data, list of NPA channels (1), sets flux limits (\(4\times 10^8\),\(2
 
 Lastly, below are a few more useful optional arguments for plotting outputs
 
-* `-p` can be used with more than one argument (e.g. -p filepath1 filepath2 ...)
+* `-p` can be used with more than one argument (e.g. `-p filepath1 filepath2 ...`)
 * `-ss -sn /u/garciaav/test/figs/` save spectral and NPA plots to a folder
 * `-h` display help message
 
 Congratulations, you made it to the end of the tutorial!
 
-If you have any questions or find a bug, please let us know on [GitHub](https://github.com/D3DEnergetic/FIDASIM/issues)
+If you have any questions, find a bug or have a suggestion, please let us know on [GitHub](https://github.com/D3DEnergetic/FIDASIM/issues)

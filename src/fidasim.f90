@@ -12006,7 +12006,7 @@ end subroutine neutron_f
 
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
-    logical, dimension(:,:), allocatable :: ray_velocities
+    real(Float64), dimension(:,:), allocatable :: ray_velocities
     real(Float64), dimension(3) :: ri, vi, rpz, v3_xyz, v3_rpz, uvw, v3_uvw
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
@@ -12046,7 +12046,7 @@ subroutine proton_f
             ray_loop: do iray=1, ptable%nrays
                 daomega = ptable%daomega(ie3,iray,ich)
                 ray_velocities = ptable%sightline(ie3,1:3,:,iray,ich)
-                if (count(ray_velocities).eq.0.d0) cycle ray_loop !skip if entire ray is zero
+                if (all(ray_velocities.eq.0.d0)) cycle ray_loop !skip if entire ray is zero
                 step_loop: do ist=1, ptable%nsteps
                     if (ist.gt.ptable%nactual(ie3,iray,ich)) cycle ray_loop
                     !! Calculate position and velocity in machine coordinates
@@ -12092,18 +12092,17 @@ subroutine proton_f
                             vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
-                            !! Get proton production rate
+                            !! Get the proton production rate and consider the effects of anisotropy
                             call get_ddpt_rate(plasma, erel, rate, branch=1)
-
-                            !! Account for anisotropy
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
                             rate = rate*kappa
 
+                            !! Get the probability factor
                             E1 = beam_mass*v2_to_E_per_amu*dot_product(vi,vi)
-
                             call get_pgyro(fields,ie3,E1,pitch,plasma%vrot,v3_xyz,pgyro)
                             rate = rate*pgyro
 
+                            !! Scale by the transmission factor
                             rate = rate*daomega
 
                             !! Store

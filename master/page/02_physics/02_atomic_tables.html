@@ -274,14 +274,14 @@ Also we normalize the m levels to the Janev tables for consistancy.</p></div>
 <p>The default settings should be appropriate for most devices but in some cases it may be necessary to generate custom tables.
 For instance, the default tables are calculated assuming the main impurity is Carbon-6 so it would be inappropriate to the default tables if you have a different main impurity.
 To generate custom tables from the tables directory run </p>
-<div class="codehilite"><pre><span></span>./generate_tables &gt; table_settings.dat
-</pre></div>
+<div class="codehilite"><pre><span></span><code>./generate_tables &gt; table_settings.dat
+</code></pre></div>
 
 
 <p>to generate the namelist file that contains the default settings. Edit this file to change the settings.</p>
 <p>After editing the namelist file run</p>
-<div class="codehilite"><pre><span></span>./generate_tables table_settings.dat <span class="o">[</span>NUM_THREADS<span class="o">]</span> &lt;-- NUM_THREADS is optional
-</pre></div>
+<div class="codehilite"><pre><span></span><code>./generate_tables table_settings.dat <span class="o">[</span>NUM_THREADS<span class="o">]</span> &lt;-- NUM_THREADS is optional
+</code></pre></div>
 
 
 <p>and wait for a couple of hours depending on the number of threads used. </p>

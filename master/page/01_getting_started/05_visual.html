@@ -143,29 +143,22 @@
 <ul>
 <li><a href="#visualizing-inputs">Visualizing Inputs</a></li>
 <li><a href="#visualizing-outputs">Visualizing Outputs</a><ul>
-<li><a href="#case-1-plotting-data-from-a-single-directory">Case 1: Plotting data from a single directory</a><ul>
-<li><a href="#below-is-a-summary-of-examples-for-case-1">Below is a summary of examples for Case 1:</a></li>
-</ul>
-</li>
-<li><a href="#case-2-plotting-data-from-user-defined-file-paths">Case 2: Plotting data from user defined file paths</a><ul>
-<li><a href="#below-is-a-summary-of-examples-for-case-2">Below is a summary of examples for Case 2:</a></li>
-</ul>
-</li>
-<li><a href="#changing-subplot-parameters-applies-to-case-1-2">Changing subplot parameters (applies to Case 1 &amp; 2)</a><ul>
-<li><a href="#below-are-some-examples">Below are some examples:</a></li>
-</ul>
-</li>
+<li><a href="#case-1-plotting-from-a-single-directory">Case 1: Plotting from a single directory</a></li>
+<li><a href="#case-2-plotting-from-anywhere">Case 2: Plotting from anywhere</a></li>
+<li><a href="#changing-subplot-parameters">Changing subplot parameters</a></li>
 </ul>
 </li>
 </ul>
 </div>
 <hr>
-<p>These visualization tools can be used straight from the command line window.
-They require an installation of Python 2.7 or higher.
-The visualization scripts are located in <code>FIDASIM/lib/scripts/</code></p>
-<h1 id="visualizing-inputs">Visualizing Inputs</h1>
-<p>The following Python packages are required for plotting the inputs.
-If you are computing on a cluster, this is probably already done for you.</p>
+<p>FIDASIM comes with visualization executables that make plotting inputs and outputs easy.
+The code can be executed in the command line prompt or imported as a Python package.
+This tutorial will focus on the former and provide many examples.
+The scripts are configured to detect and use the default Python installation.
+You can check the default path by running <code>which python</code> in the command line prompt.
+If you do not have Python installed, please visit <a href="https://www.python.org/downloads/">here</a> for more details.</p>
+<p>If you are running the visualization scripts from within a computing cluster (e.g. Iris or Portal), you will need X11 forwarding to display the plots on your screen. <a href="https://www.nomachine.com/download">NoMachine</a> is a useful application that will securely forward the plots to your display via the NoMachine virtual session.</p>
+<p>The scripts depend upon the following packages</p>
 <ul>
 <li>numpy</li>
 <li>h5py</li>
@@ -173,194 +166,203 @@ If you are computing on a cluster, this is probably already done for you.</p>
 <li>os</li>
 <li>mpl_toolkits</li>
 <li>f90nml</li>
+<li>re</li>
+<li>argparse</li>
 </ul>
-<p>Below is a brief step-by-step tutorial on how to visualize FIDASIM inputs inside an example directory <code>/u/garciaav/test</code> with run ID <code>330LT</code> and <code>LHD</code>.</p>
-<p>The simplest command will plot all of your inputs (plasma, fields, distribution function and geometry):</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT
-</pre></div>
+<p>If you are plotting locally, use <code>conda</code> or <code>pip</code> to install dependencies.
+If you are on a cluster, contact your Computer Systems Administrator to get the requirements downloaded.</p>
+<h1 id="visualizing-inputs">Visualizing Inputs</h1>
+<p>The inputs section assumes the following</p>
+<ul>
+<li>Example directory: <code>/u/garciaav/test</code></li>
+<li>Run IDs: <code>330LT</code> and <code>LHD</code>.</li>
+</ul>
+<p>Plot everything (plasma, fields, distribution function and geometry):</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT
+</code></pre></div>
 
 
-<p>If you are interested in being more specific, then use optional arguments <code>-p</code>, <code>-f</code>, <code>-d</code> or <code>-g</code>.</p>
 <p>Plot the plasma</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -p
-</pre></div>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p
+</code></pre></div>
 
 
 <p style="text-align: center"><img alt="" src="../../media/visualize1.png" width="200"></p>
-<p>and the fields</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -f
-</pre></div>
+<p>Plot the fields</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -f
+</code></pre></div>
 
 
-<p><img alt="" src="../../media/visualize2.png" width="200">
-{: style="text-align: center"}
-Note: Similar to the FIDASIM code, plots of the plasma and fields use the mask variable to define the edge of the plasma.</p>
-<p>Similarly, 2D projections of the distribution function can be plotted</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -d
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize2.png" width="200"></p>
+<p>Plot the distribution function</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d
+</code></pre></div>
 
 
-<p><img alt="" src="../../media/visualize3.png" width="200">
-{: style="text-align: center"}
-Note: The R-Z plots of the distribution function will also use the mask variable from the equilibrium file if it is available.</p>
-<p>The geometry file can be visualized interactively in a 3D rotatable plot:</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -g
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize3.png" width="200"></p>
+<p>Plot the diagnostic and beam geometry</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g
+</code></pre></div>
 
 
 <p style="text-align: center"><img alt="" src="../../media/visualize4.png" width="200"></p>
-<p>If you are using many channels, then your legend is probably crowding the plot.
-The following command hides the legend</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -g -l
-</pre></div>
+<p>Hide the legend</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g -l
+</code></pre></div>
 
 
-<p><img alt="" src="../../media/visualize5.png" width="200">
-{: style="text-align: center"}
-Several things to note:
-<em> NBI centerline and the half-widths are plotted in black
-</em> Beam grid boundaries are drawn in green
-<em> Diagnostic line-of-sights are in autumn colors
-</em> Plasma boundary is approximated with a purple torus</p>
-<p>Lineouts for the 2D plots of the plasma, fields and distribution function are available.
-For example, use the following command to plot lineouts at R = 153.4 cm</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -p -f -d -rz <span class="m">153</span>.4
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize5.png" width="200"></p>
+<ul>
+<li>Black: NBI centerline and the half-widths</li>
+<li>Green: Beam grid boundaries</li>
+<li>Autumn: Diagnostic line-of-sights</li>
+<li>Purple: Plasma boundary approximated as a torus</li>
+</ul>
+<p>Plot lineouts at R = 153.4 cm</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -rz <span class="m">153</span>.4
+</code></pre></div>
 
 
-<p style="text-align: center"><img alt="" src="../../media/visualize6-1.png" title="Te rzlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize6-2.png" title="Br rzlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize6-3.png" title="Fzr rzlineout" width="400"></p>
-<p>and conversely for lineouts at constant Z = -10.8 cm:</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -p -f -d -zr -10.8
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize6-1.png" title="Te rzlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize6-2.png" title="Br rzlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize6-3.png" title="Fzr rzlineout" width="400"></p>
+<p>Plot lineouts at Z = -10.8 cm:</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -zr -10.8
+</code></pre></div>
 
 
-<p style="text-align: center"><img alt="" src="../../media/visualize7-1.png" title="Te zrlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize7-2.png" title="Br zrlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize7-3.png" title="Fzr zrlineout" width="400"></p>
-<p>Since the distribution function is defined with 2 more coordinates (Energy and Pitch), more lineouts are available.</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ 330LT -d -pz .2 -pr -.25 -ez <span class="m">80</span> -er <span class="m">40</span> -ep <span class="m">18</span>
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize7-1.png" title="Te zrlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize7-2.png" title="Br zrlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize7-3.png" title="Fzr zrlineout" width="400"></p>
+<p>Plot Energy and Pitch lineouts for the distribution function</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d -pz .2 -pr -.25 -ez <span class="m">80</span> -er <span class="m">40</span> -ep <span class="m">18</span>
+</code></pre></div>
 
 
-<p><img alt="" src="../../media/visualize8-1.png" title="Fzp pzlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize8-2.png" title="Fpr prlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize8-3.png" title="Fze ezlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize8-4.png" title="Fer erlineout" width="400">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize8-5.png" title="Fpe eplineout" width="400">
-{: style="text-align: center"}
-Note: The first letter corresponds to the variable for the constant line and the second letter corresponds to the variable of the axis that is parallel to the constant line.</p>
-<p>If you provided 3D inputs, then specify the toroidal angle in radians to view a slice of your inputs.</p>
-<div class="codehilite"><pre><span></span>plot_inputs /u/garciaav/test/ LHD -p -f -d -ph <span class="m">0</span>.157
-</pre></div>
+<p style="text-align: center"><img alt="" src="../../media/visualize8-1.png" title="Fzp pzlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize8-2.png" title="Fpr prlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize8-3.png" title="Fze ezlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize8-4.png" title="Fer erlineout" width="400"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize8-5.png" title="Fpe eplineout" width="400"></p>
+<p>For 3D inputs, plot a slice by specifying the toroidal angle in radians</p>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ LHD -p -f -d -ph <span class="m">0</span>.157
+</code></pre></div>
 
 
 <p style="text-align: center"><img alt="" src="../../media/visualize9-1.png" title="Te" width="200"> <img alt="" src="../../media/visualize9-2.png" title="Br" width="200"> <img alt="" src="../../media/visualize9-3.png" title="Fzr" width="200"></p>
-<p>You can change the number of contour levels used in the 2D plots with <code>-nl</code></p>
-<p>You can save important plots as png files in a specified folder
-<code>-si /u/garciaav/test/figs/</code></p>
-<p>Always remember that you can execute <code>plot_inputs -h</code> to display the help message.</p>
+<p>Lastly, below are a few more useful optional arguments for plotting inputs</p>
+<ul>
+<li><code>-nl</code> number of contour levels</li>
+<li><code>-si /u/garciaav/test/figs/</code> save important plots to a folder</li>
+<li><code>-h</code> display help message</li>
+</ul>
 <p>You are all set to explore FIDASIM inputs!</p>
 <h1 id="visualizing-outputs">Visualizing Outputs</h1>
-<p>The following Python packages are required for plotting the outputs.</p>
+<p>The outputs section assumes the following</p>
 <ul>
-<li>os</li>
-<li>re</li>
-<li>h5py</li>
-<li>argparse</li>
-<li>numpy</li>
-<li>matplotlib</li>
+<li>Example directories: <code>/u/garciaav/test/</code> and <code>/u/garciaav/different/</code></li>
+<li>Run IDs <code>BAAE_1575</code>, <code>BAAE_1875</code>, <code>test_1</code>, <code>test_2</code>, and <code>diff_1575</code></li>
 </ul>
-<p>Below is a brief step-by-step tutorial on how to visualize FIDASIM outputs inside example directory <code>/u/garciaav/test/</code> with run IDs <code>BAAE_1575</code>, <code>BAAE_1875</code>, <code>test_1</code> and <code>test_2</code>, and directory <code>/u/garciaav/different/</code> with run ID <code>diff_1575</code></p>
-<p>The code executes in one of the following two cases:</p>
+<p>Plotting spectral and NPA data can be done in two ways.
+If all of your data is located in one folder, then scroll down to Case 1.
+However, if your data is located in more than one folder or you want to plot individually selected items from a single folder, then follow the conventions of Case 2.</p>
+<h2 id="case-1-plotting-from-a-single-directory">Case 1: Plotting from a single directory</h2>
+<p>The simplest command instructs the code to look inside a single directory.</p>
 <ul>
-<li>Plotting all available <code>*_spectra.h5</code> and <code>*_npa.h5</code> files located in a single directory</li>
-<li>Plotting selected files located anywhere</li>
+<li><code>-d</code> path of single folder</li>
 </ul>
-<h2 id="case-1-plotting-data-from-a-single-directory">Case 1: Plotting data from a single directory</h2>
-<p>The simplest command is to plot everything located in a single folder with the <code>-d</code> argument.</p>
-<p>If the code finds <code>*_spectra.h5</code> files in the <code>-d</code> folder, you must indicate emission and channel information.</p>
-<p>Use <code>-s</code> to plot all emission,
-or select individually with <code>-fi</code> (FIDA), <code>-pf</code> (pFIDA), <code>-f</code> (Full), <code>-hf</code> (Half), <code>-t</code> (Third), <code>-b</code> (Bremsstrahlung), <code>-c</code> (Cold), <code>-hl</code> (Halo), and <code>-dc</code> (DCX).</p>
-<p>Use <code>-as</code>, <code>-rs</code> or <code>-ls</code> to indicate all spectral channels, range of channels or list of channels.
-Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0”.</p>
-<p>Similarly, if the code finds any <code>*_npa.h5</code> files in the <code>-d</code> folder, you must indicate flux and channel information.
+<p>If the code finds <code>*_spectra.h5</code> files in the folder, you must indicate emission and channel information.</p>
+<ul>
+<li><code>-s</code> plot all emission,</li>
+<li><code>-fi</code> FIDA</li>
+<li><code>-pf</code> passive FIDA</li>
+<li><code>-f</code> Full BES</li>
+<li><code>-hf</code> Half BES</li>
+<li><code>-t</code> Third BES</li>
+<li><code>-b</code> Bremsstrahlung</li>
+<li><code>-c</code> Cold D-alpha</li>
+<li><code>-hl</code> Halo</li>
+<li><code>-dc</code> DCX</li>
+<li><code>-as</code> all spectral channels</li>
+<li><code>-rs</code> range of spectral channels</li>
+<li><code>-ls</code> list of spectral channels</li>
+</ul>
+<p>Note: <code>-s</code> cannot be used with any other emission type argument.</p>
+<p>Similarly, if the code finds any <code>*_npa.h5</code> files in the folder, you must indicate flux and channel information.
 The syntax of the NPA arguments is similar to the spectral arguments.</p>
-<p>Use <code>-n</code> to plot all NPA flux,
-or select individually with <code>-np</code> (NPA) and <code>-pn</code> (pNPA).</p>
-<p>Use <code>-an</code>, <code>-rn</code> or <code>-ln</code> to indicate all NPA channels, range of channels or list of channels.</p>
-<p>If you have many FIDASIM outputs in the <code>-d</code> folder, below are two ways you can filter what the visualization script plots.</p>
-<p>Filter out the NPA files and plot only spectral data by using the <code>-os</code> argument.
-On the other hand, filter out the spectral files and plot only NPA data by using the <code>-on</code> argument.</p>
-<p>Also, you can filter files by defining the run IDs with the <code>-r</code> argument.</p>
-<h3 id="below-is-a-summary-of-examples-for-case-1">Below is a summary of examples for Case 1:</h3>
-<p><code>plot_outputs -d /u/garciaav/test/</code></p>
-<p style="text-align: center"><code>-s -as -n -an</code>
-Plots all spectral data, all spectral channels, all NPA data and all NPA channels.
-<img alt="" src="../../media/visualize10-1.png" title="Spectra 1-9" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize10-2.png" title="Spectra 10-18" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize10-3.png" title="Spectra 19-24" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize10-4.png" title="NPA 1-3" width="200"></p>
-<p style="text-align: center"><code>-s -rs 11 19 -n -rn 1 2</code>
-Plots all spectral data, range of spectral channels (11-19), all NPA data and range of NPA channels (1-2).
-<img alt="" src="../../media/visualize11-1.png" title="Spectra 11-19" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize11-2.png" title="NPA 1-2" width="200"></p>
-<p style="text-align: center"><code>-fi -ls 1 14 22 -np -ln 2</code>
-Plots active FIDA data, list of spectral channels (1, 14 &amp; 19), active NPA data and list of NPA channels (2).
-<img alt="" src="../../media/visualize12-1.png" title="Spectra 1, 14 &amp; 22" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize12-2.png" title="NPA 2" width="200"></p>
-<p style="text-align: center"><code>-r BAAE_1875 -fi -ls 12 14 22 -os</code>
-Plots run ID BAAE_1875, active FIDA data, list of spectral channels (12, 14 &amp; 22), and ignores NPA files.
-<img alt="" src="../../media/visualize13.png" title="FIDA runid 12, 14 &amp; 22" width="200"></p>
-<h2 id="case-2-plotting-data-from-user-defined-file-paths">Case 2: Plotting data from user defined file paths</h2>
-<p>Alternatively, the code accepts specific file paths from the <code>-p</code> argument.</p>
-<p>Similar to Case 1, specifying emission type and flux type is required when plotting data from <code>*_spectra.h5</code> and <code>*_npa.h5 files</code>, respectively.
-Of course, channel information is also a requirement.</p>
-<h3 id="below-is-a-summary-of-examples-for-case-2">Below is a summary of examples for Case 2:</h3>
-<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5</code></p>
-<p style="text-align: center"><code>-s -rs 10 18 -n -rn 2 3</code>
-Plots all spectral data, range of spectral channels (10-18), all NPA data and range of NPA channels (2-3).
-<img alt="" src="../../media/visualize14-1.png" title="Spectra 10-18" width="200">
-{: style="text-align: center"}
-<img alt="" src="../../media/visualize14-2.png" title="NPA 2-3" width="200"></p>
-<p style="text-align: center"><code>-fi -ls 1</code>
-Plots active FIDA data and list of spectral channels (1).
-<img alt="" src="../../media/visualize15.png" title="FIDA 1" width="200"></p>
-<h2 id="changing-subplot-parameters-applies-to-case-1-2">Changing subplot parameters (applies to Case 1 &amp; 2)</h2>
-<p>You can change the x and y limits of the spectral plot with <code>-sx</code> and <code>-sy</code> arguments.
-Also, you can use <code>-sl</code> to plot the y axis on a log-scale.</p>
-<p>Similarly, change the NPA plots with the <code>-nx</code>, <code>-ny</code> and <code>-nl</code> arguments.</p>
-<h3 id="below-are-some-examples">Below are some examples:</h3>
-<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5</code></p>
-<p style="text-align: center"><code>-fi -ls 1 -sx 649 663</code>
-Plots active FIDA data, list of spectral channels (1) and sets wavelength limits (649-663).
-<img alt="" src="../../media/visualize16.png" title="FIDA xlim" width="200"></p>
-<p style="text-align: center"><code>-fi -ls 1 -sx 649 663 -sy 3e11 3e16 -sl</code>
-Plots active FIDA data, list of spectral channels (1), sets wavelength limits (649-663), sets radiance limits (3$\times$10$^11$-3$\times$10$^16$) and turns on the log scale.
-<img alt="" src="../../media/visualize17.png" title="FIDA xlim ylim log" width="200"></p>
-<p><code>plot_outputs -p /u/garciaav/test/test_1_npa.h5</code></p>
-<p style="text-align: center"><code>-n -ln 1 -ny 4e8 2e11 -nl</code>
-Plots NPA data, list of NPA channels (1), sets flux limits (4$\times$10$^8$-2$\times$10$^11$) and turns on the log scale.
-<img alt="" src="../../media/visualize18.png" title="NPA ylim log" width="200"></p>
-<p>You can save spectral and NPA plots as png files in a specified folder
-<code>-ss -sn /u/garciaav/test/figs/</code></p>
-<p>Lastly, execute <code>plot_outputs -h</code> to display the help message.</p>
-<p>Congrats, you made it to the end of the tutorial!</p>
-<p>If you have any questions or find a bug, please let us know on <a href="https://github.com/D3DEnergetic/FIDASIM/issues">GitHub</a></p>
+<ul>
+<li><code>-n</code> plot all NPA flux types</li>
+<li><code>-np</code> NPA</li>
+<li><code>-pn</code> passive NPA</li>
+<li><code>-an</code> all NPA channels</li>
+<li><code>-rn</code> range of NPA channels</li>
+<li><code>-ln</code> list of NPA channels</li>
+</ul>
+<p>If you have many output files in the folder, below are two filtering techniques</p>
+<ul>
+<li><code>-os</code> Force only spectral plots</li>
+<li><code>-on</code> Force only NPA plots</li>
+<li><code>-r</code> Force a specific runid</li>
+</ul>
+<p>Below are some examples for Case 1 capabilities</p>
+<p><code>plot_outputs -d /u/garciaav/test/ -s -as -n -an</code>
+Plots all spectral data, all spectral channels, all NPA data and all NPA channels.</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize10-1.png" title="Spectra 1-9" width="200"> <img alt="" src="../../media/visualize10-2.png" title="Spectra 10-18" width="200"> <img alt="" src="../../media/visualize10-3.png" title="Spectra 19-24" width="200"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize10-4.png" title="NPA 1-3" width="200"></p>
+<p>Note: The first Python index is 0, but the code will add 1 to all subplots in order to avoid displaying “Channel 0.”</p>
+<p><code>plot_outputs -d /u/garciaav/test/ -s -rs 11 19 -n -rn 1 2</code>
+Plots all spectral data, range of spectral channels (11-19), all NPA data and range of NPA channels (1-2).</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize11-1.png" title="Spectra 11-19" width="200"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize11-2.png" title="NPA 1-2" width="200"></p>
+<p><code>plot_outputs -d /u/garciaav/test/ -fi -ls 1 14 22 -np -ln 2</code>
+Plots active FIDA data, list of spectral channels (1, 14 &amp; 19), active NPA data and list of NPA channels (2).</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize12-1.png" title="Spectra 1, 14 &amp; 22" width="200"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize12-2.png" title="NPA 2" width="200"></p>
+<p><code>plot_outputs -d /u/garciaav/test/ -r BAAE_1875 -fi -ls 12 14 22 -os</code>
+Plots run ID BAAE_1875, active FIDA data, list of spectral channels (12, 14 &amp; 22), and ignores NPA files.</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize13.png" title="FIDA runid 12, 14 &amp; 22" width="200"></p>
+<h2 id="case-2-plotting-from-anywhere">Case 2: Plotting from anywhere</h2>
+<p>In this case, the single folder constraint is removed and the user must provide full file paths</p>
+<ul>
+<li><code>-p</code> paths of selected files</li>
+</ul>
+<p>Below are some examples for Case 2 capabilities</p>
+<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5 -s -rs 10 18 -n -rn 2 3</code>
+Plots all spectral data, range of spectral channels (10-18), all NPA data and range of NPA channels (2-3).</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize14-1.png" title="Spectra 10-18" width="200"></p>
+<p style="text-align: center"><img alt="" src="../../media/visualize14-2.png" title="NPA 2-3" width="200"></p>
+<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5 -fi -ls 1</code>
+Plots active FIDA data and list of spectral channels (1).</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize15.png" title="FIDA 1" width="200"></p>
+<h2 id="changing-subplot-parameters">Changing subplot parameters</h2>
+<p>Below are the arguments to customize the subplots for spectral plots</p>
+<ul>
+<li><code>-sx</code> change spectral x limits</li>
+<li><code>-sy</code> change spectral y limits</li>
+<li><code>-sl</code> spectral log plot</li>
+</ul>
+<p>and similarly for NPA plots
+* <code>-nx</code> change NPA x limits
+* <code>-ny</code> change NPA y limits
+* <code>-nl</code> NPA log plot</p>
+<p>Below are examples of subplot modifications</p>
+<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5 -fi -ls 1 -sx 649 663</code>
+Plots active FIDA data, list of spectral channels (1) and sets wavelength limits (649-663).</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize16.png" title="FIDA xlim" width="200"></p>
+<p><code>plot_outputs -p /u/garciaav/different/diff_1575_spectra.h5 -fi -ls 1 -sx 649 663 -sy 3e11 3e16 -sl</code>
+Plots active FIDA data, list of spectral channels (1), sets wavelength limits (649-663), sets radiance limits (<script type="math/tex">3\times 10^11</script>,<script type="math/tex">3\times 10^16</script> ) and turns on the log scale.</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize17.png" title="FIDA xlim ylim log" width="200"></p>
+<p><code>plot_outputs -p /u/garciaav/test/test_1_npa.h5 -n -ln 1 -ny 4e8 2e11 -nl</code>
+Plots NPA data, list of NPA channels (1), sets flux limits (<script type="math/tex">4\times 10^8</script>,<script type="math/tex">2\times 10^11</script> ) and turns on the log scale.</p>
+<p style="text-align: center"><img alt="" src="../../media/visualize18.png" title="NPA ylim log" width="200"></p>
+<p>Lastly, below are a few more useful optional arguments for plotting outputs</p>
+<ul>
+<li><code>-p</code> can be used with more than one argument (e.g. <code>-p filepath1 filepath2 ...</code>)</li>
+<li><code>-ss -sn /u/garciaav/test/figs/</code> save spectral and NPA plots to a folder</li>
+<li><code>-h</code> display help message</li>
+</ul>
+<p>Congratulations, you made it to the end of the tutorial!</p>
+<p>If you have any questions, find a bug or have a suggestion, please let us know on <a href="https://github.com/D3DEnergetic/FIDASIM/issues">GitHub</a></p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">

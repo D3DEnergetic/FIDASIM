@@ -789,12 +789,6 @@ type NPAResults
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
-type CFPDChords
-    !+ Defines a NPA system
-    integer :: nchan = 0
-         !+ Number of channels
-end type CFPDChords
-
 type BirthParticle
     !+ Defines a Birth particle
     integer :: neut_type = 0
@@ -1113,6 +1107,8 @@ type OrbProtonTable
         !+ Number of "rays"
     integer :: nsteps = 0
         !+ Number of total steps
+    integer :: nchan = 0
+        !+ Number of channels
     real(Float64) :: dl
         !+ Step length [cm]
     real(Float64), dimension(:), allocatable :: earray
@@ -1122,7 +1118,7 @@ type OrbProtonTable
     real(Float64), dimension(:,:,:), allocatable :: daomega
         !+ Differntial area times solid angle of a given velocity vector [cm^-2]
     real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
-        !+ Contains velocities and positions for a given detector channel, ray and step [cm/s cm]
+        !+ Contains velocities [cm/s] and positions [cm] in rpz: sightline(E3,:,step,ray,channel)
 end type OrbProtonTable
 
 interface assignment(=)
@@ -1185,8 +1181,6 @@ type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
-type(CFPDChords), save          :: cfpd_chords
-    !+ Variable containing the CFPD system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
@@ -3207,7 +3201,7 @@ subroutine read_npa
 end subroutine read_npa
 
 subroutine read_cfpd
-    !+ Reads the CFPD geometry and stores the quantities in [[libfida:cfpd_chords]]
+    !+ Reads the CFPD geometry and stores the quantities in [[libfida:ptable]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(3) :: dims3
     integer(HSIZE_T), dimension(5) :: dims5
@@ -3241,12 +3235,12 @@ subroutine read_cfpd
     call h5gopen_f(fid, "/cfpd", gid, error)
 
     call h5ltread_dataset_string_f(gid, "/cfpd/system", system, error)
-    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", cfpd_chords%nchan, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", ptable%nchan, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- CFPD settings ----"
         write(*,'(T2,"CFPD System: ", a)') trim(adjustl(system))
-        write(*,'(T2,"Number of channels: ",i3)') cfpd_chords%nchan
+        write(*,'(T2,"Number of channels: ",i3)') ptable%nchan
     endif
 
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ptable%nenergy, error)
@@ -3254,12 +3248,12 @@ subroutine read_cfpd
     call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ptable%nsteps, error)
 
     allocate(ptable%earray(ptable%nenergy))
-    allocate(ptable%nactual(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
-    allocate(ptable%daomega(ptable%nenergy, ptable%nrays, cfpd_chords%nchan))
-    allocate(ptable%sightline(ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan))
+    allocate(ptable%nactual(ptable%nenergy, ptable%nrays, ptable%nchan))
+    allocate(ptable%daomega(ptable%nenergy, ptable%nrays, ptable%nchan))
+    allocate(ptable%sightline(ptable%nenergy, 6, ptable%nsteps, ptable%nrays, ptable%nchan))
 
-    dims3 = [ptable%nenergy, ptable%nrays, cfpd_chords%nchan]
-    dims5 = [ptable%nenergy, 6, ptable%nsteps, ptable%nrays, cfpd_chords%nchan]
+    dims3 = [ptable%nenergy, ptable%nrays, ptable%nchan]
+    dims5 = [ptable%nenergy, 6, ptable%nsteps, ptable%nrays, ptable%nchan]
     call h5ltread_dataset_double_f(gid, "/cfpd/earray", ptable%earray, dims3(1:1), error)
     call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ptable%nactual, dims3, error)
     call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ptable%daomega, dims3, error)
@@ -5581,7 +5575,7 @@ subroutine write_proton_weights
     !Write variables
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
-        dim2 = [ptable%nenergy, cfpd_chords%nchan]
+        dim2 = [ptable%nenergy, ptable%nchan]
         dim6 = shape(proton%weight)
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
@@ -6833,6 +6827,48 @@ subroutine uvw_to_cyl(uvw, cyl)
 
 end subroutine uvw_to_cyl
 
+subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
+    !+ Convert sightline position and velocity from cylindrical coordinate `rpz` to beam coordinate `xyz`
+    integer, intent(in) :: ie3
+        !+ Proton energy index
+    integer, intent(in) :: ist
+        !+ Step index
+    integer, intent(in) :: iray
+        !+ "Ray" index
+    integer, intent(in) :: ich
+        !+ Detector channel
+    real(Float64), dimension(3), intent(out) :: xyz
+        !+ Sightline position in beam coordinates
+    real(Float64), dimension(3), intent(out) :: v3_xyz
+        !+ Sightline velocity in beam coordinates
+
+    real(Float64), dimension(3) :: rpz, uvw, v3_rpz, v3_uvw
+    real(Float64) :: phi
+
+    !! Position
+    rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
+    rpz(2) = ptable%sightline(ie3,5,ist,iray,ich)
+    rpz(3) = ptable%sightline(ie3,6,ist,iray,ich)
+
+    phi = rpz(2)
+    uvw(1) = rpz(1)*cos(phi)
+    uvw(2) = rpz(1)*sin(phi)
+    uvw(3) = rpz(3)
+    call uvw_to_xyz(uvw, xyz)
+
+    !! Velocity
+    v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
+    v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
+    v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
+
+    v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
+    v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
+    v3_uvw(3) = v3_rpz(3)
+
+    v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
+
+end subroutine convert_sightline_to_xyz
+
 subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, passive)
     !+ Calculates a particles intersection length with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in)           :: r0
@@ -7173,6 +7209,10 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
         ics = input_coords
     else
         ics = 2
+    endif
+
+    if(ics.eq.0) then
+        call xyz_to_cyl(pos, loc)
     endif
 
     if(ics.eq.1) then
@@ -8830,7 +8870,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     real(Float64), intent(out) :: gam0
         !+ Gyro angle of fast ion [rad]
 
-    real(Float64), dimension(3) :: a_xyz, vrot
+    real(Float64), dimension(3) :: a_hat, vrot
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va
     real(Float64) :: v3pp,v3mp,E3pp,E3mp,E3max,E3min
     real(Float64) :: lhs0,rhs0,cosgam0,deltaE3,dgamdE3,A,B,C
@@ -8862,15 +8902,15 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     E3min = min(E3pp,E3mp) ![keV]
 
     if ((E3.ge.E3max).or.(E3.le.E3min)) then
-        pgyro = -1.0d0
+        pgyro = 0.0d0
         return
     endif
 
     !! Calculate pgyro
     cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
     vb = norm2(vrot)*cosphib ![m/s]
-    a_xyz = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
-    cosphia = dot_product(vrot, a_xyz) / (norm2(vrot)*norm2(a_xyz))
+    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
+    cosphia = dot_product(vrot, a_hat) / norm2(vrot)
     va = norm2(vrot)*cosphia ![m/s]
     lhs0 = vperp*(sin(phip)-2.d0*va/norm_v3)
     rhs0 = norm_v3 - 1.5d0*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) &
@@ -8882,11 +8922,11 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
 
     !! Check for singularities
     if (abs(cosgam0).gt.1) then
-        pgyro = -2.d0
+        pgyro = 0.d0
         return
     endif
     if (abs(vperp*sin(phip)*sqrt(1.d0-cosgam0**2)).lt.1.d-4) then
-        pgyro = -3.d0
+        pgyro = 0.d0
         return
     endif
 
@@ -12027,15 +12067,14 @@ end subroutine neutron_f
 
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
-    real(Float64), dimension(3) :: ri, vi, vi_norm, rpz, v3_xyz, v3_rpz, uvw
-    real(Float64), dimension(3) :: v3_uvw, xyz, r_gyro
+    real(Float64), dimension(3) :: ri, vi, vi_norm, v3_xyz, xyz, r_gyro
     integer, dimension(3) :: ind
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, phi, vnet_square, factor, vabs
     real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
-    integer :: ir, iz, iphi, ie, ip, ich, ie3, iray, ist
-    integer :: ntot,ntot1,ntot2,ntot3
+    integer :: ir, iz, iphi, ie, ip, ich, ie3, iray, ist, cnt
+
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
         return
@@ -12048,9 +12087,9 @@ subroutine proton_f
         return
     endif
 
-    allocate(proton%flux(ptable%nenergy, cfpd_chords%nchan))
-    allocate(proton%prob(ptable%nenergy, cfpd_chords%nchan))
-    allocate(proton%gam(ptable%nenergy, cfpd_chords%nchan))
+    allocate(proton%flux(ptable%nenergy, ptable%nchan))
+    allocate(proton%prob(ptable%nenergy, ptable%nchan))
+    allocate(proton%gam(ptable%nenergy, ptable%nchan))
     allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     proton%flux = 0.d0
     proton%prob = 0.d0
@@ -12058,45 +12097,25 @@ subroutine proton_f
     proton%weight = 0.d0
 
     rate = 0.d0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,vabs,ri,ind,pitch,eb,ich,ie3,iray,ist,v3_rpz,kappa,&
-    !$OMP& ie,ip,plasma,uvw,xyz,v3_xyz,v3_uvw,vnet_square,rate,erel,rpz,pgyro,phi,vi_norm,fbm_denf, &
-    !$OMP& ir,iz,iphi,factor,ntot,ntot1,ntot2,ntot3,gyro)
-    channel_loop: do ich=1, cfpd_chords%nchan
+    !$OMP PARALLEL DO schedule(guided) private(ri, vi, vi_norm, v3_xyz, xyz, r_gyro,ind,plasma,fields,&
+    !$OMP& pgyro, phi, vnet_square, factor, vabs,eb, pitch, erel, rate, kappa, gyro, fbm_denf,ir, iz, &
+    !$OMP& iphi, ie, ip, ich, ie3, iray, ist, cnt)
+    channel_loop: do ich=1, ptable%nchan
         E3_loop: do ie3=1, ptable%nenergy
-            ntot = 0
-            ntot1 = 0
-            ntot2 = 0
-            ntot3 = 0
+            cnt = 0
             ray_loop: do iray=1, ptable%nrays
                 step_loop: do ist=1, ptable%nsteps
                     if (ist.gt.ptable%nactual(ie3,iray,ich)) cycle ray_loop
-                    !! Calculate position and velocity in machine coordinates
-                    rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
-                    rpz(2) = ptable%sightline(ie3,5,ist,iray,ich)
-                    rpz(3) = ptable%sightline(ie3,6,ist,iray,ich)
 
-                    phi = rpz(2)
-                    uvw(1) = rpz(1)*cos(phi)
-                    uvw(2) = rpz(1)*sin(phi)
-                    uvw(3) = rpz(3)
-                    call uvw_to_xyz(uvw, xyz)
-
-                    v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
-                    v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
-                    v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
-
-                    v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
-                    v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
-                    v3_uvw(3) = v3_rpz(3)
-
-                    v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
+                    !! Calculate position and velocity in beam coordinates
+                    call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
 
                     !! Get fields at sightline position
-                    call get_fields(fields, pos=uvw, input_coords=1)
+                    call get_fields(fields, pos=xyz)
                     if(.not.fields%in_plasma) cycle step_loop
 
                     !! Get plasma parameters at sightline position
-                    call get_plasma(plasma, pos=uvw, input_coords=1)
+                    call get_plasma(plasma, pos=xyz)
                     if(.not.plasma%in_plasma) cycle step_loop
 
                     factor = fbm%dE*fbm%dp*ptable%dl
@@ -12108,16 +12127,11 @@ subroutine proton_f
 
                             !! Get the probability factor
                             call get_pgyro(fields,ptable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
-                            if (pgyro.le.0.d0) then
-                                if (pgyro.eq.-1.d0) ntot1 = ntot1 + 1
-                                if (pgyro.eq.-2.d0) ntot2 = ntot2 + 1
-                                if (pgyro.eq.-3.d0) ntot3 = ntot3 + 1
-                                cycle energy_loop
-                            endif
-                            ntot = ntot + 1
+                            if (pgyro.le.0.d0) cycle energy_loop
+                            cnt = cnt + 1
 
                             !! Calculate fast-ion velocity
-                            call pitch_to_vec(pitch, gyro, fields, vi_norm) !!!Not sure about this
+                            call pitch_to_vec(pitch, gyro, fields, vi_norm)
                             vabs = sqrt(eb/(v2_to_E_per_amu*fbm%A))
                             vi = vi_norm*vabs
                             !!Correct for gyro orbit
@@ -12129,7 +12143,7 @@ subroutine proton_f
                                 call get_ep_denf(eb,pitch,fbm_denf,pos=(xyz+r_gyro))
                             endif
                             if (fbm_denf.ne.fbm_denf) cycle energy_loop
-                            call get_interpolation_grid_indices(uvw, ind, input_coords=1)
+                            call get_interpolation_grid_indices(xyz, ind, input_coords=0)
                             ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
                             !! Calculate effective beam energy
@@ -12156,10 +12170,10 @@ subroutine proton_f
                     enddo pitch_loop
                 enddo step_loop
             enddo ray_loop
-            !$OMP CRITICAL(pweight_ntot)
-            proton%prob(ie3,ich) = proton%prob(ie3,ich) / ntot
-            proton%gam(ie3,ich) = proton%gam(ie3,ich) / ntot
-            !$OMP END CRITICAL(pweight_ntot)
+            !$OMP CRITICAL(pweight_cnt)
+            proton%prob(ie3,ich) = proton%prob(ie3,ich) / cnt
+            proton%gam(ie3,ich) = proton%gam(ie3,ich) / cnt
+            !$OMP END CRITICAL(pweight_cnt)
         enddo E3_loop
     enddo channel_loop
     !$OMP END PARALLEL DO

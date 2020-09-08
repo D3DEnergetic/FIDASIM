@@ -3,7 +3,7 @@ dist: trusty
 language: python
 
 python:
-  - 2.7
+  - 3.6
 
 cache:
   apt: true
@@ -35,8 +35,6 @@ install:
   - export CXX=g++-5
   - pip install --upgrade graphviz
   - (pip install --upgrade ford && ford --version)
-  - pip install -Iv markdown==2.6.9
-  - pip install -Iv beautifulsoup4==4.6.3
 
 script:
   - travis_wait 60 make

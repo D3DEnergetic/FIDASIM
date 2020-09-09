@@ -301,11 +301,11 @@ def xyz_to_uvw(alpha, beta, gamma, xyz, origin = np.zeros(3)):
     if xyz.ndim == 2:
         s = xyz.shape
         if s[0] != 3:
-            raise ValueError('xyz must be (3, n), but it has shape {}'.format(uvw.shape))
+            raise ValueError('xyz must be (3, n), but it has shape {}'.format(xyz.shape))
         n = s[1]
     elif xyz.ndim == 1:
         if xyz.size != 3:
-            raise ValueError('xyz must have length 3, but it has length {}'.format(uvw.size))
+            raise ValueError('xyz must have length 3, but it has length {}'.format(xyz.size))
         n = 1
     else:
         raise ValueError('xyz must be (3) or (3, n)')

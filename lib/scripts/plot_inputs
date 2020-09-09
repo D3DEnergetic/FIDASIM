@@ -8,6 +8,7 @@ import numpy as np
 from numpy.linalg import norm
 import h5py as h5
 import os
+from fidasim import utils as ut
 
 f90 = True
 try:
@@ -20,50 +21,6 @@ try:
 except:
     print('Import WARNING: mpl_toolkits module not found. Beam grid will not be plotted')
     f90 = False
-
-def tb_zyx(alpha, beta, gamma):
-    # Refer to utils.py for more documentation
-    sa = np.sin(alpha)
-    ca = np.cos(alpha)
-    sb = np.sin(beta)
-    cb = np.cos(beta)
-    sg = np.sin(gamma)
-    cg = np.cos(gamma)
-    r = np.zeros((3, 3))
-    r[0, 0] = ca * cb
-    r[0, 1] = ca * sb * sg - cg * sa
-    r[0, 2] = sa * sg + ca * cg * sb
-    r[1, 0] = cb * sa
-    r[1, 1] = ca * cg + sa * sb * sg
-    r[1, 2] = cg * sa * sb - ca * sg
-    r[2, 0] = -sb
-    r[2, 1] = cb * sg
-    r[2, 2] = cb * cg
-    return r
-
-def xyz_to_uvw(alpha, beta, gamma, xyz, origin = np.zeros(3)):
-    # Refer to utils.py for more documentation
-    xyz = np.array(xyz)
-    if xyz.ndim == 2:
-        s = xyz.shape
-        if s[0]!=3:
-            raise ValueError('xyz must be (3, n), but it has shape {}'.format(uvw.shape))
-        n = s[1]
-    elif xyz.ndim == 1:
-        if xyz.size!=3:
-            raise ValueError('xyz must have length 3, but it has length {}'.format(uvw.size))
-        n = 1
-    else:
-        raise ValueError('xyz must be (3) or (3, n)')
-
-    if origin.ndim!=1:
-        raise ValueError('origin must be 1D, but it has shape {}'.format(origin.shape))
-
-    if origin.size!=3:
-        raise ValueError('origin must have length 3, but it has length {}'.format(origin.size))
-    R = tb_zyx(alpha,beta,gamma)
-    uvw = np.dot(R, xyz)
-    return uvw + np.squeeze(np.tile(origin, (n, 1)).T)
 
 def get_arr_lim(arr):
     #+ Find the lower and upper bounds of N-dimensional `arr`
@@ -287,7 +244,7 @@ def main():
             origin = np.array(nml['origin'])
             uvw_vertices = np.zeros_like(xyz_vertices)
             for i,v in enumerate(xyz_vertices):
-                uvw_vertices[i] = xyz_to_uvw(tb_ang[0], tb_ang[1], tb_ang[2], v, origin=origin)
+                uvw_vertices[i] = ut.xyz_to_uvw(tb_ang[0], tb_ang[1], tb_ang[2], v, origin=origin)
 
         # Plot neutral beam
         if 'nbi' in geo:

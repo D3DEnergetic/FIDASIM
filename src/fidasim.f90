@@ -11952,7 +11952,7 @@ subroutine fida_weights_los
                     call bb_cx_rates(tdens,vnbi_t,vi,rates)
                     states = states + rates
                     do is=1,n_thermal
-                        call bt_cx_rates(plasma, dcxdens + halodens, thermal_mass(i), vi, rates)
+                        call bt_cx_rates(plasma, dcxdens + halodens, thermal_mass(is), vi, rates)
                         states = states + rates*plasma%deni(is)/sum(plasma%deni)
                     enddo
 

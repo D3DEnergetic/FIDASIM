@@ -1099,7 +1099,7 @@ type GyroSurface
         !+ Basis of coordinate system of gyrosurface
 end type GyroSurface
 
-type OrbProtonTable
+type ProtonTable
     !+ Defines 3 MeV proton orbit trajectories
     integer :: nenergy = 0
         !+ Number of proton energies
@@ -1112,14 +1112,15 @@ type OrbProtonTable
     real(Float64) :: dl
         !+ Step length [cm]
     real(Float64), dimension(:), allocatable :: earray
-        !+ Energies of proton orbits [keV]
+        !+ Energies of proton orbits [keV]: earray(E3)
     real(Float64), dimension(:,:,:), allocatable :: nactual
-        !+ Number of spatial steps of a given orbit and detector
+        !+ Number of spatial steps: nactual(E3,ray,channel)
     real(Float64), dimension(:,:,:), allocatable :: daomega
-        !+ Differntial area times solid angle of a given velocity vector [cm^-2]
+        !+ Differntial area times solid angle [cm^-2]: daomega(E3,ray,channel)
     real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
-        !+ Contains velocities [cm/s] and positions [cm] in rpz: sightline(E3,:,step,ray,channel)
-end type OrbProtonTable
+        !+ Velocity [cm/s] and position [cm] in cylindrical (R,Phi,Z) coordinates:
+        !+ sightline(E3,:,step,ray,channel)
+end type ProtonTable
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
@@ -1132,19 +1133,19 @@ end interface
 
 interface operator(+)
     !+ Allows for adding [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]]
+    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]]
     module procedure pp_add,lplp_add,ff_add,lflf_add,oo_add
 end interface
 
 interface operator(-)
     !+ Allows for subtracting [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]]
+    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]]
     module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract,oo_subtract
 end interface
 
 interface operator(*)
     !+ Allows for multiplying [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]] by scalars
+    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]] by scalars
     module procedure sp_multiply, ps_multiply, lps_multiply, slp_multiply, &
                      sf_multiply, fs_multiply, lfs_multiply, slf_multiply, &
                      soo_multiply, oos_multiply
@@ -1152,7 +1153,7 @@ end interface
 
 interface operator(/)
     !+ Allows for dividing [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[OrbProtonTable]] by scalars
+    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]] by scalars
     module procedure ps_divide, lps_divide, fs_divide, lfs_divide, oos_divide
 end interface
 
@@ -1197,7 +1198,7 @@ type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
-type(OrbProtonTable), save       :: ptable
+type(ProtonTable), save       :: ptable
     !+ Variable for storing the calculated 3 MeV proton orbits
 
 contains
@@ -1902,9 +1903,9 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
 end function lfs_divide
 
 elemental function oo_add(p1, p2) result (p3)
-    !+ Defines how to add two [[OrbProtonTable]] types
-    type(OrbProtonTable), intent(in) :: p1,p2
-    type(OrbProtonTable)             :: p3
+    !+ Defines how to add two [[ProtonTable]] types
+    type(ProtonTable), intent(in) :: p1,p2
+    type(ProtonTable)             :: p3
 
     p3%nenergy   = p1%nenergy   + p2%nenergy
     p3%nrays     = p1%nrays     + p2%nrays
@@ -1917,9 +1918,9 @@ elemental function oo_add(p1, p2) result (p3)
 end function oo_add
 
 elemental function oo_subtract(p1, p2) result (p3)
-    !+ Defines how to subtract two [[OrbProtonTable]] types
-    type(OrbProtonTable), intent(in) :: p1,p2
-    type(OrbProtonTable)             :: p3
+    !+ Defines how to subtract two [[ProtonTable]] types
+    type(ProtonTable), intent(in) :: p1,p2
+    type(ProtonTable)             :: p3
 
     p3%nenergy   = p1%nenergy   - p2%nenergy
     p3%nrays     = p1%nrays     - p2%nrays
@@ -1932,10 +1933,10 @@ elemental function oo_subtract(p1, p2) result (p3)
 end function oo_subtract
 
 elemental function oos_multiply(p1, real_scalar) result (p3)
-    !+ Defines how to multiply two [[OrbProtonTable]] types
-    type(OrbProtonTable), intent(in) :: p1
+    !+ Defines how to multiply two [[ProtonTable]] types
+    type(ProtonTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(OrbProtonTable)             :: p3
+    type(ProtonTable)             :: p3
 
     p3%nenergy   = p1%nenergy   * real_scalar
     p3%nrays     = p1%nrays     * real_scalar
@@ -1948,29 +1949,29 @@ elemental function oos_multiply(p1, real_scalar) result (p3)
 end function oos_multiply
 
 elemental function soo_multiply(real_scalar, p1) result (p3)
-    !+ Defines how to multiply [[OrbProtonTable]] types by a scalar
-    type(OrbProtonTable), intent(in) :: p1
+    !+ Defines how to multiply [[ProtonTable]] types by a scalar
+    type(ProtonTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(OrbProtonTable)             :: p3
+    type(ProtonTable)             :: p3
 
     p3 = p1*real_scalar
 
 end function soo_multiply
 
 elemental function oos_divide(p1, real_scalar) result (p3)
-    !+ Defines how to divide [[OrbProtonTable]] types by a scalar
-    type(OrbProtonTable), intent(in) :: p1
+    !+ Defines how to divide [[ProtonTable]] types by a scalar
+    type(ProtonTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(OrbProtonTable)             :: p3
+    type(ProtonTable)             :: p3
 
     p3 = p1*(1.d0/real_scalar)
 
 end function oos_divide
 
 pure subroutine oo_assign(p1, p2)
-    !+ Defines how to assign [[OrbProtonTable]] types to eachother
-    type(OrbProtonTable), intent(in)  :: p2
-    type(OrbProtonTable), intent(out) :: p1
+    !+ Defines how to assign [[ProtonTable]] types to eachother
+    type(ProtonTable), intent(in)  :: p2
+    type(ProtonTable), intent(out) :: p1
 
     p1%nenergy   = p2%nenergy
     p1%nrays     = p2%nrays
@@ -12097,9 +12098,9 @@ subroutine proton_f
     proton%weight = 0.d0
 
     rate = 0.d0
-    !$OMP PARALLEL DO schedule(guided) private(ri, vi, vi_norm, v3_xyz, xyz, r_gyro,ind,plasma,fields,&
-    !$OMP& pgyro, phi, vnet_square, factor, vabs,eb, pitch, erel, rate, kappa, gyro, fbm_denf,ir, iz, &
-    !$OMP& iphi, ie, ip, ich, ie3, iray, ist, cnt)
+    factor = fbm%dE*fbm%dp*ptable%dl
+    !$OMP PARALLEL DO schedule(guided) private(ri,vi,vi_norm,v3_xyz,xyz,r_gyro,ind,plasma,fields,pgyro,phi,&
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ir,iz,iphi,ie,ip,ich,ie3,iray,ist,cnt)
     channel_loop: do ich=1, ptable%nchan
         E3_loop: do ie3=1, ptable%nenergy
             cnt = 0
@@ -12118,7 +12119,6 @@ subroutine proton_f
                     call get_plasma(plasma, pos=xyz)
                     if(.not.plasma%in_plasma) cycle step_loop
 
-                    factor = fbm%dE*fbm%dp*ptable%dl
                     !! Loop over energy/pitch/gamma
                     pitch_loop: do ip = 1, fbm%npitch
                         pitch = fbm%pitch(ip)

@@ -4274,7 +4274,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
                  rates%bt_amu(2),' amu got ', thermal_mass(1), ' amu'
         endif
-        err = .True.
+     !!!err = .True.
     endif
 
     if(err) then
@@ -8887,6 +8887,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     vpar = norm_v1*pitch ![m/s]
     vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
     vrot = plasma%vrot/100.d0 ![m/s]
+    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz) !(b,a,c)
 
     !! First, check E3 limits are valid for the given inputs
     !! Assumes cos(gamma) = +/- 1 and vrot = 0
@@ -8907,12 +8908,19 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
         return
     endif
 
+    !!! put error checks for all denominators
+    !! Get plasma rotation components in (b,a,c) coords
+    if (all(vrot.eq.0.d0)) then
+        vb = 0.d0
+        va = 0.d0
+    else
+        cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
+        vb = norm2(vrot)*cosphib ![m/s]
+        cosphia = dot_product(vrot, a_hat) / norm2(vrot)
+        va = norm2(vrot)*cosphia ![m/s]
+    endif
+
     !! Calculate pgyro
-    cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
-    vb = norm2(vrot)*cosphib ![m/s]
-    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz)
-    cosphia = dot_product(vrot, a_hat) / norm2(vrot)
-    va = norm2(vrot)*cosphia ![m/s]
     lhs0 = vperp*(sin(phip)-2.d0*va/norm_v3)
     rhs0 = norm_v3 - 1.5d0*Q/(norm_v3*mp) - (vpar+vb)*cos(phip) &
                    - va*sin(phip) - 0.5d0*(norm_v1**2 &

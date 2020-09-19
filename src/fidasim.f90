@@ -2480,7 +2480,7 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
-    if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
+    if((inputs%calc_pfida+inputs%calc_pnpa+inputs%calc_cold).gt.0) then
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
         else
@@ -2490,7 +2490,7 @@ subroutine make_diagnostic_grids
 
     !! Spectral line-of-sight passive neutral grid intersection calculations
     allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
-    if(inputs%calc_pfida.gt.0) then
+    if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
         allocate(tracks(pass_grid%ntrack))
         allocate(dlength(pass_grid%nr, &
                          pass_grid%nz, &
@@ -8819,7 +8819,7 @@ endsubroutine spectrum
 subroutine store_photons(pos, vi, lambda0, photons, spectra, passive)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
-        !+ Position of neutral
+        !+ Position of neutral in beam coordinates [machine coordinates for passive case]
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)                    :: lambda0
@@ -10251,7 +10251,7 @@ end subroutine halo_spec
 subroutine cold_spec
     !+ Calculates cold D-alpha emission
     integer :: ic, i, j, k, it, is, ncell
-    real(Float64), dimension(3) :: ri, vhalo
+    real(Float64), dimension(3) :: ri, vhalo, ri_cyl
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
@@ -10259,13 +10259,14 @@ subroutine cold_spec
     integer :: n = 10000
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,ind, &
-    !$OMP& cold_photons, ri, vhalo, plasma)
-    loop_over_cells: do ic = istart, spec_chords%ncell, istep
-        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+    !$OMP& cold_photons, ri, vhalo, plasma, ri_cyl)
+    loop_over_cells: do ic = istart, spec_chords%cyl_ncell, istep
+        call ind2sub(pass_grid%dims,spec_chords%cyl_cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+        ri_cyl(1) = [pass_grid%r(i), pass_grid%z(j), pass_grid%phi(k)]
+        call cyl_to_uvw(ri_cyl, ri)
 
-        call get_plasma(plasma, pos=ri)
+        call get_plasma(plasma, pos=ri, input_coords=1)
         do is = 1, n_thermal
             cold_photons = plasma%denn(3,is)*tables%einstein(2,3)
             if(cold_photons.le.0.0) cycle loop_over_cells
@@ -10273,7 +10274,7 @@ subroutine cold_spec
             do it=1, n
                 !! Cold Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is), passive=.True.)
             enddo
         enddo
     enddo loop_over_cells

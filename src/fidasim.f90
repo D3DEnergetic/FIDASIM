@@ -8715,7 +8715,7 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
 
 end subroutine bt_cx_rates
 
-subroutine get_ddpt_rate(plasma, eb, rate, branch)
+subroutine get_dd_rate(plasma, eb, rate, branch)
     !+ Gets d(d,p)T rate for a beam with energy `eb` interacting with a target plasma
     type(LocalProfiles), intent(in) :: plasma
         !+ Plasma Paramters
@@ -8759,7 +8759,7 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
     b22 = c%b22
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "GET_DDPT_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            write(*,'(a)') "GET_DD_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
         endif
         rate = 0.d0
         return
@@ -8781,7 +8781,7 @@ subroutine get_ddpt_rate(plasma, eb, rate, branch)
         enddo
     endif
 
-end subroutine get_ddpt_rate
+end subroutine get_dd_rate
 
 subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     !+ Gets d(d,p)T anisotropy defecit/enhancement factor for a beam interacting with a target plasma
@@ -8819,7 +8819,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     k0 = norm2(vcm) * sqrt(2*mp/(3*1.e6*(q+KE)))
     cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
     sin_phi = sin(acos(cos_phi))
-    cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0**2*sin_phi**2
+    cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
 
     !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
     e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
@@ -12029,7 +12029,7 @@ subroutine neutron_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
-                            call get_ddpt_rate(plasma, erel, rate, branch=2)
+                            call get_dd_rate(plasma, erel, rate, branch=2)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
@@ -12159,7 +12159,7 @@ subroutine proton_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get the proton production rate and anisotropy term
-                            call get_ddpt_rate(plasma, erel, rate, branch=1)
+                            call get_dd_rate(plasma, erel, rate, branch=1)
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
 
                             !$OMP CRITICAL(proton_weight)
@@ -12285,7 +12285,7 @@ subroutine neutron_mc
                 eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
-                call get_ddpt_rate(plasma, eb, rate, branch=2)
+                call get_dd_rate(plasma, eb, rate, branch=2)
                 rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
@@ -12305,7 +12305,7 @@ subroutine neutron_mc
             eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
-            call get_ddpt_rate(plasma, eb, rate, branch=2)
+            call get_dd_rate(plasma, eb, rate, branch=2)
             rate = rate*fast_ion%weight*factor
 
             !! Store neutrons

@@ -8802,24 +8802,35 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     type(InterpolCoeffs1D) :: c1D
 
     real(Float64) :: ai, bi, ci, b1, b2, b11, b12, b21, b22, cos_phi, sin_phi
-    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, q, mp, k0
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, Q, mp, k0, JMeV
     integer :: ei, i, err_status
 
     !! Calculate effective beam energy
-    vrel = v1-plasma%vrot
-    vnet_square=dot_product(vrel, vrel)
-    eb = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+    vrel = v1-plasma%vrot ![cm/s]
+    vnet_square=dot_product(vrel, vrel) ![(cm/s)**2]
+    eb = v2_to_E_per_amu*fbm%A*vnet_square ![keV]
 
     !!Calculate anisotropy enhancement/deficit factor
-    mp = H1_amu*mass_u  ! kg
-    q = 4.04*1.6e-13       ! J
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 4.04*JMeV ![J]
 
-    vcm = 0.5*(v1+plasma%vrot)
-    KE = 0.5*mp*vnet_square  ! COM kinetic energy [J]
-    k0 = norm2(vcm) * sqrt(2*mp/(3*1.e6*(q+KE)))
-    cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
-    sin_phi = sin(acos(cos_phi))
-    cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
+    vcm = 0.5*(v1+plasma%vrot) ![cm/s]
+    KE = 0.5*mp*vnet_square*1.d-4  ! [J] C-O-M kinetic energy
+    k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+    if ((norm2(vcm)*norm2(v3)).gt.0.d0) then
+        cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
+        sin_phi = sin(acos(cos_phi))
+
+        if (abs(k0*sin_phi).le.1) then
+            cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
+        else
+            cos_theta = 0.d0
+        endif
+
+    else
+        cos_theta = 0.d0
+    endif
 
     !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
     e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
@@ -8836,7 +8847,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
         abc(:,i) = abc(:,i)*bhcor(i)
     enddo
 
-    e1com=0.5*eb
+    e1com=0.5d0*eb
     call interpol_coeff(e, e1com, c1D, err_status)
 
     ei = c1D%i
@@ -8847,7 +8858,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     bi = b1*abc(2,ei) + b2*abc(2,ei+1)
     ci = b1*abc(3,ei) + b2*abc(3,ei+1)
 
-    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.+ci/5.)
+    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
 
 end subroutine get_ddpt_anisotropy
 

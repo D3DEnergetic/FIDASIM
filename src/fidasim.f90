@@ -8821,7 +8821,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, passive)
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Position of neutral in beam coordinates [machine coordinates for passive case]
     real(Float64), dimension(3), intent(in)      :: vi
-        !+ Velocitiy of neutral [cm/s]
+        !+ Velocitiy of neutral in beam coordinates [cm/s]
     real(Float64), intent(in)                    :: lambda0
         !+ Reference wavelength [nm]
     real(Float64), intent(in)                    :: photons
@@ -10250,7 +10250,7 @@ end subroutine halo_spec
 
 subroutine cold_spec
     !+ Calculates cold D-alpha emission
-    integer :: ic, i, j, k, it, is, ncell
+    integer :: ic, i, j, k, it, is
     real(Float64), dimension(3) :: ri, vhalo, ri_cyl
     integer,dimension(3) :: ind
     !! Determination of the CX probability
@@ -10263,7 +10263,9 @@ subroutine cold_spec
     loop_over_cells: do ic = istart, spec_chords%cyl_ncell, istep
         call ind2sub(pass_grid%dims,spec_chords%cyl_cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri_cyl(1) = [pass_grid%r(i), pass_grid%z(j), pass_grid%phi(k)]
+        ri_cyl(1) = pass_grid%r(i) + 0.5d0*pass_grid%dr
+        ri_cyl(2) = pass_grid%z(j) + 0.5d0*pass_grid%dz
+        ri_cyl(3) = pass_grid%phi(k) + 0.5d0*pass_grid%dphi
         call cyl_to_uvw(ri_cyl, ri)
 
         call get_plasma(plasma, pos=ri, input_coords=1)

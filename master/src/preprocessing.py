@@ -420,9 +420,10 @@ def check_beam(inputs, nbi):
         err = True
 
     if nbi['naperture'] > 0:
-        if nbi['ashape'] not in [1, 2]:
-            error('Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)')
-            err = True
+        for aper in nbi['ashape']:
+            if aper not in [1, 2]:
+                error('Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)')
+                err = True
 
         w = nbi['awidy'] < 0
         nw = len(nbi['awidy'][w])

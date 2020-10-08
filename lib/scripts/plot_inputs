@@ -4,6 +4,8 @@
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib.cm as cm
+import matplotlib
 import numpy as np
 from numpy.linalg import norm
 import h5py as h5
@@ -66,6 +68,9 @@ def main():
     parser.add_argument('-d','--distribution',
                         action='store_true',
                         help='Plot fast-ion distribution')
+    parser.add_argument('-it', '--ithermal_species', type=int,
+                        default = 0,
+                        help='Index for data that is dependent on thermal species (H1, H2 or H3)')
     parser.add_argument('-rz','--rzlineout',
                         default=None, type=float,
                         help='Plot slice at constant R on Z vs. R plot')
@@ -200,6 +205,14 @@ def main():
     lineouts[0,1,1] = args.pelineout
     lineouts[0,2,1] = args.relineout
     lineouts[1,2,1] = args.rplineout
+
+    # Set colormap
+    cmap = cm.get_cmap('viridis', args.nlevels)
+    cmap_list = ["black"]
+    for i in range(cmap.N):
+        rgb = cmap(i)
+        cmap_list.append(rgb)
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", cmap_list)
 
     # Plot geometry
     if args.geometry or plot_all:
@@ -387,11 +400,14 @@ def main():
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
 
-        to_plt = ['te','ti','dene','denn','zeff']
-        labels = ['T$_{e}$ [keV]','T$_{i}$ [keV]','n$_e$ [cm$^{-3}$]','n$_n$ [cm$^{-3}$]','Z$_{eff}$']
-        fig_labels = ['Te','Ti','Ne','Nn','Zeff']
+        to_plt = ['te','ti','deni','dene','denn','zeff']
+        labels = ['T$_{e}$ [keV]','T$_{i}$ [keV]','n$_i$ [cm$^{-3}$]','n$_e$ [cm$^{-3}$]','n$_n$ [cm$^{-3}$]','Z$_{eff}$']
+        fig_labels = ['Te','Ti','Ni','Ne','Nn','Zeff']
         for i in range(len(to_plt)):
-            plasma = eq["/plasma/"+to_plt[i]][()]
+            try: #Account mixed species (H!,H2,H3)
+                plasma = eq["/plasma/"+to_plt[i]][()][:,:,args.ithermal_species]
+            except:
+                plasma = eq["/plasma/"+to_plt[i]][()]
             plasma_masked = np.ma.array(plasma)
             plasma_masked[mask < 0.5] = np.ma.masked
             if len(phi)>1: plasma_masked = plasma_masked[iphi,:,:]
@@ -404,44 +420,44 @@ def main():
             if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero plasma 
 
             if (args.rzlineout or args.zrlineout)!=None:
-                fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
+                fig, ax = plt.subplots(1,2,figsize=(6.8,3.4))
                 ax = ax.flatten()
                 if args.rzlineout!=None:   # R line out plots
                     ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
                     linex = [r[ir], r[ir]]
                     liney = [zmin, zmax]
                     ax[1].plot(z,plasma_masked[:,ir], 'indigo')
-                    ax[1].set_xlabel("Z [cm]",fontsize=18)
-                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+                    ax[1].set_xlabel("Z [cm]",fontsize=12)
+                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=12)
                 elif args.zrlineout!=None:  # Z line out plots
                     iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
                     linex = [rmin, rmax]
                     liney = [z[iz], z[iz]]
                     ax[1].plot(r,plasma_masked[iz,:], 'indigo')
-                    ax[1].set_xlabel("R [cm]",fontsize=18)
-                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+                    ax[1].set_xlabel("R [cm]",fontsize=12)
+                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=12)
                 ax[0].plot(linex,liney,'w--')
                 ax[1].set_ylim([levs[0], levs[-1]])
-                ax[1].set_ylabel(labels[i],fontsize=18)
+                ax[1].set_ylabel(labels[i],fontsize=12)
                 if pmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
             else:
-                fig, ax = plt.subplots(figsize=(4.8,4.8))
+                fig, ax = plt.subplots(figsize=(3.0,3.4))
                 ax = np.array(ax)
                 ax = ax.flatten()
 
             # Contour plot
-            c = ax[0].contourf(r,z,plasma_masked,levs,cmap="inferno")
+            c = ax[0].contourf(r,z,plasma_masked,levs,cmap=cmap)
             ax[0].set_xlim(rmin,rmax)
             ax[0].set_ylim(zmin,zmax)
-            ax[0].set_xlabel("R [cm]",fontsize=18)
-            ax[0].set_ylabel("Z [cm]",fontsize=18)
+            ax[0].set_xlabel("R [cm]",fontsize=12)
+            ax[0].set_ylabel("Z [cm]",fontsize=12)
             ax[0].set_aspect('equal')
 
             if len(phi)>1: 
                 degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
             else:
                 degree = ''
-            ax[0].set_title(labels[i]+degree,fontsize=20)
+            ax[0].set_title(labels[i]+degree,fontsize=12)
 
             if np.mean(plasma_masked)<10.0:
                 fig.colorbar(c,format='%.2f', ax=ax[0])
@@ -452,7 +468,7 @@ def main():
             plt.tight_layout()
 
             #Save
-            important_labels = ['Te','Ti','Ne','Nn']
+            important_labels = ['Te','Ti','Nd','Ne','Nn']
             if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
                 plt.savefig(args.saveimportant+fig_labels[i])
 
@@ -488,44 +504,44 @@ def main():
             if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero fields
 
             if (args.rzlineout or args.zrlineout)!=None:
-                fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
+                fig, ax = plt.subplots(1,2,figsize=(6.8,3.4))
                 ax = ax.flatten()
                 if args.rzlineout!=None:   # R line out plots
                     ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
                     linex = [r[ir], r[ir]]
                     liney = [zmin, zmax]
                     ax[1].plot(z,fld_masked[:,ir], 'indigo')
-                    ax[1].set_xlabel("Z [cm]",fontsize=18)
-                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+                    ax[1].set_xlabel("Z [cm]",fontsize=12)
+                    ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=12)
                 elif args.zrlineout!=None:  # Z line out plots
                     iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
                     linex = [rmin, rmax]
                     liney = [z[iz], z[iz]]
                     ax[1].plot(r,fld_masked[iz,:], 'indigo')
-                    ax[1].set_xlabel("R [cm]",fontsize=18)
-                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+                    ax[1].set_xlabel("R [cm]",fontsize=12)
+                    ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=12)
                 ax[0].plot(linex,liney,'w--')
                 ax[1].set_ylim([levs[0], levs[-1]])
-                ax[1].set_ylabel(labels[i],fontsize=18)
+                ax[1].set_ylabel(labels[i],fontsize=12)
                 if fmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
             else:
-                fig, ax = plt.subplots(figsize=(4.8,4.8))
+                fig, ax = plt.subplots(figsize=(3.0,3.4))
                 ax = np.array(ax)
                 ax = ax.flatten()
 
             # Contour plot
-            c = ax[0].contourf(r,z,fld_masked,levs,cmap="inferno")
+            c = ax[0].contourf(r,z,fld_masked,levs,cmap=cmap)
             ax[0].set_xlim(rmin,rmax)
             ax[0].set_ylim(zmin,zmax)
-            ax[0].set_xlabel("R [cm]",fontsize=18)
-            ax[0].set_ylabel("Z [cm]",fontsize=18)
+            ax[0].set_xlabel("R [cm]",fontsize=12)
+            ax[0].set_ylabel("Z [cm]",fontsize=12)
             ax[0].set_aspect('equal')
 
             if len(phi)>1: 
                 degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
             else:
                 degree = ''
-            ax[0].set_title(labels[i]+degree,fontsize=20)
+            ax[0].set_title(labels[i]+degree,fontsize=12)
 
             if np.mean(fld_masked)<10.0:
                 fig.colorbar(c,format='%.2f', ax=ax[0])
@@ -603,7 +619,7 @@ def main():
 
                 # Plot lineouts
                 if (vline or hline)!=None:
-                    fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
+                    fig, ax = plt.subplots(1,2,figsize=(6.8,3.4))
                     ax = ax.flatten()
                     if vline!=None:                                        # X lineout index
                         ix = np.abs(x-vline).argmin()
@@ -611,7 +627,7 @@ def main():
                         liney = [ymin, ymax]
                         ax[1].plot(y, f2[:,ix], 'indigo')
                         ax[1].set_xlabel(f2_labels[1].capitalize() + ' [%s]'%ax_specs[f2_labels[1]]['units'],
-                                         fontsize=18)
+                                         fontsize=12)
                         unit = ax_specs[f2_labels[0]]['units']
                         #Reformat pitch labels
                         if unit=='unity':
@@ -620,14 +636,14 @@ def main():
                         else:
                             title = f2_labels[0].capitalize()
                         ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(x[ix],1)),
-                                                                unit), fontsize=20)
+                                                                unit), fontsize=12)
                     elif hline!=None:                                      # Y lineout index
                         iy = np.abs(y-hline).argmin()
                         linex = [xmin, xmax]
                         liney = [y[iy], y[iy]]
                         ax[1].plot(x, f2[iy,:], 'indigo')
                         ax[1].set_xlabel(f2_labels[0].capitalize() + ' [%s]'%ax_specs[f2_labels[0]]['units'],
-                                         fontsize=18)
+                                         fontsize=12)
                         unit = ax_specs[f2_labels[1]]['units']
                         #Reformat pitch labels
                         if unit=='unity': 
@@ -636,20 +652,20 @@ def main():
                         else:
                             title = f2_labels[1].capitalize()
                         ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(y[iy],1)), 
-                                                                unit), fontsize=20)
+                                                                unit), fontsize=12)
 
                     ax[0].plot(linex, liney, 'w--')
                     ax[1].set_ylim([levs[0], levs[-1]])
                     ax[1].set_ylabel(r'$\left< F \right>_{%s,%s}$' % (labels[i].capitalize(),
-                                                                      labels[j].capitalize()),fontsize=18)
+                                                                      labels[j].capitalize()),fontsize=12)
                     if dmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
                 else:
-                    fig, ax = plt.subplots(figsize=(4.8,4.8))
+                    fig, ax = plt.subplots(figsize=(3.0,3.4))
                     ax = np.array(ax)
                     ax = ax.flatten()
 
                 # Contour plot
-                c = ax[0].contourf(x, y, f2, levs, cmap="inferno")
+                c = ax[0].contourf(x, y, f2, levs, cmap=cmap)
                 ax[0].set_xlim(xmin,xmax)
                 ax[0].set_ylim(ymin,ymax)
                 #Reformat pitch labels
@@ -662,14 +678,14 @@ def main():
                     ylabel = 'Pitch w.r.t. B'
                 else:
                     ylabel = f2_labels[1].capitalize()
-                ax[0].set_xlabel(xlabel+' [%s]'%ax_specs[f2_labels[0]]['units'],fontsize=18)
-                ax[0].set_ylabel(ylabel+' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=18)
+                ax[0].set_xlabel(xlabel+' [%s]'%ax_specs[f2_labels[0]]['units'],fontsize=12)
+                ax[0].set_ylabel(ylabel+' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=12)
 
                 ip = np.argwhere('pitch'==f2_labels.T) #R-Pitch plot
                 if len(ip)>0 and ip==0: 
                     ax[0].set_xticks(np.round(np.linspace(x[1], x[-2], 6), 1))
                 else:
-                    plt.locator_params(axis='x', nbins=8)
+                    plt.locator_params(axis='x', nbins=4)
 
                 if labels[i]=='energy' and labels[j]=='pitch': #R-Z plot
                     ax[0].set_aspect('equal') 
@@ -678,8 +694,8 @@ def main():
                     degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
                 else:
                     degree = ''
-                ax[0].set_title(r'$\left< F \right>_{%s,%s}$' % (labels[i].capitalize(),labels[j].capitalize()) +
-                                                                 degree,fontsize=20)
+                ax[0].set_title(r'$\left< F \right>_{%s,%s}$' %(labels[i].capitalize(),labels[j].capitalize()) 
+                                                                +degree,fontsize=12)
 
                 if np.mean(f2)<10.0: #Colorbar formatting
                     fig.colorbar(c,format='%.2f', ax=ax[0])
@@ -724,44 +740,44 @@ def main():
         if (levs==0).all(): levs = [-0.1, 0.1] #In case zero fields
 
         if (args.rzlineout or args.zrlineout)!=None:
-            fig, ax = plt.subplots(1,2,figsize=(9.6,4.8))
+            fig, ax = plt.subplots(1,2,figsize=(6.8,3.4))
             ax = ax.flatten()
             if args.rzlineout!=None: # R line out plots
                 ir = np.abs(r-args.rzlineout).argmin()  # R lineout index
                 linex = [r[ir], r[ir]]
                 liney = [zmin, zmax]
                 ax[1].plot(z,denf_masked[:,ir], 'indigo')
-                ax[1].set_xlabel("Z [cm]",fontsize=18)
-                ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=20)
+                ax[1].set_xlabel("Z [cm]",fontsize=12)
+                ax[1].set_title(r'R $\approx$ '+str(round(r[ir],1))+' cm',fontsize=12)
             elif args.zrlineout!=None: # Z line out plots
                 iz = np.abs(z-args.zrlineout).argmin()  # Z lineout index
                 linex = [rmin, rmax]
                 liney = [z[iz], z[iz]]
                 ax[1].plot(r,denf_masked[iz,:], 'indigo')
-                ax[1].set_xlabel("R [cm]",fontsize=18)
-                ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=20)
+                ax[1].set_xlabel("R [cm]",fontsize=12)
+                ax[1].set_title(r'Z $\approx$ '+str(round(z[iz],1))+' cm',fontsize=12)
             ax[0].plot(linex,liney,'w--')
             ax[1].set_ylim([levs[0], levs[-1]])
-            ax[1].set_ylabel('n$_F$ [cm$^{-3}$]',fontsize=18)
+            ax[1].set_ylabel('n$_F$ [cm$^{-3}$]',fontsize=12)
             if dmax<10.0: ax[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
         else:
-            fig, ax = plt.subplots(figsize=(4.8,4.8))
+            fig, ax = plt.subplots(figsize=(3.0,3.4))
             ax = np.array(ax)
             ax = ax.flatten()
 
         # Contour plot
-        c = ax[0].contourf(r,z,denf_masked,levs,cmap="inferno")
+        c = ax[0].contourf(r,z,denf_masked,levs,cmap=cmap)
         ax[0].set_xlim(rmin,rmax)
         ax[0].set_ylim(zmin,zmax)
-        ax[0].set_xlabel("R [cm]",fontsize=18)
-        ax[0].set_ylabel("Z [cm]",fontsize=18)
+        ax[0].set_xlabel("R [cm]",fontsize=12)
+        ax[0].set_ylabel("Z [cm]",fontsize=12)
         ax[0].set_aspect('equal')
 
         if len(phi)>1: 
             degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
         else:
             degree = ''
-        ax[0].set_title('n$_F$ [cm$^{-3}$]' + degree,fontsize=20)
+        ax[0].set_title('n$_F$ [cm$^{-3}$]' + degree,fontsize=12)
 
         if np.mean(denf_masked)<10.0:
             fig.colorbar(c,format='%.2f', ax=ax[0])

@@ -203,7 +203,7 @@
 <p><strong>clobber</strong>: Overwrite exisiting HDF5 file</p>
 <p><strong>compress</strong>: Compression level(0-9). Defaults to 9</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> [<span class="mi">1</span>,<span class="mi">2</span>,<span class="mi">3</span>]
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> [<span class="mi">1</span>,<span class="mi">2</span>,<span class="mi">3</span>]
 IDL<span class="o">&gt;</span> write_hdf5,<span class="s2">&quot;a&quot;</span>,atts<span class="o">=</span>{attribute,obj<span class="o">:</span><span class="s2">&quot;/a&quot;</span>,name<span class="o">:</span><span class="s2">&quot;description&quot;</span>,data<span class="o">:</span><span class="s2">&quot;example variable&quot;</span>}
 IDL<span class="o">&gt;</span> s <span class="o">=</span> {a<span class="o">:</span><span class="mi">1</span>,b<span class="o">:</span>{a<span class="o">:</span><span class="mi">2</span>}}
 IDL<span class="o">&gt;</span> write_hdf5,s,<span class="o">/</span>clobber

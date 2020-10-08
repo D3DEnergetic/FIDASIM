@@ -156,15 +156,13 @@
 <p>FIDASIM requires inputs to be in a specific format.
 PREFIDA(<a href="../../sourcefile/prefida.pro.html">IDL</a>,<a href="../../sourcefile/preprocessing.py.html#prefida">Python</a>) is an routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
 <p>PREFIDA is called as follows</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> prefida, inputs, grid, nbi, plasma, fields, <span class="nb">dist</span>, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> prefida, inputs, grid, nbi, plasma, fields, <span class="nb">dist</span>, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
 </code></pre></div>
-
 
 <p>or using Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">preprocessing</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">preprocessing</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">prefida</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>where arguments are defined as follows. Click the argument description for extreme detail.</p>
 <ul>
@@ -191,96 +189,82 @@ Click <a href="./05_devices.html">here</a> to find out if someone has done your 
 By default, axisymmetry is assumed and the Interpolation Grid is a 2D grid in the R-Z plane that is used for interpolating the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma parameters</a> and the <a href="../03_technical/01_prefida_inputs.html#fields-structure">electromagnetic fields</a>.
 A 3D cylindrical grid in R, Z and Phi can be created if the user inputs phi variable information. 
 The routine <code>rz_grid</code>(<a href="../../sourcefile/rz_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#rz_grid">Python</a>) accomplishes the task and creates the <code>grid</code> structure. For example, the command below will create a 2D grid,</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz)
 </code></pre></div>
-
 
 <p>whereas the following command will create a 3D grid,</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin<span class="o">=</span>phimin,phimax<span class="o">=</span>phimax,nphi<span class="o">=</span>nphi)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin<span class="o">=</span>phimin,phimax<span class="o">=</span>phimax,nphi<span class="o">=</span>nphi)
 </code></pre></div>
 
-
 <p>In Python, the 2D grid can be created with,</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">rz_grid</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">rz_grid</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">rz_grid</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span><span class="n">rmax</span><span class="p">,</span><span class="n">nr</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span><span class="p">,</span><span class="n">nz</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>and the 3D grid with,</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">rz_grid</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">rz_grid</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">rz_grid</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span><span class="n">rmax</span><span class="p">,</span><span class="n">nr</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span><span class="p">,</span><span class="n">nz</span><span class="p">,</span><span class="n">phimin</span><span class="o">=</span><span class="n">phimin</span><span class="p">,</span><span class="n">phimax</span><span class="o">=</span><span class="n">phimax</span><span class="p">,</span><span class="n">nphi</span><span class="o">=</span><span class="n">nphi</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.</p>
 <p>The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
 The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#beam_grid">Python</a>) calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> bgrid <span class="o">=</span> beam_grid(nbi,rstart)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> bgrid <span class="o">=</span> beam_grid(nbi,rstart)
 </code></pre></div>
-
 
 <p>or in Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">beam_grid</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">beam_grid</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">bgrid</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">(</span><span class="n">nbi</span><span class="p">,</span><span class="n">rstart</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>FIDASIM creates a third grid for <a href="../02_physics/08_passive.html#passive-grid">passive calculations</a>.</p>
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> fields <span class="o">=</span> read_geqdsk(<span class="s1">&#39;g159243.00300&#39;</span>,grid,rho<span class="o">=</span>rho,btipsign<span class="o">=</span>btipsign)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> fields <span class="o">=</span> read_geqdsk(<span class="s1">&#39;g159243.00300&#39;</span>,grid,rho<span class="o">=</span>rho,btipsign<span class="o">=</span>btipsign)
 </code></pre></div>
-
 
 <p>or in Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_geqdsk</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_geqdsk</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>where <code>grid</code> is the interpolation grid, <code>rho</code> keyword is a named variable that recieves the sqrt(normalized torodial flux) upon executation, and <code>btipsign</code> is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).</p>
 <h1 id="extracting-geqdsk-file-and-plasma-parameters-from-transp">Extracting GEQDSK file and Plasma Parameters from TRANSP</h1>
 <p>It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
 <p>The python script, <code>extract_transp_geqdsk</code>, can be used to extract the MHD equilibrium from TRANSP's <code>.DATA* files</code>.
 For example:</p>
-<div class="codehilite"><pre><span></span><code>extract_transp_geqdsk /p/transparch/result/NSTX/14 159243H06 
+<div class="bash codehilite"><pre><span></span><code>extract_transp_geqdsk /p/transparch/result/NSTX/14 159243H06 
 </code></pre></div>
-
 
 <p>will create a GEQDSK file for every <code>.DATA*</code> file in the <code>159243H06</code> TRANSP run.
 Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 <p>The IDL routine <a href="../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> or the equivalent Python function creates the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma structure</a> at a given time. </p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> plasma <span class="o">=</span> extract_transp_plasma(<span class="s2">&quot;159243H06.CDF&quot;</span>,<span class="mf">1.02</span>,grid,rho)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> plasma <span class="o">=</span> extract_transp_plasma(<span class="s2">&quot;159243H06.CDF&quot;</span>,<span class="mf">1.02</span>,grid,rho)
 </code></pre></div>
-
 
 <p>or in Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">extract_transp_plasma</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">extract_transp_plasma</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mf">1.02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">rho</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>where <code>grid</code> is the interpolation grid and <code>rho</code> is the sqrt(normalized torodial flux).</p>
 <h1 id="translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</h1>
 <p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> nbi <span class="o">=</span> nubeam_geometry(nubeam)
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> nbi <span class="o">=</span> nubeam_geometry(nubeam)
 </code></pre></div>
-
 
 <p>or in Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">nubeam_geometry</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">nubeam_geometry</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">nubeam_geometry</span><span class="p">(</span><span class="n">nubeam</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>where <code>nubeam</code> is a structure/dictionary containing the NUBEAM geometry variables taken from the TRANSP namelist.</p>
 <h1 id="extracting-the-fast-ion-distribution-function-from-transpnubeam">Extracting the Fast-ion Distribution Function from TRANSP/NUBEAM</h1>
 <p>The python script, <code>extract_transp_fbm</code>, provides a easy way to extract the fast-ion distribution. For example:</p>
-<div class="codehilite"><pre><span></span><code>extract_transp_fbm /p/transparch/result/NSTX/14 159243H06
+<div class="bash codehilite"><pre><span></span><code>extract_transp_fbm /p/transparch/result/NSTX/14 159243H06
 </code></pre></div>
-
 
 <p>extracts a distribution function for every <code>.DATA*</code> file in the <code>159243H06</code> TRANSP run.
 Run <code>extract_transp_fbm -h</code> for the full documentation.</p>
@@ -292,14 +276,13 @@ We provide routines for:</p>
 <li><a href="../../sourcefile/read_mc_nubeam.pro.html">read_mc_nubeam.pro</a>: Monte Carlo TRANSP/NUBEAM Guiding Center distribution</li>
 <li><a href="../../sourcefile/read_spiral.pro.html">read_spiral.pro</a>: SPIRAL Guiding Center distribution</li>
 </ul>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> f <span class="o">=</span> read_nubeam(nubeam_distribution_file,grid,btipsign <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>) 
+<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> f <span class="o">=</span> read_nubeam(nubeam_distribution_file,grid,btipsign <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>) 
 IDL<span class="o">&gt;</span> mcf <span class="o">=</span> read_mc_nubeam(mc_nubeam_distribution_file,Ntotal<span class="o">=</span>1e19,btipsign<span class="o">=-</span><span class="mi">1</span>)
 IDL<span class="o">&gt;</span> s <span class="o">=</span> read_spiral(spiral_file,Ntotal<span class="o">=</span>1e19,btipsign<span class="o">=-</span><span class="mi">1</span>)
 </code></pre></div>
 
-
 <p>or in Python</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_nubeam</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_nubeam</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">read_nubeam</span><span class="p">(</span><span class="n">nubeam_distribution_file</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
     </div>

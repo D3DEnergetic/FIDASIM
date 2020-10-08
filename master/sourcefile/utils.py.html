@@ -201,9 +201,8 @@
 <h2 id="output-arguments">Output Arguments</h2>
 <p><strong>directory</strong>: FIDASIM install directory.</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fida_dir</span> <span class="o">=</span> <span class="n">get_fidasim_dir</span><span class="p">()</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fida_dir</span> <span class="o">=</span> <span class="n">get_fidasim_dir</span><span class="p">()</span>
 </code></pre></div>
-
 
 <h1 id="get_version">get_version</h1>
 <p>Gets FIDASIM version number from git.
@@ -214,9 +213,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="output-arguments_1">Output Arguments</h2>
 <p><strong>version</strong>: FIDAIM version number.</p>
 <h2 id="example-usage_1">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">version</span> <span class="o">=</span> <span class="n">get_version</span><span class="p">(</span><span class="n">get_fidasim_dir</span><span class="p">())</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">version</span> <span class="o">=</span> <span class="n">get_version</span><span class="p">(</span><span class="n">get_fidasim_dir</span><span class="p">())</span>
 </code></pre></div>
-
 
 <h1 id="aabb_intersect">aabb_intersect</h1>
 <p>Calculates intersection length of a ray and an axis aligned bounding box (AABB)</p>
@@ -231,7 +229,7 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>ri</strong>: Optional, ray enterence point</p>
 <p><strong>rf</strong>: Optional, ray exit point</p>
 <h2 id="example-usage_2">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">intersect</span><span class="p">,</span> <span class="n">r_enter</span><span class="p">,</span> <span class="n">r_exit</span> <span class="o">=</span> <span class="n">aabb_intersect</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">intersect</span><span class="p">,</span> <span class="n">r_enter</span><span class="p">,</span> <span class="n">r_exit</span> <span class="o">=</span> <span class="n">aabb_intersect</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">intersect</span><span class="p">)</span>
 <span class="mf">1.0</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">r_enter</span><span class="p">)</span>
@@ -239,7 +237,6 @@ Falls back to reading VERSION file when git is not available</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">r_exit</span><span class="p">)</span>
 <span class="mf">0.5</span>  <span class="mf">0.0</span>  <span class="mf">0.0</span>
 </code></pre></div>
-
 
 <h1 id="tb_zyx">tb_zyx</h1>
 <p>Calculates Tait-Bryan z-y'-x" active rotation matrix given rotation angles <code>alpha</code>,<code>beta</code>,<code>gamma</code> in radians</p>
@@ -251,9 +248,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value">Return Value</h2>
 <p>Rotation Matrix <a href="../sourcefile/prefida.pro.html">prefida</a></p>
 <h2 id="example-usage_3">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">tb_zyx</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">tb_zyx</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="uvw_to_xyz">uvw_to_xyz</h1>
 <p>Express non-rotated coordinate <code>uvw</code> in rotated <code>xyz</code> coordinates</p>
@@ -268,9 +264,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="output-arguments_3">Output Arguments</h2>
 <p><strong>xyz</strong>: 'uvw' in 'xyz' coordinates</p>
 <h2 id="example-usage_4">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">xyz</span> <span class="o">=</span> <span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">xyz</span> <span class="o">=</span> <span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
 </code></pre></div>
-
 
 <h2 id="xyz_to_uvwalpha-beta-gamma-xyz-origin000"><code>xyz_to_uvw(alpha, beta, gamma, xyz, origin=[0,0,0])</code></h2>
 <p>Express rotated coordinate <code>xyz</code> in non-rotated <code>uvw</code> coordinates</p>
@@ -282,9 +277,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h3 id="keyword-arguments_1">Keyword Arguments</h3>
 <p><strong>origin</strong>: Origin of rotated coordinate system in non-rotated (uvw) coordinates.</p>
 <h3 id="example-usage_5">Example Usage</h3>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">uvw</span> <span class="o">=</span> <span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">xyz</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">uvw</span> <span class="o">=</span> <span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">xyz</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="line_basis">line_basis</h1>
 <p>Calculates basis from a line with +x in the direction of line</p>
@@ -293,12 +287,11 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>r0</strong>: Starting point of line [cm]</p>
 <p><strong>v0</strong>: Direction of line</p>
 <h2 id="example-usage_6">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">line_basis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">line_basis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span> <span class="p">;</span><span class="n">Transforms</span> <span class="n">a</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">line</span><span class="o">-</span><span class="n">space</span> <span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="n">to</span> <span class="n">real</span> <span class="n">space</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 </code></pre></div>
-
 
 <h1 id="rz_grid">rz_grid</h1>
 <p>Creates interpolation grid</p>
@@ -316,9 +309,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_1">Return Value</h2>
 <p>Interpolation grid dictionary</p>
 <h2 id="example-usage_7">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">rz_grid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="n">phimin</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">phimax</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">nphi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">rz_grid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="n">phimin</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">phimax</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="n">nphi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="colored">colored</h1>
 <p>Return text string formatting for color in terminal</p>
@@ -329,10 +321,9 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="output-arguments_4">Output Arguments</h2>
 <p><strong>text</strong>: Text formated to have "color" in terminal.</p>
 <h2 id="example-usage_8">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">text</span> <span class="o">=</span> <span class="n">colored</span><span class="p">(</span><span class="s2">&quot;Text to be red&quot;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">text</span> <span class="o">=</span> <span class="n">colored</span><span class="p">(</span><span class="s2">&quot;Text to be red&quot;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="info">info</h1>
 <p>Print a informational message</p>
@@ -340,9 +331,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="arguments_5">Arguments</h2>
 <p><strong>str</strong>: message</p>
 <h2 id="example-usage_9">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span><span class="p">(</span><span class="s2">&quot;This is an informative message&quot;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">info</span><span class="p">(</span><span class="s2">&quot;This is an informative message&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="warn">warn</h1>
 <p>Print a warning message</p>
@@ -350,9 +340,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="arguments_6">Arguments</h2>
 <p><strong>string</strong>: message</p>
 <h2 id="example-usage_10">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;This may be a problem&quot;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;This may be a problem&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="error">error</h1>
 <p>Print a error message</p>
@@ -362,9 +351,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="keyword-arguments_2">Keyword Arguments</h2>
 <p><strong>halt</strong>: Halt program execution</p>
 <h2 id="example-usage_11">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="success">success</h1>
 <p>Print a success message</p>
@@ -372,9 +360,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="arguments_8">Arguments</h2>
 <p><strong>string</strong>: message</p>
 <h2 id="example-usage_12">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">success</span><span class="p">(</span><span class="s2">&quot;Yay!!!&quot;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">success</span><span class="p">(</span><span class="s2">&quot;Yay!!!&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="beam_grid">beam_grid</h1>
 <p>Calculates settings for a grid that aligns with the neutral beam.</p>
@@ -393,9 +380,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_2">Return Value</h2>
 <p>Structure containing beam grid settings suitable for the Namelist File</p>
 <h2 id="example-usage_13">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">(</span><span class="n">nbi</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="n">nx</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">ny</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">nz</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">(</span><span class="n">nbi</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="n">nx</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">ny</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">nz</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="write_data">write_data</h1>
 <p>Write h5 datasets with attributes 'description' and 'units'</p>
@@ -408,9 +394,8 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>desc</strong>: Dict with same keys as dic describing each item in dic</p>
 <p><strong>units</strong>: Dict with same keys as dic providing units of data in dic, doesn't have to be all keys of dic.</p>
 <h2 id="example-usage_14">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_data</span><span class="p">(</span><span class="n">h5_obj</span><span class="p">,</span> <span class="n">dic</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_data</span><span class="p">(</span><span class="n">h5_obj</span><span class="p">,</span> <span class="n">dic</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="read_geqdsk">read_geqdsk</h1>
 <p>Reads an EFIT GEQDSK file</p>
@@ -423,9 +408,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_3">Return Value</h2>
 <p>Electronmagnetic fields structure, rho, btipsign</p>
 <h2 id="example-usage_15">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s2">&quot;./g133223.00200&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s2">&quot;./g133223.00200&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="read_ncdf">read_ncdf</h1>
 <p>Reads a flat NetCDF file</p>
@@ -437,9 +421,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_4">Return Value</h2>
 <p>Structure containing NetCDF variables</p>
 <h2 id="example-usage_16">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">read_ncdf</span><span class="p">(</span><span class="s2">&quot;./123324H01_fi_1.cdf&quot;</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">read_ncdf</span><span class="p">(</span><span class="s2">&quot;./123324H01_fi_1.cdf&quot;</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="extract_transp_plasma">extract_transp_plasma</h1>
 <p>Extracts <code>plasma</code> structure from a TRANSP run</p>
@@ -454,9 +437,8 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>scrapeoff</strong>: scrapeoff decay length</p>
 <p><strong>rho_scrapeoff</strong>: scrapeoff length, default = 0.1</p>
 <h2 id="example-usage_17">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;./142332H01.CDF&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;./142332H01.CDF&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="read_nubeam">read_nubeam</h1>
 <p>Reads NUBEAM fast-ion distribution function</p>
@@ -472,9 +454,8 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_5">Return Value</h2>
 <p>Distribution structure</p>
 <h2 id="example-usage_18">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">read_nubeam</span><span class="p">(</span><span class="s2">&quot;./159245H02_fi_1.cdf&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">read_nubeam</span><span class="p">(</span><span class="s2">&quot;./159245H02_fi_1.cdf&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="nubeam_geometry">nubeam_geometry</h1>
 <p>Calculates the FIDASIM beam geometry from the beam geometry variables in the TRANSP/NUBEAM namelist</p>
@@ -508,7 +489,7 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="return-value_6">Return Value</h2>
 <p>Neutral beam structure</p>
 <h2 id="example-usage_19">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">nubeam_geometry</span><span class="p">(</span><span class="n">nubeam</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">nubeam_geometry</span><span class="p">(</span><span class="n">nubeam</span><span class="p">)</span>
 </code></pre></div>
       <br>
     

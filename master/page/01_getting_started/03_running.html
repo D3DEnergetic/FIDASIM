@@ -164,7 +164,6 @@
 <span class="k">For</span><span class="w"> </span><span class="n">more</span><span class="w"> </span><span class="n">information</span><span class="w"> </span><span class="n">visit</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">d3denergetic</span><span class="p">.</span><span class="n">github</span><span class="p">.</span><span class="n">io</span><span class="o">/</span><span class="n">FIDASIM</span><span class="o">/</span><span class="w"></span>
 </code></pre></div>
 
-
 <p>Actually having FIDASIM produce something takes a bit of thought</p>
 <h2 id="recommended-hardware-for-openmp-parallelized-fidasim">Recommended Hardware for OpenMP Parallelized FIDASIM</h2>
 <p>The following settings will give a reasonable runtime.</p>
@@ -181,26 +180,22 @@
 </ul>
 <h2 id="running-interactively">Running Interactively</h2>
 <p>For OpenMP parallelized FIDASIM run with 16 threads run</p>
-<div class="codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat <span class="m">16</span>
+<div class="bash codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat <span class="m">16</span>
 </code></pre></div>
-
 
 <p>For MPI parallelized FIDASIM run with 16 processes run</p>
-<div class="codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% mpirun -np <span class="m">16</span> ./fidasim /p/fida/lstagner/TEST/test_inputs.dat
+<div class="bash codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% mpirun -np <span class="m">16</span> ./fidasim /p/fida/lstagner/TEST/test_inputs.dat
 </code></pre></div>
-
 
 <h2 id="submitting-to-a-cluster-job-schedular">Submitting to a cluster job schedular</h2>
 <p>The recommended way of running FIDASIM is through a job schedular such as Slurm or PBS. </p>
 <p>FIDASIM provides <code>submit_fidasim</code>: a python script that schedules a FIDASIM job on a cluster. For example</p>
-<div class="codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
+<div class="bash codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
 </code></pre></div>
-
 
 <p>will submit any incomplete FIDASIM runs in the <code>/u/lstagner/TEST</code> directory. Alternatively</p>
-<div class="codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_inputs.dat
+<div class="bash codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_inputs.dat
 </code></pre></div>
-
 
 <p>will submit just the <code>test</code> FIDASIM run.
 Slurm and PBS resource managers are supported. <code>submit_fidasim</code> works for both OpenMP and MPI. Run <code>submit_fidasim -h</code> for the full documentation.</p>

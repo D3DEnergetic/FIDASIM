@@ -206,14 +206,13 @@
 <h2 id="keyword-arguments">Keyword Arguments</h2>
 <p><strong>desc</strong>: description of dict <code>dic</code></p>
 <h2 id="example-usage">Example usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dic</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:[</span><span class="mf">1.</span><span class="n">d0</span><span class="p">,</span><span class="mf">2.</span><span class="n">d0</span><span class="p">],</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="s2">&quot;example&quot;</span><span class="p">}</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dic</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:[</span><span class="mf">1.</span><span class="n">d0</span><span class="p">,</span><span class="mf">2.</span><span class="n">d0</span><span class="p">],</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="s2">&quot;example&quot;</span><span class="p">}</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;type&#39;</span><span class="p">:[</span><span class="nb">int</span><span class="p">]},</span> <span class="s1">&#39;b&#39;</span><span class="p">:{</span><span class="s1">&#39;dims&#39;</span><span class="p">:[</span><span class="mi">2</span><span class="p">],</span><span class="s1">&#39;type&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]},</span> <span class="s1">&#39;c&#39;</span><span class="p">:{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;type&#39;</span><span class="p">:[</span><span class="nb">str</span><span class="p">]}</span>  <span class="p">}</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">err</span> <span class="o">=</span> <span class="n">check_dict_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">dic</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Example dict&quot;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 <span class="kc">False</span>
 </code></pre></div>
-
 
 <h1 id="check_inputs">check_inputs</h1>
 <p>Checks if input dictionary is valid</p>
@@ -223,9 +222,8 @@
 <h2 id="output-arguments_1">Output Arguments</h2>
 <p><strong>inputs</strong>: Updated inputs dictionary</p>
 <h2 id="example-usage_1">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="err">&gt;&gt;&gt; inputs = check_inputs(inputs)</span>
+<div class="dist codehilite"><pre><span></span><code><span class="err">&gt;&gt;&gt; inputs = check_inputs(inputs)</span>
 </code></pre></div>
-
 
 <h1 id="check_grid">check_grid</h1>
 <p>Checks if interpolation grid structure is valid</p>
@@ -233,9 +231,8 @@
 <h2 id="input-arguments_2">Input Arguments</h2>
 <p><strong>grid</strong>: Interpolation grid structure</p>
 <h2 id="example-usage_2">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_beam">check_beam</h1>
 <p>Checks if neutral beam geometry dictionary is valid. Converts lists to numpy ndarrays</p>
@@ -246,9 +243,8 @@
 <h2 id="output-arguments_2">Output Arguments</h2>
 <p><strong>nbi</strong>: Updated nbi dictionary</p>
 <h2 id="example-usage_3">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">check_beam</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">nbi</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">check_beam</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">nbi</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_plasma">check_plasma</h1>
 <p>Checks if plasma paramters dictionary is valid</p>
@@ -260,9 +256,8 @@
 <h2 id="output-arguments_3">Output Arguments</h2>
 <p><strong>plasma</strong>: Updated plasma dictionary</p>
 <h2 id="example-usage_4">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">check_plasma</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">plasma</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">check_plasma</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">plasma</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_fields">check_fields</h1>
 <p>Checks if electromagnetic fields dictionary is valid</p>
@@ -274,9 +269,8 @@
 <h2 id="output-arguments_4">Output Arguments</h2>
 <p><strong>fields</strong>: Updated fields dictionary</p>
 <h2 id="example-usage_5">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">check_fields</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">check_fields</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_distribution">check_distribution</h1>
 <p>Checks if distribution dictionary is valid</p>
@@ -288,9 +282,8 @@
 <h2 id="output-arguments_5">Output Arguments</h2>
 <p><strong>dist</strong>: Updated dist dictionary</p>
 <h2 id="example-usage_6">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">check_distribution</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">check_distribution</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_spec">check_spec</h1>
 <p>Check if spectral geometry dictionary is valid</p>
@@ -299,9 +292,8 @@
 <p><strong>inputs</strong>: input dictionary</p>
 <p><strong>chords</strong>: spectral geometry dictionary</p>
 <h2 id="example-usage_7">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_spec</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">chords</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_spec</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">chords</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="check_npa">check_npa</h1>
 <p>Checks if NPA geometry dictionary is valid</p>
@@ -310,9 +302,8 @@
 <p><strong>inputs</strong>: input dictionary</p>
 <p><strong>npa</strong>: NPA geometry dictionary</p>
 <h2 id="example-usage_8">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_npa</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">npa</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">check_npa</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">npa</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="write_namelist">write_namelist</h1>
 <p>Writes namelist file</p>
@@ -321,9 +312,8 @@
 <p><strong>filename</strong>: Name of the namelist file</p>
 <p><strong>inputs</strong>: Input dictionary</p>
 <h2 id="example-usage_9">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_namelist</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_namelist</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="write_geometry">write_geometry</h1>
 <p>Write geometry values to a HDF5 file</p>
@@ -335,9 +325,8 @@
 <p><strong>spec</strong>: Optional, Spectral geometry structure</p>
 <p><strong>npa</strong>: Optional, NPA geometry structure</p>
 <h2 id="example-usage_10">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_geometry</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_geometry</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="write_equilibrium">write_equilibrium</h1>
 <p>Write MHD equilibrium values to a HDF5 file</p>
@@ -347,9 +336,8 @@
 <p><strong>plasma</strong>: Plasma dictionary</p>
 <p><strong>fields</strong>: Electromagnetic fields dictionary</p>
 <h2 id="example-usage_11">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_equilibrium</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">write_equilibrium</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
 </code></pre></div>
-
 
 <h1 id="write_distribution">write_distribution</h1>
 <p>Write fast-ion distribution to a HDF5 file</p>
@@ -358,9 +346,8 @@
 <p><strong>filename</strong>: Name of the distribution file</p>
 <p><strong>dist</strong>: Fast-ion distribution distionary</p>
 <h2 id="example-usage_12">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="err">&gt;&gt;&gt; write_distribution(filename, distri)</span>
+<div class="dist codehilite"><pre><span></span><code><span class="err">&gt;&gt;&gt; write_distribution(filename, distri)</span>
 </code></pre></div>
-
 
 <h1 id="prefida">prefida</h1>
 <p>Checks FIDASIM inputs and writes FIDASIM input files</p>
@@ -376,7 +363,7 @@
 <p><strong>spec</strong>: Optional, Spectral geometry structure</p>
 <p><strong>npa</strong>: Optional, NPA geometry structure</p>
 <h2 id="example-usage_13">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">prefida</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">fbm</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
+<div class="python codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">prefida</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">fbm</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
 </code></pre></div>
       <br>
     

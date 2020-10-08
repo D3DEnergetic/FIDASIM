@@ -8,6 +8,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (AutoMinorLocator, LogLocator, MultipleLocator, MaxNLocator)
+from fidasim import utils as ut
 
 # Define some functions that are called by the main functions below
 def extract_runid(f):
@@ -106,7 +107,7 @@ def increase_imod(subplot_dim, imod):
         if 2<=imod: imod += 1
     return imod
 
-def get_data(fpath, mask, plot_all, lc, rc, data_types):
+def get_data(fpath, mask, plot_all, lc, rc, data_types, it=0):
     #+ fpath contains list of files
     #+ mask contains flags for what the user would like to plot
     #+ plot_all is the flag to plot all data_types
@@ -115,6 +116,8 @@ def get_data(fpath, mask, plot_all, lc, rc, data_types):
     if 'fida' in data_types: sflag = True
     if 'flux' in data_types: nflag = True
 
+    spectra_dep_on_species = np.array(['cold', 'dcx', 'halo']) #Dependent on thermal (H1, H2 or H3)
+    species_error = False
     all_data, all_xdata, all_data_labels = [], [], []
     # Read in spectra and extract data
     for i,fp in enumerate(fpath):            # Loop over spectra files
@@ -126,23 +129,41 @@ def get_data(fpath, mask, plot_all, lc, rc, data_types):
         if plot_all:  # All spectra
             for st in data_types:
                 try:
-                    spectra.append( f[st][()] )
+                    if st in spectra_dep_on_species: #Account for species mix
+                        if (it+1) > f[st][()].shape[0]:
+                            species_error = True
+                        else:
+                            ut.info(f'Using thermal species index {it} for {st} data in {os.path.basename(fp)}')
+                        spectra.append( f[st][()][it] )
+                    else:
+                        spectra.append( f[st][()] )
                     spec_label.append( extract_runid(fp) + ' %s' % st )
                 except:
-                    if sflag: print('Warning: %s is not in %s_spectra.h5' % (st, extract_runid(fp)))
-                    if nflag: print('Warning: %s is not in %s_npa.h5' % (st, extract_runid(fp)))
+                    if sflag: ut.warn('%s not in %s_spectra.h5' % (st, extract_runid(fp)))
+                    if nflag: ut.warn('%s not in %s_npa.h5' % (st, extract_runid(fp)))
                     pass
 
         else:         # User defined spectra from mask
             for j,ma in enumerate(mask):
                 if ma:
                     try:
-                        spectra.append( f[data_types[j]][()] )
+                        if data_types[j] in spectra_dep_on_species: #Account for species mix
+                            if (it+1) > f[data_types[j]][()].shape[0]:
+                                species_error = True
+                            else:
+                                ut.info(f'Using thermal species index {it} for {data_types[j]} data in {os.path.basename(fp)}')
+                            spectra.append( f[data_types[j]][()][it] )
+                        else:
+                            spectra.append( f[data_types[j]][()] )
                         spec_label.append( extract_runid(fp) + ' %s' % data_types[j] )
                     except:
-                        if sflag: print('Warning: %s is not in %s_spectra.h5'%(data_types[j], extract_runid(fp)))
-                        if nflag: print('Warning: %s is not in %s_npa.h5' % (data_types[j], extract_runid(fp)))
+                        if sflag: ut.warn('%s not in %s_spectra.h5'%(data_types[j], extract_runid(fp)))
+                        if nflag: ut.warn('%s not in %s_npa.h5' % (data_types[j], extract_runid(fp)))
                         pass
+
+        if species_error:
+            ut.error(f'Thermal species index is too large')
+            raise SystemExit
 
         spectra = np.asarray(spectra)
         all_data.append(spectra)
@@ -239,12 +260,12 @@ def check_files(directory, path, runids):
     return
 
 
-def plot_spectra(fpath, savespectra, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
+def plot_spectra(fpath, savespectra, mask, plot_all=False, ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[], it=0):
     spec_types = np.array(['fida', 'pfida', 'brems', 'cold', 'dcx', 'full', 'half', 'third', 'halo'])
     check_inputs(fpath, mask, plot_all, ac, rc, lc, xlim, ylim, spec_types) #Error check
 
     # Plotting
-    all_spectra, all_lambda, all_spec_labels = get_data(fpath, mask, plot_all, lc, rc, spec_types)
+    all_spectra, all_lambda, all_spec_labels = get_data(fpath, mask, plot_all, lc, rc, spec_types, it=it)
     cnt_fig = 0
     Nch, ich, subplot_dim = get_figure_parameters(ac, lc, rc, all_spectra)
     colors = get_colors(all_spectra)
@@ -293,10 +314,6 @@ def plot_spectra(fpath, savespectra, mask, plot_all=False, ac=False, lc=[], rc=[
             leg = ax[ileg].legend(handles, labels, loc='upper left', ncol=1)
         [line.set_linewidth(4.0) for line in leg.get_lines()]
 
-        # Define x and y axis limits
-        if len(xlim)==2: ax[imod].set_xlim(xlim)
-        if len(ylim)==2: ax[imod].set_ylim(ylim)
-
         # Handle x axis ticks
         labelsize = get_labelsize(subplot_dim)
         ax[imod].xaxis.set_minor_locator(MultipleLocator(1))
@@ -315,6 +332,10 @@ def plot_spectra(fpath, savespectra, mask, plot_all=False, ac=False, lc=[], rc=[
         ax[imod].yaxis.set_minor_locator(minLocatorY)
         ax[imod].yaxis.set_major_locator(MaxNLocator(5, integer=True))
         ax[imod].tick_params(axis='y', which='both', labelsize=labelsize, direction='in',right=1)
+
+        # Define x and y axis limits
+        if len(xlim)==2: ax[imod].set_xlim(xlim)
+        if len(ylim)==2: ax[imod].set_ylim(ylim)
 
         #Save
         if len(savespectra)>0: plt.savefig(savespectra+ 'spectra%s' % str(cnt_fig))
@@ -382,10 +403,6 @@ def plot_npa(fpath, savenpa, mask, plot_all=False, ac=False, lc=[], rc=[], log=F
             leg = ax[ileg].legend(handles, labels, loc='upper left', ncol=1)
         [line.set_linewidth(4.0) for line in leg.get_lines()]
 
-        # Define x and y axis limits
-        if len(xlim)==2: ax[imod].set_xlim(xlim)
-        if len(ylim)==2: ax[imod].set_ylim(ylim)
-
         # Handle x axis ticks
         labelsize = get_labelsize(subplot_dim)
         ax[imod].xaxis.set_minor_locator(MultipleLocator(5))
@@ -404,6 +421,10 @@ def plot_npa(fpath, savenpa, mask, plot_all=False, ac=False, lc=[], rc=[], log=F
         ax[imod].yaxis.set_minor_locator(minLocatorY)
         ax[imod].yaxis.set_major_locator(MaxNLocator(5, integer=True))
         ax[imod].tick_params(axis='y', which='both', labelsize=labelsize, direction='in',right=1)
+
+        # Define x and y axis limits
+        if len(xlim)==2: ax[imod].set_xlim(xlim)
+        if len(ylim)==2: ax[imod].set_ylim(ylim)
 
         #Save
         if len(savenpa)>0: plt.savefig(savenpa+ 'npa%s' % str(cnt_fig))
@@ -467,6 +488,9 @@ def main():
     parser.add_argument('-hl', '--halo',
                         default = False, action='store_true',
                         help='Halo')
+    parser.add_argument('-it', '--ithermal_species', type=int,
+                        default = 0,
+                        help='Index for data that is dependent on thermal species (H1, H2 or H3)')
     parser.add_argument('-s', '--spectra',
                         default = False, action='store_true',
                         help='All spectra light')
@@ -538,13 +562,27 @@ def main():
     if args.directory!=None:
         fdir = os.path.abspath(args.directory)
         if os.path.isdir(fdir):
-            fpaths = []
             files = [f for f in os.listdir(fdir) if os.path.isfile(f)]
             if args.runids!=None:
-                fpaths.append([fdir+'/'+f for f in files for r in args.runids if re.search(r+'_spectra\.h5',f)])
-                fpaths.append([fdir+'/'+f for f in files for r in args.runids if re.search(r+'_npa\.h5',f)])
-                fpaths.append([fdir+'/'+f for f in files for r in args.runids if re.search(r+'_neutrons\.h5',f)])
+                fpaths = [[],[],[]]
+                for r in args.runids:
+                    # Grab spectra paths
+                    spec_dir = os.path.join(fdir,r+'_spectra.h5')
+                    if os.path.isfile(spec_dir) and not args.onlynpa:
+                        fpaths[0].append(spec_dir)
+                    else:
+                        ut.info(spec_dir+' does not exist')
+                    # Grab NPA paths
+                    npa_dir = os.path.join(fdir,r+'_npa.h5')
+                    if os.path.isfile(npa_dir) and not args.onlyspectra:
+                        fpaths[1].append(npa_dir)
+                    else:
+                        ut.info(npa_dir+' does not exist')
+                    # Grab neutrons paths
+                    neutron_dir = os.path.join(fdir,r+'_neutrons.h5')
+                    fpaths[2].append(neutron_dir)
             else:
+                fpaths = []
                 fpaths.append([fdir+'/'+ f for f in files if re.search('.*_spectra\.h5',f)])
                 fpaths.append([fdir+'/'+ f for f in files if re.search('.*_npa\.h5',f)])
                 fpaths.append([fdir+'/'+ f for f in files if re.search('.*_neutrons\.h5',f)])
@@ -564,13 +602,14 @@ def main():
     if len(fpaths[0])>0 and not args.onlynpa:
         spec_flags = np.array([args.fida,args.pfida,args.brems,args.cold,args.dcx,args.full,args.half,args.third,
                                args.halo])
-        plot_spectra(fpaths[0],args.savespectra,spec_flags, plot_all=args.spectra,log=args.slog,ac=args.allschan,
-                     lc=args.listschan,rc=args.rangeschan,xlim=args.sxlim,ylim=args.sylim)
+        plot_spectra(fpaths[0],args.savespectra,spec_flags,plot_all=args.spectra,
+                     log=args.slog,ac=args.allschan,lc=args.listschan,rc=args.rangeschan,xlim=args.sxlim,
+                     ylim=args.sylim,it=args.ithermal_species)
 
     if len(fpaths[1])>0 and not args.onlyspectra:
         npa_flags= np.array([args.activenpa, args.passivenpa])
-        plot_npa(fpaths[1],args.savenpa,npa_flags,plot_all=args.npa,log=args.nlog,ac=args.allnchan,
-                 lc=args.listnchan,rc=args.rangenchan,xlim=args.nxlim,ylim=args.nylim)
+        plot_npa(fpaths[1],args.savenpa,npa_flags,plot_all=args.npa,log=args.nlog,
+                 ac=args.allnchan,lc=args.listnchan,rc=args.rangenchan,xlim=args.nxlim,ylim=args.nylim)
 
     if len(fpaths[2])>0 and not args.onlyspectra and not args.onlynpa:
         get_neutron_rate(fpaths[2])

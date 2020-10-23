@@ -207,7 +207,7 @@ def main():
     lineouts[1,2,1] = args.rplineout
 
     # Set colormap
-    cmap = cm.get_cmap('inferno', args.nlevels)
+    cmap = cm.get_cmap('plasma', args.nlevels)
     cmap_list = ["black"]
     for i in range(cmap.N):
         rgb = cmap(i)
@@ -379,11 +379,11 @@ def main():
         #Save
         if len(args.saveimportant)>0:
             ax.view_init(0, -90)
-            plt.savefig(args.saveimportant+'geo_elev')
+            plt.savefig(args.saveimportant+'geo_elev',dpi=500)
             ax.view_init(zmax/2, -45)
-            plt.savefig(args.saveimportant+'geo_top1')
+            plt.savefig(args.saveimportant+'geo_top1',dpi=500)
             ax.view_init(zmax/2, 45)
-            plt.savefig(args.saveimportant+'geo_top2')
+            plt.savefig(args.saveimportant+'geo_top2',dpi=500)
 
     # Plot plasma
     if args.plasma or plot_all:
@@ -470,7 +470,7 @@ def main():
             #Save
             important_labels = ['Te','Ti','Ni','Ne','Nn']
             if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
-                plt.savefig(args.saveimportant+fig_labels[i])
+                plt.savefig(args.saveimportant+fig_labels[i],dpi=500)
 
     # Plot fields
     if args.fields or plot_all:
@@ -554,7 +554,7 @@ def main():
             #Save
             important_labels = [t.capitalize() for t in to_plt[:3]]
             if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
-                plt.savefig(args.saveimportant+fig_labels[i])
+                plt.savefig(args.saveimportant+fig_labels[i],dpi=500)
 
     # Plot distribution function
     if args.distribution or plot_all:
@@ -710,7 +710,7 @@ def main():
                 iimp = np.array([(f2_labels==['r','z']).all(), (f2_labels==['energy','pitch']).all()])
                 save_labels = np.array(['Fzr', 'Fpe'])
                 if len(args.saveimportant)>0 and iimp.any():
-                    plt.savefig(args.saveimportant+save_labels[iimp][0])
+                    plt.savefig(args.saveimportant+save_labels[iimp][0],dpi=500)
 
         # Fast-ion density
 
@@ -789,7 +789,7 @@ def main():
 
         #Save
         if len(args.saveimportant)>0:
-            plt.savefig(args.saveimportant+'Nf')
+            plt.savefig(args.saveimportant+'Nf',dpi=500)
 
     plt.show()
 

@@ -12117,7 +12117,7 @@ subroutine proton_f
     proton%weight = 0.d0
 
     rate = 0.d0
-    factor = fbm%dE*fbm%dp*ptable%dl
+    factor = 0.5d0*fbm%dE*fbm%dp*ptable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(ri,vi,vi_norm,v3_xyz,xyz,r_gyro,ind,plasma,fields,pgyro,phi,&
     !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ir,iz,iphi,ie,ip,ich,ie3,iray,ist,cnt)
     channel_loop: do ich=1, ptable%nchan

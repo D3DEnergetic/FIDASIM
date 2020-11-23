@@ -853,8 +853,8 @@ end type NeutronRate
 
 type ProtonRate
     !+ Proton storage structure
-    real(Float64), dimension(:,:,:,:,:,:), allocatable :: weight
-        !+ Proton rate weight: weight(Ep,E,p,R,Z,Phi)
+    real(Float64), dimension(:,:,:,:), allocatable :: weight
+        !+ Proton rate weight: weight(Ep,Ch,E,p)
     real(Float64), dimension(:,:), allocatable         :: flux
         !+ Proton flux: flux(E3,chan) [protons/(s*dE)]
     real(Float64), dimension(:,:), allocatable         :: prob
@@ -5558,8 +5558,7 @@ subroutine write_proton_weights
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(2) :: dim2
-    integer(HSIZE_T), dimension(3) :: dim3
-    integer(HSIZE_T), dimension(6) :: dim6
+    integer(HSIZE_T), dimension(4) :: dim4
     integer :: error
 
     character(charlim) :: filename
@@ -5577,59 +5576,42 @@ subroutine write_proton_weights
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
         dim2 = [ptable%nenergy, ptable%nchan]
-        dim6 = shape(proton%weight)
+        dim4 = [ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch]
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, proton%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, proton%gam, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 6, dim6, proton%weight, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, proton%weight, error)
 
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
-        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
-        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
-        call h5ltmake_dataset_int_f(fid,"/nphi",0,dim1,[fbm%nphi], error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim6(2:2), fbm%energy, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim6(3:3), fbm%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim6(4:4), fbm%r, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim6(5:5), fbm%z, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/phi", 1, dim6(6:6), fbm%phi, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(3:3), fbm%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(4:4), fbm%pitch, error)
 
         call h5ltset_attribute_string_f(fid,"/flux", "description", &
              "Proton flux: flux(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/flux", "units", &
              "protons/(s*dE)", error)
+
         call h5ltset_attribute_string_f(fid,"/prob", "description", &
              "Proton average nonzero probability: prob(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/gam", "description", &
+             "Proton average nonzero gyroangle: gam(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/gam", "units", "rad", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
-             "Proton Weight Function: weight(E3,E,p,R,Z,Phi), rate = sum(f*weight)", error)
+             "Proton Weight Function: weight(Ch,E3,E,p), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
              "Number of distribution function energy values", error)
         call h5ltset_attribute_string_f(fid,"/npitch", "description", &
              "Number of distribution function pitch values", error)
-        call h5ltset_attribute_string_f(fid,"/nr", "description", &
-             "Number of distribution function R values", error)
-        call h5ltset_attribute_string_f(fid,"/nz", "description", &
-             "Number of distribution function Z values", error)
-        call h5ltset_attribute_string_f(fid,"/nphi", "description", &
-             "Number of distribution function Phi values", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
              "Energy array", error)
         call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
         call h5ltset_attribute_string_f(fid,"/pitch", "description", &
              "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
-        call h5ltset_attribute_string_f(fid,"/r","description", &
-             "Radius array", error)
-        call h5ltset_attribute_string_f(fid,"/r", "units","cm", error)
-        call h5ltset_attribute_string_f(fid,"/z","description", &
-             "Z array", error)
-        call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
-        call h5ltset_attribute_string_f(fid,"/phi","description", &
-             "Phi array", error)
-        call h5ltset_attribute_string_f(fid,"/phi", "units","rad", error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -12110,7 +12092,7 @@ subroutine proton_f
     allocate(proton%flux(ptable%nenergy, ptable%nchan))
     allocate(proton%prob(ptable%nenergy, ptable%nchan))
     allocate(proton%gam(ptable%nenergy, ptable%nchan))
-    allocate(proton%weight(ptable%nenergy,fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
+    allocate(proton%weight(ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch))
     proton%flux = 0.d0
     proton%prob = 0.d0
     proton%gam = 0.d0
@@ -12174,10 +12156,10 @@ subroutine proton_f
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
 
                             !$OMP CRITICAL(proton_weight)
-                            proton%weight(ie3,ie,ip,ir,iz,iphi) = proton%weight(ie3,ie,ip,ir,iz,iphi) &
-                                                                  + rate * kappa * pgyro &
-                                                                  * ptable%daomega(ie3,iray,ich) &
-                                                                  * fbm_denf * factor
+                            proton%weight(ie3,ich,ie,ip) = proton%weight(ie3,ich,ie,ip) &
+                                                            + rate * kappa * pgyro &
+                                                            * ptable%daomega(ie3,iray,ich) &
+                                                            * factor / (fbm%dE*fbm%dp)
                             proton%prob(ie3,ich) = proton%prob(ie3,ich) + pgyro
                             proton%gam(ie3,ich) = proton%gam(ie3,ich) + gyro
                             proton%flux(ie3,ich) = proton%flux(ie3,ich) + rate * kappa * pgyro &

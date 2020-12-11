@@ -2219,10 +2219,12 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
 
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
-        
-        write(*, '(a)') "---- Identify Transition ----"
-        write(*, '(a)') "The Transition is Balmer-alpha."
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+           write(*, '(a)') "---- Identify Transition ----"
+           write(*, '(a)') "The Transition is Balmer-alpha."
+           write(*,*) ''
+        endif
+
 
     else if (inputs%lambdamin > 103.0d0 .and. inputs%lambdamax < 136.0d0) then
         ! Assigns stark varibales to Lyman alpha transition
@@ -2245,9 +2247,12 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
        
-        write(*, '(a)') "---- Identify Transition ----"
-        write(*, '(a)') "The Transition is Lyman-alpha."
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+           write(*, '(a)') "---- Identify Transition ----"
+           write(*, '(a)') "The Transition is Lyman-alpha."
+           write(*,*) ''
+        endif
+
    endif
   
 end subroutine identify_transition

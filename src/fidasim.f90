@@ -997,7 +997,7 @@ type SimulationInputs
         !+ Total number of spectral switches on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
-    integer(Int32) :: output_reservoir
+    integer(Int32) :: output_neutral_reservoir
         !+ Output neutral reservoir: 0 = off, 1=on
     integer(Int32) :: calc_npa
         !+ Calculate Active NPA: 0 = off, 1=on, 2=on++
@@ -1874,7 +1874,7 @@ subroutine read_inputs
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,flr,split,stark_components
-    integer            :: output_reservoir
+    integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1891,7 +1891,7 @@ subroutine read_inputs
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
-        ab, pinj, einj, current_fractions, output_reservoir, &
+        ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
@@ -1932,7 +1932,7 @@ subroutine read_inputs
     calc_fida_wght=0
     calc_npa_wght=0
     load_neutrals=0
-    output_reservoir=1
+    output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
     n_fida=0
@@ -2045,7 +2045,7 @@ subroutine read_inputs
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
-    inputs%output_reservoir=output_reservoir
+    inputs%output_neutral_reservoir=output_neutral_reservoir
 
     inputs%verbose=verbose
     inputs%flr = flr
@@ -4487,7 +4487,7 @@ subroutine write_neutral_population(id, pop, error)
     enddo
 
     !Create reservoir group
-    if(inputs%output_reservoir.eq.1) then
+    if(inputs%output_neutral_reservoir.eq.1) then
        call h5gcreate_f(id, "reservoir", gid, error)
        call h5ltset_attribute_string_f(id,"reservoir","description", &
             "Neutral Particle Reservoir",error)

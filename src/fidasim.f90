@@ -119,7 +119,7 @@ integer :: n_thermal = 1
 real(Float64) :: thermal_mass(max_species) = 0.d0
     !+ Thermal ion species mass [amu]
 real(Float64) :: thermal_lambda0(max_species) = 0.d0
-    !+ Reference wavelengths for thermal species/isotopes
+    !+ Reference wavelengths for thermal species/isotopes [nm]
 integer :: impurity_charge = 1
     !+ Charge of main impurity (boron=5, carbon=6,...)
 real(Float64) :: impurity_mass = 0.d0
@@ -5111,6 +5111,19 @@ subroutine write_spectra
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
         endif
     endif
+
+    if((inputs%calc_halo.ge.1) .or. (inputs%calc_dcx.ge.1)) then
+       call h5ltmake_compressed_dataset_double_f(fid, "/thermal_mass", 1, dims(4:4), thermal_mass(1:n_thermal), error)
+       call h5ltset_attribute_string_f(fid,"/thermal_mass","description", &
+            "Mass of each of the thermal ions: thermal_mass(species)", error)
+       call h5ltset_attribute_string_f(fid,"/thermal_mass", "units", "amu", error)
+
+       call h5ltmake_compressed_dataset_double_f(fid, "/thermal_lambda0", 1, dims(4:4), thermal_lambda0(1:n_thermal), error)
+       call h5ltset_attribute_string_f(fid,"/thermal_lambda0","description", &
+            "Rest wavelength of the thermal species lines: thermal_lambda0(species)", error)
+       call h5ltset_attribute_string_f(fid,"/thermal_lambda0", "units", "nm", error)
+    endif
+
 
     if(inputs%calc_cold.ge.1) then
         spec%cold = factor*spec%cold

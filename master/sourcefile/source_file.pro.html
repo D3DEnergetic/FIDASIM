@@ -238,29 +238,29 @@ If name is not given then it returns the source file of caller routine</p>
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">source_file</span><span class="p">,</span><span class="s s-Atom">name</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Returns</span> <span class="s s-Atom">the</span> <span class="s s-Atom">source</span> <span class="s s-Atom">file</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">routine</span> <span class="err">`</span><span class="s s-Atom">name</span><span class="err">`</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">If</span> <span class="s s-Atom">name</span> <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">given</span> <span class="s s-Atom">then</span> <span class="s s-Atom">it</span> <span class="s s-Atom">returns</span> <span class="s s-Atom">the</span> <span class="s s-Atom">source</span> <span class="s s-Atom">file</span> <span class="s s-Atom">of</span> <span class="s s-Atom">caller</span> <span class="s s-Atom">routine</span>
-<a name="ln-4"></a>    <span class="s s-Atom">if</span> <span class="nv">N_PARAMS</span><span class="p">()</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-5"></a>        <span class="s s-Atom">s</span> <span class="o">=</span> <span class="nf">scope_traceback</span><span class="p">(</span><span class="o">/</span><span class="s s-Atom">structure</span><span class="p">)</span>
-<a name="ln-6"></a>        <span class="s s-Atom">nlevels</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
-<a name="ln-7"></a>        <span class="s s-Atom">sfile</span> <span class="o">=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">nlevels</span><span class="o">-</span><span class="mi">2</span><span class="p">].</span><span class="s s-Atom">filename</span>
-<a name="ln-8"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">sfile</span><span class="p">)</span>
-<a name="ln-9"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-10"></a>        <span class="s s-Atom">help</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">source_files</span><span class="p">,</span><span class="s s-Atom">output</span><span class="o">=</span><span class="s s-Atom">csf</span> <span class="p">;</span><span class="s s-Atom">all</span> <span class="s s-Atom">compiled</span> <span class="s s-Atom">source</span> <span class="s s-Atom">files</span>
-<a name="ln-11"></a>        <span class="s s-Atom">nc</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">)</span>
-<a name="ln-12"></a>        <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="s s-Atom">nc</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-13"></a>            <span class="s s-Atom">has_name</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">],</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="o">-</span><span class="mi">1</span>
-<a name="ln-14"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">has_name</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-15"></a>                <span class="s s-Atom">sfile</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">],</span><span class="s2">&quot;(/[^/ ]*)+/?$&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span>
-<a name="ln-16"></a>                <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">sfile</span><span class="p">)</span>
-<a name="ln-17"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-18"></a>        <span class="s s-Atom">endfor</span>
-<a name="ln-19"></a>    <span class="s s-Atom">endelse</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> source_file,name
+<a name="ln-2"></a><span class="c1">    ;+ Returns the source file of the routine `name`</span>
+<a name="ln-3"></a><span class="c1">    ;+ If name is not given then it returns the source file of caller routine</span>
+<a name="ln-4"></a>    <span class="k">if</span> <span class="nb">N_PARAMS</span>() <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-5"></a>        s <span class="o">=</span> <span class="nb">scope_traceback</span>(<span class="o">/</span>structure)
+<a name="ln-6"></a>        nlevels <span class="o">=</span> <span class="nb">n_elements</span>(s)
+<a name="ln-7"></a>        sfile <span class="o">=</span> s[nlevels<span class="o">-</span><span class="mi">2</span>].filename
+<a name="ln-8"></a>        <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
+<a name="ln-9"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-10"></a>        <span class="nb">help</span>,<span class="o">/</span>source_files,output<span class="o">=</span>csf ;all compiled source files
+<a name="ln-11"></a>        nc <span class="o">=</span> <span class="nb">n_elements</span>(csf)
+<a name="ln-12"></a>        <span class="k">for</span> i<span class="o">=</span><span class="mi">2</span>,nc<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-13"></a>            has_name <span class="o">=</span> <span class="nb">stregex</span>(csf[i],name,<span class="o">/</span>fold_case) <span class="k">ne</span> <span class="o">-</span><span class="mi">1</span>
+<a name="ln-14"></a>            <span class="k">if</span> has_name <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-15"></a>                sfile <span class="o">=</span> <span class="nb">stregex</span>(csf[i],<span class="s2">&quot;(/[^/ ]*)+/?$&quot;</span>,<span class="o">/</span>extract,<span class="o">/</span>fold_case)
+<a name="ln-16"></a>                <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
+<a name="ln-17"></a>            <span class="k">endif</span>
+<a name="ln-18"></a>        <span class="k">endfor</span>
+<a name="ln-19"></a>    <span class="k">endelse</span>
 <a name="ln-20"></a>
-<a name="ln-21"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-21"></a>    <span class="nb">return</span>,<span class="s1">&#39;&#39;</span>
 <a name="ln-22"></a>
-<a name="ln-23"></a><span class="nv">END</span>
+<a name="ln-23"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -273,7 +273,7 @@ If name is not given then it returns the source file of caller routine</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

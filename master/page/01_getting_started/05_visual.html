@@ -178,31 +178,31 @@ If you are on a cluster, contact your Computer Systems Administrator to get the 
 <li>Run IDs: <code>330LT</code> and <code>LHD</code>.</li>
 </ul>
 <p>Plot everything (plasma, fields, distribution function and geometry):</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT
 </code></pre></div>
 
 <p>Plot the plasma</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize1.png" width="200"></p>
 <p>Plot the fields</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -f
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -f
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize2.png" width="200"></p>
 <p>Plot the distribution function</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize3.png" width="200"></p>
 <p>Plot the diagnostic and beam geometry</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize4.png" width="200"></p>
 <p>Hide the legend</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g -l
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -g -l
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize5.png" width="200"></p>
@@ -213,21 +213,21 @@ If you are on a cluster, contact your Computer Systems Administrator to get the 
 <li>Purple: Plasma boundary approximated as a torus</li>
 </ul>
 <p>Plot lineouts at R = 153.4 cm</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -rz <span class="m">153</span>.4
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -rz <span class="m">153</span>.4
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize6-1.png" title="Te rzlineout" width="400"></p>
 <p style="text-align: center"><img alt="" src="../../media/visualize6-2.png" title="Br rzlineout" width="400"></p>
 <p style="text-align: center"><img alt="" src="../../media/visualize6-3.png" title="Fzr rzlineout" width="400"></p>
 <p>Plot lineouts at Z = -10.8 cm:</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -zr -10.8
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -p -f -d -zr -10.8
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize7-1.png" title="Te zrlineout" width="400"></p>
 <p style="text-align: center"><img alt="" src="../../media/visualize7-2.png" title="Br zrlineout" width="400"></p>
 <p style="text-align: center"><img alt="" src="../../media/visualize7-3.png" title="Fzr zrlineout" width="400"></p>
 <p>Plot Energy and Pitch lineouts for the distribution function</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d -pz .2 -pr -.25 -ez <span class="m">80</span> -er <span class="m">40</span> -ep <span class="m">18</span>
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ 330LT -d -pz .2 -pr -.25 -ez <span class="m">80</span> -er <span class="m">40</span> -ep <span class="m">18</span>
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize8-1.png" title="Fzp pzlineout" width="400"></p>
@@ -236,7 +236,7 @@ If you are on a cluster, contact your Computer Systems Administrator to get the 
 <p style="text-align: center"><img alt="" src="../../media/visualize8-4.png" title="Fer erlineout" width="400"></p>
 <p style="text-align: center"><img alt="" src="../../media/visualize8-5.png" title="Fpe eplineout" width="400"></p>
 <p>For 3D inputs, plot a slice by specifying the toroidal angle in radians</p>
-<div class="bash codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ LHD -p -f -d -ph <span class="m">0</span>.157
+<div class="codehilite"><pre><span></span><code>plot_inputs /u/garciaav/test/ LHD -p -f -d -ph <span class="m">0</span>.157
 </code></pre></div>
 
 <p style="text-align: center"><img alt="" src="../../media/visualize9-1.png" title="Te" width="200"> <img alt="" src="../../media/visualize9-2.png" title="Br" width="200"> <img alt="" src="../../media/visualize9-3.png" title="Fzr" width="200"></p>
@@ -482,7 +482,7 @@ Plots NPA data, list of NPA channels (1), sets flux limits (<script type="math/t
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

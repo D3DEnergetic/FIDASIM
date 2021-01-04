@@ -198,7 +198,7 @@
 <p><strong>filename</strong>: Name of the distribution file</p>
 <p><strong>dist</strong>: Fast-ion distribution structure</p>
 <h3 id="example-usage">Example Usage</h3>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> write_distribution, filename, distri
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> write_distribution, filename, distri
 </code></pre></div>
       <br>
     
@@ -244,243 +244,243 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">write_distribution</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="p">,</span> <span class="s s-Atom">distri</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="err">`</span><span class="s s-Atom">write_distribution</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="p">,</span> <span class="s s-Atom">dist</span><span class="err">`</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Write</span> <span class="s s-Atom">fast</span><span class="o">-</span><span class="s s-Atom">ion</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">to</span> <span class="s s-Atom">a</span> <span class="nv">HDF5</span> <span class="s s-Atom">file</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+###</span><span class="nv">Input</span> <span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**filename**:</span> <span class="nv">Name</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">file</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**dist**:</span> <span class="nv">Fast</span><span class="o">-</span><span class="s s-Atom">ion</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">structure</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="s s-Atom">+###</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">write_distribution</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="p">,</span> <span class="s s-Atom">distri</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> write_distribution, filename, distri
+<a name="ln-2"></a><span class="c1">    ;+##`write_distribution, filename, dist`</span>
+<a name="ln-3"></a><span class="c1">    ;+Write fast-ion distribution to a HDF5 file</span>
+<a name="ln-4"></a><span class="c1">    ;+</span>
+<a name="ln-5"></a><span class="c1">    ;+###Input Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+     **filename**: Name of the distribution file</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+     **dist**: Fast-ion distribution structure</span>
+<a name="ln-9"></a><span class="c1">    ;+</span>
+<a name="ln-10"></a><span class="c1">    ;+###Example Usage</span>
+<a name="ln-11"></a><span class="c1">    ;+```idl</span>
+<a name="ln-12"></a><span class="c1">    ;+IDL&gt; write_distribution, filename, distri</span>
+<a name="ln-13"></a><span class="c1">    ;+```</span>
 <a name="ln-14"></a>
-<a name="ln-15"></a>    <span class="s s-Atom">info</span><span class="p">,</span> <span class="s s-Atom">&#39;Writing fast-ion distribution file...&#39;</span>
+<a name="ln-15"></a>    info, <span class="s1">&#39;Writing fast-ion distribution file...&#39;</span>
 <a name="ln-16"></a>
-<a name="ln-17"></a>    <span class="s s-Atom">root_atts</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-18"></a>                 <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-19"></a>                 <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Fast-ion distribution for FIDASIM&#39;</span><span class="p">}</span>
+<a name="ln-17"></a>    root_atts <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
+<a name="ln-18"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-19"></a>                 data<span class="o">:</span><span class="s1">&#39;Fast-ion distribution for FIDASIM&#39;</span>}
 <a name="ln-20"></a>
-<a name="ln-21"></a>    <span class="s s-Atom">cs_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-22"></a>               <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;coordinate_system&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-23"></a>               <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Cylindrical&#39;</span><span class="p">}</span>
+<a name="ln-21"></a>    cs_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
+<a name="ln-22"></a>               name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a name="ln-23"></a>               data<span class="o">:</span><span class="s1">&#39;Cylindrical&#39;</span>}
 <a name="ln-24"></a>
-<a name="ln-25"></a>    <span class="s s-Atom">ds_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/data_source&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-26"></a>               <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-27"></a>               <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Source of the fast-ion distribution&#39;</span><span class="p">}</span>    
+<a name="ln-25"></a>    ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/data_source&#39;</span>, $
+<a name="ln-26"></a>               name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-27"></a>               data<span class="o">:</span><span class="s1">&#39;Source of the fast-ion distribution&#39;</span>}    
 <a name="ln-28"></a>    
-<a name="ln-29"></a>    <span class="s s-Atom">type_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/type&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-30"></a>                 <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-31"></a>                 <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Distribution type: &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-32"></a>                      <span class="s s-Atom">&#39;1=&quot;Guiding Center Density Function&quot;, &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-33"></a>                      <span class="s s-Atom">&#39;2=&quot;Guiding Center Monte Carlo&quot;, &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-34"></a>                      <span class="s s-Atom">&#39;3=&quot;Full Orbit Monte Carlo&quot;&#39;</span><span class="p">}</span>
+<a name="ln-29"></a>    type_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/type&#39;</span>, $
+<a name="ln-30"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-31"></a>                 data<span class="o">:</span><span class="s1">&#39;Distribution type: &#39;</span><span class="o">+</span> $
+<a name="ln-32"></a>                      <span class="s1">&#39;1=&quot;Guiding Center Density Function&quot;, &#39;</span><span class="o">+</span> $
+<a name="ln-33"></a>                      <span class="s1">&#39;2=&quot;Guiding Center Monte Carlo&quot;, &#39;</span><span class="o">+</span> $
+<a name="ln-34"></a>                      <span class="s1">&#39;3=&quot;Full Orbit Monte Carlo&quot;&#39;</span>}
 <a name="ln-35"></a>
-<a name="ln-36"></a>    <span class="s s-Atom">time_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/time&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-37"></a>                 <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-38"></a>                 <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Distribution time&#39;</span><span class="p">}</span>
-<a name="ln-39"></a>    <span class="s s-Atom">time_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/time&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-40"></a>                 <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-41"></a>                 <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;s&#39;</span><span class="p">}</span>
+<a name="ln-36"></a>    time_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/time&#39;</span>, $
+<a name="ln-37"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-38"></a>                 data<span class="o">:</span><span class="s1">&#39;Distribution time&#39;</span>}
+<a name="ln-39"></a>    time_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/time&#39;</span>, $
+<a name="ln-40"></a>                 name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-41"></a>                 data<span class="o">:</span><span class="s1">&#39;s&#39;</span>}
 <a name="ln-42"></a>
-<a name="ln-43"></a>    <span class="s s-Atom">type</span> <span class="o">=</span> <span class="s s-Atom">distri</span><span class="p">.</span><span class="s s-Atom">type</span>
+<a name="ln-43"></a>    type <span class="o">=</span> distri.type
 <a name="ln-44"></a>
-<a name="ln-45"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">type</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-46"></a>        <span class="s s-Atom">nen_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nenergy&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-47"></a>                    <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-48"></a>                    <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of energy values&#39;</span><span class="p">}</span>
-<a name="ln-49"></a>        <span class="s s-Atom">np_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/npitch&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-50"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-51"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of pitch values&#39;</span><span class="p">}</span>
+<a name="ln-45"></a>    <span class="k">if</span> type <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-46"></a>        nen_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nenergy&#39;</span>,$
+<a name="ln-47"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-48"></a>                    data<span class="o">:</span><span class="s1">&#39;Number of energy values&#39;</span>}
+<a name="ln-49"></a>        np_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npitch&#39;</span>, $
+<a name="ln-50"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-51"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of pitch values&#39;</span>}
 <a name="ln-52"></a>
-<a name="ln-53"></a>        <span class="s s-Atom">energy_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/energy&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-54"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-55"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Energy&#39;</span><span class="p">}</span>
-<a name="ln-56"></a>        <span class="s s-Atom">energy_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/energy&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-57"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-58"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;keV&#39;</span><span class="p">}</span>
+<a name="ln-53"></a>        energy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/energy&#39;</span>, $
+<a name="ln-54"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
+<a name="ln-55"></a>                       data<span class="o">:</span><span class="s1">&#39;Energy&#39;</span>}
+<a name="ln-56"></a>        energy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/energy&#39;</span>, $
+<a name="ln-57"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-58"></a>                       data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
 <a name="ln-59"></a> 
-<a name="ln-60"></a>        <span class="s s-Atom">pitch_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/pitch&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-61"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-62"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Pitch: p = v_parallel/v  w.r.t. the magnetic field&#39;</span><span class="p">}</span>
+<a name="ln-60"></a>        pitch_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/pitch&#39;</span>, $
+<a name="ln-61"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
+<a name="ln-62"></a>                       data<span class="o">:</span><span class="s1">&#39;Pitch: p = v_parallel/v  w.r.t. the magnetic field&#39;</span>}
 <a name="ln-63"></a>
-<a name="ln-64"></a>        <span class="s s-Atom">f_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/f&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-65"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-66"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Fast-ion density function: F(E,p,R,Z[,Phi])&#39;</span><span class="p">}</span>
-<a name="ln-67"></a>        <span class="s s-Atom">f_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/f&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-68"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-69"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;fast-ions/(dE*dP*cm^3)&#39;</span><span class="p">}</span> 
+<a name="ln-64"></a>        f_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/f&#39;</span>, $
+<a name="ln-65"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-66"></a>                  data<span class="o">:</span><span class="s1">&#39;Fast-ion density function: F(E,p,R,Z[,Phi])&#39;</span>}
+<a name="ln-67"></a>        f_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/f&#39;</span>, $
+<a name="ln-68"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-69"></a>                  data<span class="o">:</span><span class="s1">&#39;fast-ions/(dE*dP*cm^3)&#39;</span>} 
 <a name="ln-70"></a>
-<a name="ln-71"></a>        <span class="s s-Atom">denf_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/denf&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-72"></a>                     <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-73"></a>                     <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Fast-ion density: Denf(r,z[,phi])&#39;</span><span class="p">}</span>
-<a name="ln-74"></a>        <span class="s s-Atom">denf_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/denf&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-75"></a>                     <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-76"></a>                     <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm^-3&#39;</span><span class="p">}</span> 
+<a name="ln-71"></a>        denf_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/denf&#39;</span>, $
+<a name="ln-72"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-73"></a>                     data<span class="o">:</span><span class="s1">&#39;Fast-ion density: Denf(r,z[,phi])&#39;</span>}
+<a name="ln-74"></a>        denf_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/denf&#39;</span>, $
+<a name="ln-75"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-76"></a>                     data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>} 
 <a name="ln-77"></a>
-<a name="ln-78"></a>        <span class="s s-Atom">nr_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nr&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-79"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-80"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of R values&#39;</span><span class="p">}</span>
+<a name="ln-78"></a>        nr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nr&#39;</span>, $
+<a name="ln-79"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-80"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of R values&#39;</span>}
 <a name="ln-81"></a>   
-<a name="ln-82"></a>        <span class="s s-Atom">nz_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nz&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-83"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-84"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of Z values&#39;</span><span class="p">}</span>
+<a name="ln-82"></a>        nz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nz&#39;</span>, $
+<a name="ln-83"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-84"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of Z values&#39;</span>}
 <a name="ln-85"></a>
-<a name="ln-86"></a>        <span class="s s-Atom">nphi_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nphi&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-87"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-88"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of Phi values&#39;</span><span class="p">}</span>
+<a name="ln-86"></a>        nphi_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nphi&#39;</span>, $
+<a name="ln-87"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-88"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of Phi values&#39;</span>}
 <a name="ln-89"></a>
-<a name="ln-90"></a>        <span class="s s-Atom">r_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-91"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-92"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Radius&#39;</span><span class="p">}</span>
-<a name="ln-93"></a>        <span class="s s-Atom">r_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-94"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-95"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-90"></a>        r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r&#39;</span>, $
+<a name="ln-91"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-92"></a>                  data<span class="o">:</span><span class="s1">&#39;Radius&#39;</span>}
+<a name="ln-93"></a>        r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r&#39;</span>, $
+<a name="ln-94"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-95"></a>                  data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-96"></a>
-<a name="ln-97"></a>        <span class="s s-Atom">z_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-98"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-99"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Z&#39;</span><span class="p">}</span>
-<a name="ln-100"></a>        <span class="s s-Atom">z_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-101"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-102"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-97"></a>        z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z&#39;</span>, $
+<a name="ln-98"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-99"></a>                  data<span class="o">:</span><span class="s1">&#39;Z&#39;</span>}
+<a name="ln-100"></a>        z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z&#39;</span>, $
+<a name="ln-101"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-102"></a>                  data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-103"></a>
-<a name="ln-104"></a>        <span class="s s-Atom">phi_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/phi&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-105"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-106"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Phi&#39;</span><span class="p">}</span>
-<a name="ln-107"></a>        <span class="s s-Atom">phi_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/phi&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-108"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-109"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;rad&#39;</span><span class="p">}</span>
+<a name="ln-104"></a>        phi_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/phi&#39;</span>, $
+<a name="ln-105"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-106"></a>                  data<span class="o">:</span><span class="s1">&#39;Phi&#39;</span>}
+<a name="ln-107"></a>        phi_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/phi&#39;</span>, $
+<a name="ln-108"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-109"></a>                  data<span class="o">:</span><span class="s1">&#39;rad&#39;</span>}
 <a name="ln-110"></a>
-<a name="ln-111"></a>        <span class="s s-Atom">r2d_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r2d&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-112"></a>                    <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-113"></a>                    <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Radius grid: R(r,z)&#39;</span><span class="p">}</span>
-<a name="ln-114"></a>        <span class="s s-Atom">r2d_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r2d&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-115"></a>                    <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-116"></a>                    <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-111"></a>        r2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r2d&#39;</span>, $
+<a name="ln-112"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-113"></a>                    data<span class="o">:</span><span class="s1">&#39;Radius grid: R(r,z)&#39;</span>}
+<a name="ln-114"></a>        r2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r2d&#39;</span>, $
+<a name="ln-115"></a>                    name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-116"></a>                    data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-117"></a>
-<a name="ln-118"></a>        <span class="s s-Atom">z2d_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z2d&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-119"></a>                    <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-120"></a>                    <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Z grid: Z(r,z)&#39;</span><span class="p">}</span>
-<a name="ln-121"></a>        <span class="s s-Atom">z2d_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z2d&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-122"></a>                    <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-123"></a>                    <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-118"></a>        z2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z2d&#39;</span>, $
+<a name="ln-119"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-120"></a>                    data<span class="o">:</span><span class="s1">&#39;Z grid: Z(r,z)&#39;</span>}
+<a name="ln-121"></a>        z2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z2d&#39;</span>, $
+<a name="ln-122"></a>                    name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-123"></a>                    data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-124"></a>
-<a name="ln-125"></a>        <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">root_atts</span><span class="p">,</span> <span class="s s-Atom">cs_desc</span><span class="p">,</span> <span class="s s-Atom">ds_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-126"></a>                <span class="s s-Atom">type_desc</span><span class="p">,</span> <span class="s s-Atom">time_desc</span><span class="p">,</span><span class="s s-Atom">time_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-127"></a>                <span class="s s-Atom">nen_desc</span><span class="p">,</span> <span class="s s-Atom">np_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-128"></a>                <span class="s s-Atom">energy_desc</span><span class="p">,</span> <span class="s s-Atom">energy_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-129"></a>                <span class="s s-Atom">pitch_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-130"></a>                <span class="s s-Atom">f_desc</span><span class="p">,</span> <span class="s s-Atom">f_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-131"></a>                <span class="s s-Atom">denf_desc</span><span class="p">,</span> <span class="s s-Atom">denf_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-132"></a>                <span class="s s-Atom">nr_desc</span><span class="p">,</span> <span class="s s-Atom">nz_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-133"></a>                <span class="s s-Atom">nphi_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-134"></a>                <span class="s s-Atom">r_desc</span><span class="p">,</span> <span class="s s-Atom">r_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-135"></a>                <span class="s s-Atom">z_desc</span><span class="p">,</span> <span class="s s-Atom">z_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-136"></a>                <span class="s s-Atom">phi_desc</span><span class="p">,</span> <span class="s s-Atom">phi_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-137"></a>                <span class="s s-Atom">r2d_desc</span><span class="p">,</span> <span class="s s-Atom">r2d_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-138"></a>                <span class="s s-Atom">z2d_desc</span><span class="p">,</span> <span class="s s-Atom">z2d_unit</span><span class="p">]</span>
+<a name="ln-125"></a>        atts <span class="o">=</span> [root_atts, cs_desc, ds_desc, $
+<a name="ln-126"></a>                type_desc, time_desc,time_unit, $
+<a name="ln-127"></a>                nen_desc, np_desc, $
+<a name="ln-128"></a>                energy_desc, energy_unit, $
+<a name="ln-129"></a>                pitch_desc, $
+<a name="ln-130"></a>                f_desc, f_unit, $
+<a name="ln-131"></a>                denf_desc, denf_unit, $
+<a name="ln-132"></a>                nr_desc, nz_desc, $
+<a name="ln-133"></a>                nphi_desc, $
+<a name="ln-134"></a>                r_desc, r_unit, $
+<a name="ln-135"></a>                z_desc, z_unit, $
+<a name="ln-136"></a>                phi_desc, phi_unit, $
+<a name="ln-137"></a>                r2d_desc, r2d_unit, $
+<a name="ln-138"></a>                z2d_desc, z2d_unit]
 <a name="ln-139"></a>
-<a name="ln-140"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-140"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
 <a name="ln-141"></a>
-<a name="ln-142"></a>        <span class="s s-Atom">np_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nparticle&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-143"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-144"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of MC particles&#39;</span><span class="p">}</span>
+<a name="ln-142"></a>        np_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nparticle&#39;</span>, $
+<a name="ln-143"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-144"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of MC particles&#39;</span>}
 <a name="ln-145"></a>
-<a name="ln-146"></a>        <span class="s s-Atom">nc_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nclass&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-147"></a>                   <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-148"></a>                   <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Number of orbit classes&#39;</span><span class="p">}</span>
+<a name="ln-146"></a>        nc_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nclass&#39;</span>, $
+<a name="ln-147"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-148"></a>                   data<span class="o">:</span><span class="s1">&#39;Number of orbit classes&#39;</span>}
 <a name="ln-149"></a>
-<a name="ln-150"></a>        <span class="s s-Atom">r_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-151"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-152"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;R position of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-153"></a>        <span class="s s-Atom">r_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/r&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-154"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-155"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-150"></a>        r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r&#39;</span>, $
+<a name="ln-151"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-152"></a>                  data<span class="o">:</span><span class="s1">&#39;R position of a MC particle&#39;</span>}
+<a name="ln-153"></a>        r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/r&#39;</span>, $
+<a name="ln-154"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-155"></a>                  data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-156"></a>
-<a name="ln-157"></a>        <span class="s s-Atom">z_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-158"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-159"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Z position of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-160"></a>        <span class="s s-Atom">z_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/z&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-161"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-162"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm&#39;</span><span class="p">}</span>
+<a name="ln-157"></a>        z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z&#39;</span>, $
+<a name="ln-158"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-159"></a>                  data<span class="o">:</span><span class="s1">&#39;Z position of a MC particle&#39;</span>}
+<a name="ln-160"></a>        z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/z&#39;</span>, $
+<a name="ln-161"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-162"></a>                  data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
 <a name="ln-163"></a>
-<a name="ln-164"></a>        <span class="s s-Atom">phi_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/phi&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-165"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-166"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Phi position of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-167"></a>        <span class="s s-Atom">phi_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/phi&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-168"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-169"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;rad&#39;</span><span class="p">}</span>
+<a name="ln-164"></a>        phi_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/phi&#39;</span>, $
+<a name="ln-165"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-166"></a>                  data<span class="o">:</span><span class="s1">&#39;Phi position of a MC particle&#39;</span>}
+<a name="ln-167"></a>        phi_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/phi&#39;</span>, $
+<a name="ln-168"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-169"></a>                  data<span class="o">:</span><span class="s1">&#39;rad&#39;</span>}
 <a name="ln-170"></a>
-<a name="ln-171"></a>        <span class="s s-Atom">w_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/weight&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-172"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-173"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Weight of a MC particle: sum(weight) = # of fast-ions &#39;</span><span class="p">}</span>
-<a name="ln-174"></a>        <span class="s s-Atom">w_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/weight&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-175"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-176"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;fast-ions/particle&#39;</span><span class="p">}</span>
+<a name="ln-171"></a>        w_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/weight&#39;</span>, $
+<a name="ln-172"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-173"></a>                  data<span class="o">:</span><span class="s1">&#39;Weight of a MC particle: sum(weight) = # of fast-ions &#39;</span>}
+<a name="ln-174"></a>        w_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/weight&#39;</span>, $
+<a name="ln-175"></a>                  name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-176"></a>                  data<span class="o">:</span><span class="s1">&#39;fast-ions/particle&#39;</span>}
 <a name="ln-177"></a>
-<a name="ln-178"></a>        <span class="s s-Atom">c_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/class&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-179"></a>                  <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-180"></a>                  <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Orbit class of a MC particle: class in Set(1:nclass)&#39;</span><span class="p">}</span>
+<a name="ln-178"></a>        c_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/class&#39;</span>, $
+<a name="ln-179"></a>                  name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-180"></a>                  data<span class="o">:</span><span class="s1">&#39;Orbit class of a MC particle: class in Set(1:nclass)&#39;</span>}
 <a name="ln-181"></a>
-<a name="ln-182"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">type</span> <span class="s s-Atom">eq</span> <span class="mi">2</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-183"></a>            <span class="s s-Atom">energy_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/energy&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-184"></a>                           <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-185"></a>                           <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Energy of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-186"></a>            <span class="s s-Atom">energy_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/energy&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-187"></a>                           <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-188"></a>                           <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;keV&#39;</span><span class="p">}</span>
+<a name="ln-182"></a>        <span class="k">if</span> type <span class="k">eq</span> <span class="mi">2</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-183"></a>            energy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/energy&#39;</span>, $
+<a name="ln-184"></a>                           name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-185"></a>                           data<span class="o">:</span><span class="s1">&#39;Energy of a MC particle&#39;</span>}
+<a name="ln-186"></a>            energy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/energy&#39;</span>, $
+<a name="ln-187"></a>                           name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-188"></a>                           data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
 <a name="ln-189"></a>
-<a name="ln-190"></a>            <span class="s s-Atom">pitch_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/pitch&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-191"></a>                          <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-192"></a>                          <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Pitch of a MC particle: p = v_parallel/v  w.r.t. the magnetic field&#39;</span><span class="p">}</span>
-<a name="ln-193"></a>            <span class="s s-Atom">type_atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">energy_desc</span><span class="p">,</span><span class="s s-Atom">energy_unit</span><span class="p">,</span><span class="s s-Atom">pitch_desc</span><span class="p">]</span>
-<a name="ln-194"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-195"></a>            <span class="s s-Atom">vr_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vr&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-196"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-197"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Radial velocity of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-198"></a>            <span class="s s-Atom">vr_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vr&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-199"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-200"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm/s&#39;</span><span class="p">}</span>
-<a name="ln-201"></a>            <span class="s s-Atom">vt_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vt&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-202"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-203"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Torodial velocity of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-204"></a>            <span class="s s-Atom">vt_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vt&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-205"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-206"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm/s&#39;</span><span class="p">}</span>
-<a name="ln-207"></a>            <span class="s s-Atom">vz_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vz&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-208"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;description&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-209"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;Z velocity of a MC particle&#39;</span><span class="p">}</span>
-<a name="ln-210"></a>            <span class="s s-Atom">vz_unit</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/vz&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-211"></a>                       <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">&#39;units&#39;</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-212"></a>                       <span class="nn">data</span><span class="p">:</span><span class="s s-Atom">&#39;cm/s&#39;</span><span class="p">}</span>
-<a name="ln-213"></a>            <span class="s s-Atom">type_atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">vr_desc</span><span class="p">,</span><span class="s s-Atom">vr_unit</span><span class="p">,</span><span class="s s-Atom">vt_desc</span><span class="p">,</span><span class="s s-Atom">vt_unit</span><span class="p">,</span><span class="s s-Atom">vz_desc</span><span class="p">,</span><span class="s s-Atom">vz_unit</span><span class="p">]</span>
-<a name="ln-214"></a>        <span class="s s-Atom">endelse</span>
+<a name="ln-190"></a>            pitch_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/pitch&#39;</span>, $
+<a name="ln-191"></a>                          name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-192"></a>                          data<span class="o">:</span><span class="s1">&#39;Pitch of a MC particle: p = v_parallel/v  w.r.t. the magnetic field&#39;</span>}
+<a name="ln-193"></a>            type_atts <span class="o">=</span> [energy_desc,energy_unit,pitch_desc]
+<a name="ln-194"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-195"></a>            vr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vr&#39;</span>, $
+<a name="ln-196"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-197"></a>                       data<span class="o">:</span><span class="s1">&#39;Radial velocity of a MC particle&#39;</span>}
+<a name="ln-198"></a>            vr_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vr&#39;</span>, $
+<a name="ln-199"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-200"></a>                       data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a name="ln-201"></a>            vt_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vt&#39;</span>, $
+<a name="ln-202"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-203"></a>                       data<span class="o">:</span><span class="s1">&#39;Torodial velocity of a MC particle&#39;</span>}
+<a name="ln-204"></a>            vt_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vt&#39;</span>, $
+<a name="ln-205"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-206"></a>                       data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a name="ln-207"></a>            vz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vz&#39;</span>, $
+<a name="ln-208"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-209"></a>                       data<span class="o">:</span><span class="s1">&#39;Z velocity of a MC particle&#39;</span>}
+<a name="ln-210"></a>            vz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/vz&#39;</span>, $
+<a name="ln-211"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-212"></a>                       data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a name="ln-213"></a>            type_atts <span class="o">=</span> [vr_desc,vr_unit,vt_desc,vt_unit,vz_desc,vz_unit]
+<a name="ln-214"></a>        <span class="k">endelse</span>
 <a name="ln-215"></a>
-<a name="ln-216"></a>        <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">root_atts</span><span class="p">,</span> <span class="s s-Atom">cs_desc</span><span class="p">,</span> <span class="s s-Atom">ds_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-217"></a>                <span class="s s-Atom">type_desc</span><span class="p">,</span> <span class="s s-Atom">time_desc</span><span class="p">,</span><span class="s s-Atom">time_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-218"></a>                <span class="s s-Atom">np_desc</span><span class="p">,</span> <span class="s s-Atom">nc_desc</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-219"></a>                <span class="s s-Atom">r_desc</span><span class="p">,</span> <span class="s s-Atom">r_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-220"></a>                <span class="s s-Atom">z_desc</span><span class="p">,</span> <span class="s s-Atom">z_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-221"></a>                <span class="s s-Atom">w_desc</span><span class="p">,</span> <span class="s s-Atom">w_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-222"></a>                <span class="s s-Atom">c_desc</span><span class="p">,</span> <span class="s s-Atom">type_atts</span><span class="p">]</span>
+<a name="ln-216"></a>        atts <span class="o">=</span> [root_atts, cs_desc, ds_desc, $
+<a name="ln-217"></a>                type_desc, time_desc,time_unit, $
+<a name="ln-218"></a>                np_desc, nc_desc, $
+<a name="ln-219"></a>                r_desc, r_unit, $
+<a name="ln-220"></a>                z_desc, z_unit, $
+<a name="ln-221"></a>                w_desc, w_unit, $
+<a name="ln-222"></a>                c_desc, type_atts]
 <a name="ln-223"></a>
-<a name="ln-224"></a>        <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">&#39;phi&#39;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nf">tag_names</span><span class="p">(</span><span class="s s-Atom">distri</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-225"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-226"></a>            <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="s s-Atom">phi_desc</span><span class="p">,</span> <span class="s s-Atom">phi_unit</span><span class="p">]</span>
-<a name="ln-227"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-228"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-224"></a>        w <span class="o">=</span> <span class="nb">where</span>(<span class="s1">&#39;phi&#39;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">tag_names</span>(distri)),nw)
+<a name="ln-225"></a>        <span class="k">if</span> nw <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-226"></a>            atts <span class="o">=</span> [atts, phi_desc, phi_unit]
+<a name="ln-227"></a>        <span class="k">endif</span>
+<a name="ln-228"></a>    <span class="k">endelse</span>
 <a name="ln-229"></a>
-<a name="ln-230"></a>    <span class="s s-Atom">write_hdf5</span><span class="p">,</span> <span class="s s-Atom">distri</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="o">=</span><span class="s s-Atom">filename</span><span class="p">,</span><span class="s s-Atom">atts</span><span class="o">=</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">clobber</span><span class="p">,</span> <span class="s s-Atom">compress</span><span class="o">=</span><span class="mi">4</span>
+<a name="ln-230"></a>    write_hdf5, distri, filename<span class="o">=</span>filename,atts<span class="o">=</span>atts, <span class="o">/</span>clobber, compress<span class="o">=</span><span class="mi">4</span>
 <a name="ln-231"></a>
-<a name="ln-232"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-233"></a>        <span class="s s-Atom">success</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file created: &#39;</span><span class="o">+</span><span class="s s-Atom">filename</span>
-<a name="ln-234"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-235"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file creation failed.&#39;</span>
-<a name="ln-236"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-237"></a><span class="nv">END</span>
+<a name="ln-232"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-233"></a>        success, <span class="s1">&#39;Distribution file created: &#39;</span><span class="o">+</span>filename
+<a name="ln-234"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-235"></a>        error, <span class="s1">&#39;Distribution file creation failed.&#39;</span>
+<a name="ln-236"></a>    <span class="k">endelse</span>
+<a name="ln-237"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -493,7 +493,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

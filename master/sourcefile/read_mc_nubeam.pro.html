@@ -206,7 +206,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Distribution structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_spiral(<span class="s2">&quot;./spiral_file.TXT&quot;</span>,time<span class="o">=</span><span class="mf">1.0</span>, ntotal<span class="o">=</span>1e19)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_spiral(<span class="s2">&quot;./spiral_file.TXT&quot;</span>,time<span class="o">=</span><span class="mf">1.0</span>, ntotal<span class="o">=</span>1e19)
 </code></pre></div>
       <br>
     
@@ -252,142 +252,142 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_mc_nubeam</span><span class="p">,</span><span class="s s-Atom">infile</span><span class="p">,</span><span class="s s-Atom">ntotal</span><span class="o">=</span><span class="s s-Atom">ntotal</span><span class="p">,</span><span class="s s-Atom">e_range</span><span class="o">=</span><span class="s s-Atom">e_range</span><span class="p">,</span><span class="s s-Atom">p_range</span><span class="o">=</span><span class="s s-Atom">p_range</span><span class="p">,</span><span class="s s-Atom">particle_weight</span> <span class="o">=</span> <span class="s s-Atom">particle_weight</span><span class="p">,</span><span class="s s-Atom">btipsign</span><span class="o">=</span><span class="s s-Atom">btipsign</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#read_mc_nubeam</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Reads</span> <span class="s s-Atom">guiding</span> <span class="s s-Atom">center</span> <span class="nv">Monte</span> <span class="nv">Carlo</span> <span class="nv">NUBEAM</span> <span class="s s-Atom">fast</span><span class="o">-</span><span class="s s-Atom">ion</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">file</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**infile**:</span> <span class="nv">NUBEAM</span> <span class="nv">Monte</span> <span class="nv">Carlo</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">file</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**ntotal**:</span> <span class="nv">Total</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">fast</span><span class="o">-</span><span class="s s-Atom">ions</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**e_range**:</span> <span class="nv">Energy</span> <span class="s s-Atom">range</span> <span class="s s-Atom">of</span> <span class="s s-Atom">particles</span> <span class="s s-Atom">to</span> <span class="s s-Atom">consider</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**p_range**:</span> <span class="nv">Pitch</span> <span class="s s-Atom">range</span> <span class="s s-Atom">of</span> <span class="s s-Atom">particles</span> <span class="s s-Atom">to</span> <span class="s s-Atom">consider</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**particle_weight**:</span> <span class="nv">Set</span> <span class="s s-Atom">particle</span><span class="o">/</span><span class="s s-Atom">marker</span> <span class="s s-Atom">weight</span> <span class="s s-Atom">such</span> <span class="s s-Atom">that</span> <span class="nf">sum</span><span class="p">(</span><span class="s s-Atom">particle_weights</span><span class="p">)</span> <span class="o">=</span> <span class="nn">ntotal</span><span class="p">:</span> <span class="nv">Defaults</span> <span class="s s-Atom">to</span> <span class="err">`</span><span class="s s-Atom">ntotal</span><span class="err">`</span><span class="o">/</span><span class="s s-Atom">nparticles</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-17"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**btipsign**:</span> <span class="nv">Sign</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">dot</span> <span class="s s-Atom">product</span> <span class="s s-Atom">between</span> <span class="s s-Atom">the</span> <span class="s s-Atom">current</span> <span class="s s-Atom">and</span> <span class="s s-Atom">magnetic</span> <span class="nf">field</span> <span class="p">(</span><span class="nv">Required</span><span class="p">)</span>
-<a name="ln-18"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-19"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-20"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Distribution</span> <span class="s s-Atom">structure</span>
-<a name="ln-21"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-22"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-23"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-24"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">dist</span> <span class="o">=</span> <span class="nf">read_spiral</span><span class="p">(</span><span class="s2">&quot;./spiral_file.TXT&quot;</span><span class="p">,</span><span class="s s-Atom">time</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="s s-Atom">ntotal</span><span class="o">=</span><span class="mi">1</span><span class="s s-Atom">e19</span><span class="p">)</span>
-<a name="ln-25"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-26"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">btipsign</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-27"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;btipsign is not set.&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-28"></a>    <span class="s s-Atom">endif</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> read_mc_nubeam,infile,ntotal<span class="o">=</span>ntotal,e_range<span class="o">=</span>e_range,p_range<span class="o">=</span>p_range,particle_weight <span class="o">=</span> particle_weight,btipsign<span class="o">=</span>btipsign
+<a name="ln-2"></a><span class="c1">    ;+#read_mc_nubeam</span>
+<a name="ln-3"></a><span class="c1">    ;+Reads guiding center Monte Carlo NUBEAM fast-ion distribution file</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+    **infile**: NUBEAM Monte Carlo distribution file</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a name="ln-9"></a><span class="c1">    ;+    **ntotal**: Total number of fast-ions</span>
+<a name="ln-10"></a><span class="c1">    ;+</span>
+<a name="ln-11"></a><span class="c1">    ;+    **e_range**: Energy range of particles to consider</span>
+<a name="ln-12"></a><span class="c1">    ;+</span>
+<a name="ln-13"></a><span class="c1">    ;+    **p_range**: Pitch range of particles to consider</span>
+<a name="ln-14"></a><span class="c1">    ;+</span>
+<a name="ln-15"></a><span class="c1">    ;+    **particle_weight**: Set particle/marker weight such that sum(particle_weights) = ntotal: Defaults to `ntotal`/nparticles</span>
+<a name="ln-16"></a><span class="c1">    ;+</span>
+<a name="ln-17"></a><span class="c1">    ;+    **btipsign**: Sign of the dot product between the current and magnetic field (Required)</span>
+<a name="ln-18"></a><span class="c1">    ;+</span>
+<a name="ln-19"></a><span class="c1">    ;+##Return Value</span>
+<a name="ln-20"></a><span class="c1">    ;+Distribution structure</span>
+<a name="ln-21"></a><span class="c1">    ;+</span>
+<a name="ln-22"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-23"></a><span class="c1">    ;+```idl</span>
+<a name="ln-24"></a><span class="c1">    ;+IDL&gt; dist = read_spiral(&quot;./spiral_file.TXT&quot;,time=1.0, ntotal=1e19)</span>
+<a name="ln-25"></a><span class="c1">    ;+```</span>
+<a name="ln-26"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(btipsign) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-27"></a>        error,<span class="s1">&#39;btipsign is not set.&#39;</span>,<span class="o">/</span>halt
+<a name="ln-28"></a>    <span class="k">endif</span>
 <a name="ln-29"></a>
-<a name="ln-30"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">ntotal</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">particle_weight</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-31"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Ntotal not set. Setting arbitrarily to 1e19&#39;</span>
-<a name="ln-32"></a>        <span class="s s-Atom">ntotal</span> <span class="o">=</span> <span class="mf">1.</span><span class="s s-Atom">d19</span>
-<a name="ln-33"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-30"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(ntotal) <span class="k">and</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-31"></a>        warn,<span class="s1">&#39;Ntotal not set. Setting arbitrarily to 1e19&#39;</span>
+<a name="ln-32"></a>        ntotal <span class="o">=</span> <span class="mf">1.d19</span>
+<a name="ln-33"></a>    <span class="k">endif</span>
 <a name="ln-34"></a>
-<a name="ln-35"></a>    <span class="s s-Atom">zzz</span><span class="o">=</span><span class="nv">FINDFILE</span><span class="p">(</span><span class="s s-Atom">infile</span><span class="p">)</span>
-<a name="ln-36"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">zzz</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-37"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Nonexistent file: &#39;</span><span class="o">+</span><span class="s s-Atom">infile</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-38"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-35"></a>    zzz<span class="o">=</span>FINDFILE(infile)
+<a name="ln-36"></a>    <span class="k">if</span> zzz <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-37"></a>        error, <span class="s1">&#39;Nonexistent file: &#39;</span><span class="o">+</span>infile,<span class="o">/</span>halt
+<a name="ln-38"></a>    <span class="k">endif</span>
 <a name="ln-39"></a>    
-<a name="ln-40"></a>    <span class="s s-Atom">openr</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">infile</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">get_lun</span>
-<a name="ln-41"></a>    <span class="s s-Atom">line=&#39; &#39;</span>
-<a name="ln-42"></a>    <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">line</span>           <span class="p">;</span> <span class="s s-Atom">read</span> <span class="s s-Atom">string</span>
-<a name="ln-43"></a>    <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">line</span>
-<a name="ln-44"></a>    <span class="s s-Atom">pos</span><span class="o">=</span><span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">,</span><span class="s s-Atom">&#39;N=&#39;</span><span class="p">)</span>
-<a name="ln-45"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">pos</span> <span class="s s-Atom">eq</span> <span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-46"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Second line is missing the number of points&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-47"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-40"></a>    openr,unit,infile, <span class="o">/</span><span class="nb">get_lun</span>
+<a name="ln-41"></a>    line<span class="o">=</span><span class="s1">&#39; &#39;</span>
+<a name="ln-42"></a>    readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
+<a name="ln-43"></a>    readf,unit,line
+<a name="ln-44"></a>    pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;N=&#39;</span>)
+<a name="ln-45"></a>    <span class="k">if</span> pos <span class="k">eq</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-46"></a>        error,<span class="s1">&#39;Second line is missing the number of points&#39;</span>,<span class="o">/</span>halt
+<a name="ln-47"></a>    <span class="k">endif</span>
 <a name="ln-48"></a>
-<a name="ln-49"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">,</span><span class="s s-Atom">&#39;N *= *([0-9]*)&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">sub</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">)</span>
-<a name="ln-50"></a>    <span class="s s-Atom">npts</span> <span class="o">=</span> <span class="nf">long</span><span class="p">(</span><span class="s s-Atom">w</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<a name="ln-51"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">npts</span> <span class="s s-Atom">lt</span> <span class="mi">5</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-52"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Too few points &#39;</span><span class="o">+</span><span class="nf">strtrim</span><span class="p">(</span><span class="s s-Atom">npts</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-53"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-54"></a>    
-<a name="ln-55"></a>    <span class="p">;</span> <span class="nv">Get</span> <span class="s s-Atom">time</span>
-<a name="ln-56"></a>    <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">line</span>
-<a name="ln-57"></a>    <span class="s s-Atom">parts</span><span class="o">=</span><span class="nf">str_sep</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">,</span> <span class="s s-Atom">&#39; &#39;</span><span class="p">)</span>
-<a name="ln-58"></a>    <span class="s s-Atom">w</span><span class="o">=</span><span class="nf">where</span><span class="p">(</span><span class="s s-Atom">parts</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;TIME&#39;</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-60"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Time not found on 3rd line&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-61"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-62"></a>    <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">1</span>
-<a name="ln-63"></a>    <span class="s s-Atom">while</span> <span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-64"></a>        <span class="s s-Atom">s</span> <span class="o">=</span> <span class="s s-Atom">parts</span><span class="p">[</span><span class="s s-Atom">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-65"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">s</span> <span class="s s-Atom">ne</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">and</span> <span class="s s-Atom">s</span> <span class="s s-Atom">ne</span> <span class="s s-Atom">&#39;=&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-66"></a>            <span class="s s-Atom">time</span> <span class="o">=</span> <span class="nf">float</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
-<a name="ln-67"></a>            <span class="s s-Atom">break</span>
-<a name="ln-68"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-69"></a>        <span class="s s-Atom">i</span> <span class="o">=</span> <span class="s s-Atom">i</span><span class="o">+</span><span class="mi">1</span>
-<a name="ln-70"></a>    <span class="s s-Atom">endwhile</span>
-<a name="ln-71"></a>    <span class="s s-Atom">data</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="s s-Atom">npts</span><span class="p">)</span>
+<a name="ln-49"></a>    w <span class="o">=</span> <span class="nb">stregex</span>(line,<span class="s1">&#39;N *= *([0-9]*)&#39;</span>,<span class="o">/</span>sub,<span class="o">/</span>extract)
+<a name="ln-50"></a>    npts <span class="o">=</span> <span class="nb">long</span>(w[<span class="mi">1</span>])
+<a name="ln-51"></a>    <span class="k">if</span> npts <span class="k">lt</span> <span class="mi">5</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-52"></a>        error,<span class="s1">&#39;Too few points &#39;</span><span class="o">+</span><span class="nb">strtrim</span>(npts,<span class="mi">2</span>),<span class="o">/</span>halt
+<a name="ln-53"></a>    <span class="k">endif</span>
+<a name="ln-54"></a><span class="c1">    </span>
+<a name="ln-55"></a><span class="c1">    ; Get time</span>
+<a name="ln-56"></a>    readf,unit,line
+<a name="ln-57"></a>    parts<span class="o">=</span>str_sep(line, <span class="s1">&#39; &#39;</span>)
+<a name="ln-58"></a>    w<span class="o">=</span><span class="nb">where</span>(parts <span class="k">eq</span> <span class="s1">&#39;TIME&#39;</span>,nw)
+<a name="ln-59"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-60"></a>        error,<span class="s1">&#39;Time not found on 3rd line&#39;</span>,<span class="o">/</span>halt
+<a name="ln-61"></a>    <span class="k">endif</span>
+<a name="ln-62"></a>    i<span class="o">=</span><span class="mi">1</span>
+<a name="ln-63"></a>    <span class="k">while</span> <span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-64"></a>        s <span class="o">=</span> parts[w[<span class="mi">0</span>]<span class="o">+</span>i]
+<a name="ln-65"></a>        <span class="k">if</span> s <span class="k">ne</span> <span class="s1">&#39;&#39;</span> <span class="k">and</span> s <span class="k">ne</span> <span class="s1">&#39;=&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-66"></a>            time <span class="o">=</span> <span class="nb">float</span>(s)
+<a name="ln-67"></a>            <span class="k">break</span>
+<a name="ln-68"></a>        <span class="k">endif</span>
+<a name="ln-69"></a>        i <span class="o">=</span> i<span class="o">+</span><span class="mi">1</span>
+<a name="ln-70"></a>    <span class="k">endwhile</span>
+<a name="ln-71"></a>    data<span class="o">=</span><span class="nb">fltarr</span>(<span class="mi">4</span>,npts)
 <a name="ln-72"></a>    
-<a name="ln-73"></a>    <span class="s s-Atom">ready</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-74"></a>    <span class="s s-Atom">while</span> <span class="o">not</span> <span class="s s-Atom">ready</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-75"></a>        <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">line</span>  <span class="p">;</span> <span class="nv">Description</span> <span class="s s-Atom">line</span>
-<a name="ln-76"></a>        <span class="s s-Atom">pos</span><span class="o">=</span><span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">,</span><span class="s s-Atom">&#39;R(cm)&#39;</span><span class="p">)</span>
-<a name="ln-77"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">pos</span> <span class="s s-Atom">gt</span> <span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">ready</span><span class="o">=</span><span class="mi">1</span>
-<a name="ln-78"></a>    <span class="s s-Atom">endwhile</span>
+<a name="ln-73"></a>    ready<span class="o">=</span><span class="mi">0</span>
+<a name="ln-74"></a>    <span class="k">while</span> <span class="k">not</span> ready <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-75"></a>        readf,unit,line  ; Description line
+<a name="ln-76"></a>        pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;R(cm)&#39;</span>)
+<a name="ln-77"></a>        <span class="k">if</span> pos <span class="k">gt</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> ready<span class="o">=</span><span class="mi">1</span>
+<a name="ln-78"></a>    <span class="k">endwhile</span>
 <a name="ln-79"></a> 
-<a name="ln-80"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="nv">L</span><span class="p">,</span><span class="s s-Atom">npts</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-81"></a>        <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">unit</span><span class="p">,</span><span class="s s-Atom">line</span>           <span class="p">;</span> <span class="s s-Atom">read</span> <span class="s s-Atom">string</span>
-<a name="ln-82"></a>        <span class="s s-Atom">line</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">)</span>
-<a name="ln-83"></a>        <span class="s s-Atom">parts</span> <span class="o">=</span> <span class="nf">str_sep</span><span class="p">(</span><span class="s s-Atom">line</span><span class="p">,</span> <span class="s s-Atom">&#39; &#39;</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">np</span><span class="o">=</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">parts</span><span class="p">)</span>
-<a name="ln-84"></a>        <span class="s s-Atom">if</span> <span class="nf">parts</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">parts</span><span class="o">=</span><span class="nf">shift</span><span class="p">(</span><span class="s s-Atom">parts</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="s s-Atom">accommodate</span> <span class="s s-Atom">blank</span> <span class="s s-Atom">before</span> <span class="mi">1</span><span class="s s-Atom">st</span>
+<a name="ln-80"></a>    <span class="k">for</span> i<span class="o">=</span><span class="il">0L</span>,npts<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-81"></a>        readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
+<a name="ln-82"></a>        line<span class="o">=</span><span class="nb">strcompress</span>(line)
+<a name="ln-83"></a>        parts <span class="o">=</span> str_sep(line, <span class="s1">&#39; &#39;</span>) &amp; np<span class="o">=</span><span class="nb">n_elements</span>(parts)
+<a name="ln-84"></a>        <span class="k">if</span> parts(<span class="mi">0</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> parts<span class="o">=</span><span class="nb">shift</span>(parts,<span class="o">-</span><span class="mi">1</span>) ; accommodate blank before 1st
 <a name="ln-85"></a>
-<a name="ln-86"></a>        <span class="s s-Atom">while</span> <span class="nf">parts</span><span class="p">(</span><span class="s s-Atom">np</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">do</span> <span class="s s-Atom">np</span><span class="o">=</span><span class="s s-Atom">np</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-86"></a>        <span class="k">while</span> parts(np<span class="o">-</span><span class="mi">1</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">do</span> np<span class="o">=</span>np<span class="o">-</span><span class="mi">1</span>
 <a name="ln-87"></a>
-<a name="ln-88"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">np</span> <span class="s s-Atom">ne</span> <span class="mi">4</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-89"></a>            <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Wrong number of entries on line: &#39;</span><span class="o">+</span><span class="s s-Atom">line</span>
-<a name="ln-90"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-91"></a>            <span class="s s-Atom">data</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">parts</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:np</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<a name="ln-92"></a>        <span class="s s-Atom">endelse</span>
-<a name="ln-93"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">format=&#39;(f7.2,&quot;%&quot;,A,$)&#39;</span><span class="p">,</span><span class="mf">100.0</span><span class="s s-Atom">*</span><span class="p">(</span><span class="s s-Atom">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nf">float</span><span class="p">(</span><span class="s s-Atom">npts</span><span class="p">),</span><span class="nf">string</span><span class="p">(</span><span class="mi">13</span><span class="s s-Atom">b</span><span class="p">)</span>
-<a name="ln-94"></a>    <span class="s s-Atom">endfor</span>   
-<a name="ln-95"></a>    <span class="s s-Atom">free_lun</span><span class="p">,</span> <span class="s s-Atom">unit</span>
+<a name="ln-88"></a>        <span class="k">if</span> np <span class="k">ne</span> <span class="mi">4</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-89"></a>            error,<span class="s1">&#39;Wrong number of entries on line: &#39;</span><span class="o">+</span>line
+<a name="ln-90"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-91"></a>            data[<span class="o">*</span>,i]<span class="o">=</span>parts[<span class="mi">0</span><span class="o">:</span>np<span class="o">-</span><span class="mi">1</span>]
+<a name="ln-92"></a>        <span class="k">endelse</span>
+<a name="ln-93"></a>        <span class="nb">print</span>,format<span class="o">=</span><span class="s1">&#39;(f7.2,&quot;%&quot;,A,$)&#39;</span>,<span class="mf">100.0</span><span class="o">*</span>(i<span class="o">+</span><span class="mi">1</span>)<span class="o">/</span><span class="nb">float</span>(npts),<span class="nb">string</span>(<span class="m">13b</span>)
+<a name="ln-94"></a>    <span class="k">endfor</span>   
+<a name="ln-95"></a>    <span class="nb">free_lun</span>, unit
 <a name="ln-96"></a>
-<a name="ln-97"></a>    <span class="s s-Atom">r</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:npts</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-<a name="ln-98"></a>    <span class="s s-Atom">w</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">data</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:npts</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-<a name="ln-99"></a>    <span class="s s-Atom">pitch</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:npts</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span><span class="o">*</span><span class="s s-Atom">btipsign</span>
-<a name="ln-100"></a>    <span class="s s-Atom">energy</span><span class="o">=</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">data</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:npts</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="mf">1.</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">3</span> <span class="p">;</span><span class="s s-Atom">keV</span>
-<a name="ln-101"></a>    <span class="s s-Atom">orbit_class</span> <span class="o">=</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">npts</span><span class="p">)</span>
-<a name="ln-102"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">particle_weight</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-103"></a>        <span class="s s-Atom">particle_weight</span> <span class="o">=</span> <span class="s s-Atom">ntotal</span><span class="o">/</span><span class="nf">float</span><span class="p">(</span><span class="s s-Atom">npts</span><span class="p">)</span>
-<a name="ln-104"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-105"></a>    <span class="s s-Atom">weight</span> <span class="o">=</span> <span class="nf">replicate</span><span class="p">(</span><span class="s s-Atom">particle_weight</span><span class="p">,</span><span class="s s-Atom">npts</span><span class="p">)</span>
+<a name="ln-97"></a>    r<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">0</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
+<a name="ln-98"></a>    w<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">1</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
+<a name="ln-99"></a>    pitch<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">2</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))<span class="o">*</span>btipsign
+<a name="ln-100"></a>    energy<span class="o">=</span><span class="nb">reform</span>(data[<span class="mi">3</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>])<span class="o">*</span><span class="mf">1.d-3</span> ;keV
+<a name="ln-101"></a>    orbit_class <span class="o">=</span> <span class="nb">replicate</span>(<span class="mi">1</span>,npts)
+<a name="ln-102"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-103"></a>        particle_weight <span class="o">=</span> ntotal<span class="o">/</span><span class="nb">float</span>(npts)
+<a name="ln-104"></a>    <span class="k">endif</span>
+<a name="ln-105"></a>    weight <span class="o">=</span> <span class="nb">replicate</span>(particle_weight,npts)
 <a name="ln-106"></a>
-<a name="ln-107"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">e_range</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-108"></a>        <span class="s s-Atom">e_range</span> <span class="o">=</span> <span class="p">[</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">energy</span><span class="p">),</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">energy</span><span class="p">)]</span>
-<a name="ln-109"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-110"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">p_range</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-111"></a>        <span class="s s-Atom">p_range</span> <span class="o">=</span> <span class="p">[</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">pitch</span><span class="p">),</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">pitch</span><span class="p">)]</span>
-<a name="ln-112"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-107"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(e_range) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-108"></a>        e_range <span class="o">=</span> [<span class="nb">min</span>(energy),<span class="nb">max</span>(energy)]
+<a name="ln-109"></a>    <span class="k">endif</span>
+<a name="ln-110"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(p_range) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-111"></a>        p_range <span class="o">=</span> [<span class="nb">min</span>(pitch),<span class="nb">max</span>(pitch)]
+<a name="ln-112"></a>    <span class="k">endif</span>
 <a name="ln-113"></a>
-<a name="ln-114"></a>    <span class="s s-Atom">ww</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">energy</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">e_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">and</span> <span class="s s-Atom">energy</span> <span class="s s-Atom">le</span> <span class="s s-Atom">e_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-115"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-116"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;No particles fall in requested energy range&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-117"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-118"></a>    <span class="s s-Atom">wwp</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">pitch</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">p_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">and</span> <span class="s s-Atom">pitch</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]</span> <span class="s s-Atom">le</span> <span class="s s-Atom">p_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s s-Atom">nwp</span><span class="p">)</span>
-<a name="ln-119"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nwp</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-120"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;No particles fall in the requested pitch range&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-121"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-122"></a>    <span class="s s-Atom">ww</span> <span class="o">=</span> <span class="s s-Atom">ww</span><span class="p">[</span><span class="s s-Atom">wwp</span><span class="p">]</span>
-<a name="ln-123"></a>    <span class="s s-Atom">nw</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">ww</span><span class="p">)</span>
+<a name="ln-114"></a>    ww <span class="o">=</span> <span class="nb">where</span>(energy <span class="k">ge</span> e_range[<span class="mi">0</span>] <span class="k">and</span> energy <span class="k">le</span> e_range[<span class="mi">1</span>],nw)
+<a name="ln-115"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-116"></a>        error,<span class="s1">&#39;No particles fall in requested energy range&#39;</span>,<span class="o">/</span>halt
+<a name="ln-117"></a>    <span class="k">endif</span>
+<a name="ln-118"></a>    wwp <span class="o">=</span> <span class="nb">where</span>(pitch[ww] <span class="k">ge</span> p_range[<span class="mi">0</span>] <span class="k">and</span> pitch[ww] <span class="k">le</span> p_range[<span class="mi">1</span>],nwp)
+<a name="ln-119"></a>    <span class="k">if</span> nwp <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-120"></a>        error,<span class="s1">&#39;No particles fall in the requested pitch range&#39;</span>,<span class="o">/</span>halt
+<a name="ln-121"></a>    <span class="k">endif</span>
+<a name="ln-122"></a>    ww <span class="o">=</span> ww[wwp]
+<a name="ln-123"></a>    nw <span class="o">=</span> <span class="nb">n_elements</span>(ww)
 <a name="ln-124"></a>
-<a name="ln-125"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Time: &#39;</span><span class="p">,</span><span class="s s-Atom">time</span>  
-<a name="ln-126"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of markers: &#39;</span><span class="p">,</span><span class="s s-Atom">npts</span>
-<a name="ln-127"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of markers in phase space: &#39;</span><span class="p">,</span><span class="s s-Atom">nw</span>
-<a name="ln-128"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Total Number of Fast-ions in phase space: &#39;</span><span class="p">,</span><span class="s s-Atom">particle_weight</span><span class="o">*</span><span class="s s-Atom">nw</span>
+<a name="ln-125"></a>    <span class="nb">print</span>, <span class="s1">&#39;Time: &#39;</span>,time  
+<a name="ln-126"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers: &#39;</span>,npts
+<a name="ln-127"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers in phase space: &#39;</span>,nw
+<a name="ln-128"></a>    <span class="nb">print</span>, <span class="s1">&#39;Total Number of Fast-ions in phase space: &#39;</span>,particle_weight<span class="o">*</span>nw
 <a name="ln-129"></a>
-<a name="ln-130"></a>    <span class="s s-Atom">fbm_struct</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nn">time</span><span class="p">:</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">time</span><span class="p">),</span><span class="s s-Atom">data_source:</span><span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">infile</span><span class="p">),</span> <span class="err">$</span>
-<a name="ln-131"></a>                  <span class="nn">nparticle</span><span class="p">:</span><span class="nf">long</span><span class="p">(</span><span class="s s-Atom">nw</span><span class="p">),</span><span class="nn">nclass</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nn">r</span><span class="p">:</span><span class="s s-Atom">r</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">z</span><span class="p">:</span><span class="s s-Atom">w</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="err">$</span>
-<a name="ln-132"></a>                  <span class="nn">energy</span><span class="p">:</span><span class="s s-Atom">energy</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">pitch</span><span class="p">:</span><span class="s s-Atom">pitch</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">class</span><span class="p">:</span><span class="s s-Atom">orbit_class</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="err">$</span>
-<a name="ln-133"></a>                  <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">weight</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]}</span>
+<a name="ln-130"></a>    fbm_struct <span class="o">=</span> {type<span class="o">:</span><span class="mi">2</span>,time<span class="o">:</span><span class="nb">double</span>(time),data_source<span class="o">:</span><span class="nb">file_expand_path</span>(infile), $
+<a name="ln-131"></a>                  nparticle<span class="o">:</span><span class="nb">long</span>(nw),nclass<span class="o">:</span><span class="mi">1</span>,r<span class="o">:</span>r[ww],z<span class="o">:</span>w[ww],$
+<a name="ln-132"></a>                  energy<span class="o">:</span>energy[ww],pitch<span class="o">:</span>pitch[ww],class<span class="o">:</span>orbit_class[ww],$
+<a name="ln-133"></a>                  weight<span class="o">:</span>weight[ww]}
 <a name="ln-134"></a>
-<a name="ln-135"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">fbm_struct</span>
-<a name="ln-136"></a><span class="nv">END</span>
+<a name="ln-135"></a>    <span class="nb">return</span>, fbm_struct
+<a name="ln-136"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -400,7 +400,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

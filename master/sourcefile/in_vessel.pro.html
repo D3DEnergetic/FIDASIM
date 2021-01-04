@@ -203,7 +203,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>0 for false, 1 for true</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> inv <span class="o">=</span> in_vessel(rwall,zwall,r,z)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> inv <span class="o">=</span> in_vessel(rwall,zwall,r,z)
 </code></pre></div>
       <br>
     
@@ -249,74 +249,74 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">is_left</span><span class="p">,</span> <span class="s s-Atom">p0</span><span class="p">,</span> <span class="s s-Atom">p1</span><span class="p">,</span> <span class="s s-Atom">p2</span>
-<a name="ln-2"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="p">((</span><span class="s s-Atom">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="s s-Atom">*</span><span class="p">(</span><span class="s s-Atom">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="p">(</span><span class="s s-Atom">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="s s-Atom">*</span><span class="p">(</span><span class="s s-Atom">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-<a name="ln-3"></a><span class="nv">END</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> is_left, p0, p1, p2
+<a name="ln-2"></a>    <span class="nb">return</span>, ((p1[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p2[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]) <span class="o">-</span> (p2[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p1[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]))
+<a name="ln-3"></a><span class="k">END</span>
 <a name="ln-4"></a>
-<a name="ln-5"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">in_vessel</span><span class="p">,</span> <span class="s s-Atom">rwall</span><span class="p">,</span> <span class="s s-Atom">zwall</span><span class="p">,</span> <span class="s s-Atom">r</span><span class="p">,</span> <span class="s s-Atom">z</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="s s-Atom">+#in_vessel</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Calculates</span> <span class="s s-Atom">whether</span> <span class="s s-Atom">a</span> <span class="s s-Atom">given</span> <span class="s s-Atom">r</span><span class="p">,</span><span class="s s-Atom">z</span> <span class="o">is</span> <span class="s s-Atom">within</span> <span class="s s-Atom">the</span> <span class="s s-Atom">vessel</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rwall**:</span> <span class="s s-Atom">r</span> <span class="s s-Atom">values</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">wall</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zwall**:</span> <span class="s s-Atom">z</span> <span class="s s-Atom">values</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">wall</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**r**:</span> <span class="s s-Atom">r</span> <span class="s s-Atom">values</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**z**:</span> <span class="s s-Atom">z</span> <span class="s s-Atom">values</span>
-<a name="ln-17"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-18"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-19"></a>    <span class="p">;</span><span class="o">+</span>    <span class="mi">0</span> <span class="s s-Atom">for</span> <span class="s s-Atom">false</span><span class="p">,</span> <span class="mi">1</span> <span class="s s-Atom">for</span> <span class="s s-Atom">true</span>
-<a name="ln-20"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-21"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-22"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-23"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">inv</span> <span class="o">=</span> <span class="nf">in_vessel</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span><span class="p">,</span><span class="s s-Atom">r</span><span class="p">,</span><span class="s s-Atom">z</span><span class="p">)</span>
-<a name="ln-24"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-5"></a><span class="k">FUNCTION</span> in_vessel, rwall, zwall, r, z
+<a name="ln-6"></a><span class="c1">    ;+#in_vessel</span>
+<a name="ln-7"></a><span class="c1">    ;+Calculates whether a given r,z is within the vessel</span>
+<a name="ln-8"></a><span class="c1">    ;+***</span>
+<a name="ln-9"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-10"></a><span class="c1">    ;+    **rwall**: r values of the wall</span>
+<a name="ln-11"></a><span class="c1">    ;+</span>
+<a name="ln-12"></a><span class="c1">    ;+    **zwall**: z values of the wall</span>
+<a name="ln-13"></a><span class="c1">    ;+</span>
+<a name="ln-14"></a><span class="c1">    ;+    **r**: r values</span>
+<a name="ln-15"></a><span class="c1">    ;+</span>
+<a name="ln-16"></a><span class="c1">    ;+    **z**: z values</span>
+<a name="ln-17"></a><span class="c1">    ;+</span>
+<a name="ln-18"></a><span class="c1">    ;+##Return Value</span>
+<a name="ln-19"></a><span class="c1">    ;+    0 for false, 1 for true</span>
+<a name="ln-20"></a><span class="c1">    ;+</span>
+<a name="ln-21"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-22"></a><span class="c1">    ;+```idl</span>
+<a name="ln-23"></a><span class="c1">    ;+IDL&gt; inv = in_vessel(rwall,zwall,r,z)</span>
+<a name="ln-24"></a><span class="c1">    ;+```</span>
 <a name="ln-25"></a>
-<a name="ln-26"></a>    <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">zwall</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-27"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s2">&quot;rwall and zwall must have the same number of elements&quot;</span>
-<a name="ln-28"></a>        <span class="s s-Atom">stop</span>
-<a name="ln-29"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-30"></a>    <span class="s s-Atom">nv</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span>
-<a name="ln-31"></a>    <span class="s s-Atom">v</span> <span class="o">=</span> <span class="p">[[</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">nv</span><span class="p">)],[</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">zwall</span><span class="p">,</span><span class="s s-Atom">nv</span><span class="p">)]]</span>
+<a name="ln-26"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(rwall) <span class="k">ne</span> <span class="nb">n_elements</span>(zwall) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-27"></a>        error, <span class="s2">&quot;rwall and zwall must have the same number of elements&quot;</span>
+<a name="ln-28"></a>        <span class="nb">stop</span>
+<a name="ln-29"></a>    <span class="k">endif</span>
+<a name="ln-30"></a>    nv <span class="o">=</span> <span class="nb">n_elements</span>(rwall)
+<a name="ln-31"></a>    v <span class="o">=</span> [[<span class="nb">reform</span>(rwall,nv)],[<span class="nb">reform</span>(zwall,nv)]]
 <a name="ln-32"></a>
-<a name="ln-33"></a>    <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">r</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-34"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s2">&quot;r and z must have the same number of elements&quot;</span>
-<a name="ln-35"></a>        <span class="s s-Atom">stop</span>
-<a name="ln-36"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-37"></a>    <span class="s s-Atom">np</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">r</span><span class="p">)</span>
-<a name="ln-38"></a>    <span class="s s-Atom">dims</span> <span class="o">=</span> <span class="nf">size</span><span class="p">(</span><span class="s s-Atom">r</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">d</span><span class="p">)</span>
-<a name="ln-39"></a>    <span class="s s-Atom">rr</span> <span class="o">=</span> <span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">r</span><span class="p">,</span><span class="s s-Atom">np</span><span class="p">)</span>
-<a name="ln-40"></a>    <span class="s s-Atom">zz</span> <span class="o">=</span> <span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">z</span><span class="p">,</span><span class="s s-Atom">np</span><span class="p">)</span>
+<a name="ln-33"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(r) <span class="k">ne</span> <span class="nb">n_elements</span>(z) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-34"></a>        error, <span class="s2">&quot;r and z must have the same number of elements&quot;</span>
+<a name="ln-35"></a>        <span class="nb">stop</span>
+<a name="ln-36"></a>    <span class="k">endif</span>
+<a name="ln-37"></a>    np <span class="o">=</span> <span class="nb">n_elements</span>(r)
+<a name="ln-38"></a>    dims <span class="o">=</span> <span class="nb">size</span>(r,<span class="o">/</span>d)
+<a name="ln-39"></a>    rr <span class="o">=</span> <span class="nb">reform</span>(r,np)
+<a name="ln-40"></a>    zz <span class="o">=</span> <span class="nb">reform</span>(z,np)
 <a name="ln-41"></a>
-<a name="ln-42"></a>    <span class="s s-Atom">inv</span> <span class="o">=</span> <span class="nf">intarr</span><span class="p">(</span><span class="s s-Atom">np</span><span class="p">)</span>
-<a name="ln-43"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">ip</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="s s-Atom">np</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-44"></a>        <span class="s s-Atom">p</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">rr</span><span class="p">[</span><span class="s s-Atom">ip</span><span class="p">],</span> <span class="s s-Atom">zz</span><span class="p">[</span><span class="s s-Atom">ip</span><span class="p">]]</span>
+<a name="ln-42"></a>    inv <span class="o">=</span> <span class="nb">intarr</span>(np)
+<a name="ln-43"></a>    <span class="k">for</span> ip<span class="o">=</span><span class="mi">0</span>, np<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-44"></a>        p <span class="o">=</span> [rr[ip], zz[ip]]
 <a name="ln-45"></a>
-<a name="ln-46"></a>        <span class="s s-Atom">wn</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-47"></a>        <span class="s s-Atom">for</span> <span class="s s-Atom">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="s s-Atom">nv</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-48"></a>            <span class="s s-Atom">i1</span> <span class="o">=</span> <span class="p">(</span><span class="s s-Atom">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">mod</span> <span class="s s-Atom">nv</span>
-<a name="ln-49"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">le</span> <span class="s s-Atom">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-50"></a>                <span class="s s-Atom">if</span> <span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="s s-Atom">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-51"></a>                    <span class="s s-Atom">if</span> <span class="nf">is_left</span><span class="p">(</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="s s-Atom">p</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-52"></a>                        <span class="s s-Atom">wn</span> <span class="o">=</span> <span class="s s-Atom">wn</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-53"></a>                    <span class="s s-Atom">endif</span>
-<a name="ln-54"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-55"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-56"></a>                <span class="s s-Atom">if</span> <span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">le</span> <span class="s s-Atom">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-57"></a>                    <span class="s s-Atom">if</span> <span class="nf">is_left</span><span class="p">(</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">i1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="s s-Atom">p</span><span class="p">)</span> <span class="s s-Atom">lt</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-58"></a>                        <span class="s s-Atom">wn</span> <span class="o">=</span> <span class="s s-Atom">wn</span> <span class="o">-</span> <span class="mi">1</span>
-<a name="ln-59"></a>                    <span class="s s-Atom">endif</span>
-<a name="ln-60"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-61"></a>            <span class="s s-Atom">endelse</span>
-<a name="ln-62"></a>        <span class="s s-Atom">endfor</span>
+<a name="ln-46"></a>        wn <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-47"></a>        <span class="k">for</span> i <span class="o">=</span> <span class="mi">0</span>, nv<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-48"></a>            i1 <span class="o">=</span> (i <span class="o">+</span> <span class="mi">1</span>) <span class="k">mod</span> nv
+<a name="ln-49"></a>            <span class="k">if</span> v[i,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-50"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">gt</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-51"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">gt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-52"></a>                        wn <span class="o">=</span> wn <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-53"></a>                    <span class="k">endif</span>
+<a name="ln-54"></a>                <span class="k">endif</span>
+<a name="ln-55"></a>            <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-56"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-57"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">lt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-58"></a>                        wn <span class="o">=</span> wn <span class="o">-</span> <span class="mi">1</span>
+<a name="ln-59"></a>                    <span class="k">endif</span>
+<a name="ln-60"></a>                <span class="k">endif</span>
+<a name="ln-61"></a>            <span class="k">endelse</span>
+<a name="ln-62"></a>        <span class="k">endfor</span>
 <a name="ln-63"></a>
-<a name="ln-64"></a>        <span class="s s-Atom">inv</span><span class="p">[</span><span class="s s-Atom">ip</span><span class="p">]</span> <span class="o">=</span> <span class="s s-Atom">wn</span> <span class="s s-Atom">ne</span> <span class="mi">0</span>
-<a name="ln-65"></a>    <span class="s s-Atom">endfor</span>
+<a name="ln-64"></a>        inv[ip] <span class="o">=</span> wn <span class="k">ne</span> <span class="mi">0</span>
+<a name="ln-65"></a>    <span class="k">endfor</span>
 <a name="ln-66"></a>
-<a name="ln-67"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">inv</span><span class="p">,</span><span class="s s-Atom">dims</span><span class="p">)</span>
-<a name="ln-68"></a><span class="nv">END</span>
+<a name="ln-67"></a>    <span class="nb">return</span>, <span class="nb">reform</span>(inv,dims)
+<a name="ln-68"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -329,7 +329,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

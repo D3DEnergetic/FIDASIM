@@ -200,7 +200,7 @@
 <h2 id="keyword-arguments">Keyword Arguments</h2>
 <p><strong>halt</strong>: Halt program execution</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> error, <span class="s2">&quot;=(&quot;</span>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> error, <span class="s2">&quot;=(&quot;</span>
 </code></pre></div>
       <br>
     
@@ -246,26 +246,26 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">halt</span><span class="o">=</span><span class="s s-Atom">halt</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#error</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Print</span> <span class="s s-Atom">a</span> <span class="s s-Atom">error</span> <span class="s s-Atom">message</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**str**:</span> <span class="s s-Atom">message</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**halt**:</span> <span class="nv">Halt</span> <span class="s s-Atom">program</span> <span class="s s-Atom">execution</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">error</span><span class="p">,</span> <span class="s2">&quot;=(&quot;</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-15"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">halt</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-16"></a>        <span class="s s-Atom">message</span><span class="p">,</span> <span class="nf">colored</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">c=&#39;r&#39;</span><span class="p">),</span><span class="s s-Atom">level=-</span><span class="mi">1</span>
-<a name="ln-17"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-18"></a>        <span class="s s-Atom">print</span><span class="p">,</span> <span class="nf">colored</span><span class="p">(</span><span class="s s-Atom">&#39;ERROR: &#39;</span><span class="o">+</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">c=&#39;r&#39;</span><span class="p">)</span>
-<a name="ln-19"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-20"></a><span class="nv">END</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> error, str,halt<span class="o">=</span>halt
+<a name="ln-2"></a><span class="c1">    ;+#error</span>
+<a name="ln-3"></a><span class="c1">    ;+Print a error message</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+     **str**: message</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a name="ln-9"></a><span class="c1">    ;+     **halt**: Halt program execution</span>
+<a name="ln-10"></a><span class="c1">    ;+</span>
+<a name="ln-11"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-12"></a><span class="c1">    ;+```idl</span>
+<a name="ln-13"></a><span class="c1">    ;+IDL&gt; error, &quot;=(&quot;</span>
+<a name="ln-14"></a><span class="c1">    ;+```</span>
+<a name="ln-15"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(halt) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-16"></a>        <span class="nb">message</span>, colored(str,c<span class="o">=</span><span class="s1">&#39;r&#39;</span>),level<span class="o">=-</span><span class="mi">1</span>
+<a name="ln-17"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-18"></a>        <span class="nb">print</span>, colored(<span class="s1">&#39;ERROR: &#39;</span><span class="o">+</span>str,c<span class="o">=</span><span class="s1">&#39;r&#39;</span>)
+<a name="ln-19"></a>    <span class="k">endelse</span>
+<a name="ln-20"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -278,7 +278,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

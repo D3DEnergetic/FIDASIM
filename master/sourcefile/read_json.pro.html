@@ -200,7 +200,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Structure containg JSON values</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> json_struct <span class="o">=</span> read_json(<span class="s2">&quot;./file.json&quot;</span>)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> json_struct <span class="o">=</span> read_json(<span class="s2">&quot;./file.json&quot;</span>)
 </code></pre></div>
       <br>
     
@@ -246,112 +246,112 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">tokenize</span><span class="p">,</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">regex</span>
-<a name="ln-2"></a>	<span class="p">;;;</span> <span class="nv">Splits</span> <span class="s s-Atom">string</span> <span class="s s-Atom">into</span> <span class="s s-Atom">tokens</span> <span class="s s-Atom">according</span> <span class="s s-Atom">to</span> <span class="s s-Atom">regex</span> <span class="p">;;;</span>
-<a name="ln-3"></a>    <span class="s s-Atom">json</span><span class="o">=</span><span class="s s-Atom">str</span>
-<a name="ln-4"></a>    <span class="s s-Atom">group</span><span class="o">=</span><span class="p">[]</span>
-<a name="ln-5"></a>    <span class="s s-Atom">start</span><span class="o">=</span><span class="p">[]</span>
-<a name="ln-6"></a>    <span class="s s-Atom">finish</span><span class="o">=</span><span class="p">[]</span>
-<a name="ln-7"></a>    <span class="s s-Atom">cnt</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-8"></a>    <span class="s s-Atom">while</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">,</span><span class="s s-Atom">regex</span><span class="p">,</span><span class="o">/</span><span class="nv">BOOLEAN</span><span class="p">)</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-9"></a>        <span class="s s-Atom">pos</span><span class="o">=</span><span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">,</span><span class="s s-Atom">regex</span><span class="p">,</span><span class="s s-Atom">length</span><span class="o">=</span><span class="s s-Atom">len</span><span class="p">)</span>
-<a name="ln-10"></a>        <span class="s s-Atom">tmp</span><span class="o">=</span><span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">,</span><span class="s s-Atom">pos</span><span class="p">,</span><span class="s s-Atom">len</span><span class="p">)</span>
-<a name="ln-11"></a>        <span class="s s-Atom">group</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">group</span><span class="p">,</span><span class="s s-Atom">tmp</span><span class="p">]</span>
-<a name="ln-12"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">cnt</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-13"></a>            <span class="s s-Atom">start</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">start</span><span class="p">,</span><span class="s s-Atom">pos</span><span class="p">]</span>
-<a name="ln-14"></a>            <span class="s s-Atom">finish</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">finish</span><span class="p">,</span><span class="s s-Atom">pos</span><span class="o">+</span><span class="s s-Atom">len</span><span class="p">]</span>
-<a name="ln-15"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-16"></a>            <span class="s s-Atom">start</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">start</span><span class="p">,</span><span class="s s-Atom">finish</span><span class="p">[</span><span class="s s-Atom">cnt</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s s-Atom">pos</span><span class="p">]</span>
-<a name="ln-17"></a>            <span class="s s-Atom">finish</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">finish</span><span class="p">,</span><span class="s s-Atom">finish</span><span class="p">[</span><span class="s s-Atom">cnt</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s s-Atom">pos</span><span class="o">+</span><span class="s s-Atom">len</span><span class="p">]</span>
-<a name="ln-18"></a>        <span class="s s-Atom">endelse</span>
-<a name="ln-19"></a>        <span class="s s-Atom">json</span><span class="o">=</span><span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">,</span><span class="s s-Atom">pos</span><span class="o">+</span><span class="s s-Atom">len</span><span class="p">,</span><span class="nf">strlen</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">))</span>
-<a name="ln-20"></a>        <span class="s s-Atom">cnt+=</span><span class="mi">1</span>
-<a name="ln-21"></a>    <span class="s s-Atom">endwhile</span>
-<a name="ln-22"></a>    <span class="s s-Atom">return</span><span class="p">,{</span><span class="nn">group</span><span class="p">:</span><span class="s s-Atom">group</span><span class="p">,</span><span class="nn">start</span><span class="p">:</span><span class="s s-Atom">start</span><span class="p">,</span><span class="nn">finish</span><span class="p">:</span><span class="s s-Atom">finish</span><span class="p">}</span>   
-<a name="ln-23"></a><span class="nv">END</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> tokenize,str,regex
+<a name="ln-2"></a><span class="c1">	;;; Splits string into tokens according to regex ;;;</span>
+<a name="ln-3"></a>    json<span class="o">=</span>str
+<a name="ln-4"></a>    group<span class="o">=</span>[]
+<a name="ln-5"></a>    start<span class="o">=</span>[]
+<a name="ln-6"></a>    finish<span class="o">=</span>[]
+<a name="ln-7"></a>    cnt<span class="o">=</span><span class="mi">0</span>
+<a name="ln-8"></a>    <span class="k">while</span> <span class="nb">stregex</span>(json,regex,<span class="o">/</span>BOOLEAN) <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-9"></a>        pos<span class="o">=</span><span class="nb">stregex</span>(json,regex,length<span class="o">=</span>len)
+<a name="ln-10"></a>        tmp<span class="o">=</span><span class="nb">strmid</span>(json,pos,len)
+<a name="ln-11"></a>        group<span class="o">=</span>[group,tmp]
+<a name="ln-12"></a>        <span class="k">if</span> cnt <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-13"></a>            start<span class="o">=</span>[start,pos]
+<a name="ln-14"></a>            finish<span class="o">=</span>[finish,pos<span class="o">+</span>len]
+<a name="ln-15"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-16"></a>            start<span class="o">=</span>[start,finish[cnt<span class="o">-</span><span class="mi">1</span>]<span class="o">+</span>pos]
+<a name="ln-17"></a>            finish<span class="o">=</span>[finish,finish[cnt<span class="o">-</span><span class="mi">1</span>]<span class="o">+</span>pos<span class="o">+</span>len]
+<a name="ln-18"></a>        <span class="k">endelse</span>
+<a name="ln-19"></a>        json<span class="o">=</span><span class="nb">strmid</span>(json,pos<span class="o">+</span>len,<span class="nb">strlen</span>(json))
+<a name="ln-20"></a>        cnt<span class="o">+=</span><span class="mi">1</span>
+<a name="ln-21"></a>    <span class="k">endwhile</span>
+<a name="ln-22"></a>    <span class="nb">return</span>,{group<span class="o">:</span>group,start<span class="o">:</span>start,finish<span class="o">:</span>finish}   
+<a name="ln-23"></a><span class="k">END</span>
 <a name="ln-24"></a>
-<a name="ln-25"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">json_minify</span><span class="p">,</span><span class="s s-Atom">str</span>
-<a name="ln-26"></a>    <span class="p">;;;</span> <span class="nv">Strips</span> <span class="s s-Atom">out</span> <span class="nv">C</span> <span class="s s-Atom">like</span> <span class="s s-Atom">comments</span> <span class="s s-Atom">out</span> <span class="s s-Atom">of</span> <span class="nv">JSON</span> <span class="s s-Atom">string</span> <span class="p">;;;</span>
-<a name="ln-27"></a>    <span class="p">;;;</span> <span class="nv">Based</span> <span class="s s-Atom">of</span> <span class="nv">JSON</span><span class="p">.</span><span class="s s-Atom">minify</span> <span class="nn">https</span><span class="p">:</span><span class="o">//</span><span class="s s-Atom">github</span><span class="p">.</span><span class="s s-Atom">com</span><span class="o">/</span><span class="s s-Atom">getify</span><span class="o">/</span><span class="nv">JSON</span><span class="p">.</span><span class="s s-Atom">minify</span> <span class="p">;;;</span>
-<a name="ln-28"></a>    <span class="s s-Atom">regex=&#39;&quot;|(#=)|(=#)|(#)|&#39;</span><span class="o">+</span><span class="nf">string</span><span class="p">(</span><span class="mi">10</span><span class="s s-Atom">b</span><span class="p">)</span><span class="s s-Atom">+&#39;|&#39;</span><span class="o">+</span><span class="nf">string</span><span class="p">(</span><span class="mi">13</span><span class="s s-Atom">b</span><span class="p">)</span>
-<a name="ln-29"></a>    <span class="s s-Atom">slashes=&#39;(\\)*$&#39;</span>
+<a name="ln-25"></a><span class="k">FUNCTION</span> json_minify,str
+<a name="ln-26"></a><span class="c1">    ;;; Strips out C like comments out of JSON string ;;;</span>
+<a name="ln-27"></a><span class="c1">    ;;; Based of JSON.minify https://github.com/getify/JSON.minify ;;;</span>
+<a name="ln-28"></a>    regex<span class="o">=</span><span class="s1">&#39;&quot;|(#=)|(=#)|(#)|&#39;</span><span class="o">+</span><span class="nb">string</span>(<span class="m">10b</span>)<span class="o">+</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="nb">string</span>(<span class="m">13b</span>)
+<a name="ln-29"></a>    slashes<span class="o">=</span><span class="s1">&#39;(\\)*$&#39;</span>
 <a name="ln-30"></a>
-<a name="ln-31"></a>    <span class="s s-Atom">in_string</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-32"></a>    <span class="s s-Atom">in_multi</span> <span class="o">=</span> <span class="mi">0</span> 
-<a name="ln-33"></a>    <span class="s s-Atom">in_single</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-34"></a>    <span class="s s-Atom">new_str=&#39;&#39;</span>
-<a name="ln-35"></a>    <span class="s s-Atom">index</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-36"></a>    <span class="s s-Atom">tokenizer</span><span class="o">=</span><span class="nf">tokenize</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">regex</span><span class="p">)</span>
+<a name="ln-31"></a>    in_string <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-32"></a>    in_multi <span class="o">=</span> <span class="mi">0</span> 
+<a name="ln-33"></a>    in_single <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-34"></a>    new_str<span class="o">=</span><span class="s1">&#39;&#39;</span>
+<a name="ln-35"></a>    index<span class="o">=</span><span class="mi">0</span>
+<a name="ln-36"></a>    tokenizer<span class="o">=</span>tokenize(str,regex)
 <a name="ln-37"></a> 
-<a name="ln-38"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">tokenizer</span><span class="p">.</span><span class="s s-Atom">group</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-38"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,<span class="nb">n_elements</span>(tokenizer.group)<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
 <a name="ln-39"></a>        
-<a name="ln-40"></a>        <span class="s s-Atom">if</span> <span class="o">not</span> <span class="p">(</span><span class="s s-Atom">in_multi</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_single</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-41"></a>             <span class="s s-Atom">tmp</span><span class="o">=</span><span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">index</span><span class="p">,</span><span class="s s-Atom">tokenizer</span><span class="p">.</span><span class="s s-Atom">start</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">)</span>
-<a name="ln-42"></a>             <span class="s s-Atom">if</span> <span class="o">not</span> <span class="s s-Atom">in_string</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-43"></a>                 <span class="s s-Atom">tmp</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="s s-Atom">tmp</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">remove_all</span><span class="p">)</span>
-<a name="ln-44"></a>                 <span class="s s-Atom">tmp</span><span class="o">=</span><span class="nf">strjoin</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">tmp</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">10</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">regex</span><span class="p">),</span><span class="s s-Atom">&#39;&#39;</span><span class="p">)</span>
-<a name="ln-45"></a>                 <span class="s s-Atom">tmp</span><span class="o">=</span><span class="nf">strjoin</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">tmp</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">13</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">regex</span><span class="p">),</span><span class="s s-Atom">&#39;&#39;</span><span class="p">)</span>                
-<a name="ln-46"></a>             <span class="s s-Atom">endif</span>
-<a name="ln-47"></a>             <span class="s s-Atom">new_str+=tmp</span>
-<a name="ln-48"></a>        <span class="s s-Atom">endif</span>
+<a name="ln-40"></a>        <span class="k">if</span> <span class="k">not</span> (in_multi <span class="k">or</span> in_single) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-41"></a>             tmp<span class="o">=</span><span class="nb">strmid</span>(str,index,tokenizer.start[i]<span class="o">-</span>index)
+<a name="ln-42"></a>             <span class="k">if</span> <span class="k">not</span> in_string <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-43"></a>                 tmp<span class="o">=</span><span class="nb">strcompress</span>(tmp,<span class="o">/</span>remove_all)
+<a name="ln-44"></a>                 tmp<span class="o">=</span><span class="nb">strjoin</span>(<span class="nb">strsplit</span>(tmp,<span class="nb">string</span>(<span class="m">10b</span>),<span class="o">/</span>extract,<span class="o">/</span>regex),<span class="s1">&#39;&#39;</span>)
+<a name="ln-45"></a>                 tmp<span class="o">=</span><span class="nb">strjoin</span>(<span class="nb">strsplit</span>(tmp,<span class="nb">string</span>(<span class="m">13b</span>),<span class="o">/</span>extract,<span class="o">/</span>regex),<span class="s1">&#39;&#39;</span>)                
+<a name="ln-46"></a>             <span class="k">endif</span>
+<a name="ln-47"></a>             new_str<span class="o">+=</span>tmp
+<a name="ln-48"></a>        <span class="k">endif</span>
 <a name="ln-49"></a>
-<a name="ln-50"></a>        <span class="s s-Atom">index</span><span class="o">=</span><span class="s s-Atom">tokenizer</span><span class="p">.</span><span class="s s-Atom">finish</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-51"></a>        <span class="s s-Atom">val</span><span class="o">=</span><span class="s s-Atom">tokenizer</span><span class="p">.</span><span class="s s-Atom">group</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
+<a name="ln-50"></a>        index<span class="o">=</span>tokenizer.finish[i]
+<a name="ln-51"></a>        val<span class="o">=</span>tokenizer.group[i]
 <a name="ln-52"></a>
-<a name="ln-53"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">val</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&quot;&#39;</span> <span class="s s-Atom">and</span> <span class="o">not</span> <span class="p">(</span><span class="s s-Atom">in_multi</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_single</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-54"></a>            <span class="s s-Atom">escaped</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">tokenizer</span><span class="p">.</span><span class="s s-Atom">start</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]),</span><span class="s s-Atom">slashes</span><span class="p">,</span><span class="o">/</span><span class="nv">EXTRACT</span><span class="p">)</span>
-<a name="ln-55"></a>            <span class="s s-Atom">if</span> <span class="o">not</span> <span class="s s-Atom">in_string</span> <span class="nf">or</span> <span class="p">(</span><span class="s s-Atom">escaped</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">or</span> <span class="nf">strlen</span><span class="p">(</span><span class="s s-Atom">escaped</span><span class="p">)</span> <span class="o">mod</span> <span class="mi">2</span> <span class="s s-Atom">eq</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">in_string</span> <span class="o">=</span> <span class="o">not</span> <span class="s s-Atom">in_string</span>
-<a name="ln-56"></a>            <span class="s s-Atom">index-=</span><span class="mi">1</span>
+<a name="ln-53"></a>        <span class="k">if</span> val <span class="k">eq</span> <span class="s1">&#39;&quot;&#39;</span> <span class="k">and</span> <span class="k">not</span> (in_multi <span class="k">or</span> in_single) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-54"></a>            escaped <span class="o">=</span> <span class="nb">stregex</span>(<span class="nb">strmid</span>(str,<span class="mi">0</span>,tokenizer.start[i]),slashes,<span class="o">/</span>EXTRACT)
+<a name="ln-55"></a>            <span class="k">if</span> <span class="k">not</span> in_string <span class="k">or</span> (escaped <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">or</span> <span class="nb">strlen</span>(escaped) <span class="k">mod</span> <span class="mi">2</span> <span class="k">eq</span> <span class="mi">0</span>) <span class="k">then</span> in_string <span class="o">=</span> <span class="k">not</span> in_string
+<a name="ln-56"></a>            index<span class="o">-=</span><span class="mi">1</span>
 <a name="ln-57"></a>
-<a name="ln-58"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">if</span> <span class="o">not</span> <span class="p">(</span><span class="s s-Atom">in_string</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_multi</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_single</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-59"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">val</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;#=&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">in_multi</span> <span class="o">=</span> <span class="mi">1</span> <span class="s s-Atom">else</span> <span class="s s-Atom">if</span> <span class="s s-Atom">val</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;#&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">in_single</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-58"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">if</span> <span class="k">not</span> (in_string <span class="k">or</span> in_multi <span class="k">or</span> in_single) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-59"></a>            <span class="k">if</span> val <span class="k">eq</span> <span class="s1">&#39;#=&#39;</span> <span class="k">then</span> in_multi <span class="o">=</span> <span class="mi">1</span> <span class="k">else</span> <span class="k">if</span> val <span class="k">eq</span> <span class="s1">&#39;#&#39;</span> <span class="k">then</span> in_single<span class="o">=</span><span class="mi">1</span>
 <a name="ln-60"></a>
-<a name="ln-61"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">if</span> <span class="s s-Atom">val</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;=#&#39;</span> <span class="s s-Atom">and</span> <span class="s s-Atom">in_multi</span> <span class="s s-Atom">and</span> <span class="o">not</span> <span class="p">(</span><span class="s s-Atom">in_string</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_single</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-62"></a>            <span class="s s-Atom">in_multi</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-63"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="nf">if</span> <span class="p">(</span><span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">10</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">)</span> <span class="s s-Atom">or</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">13</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">))</span> <span class="err">$</span>
-<a name="ln-64"></a>                      <span class="s s-Atom">and</span> <span class="o">not</span> <span class="p">(</span><span class="s s-Atom">in_multi</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_string</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="s s-Atom">in_single</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-65"></a>            <span class="s s-Atom">in_single</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-66"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">if</span> <span class="o">not</span> <span class="p">((</span><span class="s s-Atom">in_multi</span> <span class="s s-Atom">or</span> <span class="s s-Atom">in_single</span><span class="p">)</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-67"></a>                      <span class="p">(</span><span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">10</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">)</span> <span class="s s-Atom">or</span> <span class="err">$</span> 
-<a name="ln-68"></a>                       <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">13</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">)</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-69"></a>                       <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">9</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">)</span>  <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-70"></a>                       <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">val</span><span class="p">,</span><span class="nf">string</span><span class="p">(</span><span class="mi">32</span><span class="s s-Atom">b</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">boolean</span><span class="p">)</span> <span class="p">))</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-71"></a>            <span class="s s-Atom">new_str+=val</span>
-<a name="ln-72"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-73"></a>    <span class="s s-Atom">endfor</span>            
-<a name="ln-74"></a>    <span class="s s-Atom">new_str+=</span><span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">,</span><span class="s s-Atom">index</span><span class="p">,</span><span class="nf">strlen</span><span class="p">(</span><span class="s s-Atom">str</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">index</span><span class="p">)</span>
+<a name="ln-61"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">if</span> val <span class="k">eq</span> <span class="s1">&#39;=#&#39;</span> <span class="k">and</span> in_multi <span class="k">and</span> <span class="k">not</span> (in_string <span class="k">or</span> in_single) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-62"></a>            in_multi<span class="o">=</span><span class="mi">0</span>
+<a name="ln-63"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">if</span> (<span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">10b</span>),<span class="o">/</span>boolean) <span class="k">or</span> <span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">13b</span>),<span class="o">/</span>boolean)) $
+<a name="ln-64"></a>                      <span class="k">and</span> <span class="k">not</span> (in_multi <span class="k">or</span> in_string) <span class="k">and</span> in_single <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-65"></a>            in_single<span class="o">=</span><span class="mi">0</span>
+<a name="ln-66"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">if</span> <span class="k">not</span> ((in_multi <span class="k">or</span> in_single) <span class="k">or</span> $
+<a name="ln-67"></a>                      (<span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">10b</span>),<span class="o">/</span>boolean) <span class="k">or</span> $ 
+<a name="ln-68"></a>                       <span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">13b</span>),<span class="o">/</span>boolean) <span class="k">or</span> $
+<a name="ln-69"></a>                       <span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">9b</span>),<span class="o">/</span>boolean)  <span class="k">or</span> $
+<a name="ln-70"></a>                       <span class="nb">stregex</span>(val,<span class="nb">string</span>(<span class="m">32b</span>),<span class="o">/</span>boolean) )) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-71"></a>            new_str<span class="o">+=</span>val
+<a name="ln-72"></a>        <span class="k">endif</span>
+<a name="ln-73"></a>    <span class="k">endfor</span>            
+<a name="ln-74"></a>    new_str<span class="o">+=</span><span class="nb">strmid</span>(str,index,<span class="nb">strlen</span>(str)<span class="o">-</span>index)
 <a name="ln-75"></a>
-<a name="ln-76"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">new_str</span>
-<a name="ln-77"></a><span class="nv">END</span>
+<a name="ln-76"></a>    <span class="nb">return</span>,new_str
+<a name="ln-77"></a><span class="k">END</span>
 <a name="ln-78"></a>
-<a name="ln-79"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_json</span><span class="p">,</span> <span class="s s-Atom">file</span>
-<a name="ln-80"></a>    <span class="p">;</span><span class="s s-Atom">+#read_json</span>
-<a name="ln-81"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Reads</span> <span class="s s-Atom">a</span> <span class="nv">JSON</span> <span class="s s-Atom">file</span> <span class="s s-Atom">that</span> <span class="s s-Atom">can</span> <span class="s s-Atom">have</span> <span class="nv">YAML</span> <span class="s s-Atom">like</span> <span class="s s-Atom">comments</span>
-<a name="ln-82"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-83"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-84"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**file**:</span> <span class="nv">JSON</span> <span class="s s-Atom">file</span>
-<a name="ln-85"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-86"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span> 
-<a name="ln-87"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Structure</span> <span class="s s-Atom">containg</span> <span class="nv">JSON</span> <span class="s s-Atom">values</span>
-<a name="ln-88"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-89"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-90"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-91"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">json_struct</span> <span class="o">=</span> <span class="nf">read_json</span><span class="p">(</span><span class="s2">&quot;./file.json&quot;</span><span class="p">)</span>
-<a name="ln-92"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-79"></a><span class="k">FUNCTION</span> read_json, file
+<a name="ln-80"></a><span class="c1">    ;+#read_json</span>
+<a name="ln-81"></a><span class="c1">    ;+ Reads a JSON file that can have YAML like comments</span>
+<a name="ln-82"></a><span class="c1">    ;+***</span>
+<a name="ln-83"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-84"></a><span class="c1">    ;+    **file**: JSON file</span>
+<a name="ln-85"></a><span class="c1">    ;+</span>
+<a name="ln-86"></a><span class="c1">    ;+##Return Value </span>
+<a name="ln-87"></a><span class="c1">    ;+Structure containg JSON values</span>
+<a name="ln-88"></a><span class="c1">    ;+</span>
+<a name="ln-89"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-90"></a><span class="c1">    ;+```idl</span>
+<a name="ln-91"></a><span class="c1">    ;+IDL&gt; json_struct = read_json(&quot;./file.json&quot;)</span>
+<a name="ln-92"></a><span class="c1">    ;+```</span>
 <a name="ln-93"></a>
-<a name="ln-94"></a>    <span class="s s-Atom">openr</span><span class="p">,</span><span class="s s-Atom">lun</span><span class="p">,</span><span class="s s-Atom">file</span><span class="p">,</span><span class="o">/</span><span class="nv">GET_LUN</span>
-<a name="ln-95"></a>    <span class="s s-Atom">json=&#39;&#39;</span>
-<a name="ln-96"></a>    <span class="s s-Atom">tmp=&#39;&#39;</span>
-<a name="ln-97"></a>    <span class="s s-Atom">while</span> <span class="o">not</span> <span class="nv">EOF</span><span class="p">(</span><span class="s s-Atom">lun</span><span class="p">)</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-98"></a>        <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">lun</span><span class="p">,</span><span class="s s-Atom">tmp</span>
-<a name="ln-99"></a>        <span class="s s-Atom">json+=tmp</span>
-<a name="ln-100"></a>        <span class="s s-Atom">json+=</span><span class="nf">string</span><span class="p">(</span><span class="mi">10</span><span class="s s-Atom">b</span><span class="p">)</span>
-<a name="ln-101"></a>    <span class="s s-Atom">endwhile</span>
-<a name="ln-102"></a>    <span class="s s-Atom">free_lun</span><span class="p">,</span><span class="s s-Atom">lun</span>
-<a name="ln-103"></a>    <span class="s s-Atom">stripped_json</span><span class="o">=</span><span class="nf">json_minify</span><span class="p">(</span><span class="s s-Atom">json</span><span class="p">)</span>
+<a name="ln-94"></a>    openr,lun,file,<span class="o">/</span><span class="nb">GET_LUN</span>
+<a name="ln-95"></a>    json<span class="o">=</span><span class="s1">&#39;&#39;</span>
+<a name="ln-96"></a>    tmp<span class="o">=</span><span class="s1">&#39;&#39;</span>
+<a name="ln-97"></a>    <span class="k">while</span> <span class="k">not</span> <span class="nb">EOF</span>(lun) <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-98"></a>        readf,lun,tmp
+<a name="ln-99"></a>        json<span class="o">+=</span>tmp
+<a name="ln-100"></a>        json<span class="o">+=</span><span class="nb">string</span>(<span class="m">10b</span>)
+<a name="ln-101"></a>    <span class="k">endwhile</span>
+<a name="ln-102"></a>    <span class="nb">free_lun</span>,lun
+<a name="ln-103"></a>    stripped_json<span class="o">=</span>json_minify(json)
 <a name="ln-104"></a>
-<a name="ln-105"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="nf">json_parse</span><span class="p">(</span><span class="s s-Atom">stripped_json</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">toarray</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">tostruct</span><span class="p">)</span>
-<a name="ln-106"></a><span class="nv">END</span>
+<a name="ln-105"></a>    <span class="nb">return</span>,<span class="nb">json_parse</span>(stripped_json,<span class="o">/</span>toarray,<span class="o">/</span>tostruct)
+<a name="ln-106"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -364,7 +364,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

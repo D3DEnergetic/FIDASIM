@@ -204,7 +204,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Structure containing variables and attributes</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>)
 IDL<span class="o">&gt;</span> b <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>,paths<span class="o">=</span><span class="s2">&quot;/spec/lens&quot;</span>,<span class="o">/</span>flatten,<span class="o">/</span>shallow)
 </code></pre></div>
       <br>
@@ -251,267 +251,267 @@ IDL<span class="o">&gt;</span> b <span class="o">=</span> read_hdf5(<span class=
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">valid_name</span><span class="p">,</span> <span class="s s-Atom">name</span><span class="p">,</span> <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">bad_names</span><span class="p">,</span> <span class="s s-Atom">post</span> <span class="o">=</span> <span class="s s-Atom">post</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> valid_name, name, bad_names<span class="o">=</span>bad_names, post <span class="o">=</span> post
 <a name="ln-2"></a>
-<a name="ln-3"></a>    <span class="s s-Atom">reserved</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">&#39;AND&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BEGIN&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BREAK&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;CASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMMON&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMPILE_OPT&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-4"></a>              <span class="s s-Atom">&#39;CONTINUE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;DO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ELSE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;END&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDCASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDELSE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-5"></a>              <span class="s s-Atom">&#39;ENDFOR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDFOREACH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDIF&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDREP&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDSWITCH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDWHILE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-6"></a>              <span class="s s-Atom">&#39;EQ&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FOR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FOREACH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FORWARD_FUNCTION&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FUNCTION&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;GE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-7"></a>              <span class="s s-Atom">&#39;GOTO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;GT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;IF&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;INHERITS&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;LE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;LT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;MOD&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;NE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;NOT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;OF&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-8"></a>              <span class="s s-Atom">&#39;ON_IOERROR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;OR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;PRO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;REPEAT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;SWITCH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;THEN&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;UNTIL&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-9"></a>              <span class="s s-Atom">&#39;WHILE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;X0R&#39;</span><span class="p">]</span>
+<a name="ln-3"></a>    reserved<span class="o">=</span>[<span class="s1">&#39;AND&#39;</span>,<span class="s1">&#39;BEGIN&#39;</span>,<span class="s1">&#39;BREAK&#39;</span>,<span class="s1">&#39;CASE&#39;</span>,<span class="s1">&#39;COMMON&#39;</span>,<span class="s1">&#39;COMPILE_OPT&#39;</span>,$
+<a name="ln-4"></a>              <span class="s1">&#39;CONTINUE&#39;</span>,<span class="s1">&#39;DO&#39;</span>,<span class="s1">&#39;ELSE&#39;</span>,<span class="s1">&#39;END&#39;</span>,<span class="s1">&#39;ENDCASE&#39;</span>,<span class="s1">&#39;ENDELSE&#39;</span>,$
+<a name="ln-5"></a>              <span class="s1">&#39;ENDFOR&#39;</span>,<span class="s1">&#39;ENDFOREACH&#39;</span>,<span class="s1">&#39;ENDIF&#39;</span>,<span class="s1">&#39;ENDREP&#39;</span>,<span class="s1">&#39;ENDSWITCH&#39;</span>,<span class="s1">&#39;ENDWHILE&#39;</span>,$
+<a name="ln-6"></a>              <span class="s1">&#39;EQ&#39;</span>,<span class="s1">&#39;FOR&#39;</span>,<span class="s1">&#39;FOREACH&#39;</span>,<span class="s1">&#39;FORWARD_FUNCTION&#39;</span>,<span class="s1">&#39;FUNCTION&#39;</span>,<span class="s1">&#39;GE&#39;</span>,$
+<a name="ln-7"></a>              <span class="s1">&#39;GOTO&#39;</span>,<span class="s1">&#39;GT&#39;</span>,<span class="s1">&#39;IF&#39;</span>,<span class="s1">&#39;INHERITS&#39;</span>,<span class="s1">&#39;LE&#39;</span>,<span class="s1">&#39;LT&#39;</span>,<span class="s1">&#39;MOD&#39;</span>,<span class="s1">&#39;NE&#39;</span>,<span class="s1">&#39;NOT&#39;</span>,<span class="s1">&#39;OF&#39;</span>,$
+<a name="ln-8"></a>              <span class="s1">&#39;ON_IOERROR&#39;</span>,<span class="s1">&#39;OR&#39;</span>,<span class="s1">&#39;PRO&#39;</span>,<span class="s1">&#39;REPEAT&#39;</span>,<span class="s1">&#39;SWITCH&#39;</span>,<span class="s1">&#39;THEN&#39;</span>,<span class="s1">&#39;UNTIL&#39;</span>,$
+<a name="ln-9"></a>              <span class="s1">&#39;WHILE&#39;</span>,<span class="s1">&#39;X0R&#39;</span>]
 <a name="ln-10"></a>
-<a name="ln-11"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">bad_names</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">bad_names</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-12"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">post</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">post</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-11"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(bad_names) <span class="k">then</span> bad_names <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-12"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(post) <span class="k">then</span> post <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 <a name="ln-13"></a>
-<a name="ln-14"></a>    <span class="s s-Atom">bad_names</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">reserved</span><span class="p">,</span> <span class="s s-Atom">bad_names</span><span class="p">]</span>
-<a name="ln-15"></a>    <span class="s s-Atom">if</span> <span class="nf">total</span><span class="p">(</span><span class="nf">strmatch</span><span class="p">(</span><span class="s s-Atom">bad_names</span><span class="p">,</span> <span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-16"></a>        <span class="s s-Atom">valid_name</span> <span class="o">=</span> <span class="s s-Atom">name</span> <span class="o">+</span> <span class="s s-Atom">&#39;_&#39;</span> <span class="o">+</span> <span class="s s-Atom">post</span>
-<a name="ln-17"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-18"></a>        <span class="s s-Atom">valid_name</span> <span class="o">=</span> <span class="s s-Atom">name</span>
-<a name="ln-19"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-14"></a>    bad_names <span class="o">=</span> [reserved, bad_names]
+<a name="ln-15"></a>    <span class="k">if</span> <span class="nb">total</span>(<span class="nb">strmatch</span>(bad_names, name,<span class="o">/</span>fold_case)) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-16"></a>        valid_name <span class="o">=</span> name <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> post
+<a name="ln-17"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-18"></a>        valid_name <span class="o">=</span> name
+<a name="ln-19"></a>    <span class="k">endelse</span>
 <a name="ln-20"></a>
-<a name="ln-21"></a>    <span class="p">;</span> <span class="s s-Atom">added</span> <span class="mi">2016</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">15</span> <span class="s s-Atom">by</span> <span class="nv">NGB</span> <span class="s s-Atom">to</span> <span class="s s-Atom">fix</span> <span class="s s-Atom">invalid</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">tags</span>
-<a name="ln-22"></a>    <span class="s s-Atom">valid_name</span> <span class="o">=</span> <span class="nf">idl_validname</span><span class="p">(</span><span class="s s-Atom">valid_name</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">convert_all</span><span class="p">)</span>
+<a name="ln-21"></a><span class="c1">    ; added 2016-09-15 by NGB to fix invalid structure tags</span>
+<a name="ln-22"></a>    valid_name <span class="o">=</span> <span class="nb">idl_validname</span>(valid_name, <span class="o">/</span>convert_all)
 <a name="ln-23"></a>    
-<a name="ln-24"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">valid_name</span>
+<a name="ln-24"></a>    <span class="nb">return</span>, valid_name
 <a name="ln-25"></a>
-<a name="ln-26"></a><span class="nv">END</span>
+<a name="ln-26"></a><span class="k">END</span>
 <a name="ln-27"></a>
-<a name="ln-28"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">create_nested_struct</span><span class="p">,</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">data</span>
+<a name="ln-28"></a><span class="k">FUNCTION</span> create_nested_struct,path,data
 <a name="ln-29"></a>
-<a name="ln-30"></a>     <span class="s s-Atom">rpath</span> <span class="o">=</span> <span class="nf">reverse</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">))</span>
-<a name="ln-31"></a>     <span class="s s-Atom">d</span> <span class="o">=</span> <span class="s s-Atom">data</span>
-<a name="ln-32"></a>     <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">rpath</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-33"></a>         <span class="s s-Atom">varname</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">rpath</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">])</span>
-<a name="ln-34"></a>         <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">varname</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">)</span>
-<a name="ln-35"></a>     <span class="s s-Atom">endfor</span>
+<a name="ln-30"></a>     rpath <span class="o">=</span> <span class="nb">reverse</span>(<span class="nb">strsplit</span>(path,<span class="s1">&#39;/&#39;</span>,<span class="o">/</span>extract))
+<a name="ln-31"></a>     d <span class="o">=</span> data
+<a name="ln-32"></a>     <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,<span class="nb">n_elements</span>(rpath) <span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-33"></a>         varname <span class="o">=</span> valid_name(rpath[i])
+<a name="ln-34"></a>         d <span class="o">=</span> <span class="nb">create_struct</span>(varname,d)
+<a name="ln-35"></a>     <span class="k">endfor</span>
 <a name="ln-36"></a>
-<a name="ln-37"></a>     <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">d</span>
-<a name="ln-38"></a><span class="nv">END</span>
+<a name="ln-37"></a>     <span class="nb">return</span>, d
+<a name="ln-38"></a><span class="k">END</span>
 <a name="ln-39"></a>
-<a name="ln-40"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">hdf5_read_attributes</span><span class="p">,</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">bad_names</span>
+<a name="ln-40"></a><span class="k">FUNCTION</span> hdf5_read_attributes,id,bad_names<span class="o">=</span>bad_names
 <a name="ln-41"></a>
-<a name="ln-42"></a>    <span class="p">;;</span> <span class="nv">Get</span> <span class="s s-Atom">any</span> <span class="s s-Atom">attributes</span>
-<a name="ln-43"></a>    <span class="s s-Atom">natts</span> <span class="o">=</span> <span class="nf">h5a_get_num_attrs</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">)</span>
-<a name="ln-44"></a>    <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="p">{}</span>
-<a name="ln-45"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="nv">L</span><span class="p">,</span> <span class="s s-Atom">natts</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-46"></a>        <span class="p">;;</span> <span class="nv">Open</span> <span class="s s-Atom">attribute</span> <span class="s s-Atom">id</span>
-<a name="ln-47"></a>        <span class="s s-Atom">attribute_id</span> <span class="o">=</span> <span class="nf">h5a_open_idx</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span>
+<a name="ln-42"></a><span class="c1">    ;; Get any attributes</span>
+<a name="ln-43"></a>    natts <span class="o">=</span> h5a_get_num_attrs(id)
+<a name="ln-44"></a>    atts <span class="o">=</span> {}
+<a name="ln-45"></a>    <span class="k">for</span> i<span class="o">=</span><span class="il">0L</span>, natts<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-46"></a><span class="c1">        ;; Open attribute id</span>
+<a name="ln-47"></a>        attribute_id <span class="o">=</span> h5a_open_idx(id,i)
 <a name="ln-48"></a>
-<a name="ln-49"></a>        <span class="p">;;</span> <span class="nv">Get</span> <span class="s s-Atom">attribute</span> <span class="s s-Atom">name</span> <span class="s s-Atom">and</span> <span class="s s-Atom">make</span> <span class="s s-Atom">sure</span> <span class="s s-Atom">its</span> <span class="s s-Atom">valid</span>
-<a name="ln-50"></a>        <span class="s s-Atom">attribute_name</span> <span class="o">=</span> <span class="nf">h5a_get_name</span><span class="p">(</span><span class="s s-Atom">attribute_id</span><span class="p">)</span>
-<a name="ln-51"></a>        <span class="s s-Atom">attribute_name</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">attribute_name</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-52"></a>                         <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">bad_names</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-53"></a>                         <span class="s s-Atom">post</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="nf">string</span><span class="p">(</span><span class="s s-Atom">i</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">remove_all</span><span class="p">))</span>
+<a name="ln-49"></a><span class="c1">        ;; Get attribute name and make sure its valid</span>
+<a name="ln-50"></a>        attribute_name <span class="o">=</span> h5a_get_name(attribute_id)
+<a name="ln-51"></a>        attribute_name <span class="o">=</span> valid_name(attribute_name, $
+<a name="ln-52"></a>                         bad_names<span class="o">=</span>bad_names, $
+<a name="ln-53"></a>                         post<span class="o">=</span><span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all))
 <a name="ln-54"></a>
-<a name="ln-55"></a>        <span class="p">;;</span> <span class="nv">Get</span> <span class="s s-Atom">the</span> <span class="s s-Atom">attribute</span> <span class="s s-Atom">data</span>
-<a name="ln-56"></a>        <span class="s s-Atom">attribute_data</span> <span class="o">=</span> <span class="nf">h5a_read</span><span class="p">(</span><span class="s s-Atom">attribute_id</span><span class="p">)</span>
-<a name="ln-57"></a>        <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">atts</span><span class="p">,</span><span class="s s-Atom">attribute_name</span><span class="p">,</span><span class="s s-Atom">attribute_data</span><span class="p">)</span>
-<a name="ln-58"></a>       
-<a name="ln-59"></a>        <span class="p">;;</span> <span class="nv">Close</span> <span class="s s-Atom">attribute</span> <span class="s s-Atom">id</span>
-<a name="ln-60"></a>        <span class="s s-Atom">h5a_close</span><span class="p">,</span><span class="s s-Atom">attribute_id</span>
-<a name="ln-61"></a>    <span class="s s-Atom">endfor</span>
+<a name="ln-55"></a><span class="c1">        ;; Get the attribute data</span>
+<a name="ln-56"></a>        attribute_data <span class="o">=</span> h5a_read(attribute_id)
+<a name="ln-57"></a>        atts <span class="o">=</span> <span class="nb">create_struct</span>(atts,attribute_name,attribute_data)
+<a name="ln-58"></a><span class="c1">       </span>
+<a name="ln-59"></a><span class="c1">        ;; Close attribute id</span>
+<a name="ln-60"></a>        h5a_close,attribute_id
+<a name="ln-61"></a>    <span class="k">endfor</span>
 <a name="ln-62"></a>
-<a name="ln-63"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">atts</span>
-<a name="ln-64"></a><span class="nv">END</span>
+<a name="ln-63"></a>    <span class="nb">return</span>, atts
+<a name="ln-64"></a><span class="k">END</span>
 <a name="ln-65"></a>
-<a name="ln-66"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">hdf5_read_dataset</span><span class="p">,</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span>
+<a name="ln-66"></a><span class="k">FUNCTION</span> hdf5_read_dataset,id,name,shallow<span class="o">=</span>shallow
 <a name="ln-67"></a>
-<a name="ln-68"></a>    <span class="p">;;</span> <span class="nv">Get</span> <span class="s s-Atom">data</span>
-<a name="ln-69"></a>    <span class="s s-Atom">dataset_id</span> <span class="o">=</span> <span class="nf">h5d_open</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">)</span>
-<a name="ln-70"></a>    <span class="s s-Atom">data</span> <span class="o">=</span> <span class="nf">h5d_read</span><span class="p">(</span><span class="s s-Atom">dataset_id</span><span class="p">)</span>
+<a name="ln-68"></a><span class="c1">    ;; Get data</span>
+<a name="ln-69"></a>    dataset_id <span class="o">=</span> h5d_open(id,name)
+<a name="ln-70"></a>    data <span class="o">=</span> h5d_read(dataset_id)
 <a name="ln-71"></a>
-<a name="ln-72"></a>    <span class="p">;;</span> <span class="nv">Get</span> <span class="s s-Atom">any</span> <span class="s s-Atom">attributes</span>
-<a name="ln-73"></a>    <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="nf">hdf5_read_attributes</span><span class="p">(</span><span class="s s-Atom">dataset_id</span><span class="p">,</span><span class="s s-Atom">bad_names=</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<a name="ln-72"></a><span class="c1">    ;; Get any attributes</span>
+<a name="ln-73"></a>    atts <span class="o">=</span> hdf5_read_attributes(dataset_id,bad_names<span class="o">=</span><span class="s2">&quot;data&quot;</span>)
 <a name="ln-74"></a>
-<a name="ln-75"></a>    <span class="p">;;</span> <span class="nv">Close</span> <span class="s s-Atom">the</span> <span class="s s-Atom">dataset</span>
-<a name="ln-76"></a>    <span class="s s-Atom">h5d_close</span><span class="p">,</span> <span class="s s-Atom">dataset_id</span>
+<a name="ln-75"></a><span class="c1">    ;; Close the dataset</span>
+<a name="ln-76"></a>    h5d_close, dataset_id
 <a name="ln-77"></a>
-<a name="ln-78"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">shallow</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-79"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">data</span>
-<a name="ln-80"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-81"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s s-Atom">data</span><span class="p">)</span>
-<a name="ln-82"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-83"></a><span class="nv">END</span>
+<a name="ln-78"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(shallow) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-79"></a>        <span class="nb">return</span>, data
+<a name="ln-80"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-81"></a>        <span class="nb">return</span>, <span class="nb">create_struct</span>(atts, <span class="s2">&quot;data&quot;</span>, data)
+<a name="ln-82"></a>    <span class="k">endelse</span>
+<a name="ln-83"></a><span class="k">END</span>
 <a name="ln-84"></a>
-<a name="ln-85"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">hdf5_read_group</span><span class="p">,</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span>
+<a name="ln-85"></a><span class="k">FUNCTION</span> hdf5_read_group,id,shallow<span class="o">=</span>shallow
 <a name="ln-86"></a>
-<a name="ln-87"></a>    <span class="nv">FORWARD_FUNCTION</span> <span class="s s-Atom">hdf5_read_group</span>
+<a name="ln-87"></a>    <span class="k">FORWARD_FUNCTION</span> hdf5_read_group
 <a name="ln-88"></a>
-<a name="ln-89"></a>    <span class="s s-Atom">nobjs</span> <span class="o">=</span> <span class="nf">h5g_get_num_objs</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">)</span>
-<a name="ln-90"></a>    <span class="s s-Atom">d</span> <span class="o">=</span> <span class="p">{}</span>
-<a name="ln-91"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="s s-Atom">nobjs</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-92"></a>        <span class="s s-Atom">obj_name</span> <span class="o">=</span> <span class="nf">h5g_get_obj_name_by_idx</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">i</span><span class="p">)</span>
-<a name="ln-93"></a>        <span class="s s-Atom">var_name</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">obj_name</span><span class="p">)</span>
+<a name="ln-89"></a>    nobjs <span class="o">=</span> h5g_get_num_objs(id)
+<a name="ln-90"></a>    d <span class="o">=</span> {}
+<a name="ln-91"></a>    <span class="k">for</span> i <span class="o">=</span> <span class="mi">0</span>, nobjs<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-92"></a>        obj_name <span class="o">=</span> h5g_get_obj_name_by_idx(id, i)
+<a name="ln-93"></a>        var_name <span class="o">=</span> valid_name(obj_name)
 <a name="ln-94"></a>
-<a name="ln-95"></a>        <span class="s s-Atom">obj_info</span> <span class="o">=</span> <span class="nf">h5g_get_objinfo</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">obj_name</span><span class="p">)</span>
-<a name="ln-96"></a>        <span class="s s-Atom">obj_type</span> <span class="o">=</span> <span class="s s-Atom">obj_info</span><span class="p">.</span><span class="s s-Atom">type</span>
+<a name="ln-95"></a>        obj_info <span class="o">=</span> h5g_get_objinfo(id, obj_name)
+<a name="ln-96"></a>        obj_type <span class="o">=</span> obj_info.type
 <a name="ln-97"></a> 
-<a name="ln-98"></a>        <span class="nv">CASE</span> <span class="s s-Atom">obj_type</span> <span class="nv">OF</span>
-<a name="ln-99"></a>            <span class="s s-Atom">&#39;GROUP&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-100"></a>                <span class="s s-Atom">gid</span> <span class="o">=</span> <span class="nf">h5g_open</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">obj_name</span><span class="p">)</span>
-<a name="ln-101"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_group</span><span class="p">(</span><span class="s s-Atom">gid</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-102"></a>                <span class="s s-Atom">h5g_close</span><span class="p">,</span> <span class="s s-Atom">gid</span>
-<a name="ln-103"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-104"></a>                    <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-105"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-106"></a>            <span class="nv">END</span>
-<a name="ln-107"></a>            <span class="s s-Atom">&#39;DATASET&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-108"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_dataset</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">obj_name</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-109"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-110"></a>                    <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-111"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-112"></a>            <span class="nv">END</span>
-<a name="ln-113"></a>            <span class="s s-Atom">&#39;TYPE&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-114"></a>                <span class="s s-Atom">tid</span> <span class="o">=</span> <span class="nf">h5t_open</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">obj_name</span><span class="p">)</span>
-<a name="ln-115"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_attributes</span><span class="p">(</span><span class="s s-Atom">tid</span><span class="p">)</span>
-<a name="ln-116"></a>                <span class="s s-Atom">h5t_close</span><span class="p">,</span> <span class="s s-Atom">tid</span>
-<a name="ln-117"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-118"></a>                    <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-119"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-120"></a>            <span class="nv">END</span>
-<a name="ln-121"></a>            <span class="nv">ELSE</span><span class="s s-Atom">:</span>
-<a name="ln-122"></a>        <span class="nv">ENDCASE</span>
-<a name="ln-123"></a>    <span class="s s-Atom">endfor</span>
+<a name="ln-98"></a>        <span class="k">CASE</span> obj_type <span class="k">OF</span>
+<a name="ln-99"></a>            <span class="s1">&#39;GROUP&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-100"></a>                gid <span class="o">=</span> h5g_open(id, obj_name)
+<a name="ln-101"></a>                var <span class="o">=</span> hdf5_read_group(gid,shallow<span class="o">=</span>shallow)
+<a name="ln-102"></a>                h5g_close, gid
+<a name="ln-103"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-104"></a>                    d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-105"></a>                <span class="k">endif</span>
+<a name="ln-106"></a>            <span class="k">END</span>
+<a name="ln-107"></a>            <span class="s1">&#39;DATASET&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-108"></a>                var <span class="o">=</span> hdf5_read_dataset(id,obj_name,shallow<span class="o">=</span>shallow)
+<a name="ln-109"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-110"></a>                    d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-111"></a>                <span class="k">endif</span>
+<a name="ln-112"></a>            <span class="k">END</span>
+<a name="ln-113"></a>            <span class="s1">&#39;TYPE&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-114"></a>                tid <span class="o">=</span> h5t_open(id, obj_name)
+<a name="ln-115"></a>                var <span class="o">=</span> hdf5_read_attributes(tid)
+<a name="ln-116"></a>                h5t_close, tid
+<a name="ln-117"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-118"></a>                    d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-119"></a>                <span class="k">endif</span>
+<a name="ln-120"></a>            <span class="k">END</span>
+<a name="ln-121"></a>            <span class="k">ELSE</span><span class="o">:</span>
+<a name="ln-122"></a>        <span class="k">ENDCASE</span>
+<a name="ln-123"></a>    <span class="k">endfor</span>
 <a name="ln-124"></a>
-<a name="ln-125"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">shallow</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-126"></a>        <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="nf">hdf5_read_attributes</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">)</span>
-<a name="ln-127"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-125"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(shallow) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-126"></a>        atts <span class="o">=</span> hdf5_read_attributes(id)
+<a name="ln-127"></a>    <span class="k">endif</span>
 <a name="ln-128"></a>
-<a name="ln-129"></a>    <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">atts</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span> 
-<a name="ln-130"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">atts</span><span class="p">)</span>
-<a name="ln-131"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-132"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">d</span>
-<a name="ln-133"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-129"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(atts) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span> 
+<a name="ln-130"></a>        <span class="nb">return</span>, <span class="nb">create_struct</span>(d, atts)
+<a name="ln-131"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-132"></a>        <span class="nb">return</span>, d
+<a name="ln-133"></a>    <span class="k">endelse</span>
 <a name="ln-134"></a>    
-<a name="ln-135"></a><span class="nv">END</span>
+<a name="ln-135"></a><span class="k">END</span>
 <a name="ln-136"></a>
-<a name="ln-137"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">hdf5_read_from_list</span><span class="p">,</span> <span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">var_paths</span><span class="p">,</span> <span class="s s-Atom">flatten</span><span class="o">=</span><span class="s s-Atom">flatten</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span>
+<a name="ln-137"></a><span class="k">FUNCTION</span> hdf5_read_from_list, id, var_paths, flatten<span class="o">=</span>flatten,shallow<span class="o">=</span>shallow
 <a name="ln-138"></a>
-<a name="ln-139"></a>    <span class="s s-Atom">d</span> <span class="o">=</span> <span class="p">{}</span>
-<a name="ln-140"></a>    <span class="s s-Atom">used_names</span> <span class="o">=</span> <span class="p">[]</span>
-<a name="ln-141"></a>    <span class="s s-Atom">i</span> <span class="o">=</span> <span class="mi">0</span><span class="nv">L</span>
-<a name="ln-142"></a>    <span class="s s-Atom">while</span> <span class="s s-Atom">i</span> <span class="s s-Atom">lt</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var_paths</span><span class="p">)</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-143"></a>        <span class="s s-Atom">catch</span><span class="p">,</span><span class="s s-Atom">err_status</span>
-<a name="ln-144"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-145"></a>            <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Error reading &#39;</span><span class="o">+</span><span class="s s-Atom">var_paths</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-146"></a>            <span class="s s-Atom">print</span><span class="p">,!</span><span class="nv">ERROR_STATE</span><span class="p">.</span><span class="nv">MSG</span>
-<a name="ln-147"></a>            <span class="s s-Atom">catch</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">cancel</span>
-<a name="ln-148"></a>            <span class="s s-Atom">i</span> <span class="o">=</span> <span class="s s-Atom">i</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-149"></a>            <span class="s s-Atom">continue</span>
-<a name="ln-150"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-151"></a>        <span class="s s-Atom">path</span> <span class="o">=</span> <span class="s s-Atom">var_paths</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-152"></a>        <span class="s s-Atom">obj_info</span> <span class="o">=</span> <span class="nf">h5g_get_objinfo</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">path</span><span class="p">)</span>
-<a name="ln-153"></a>        <span class="s s-Atom">obj_type</span> <span class="o">=</span> <span class="s s-Atom">obj_info</span><span class="p">.</span><span class="s s-Atom">type</span>
+<a name="ln-139"></a>    d <span class="o">=</span> {}
+<a name="ln-140"></a>    used_names <span class="o">=</span> []
+<a name="ln-141"></a>    i <span class="o">=</span> <span class="il">0L</span>
+<a name="ln-142"></a>    <span class="k">while</span> i <span class="k">lt</span> <span class="nb">n_elements</span>(var_paths) <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-143"></a>        <span class="nb">catch</span>,err_status
+<a name="ln-144"></a>        <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-145"></a>            <span class="nb">print</span>,<span class="s1">&#39;Error reading &#39;</span><span class="o">+</span>var_paths[i]
+<a name="ln-146"></a>            <span class="nb">print</span>,!ERROR_STATE.MSG
+<a name="ln-147"></a>            <span class="nb">catch</span>,<span class="o">/</span>cancel
+<a name="ln-148"></a>            i <span class="o">=</span> i <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-149"></a>            <span class="k">continue</span>
+<a name="ln-150"></a>        <span class="k">endif</span>
+<a name="ln-151"></a>        path <span class="o">=</span> var_paths[i]
+<a name="ln-152"></a>        obj_info <span class="o">=</span> h5g_get_objinfo(id, path)
+<a name="ln-153"></a>        obj_type <span class="o">=</span> obj_info.type
 <a name="ln-154"></a>
-<a name="ln-155"></a>        <span class="nv">CASE</span> <span class="s s-Atom">obj_type</span> <span class="nv">OF</span>
-<a name="ln-156"></a>            <span class="s s-Atom">&#39;LINK&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-157"></a>                <span class="s s-Atom">var_name</span> <span class="o">=</span> <span class="nf">h5g_get_linkval</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">path</span><span class="p">)</span>
-<a name="ln-158"></a>                <span class="s s-Atom">var_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">var_paths</span><span class="p">,</span><span class="s s-Atom">var_name</span><span class="p">]</span>
-<a name="ln-159"></a>             <span class="nv">END</span>
-<a name="ln-160"></a>            <span class="s s-Atom">&#39;GROUP&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-161"></a>                <span class="s s-Atom">gid</span> <span class="o">=</span> <span class="nf">h5g_open</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">path</span><span class="p">)</span>
-<a name="ln-162"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_group</span><span class="p">(</span><span class="s s-Atom">gid</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-163"></a>                <span class="s s-Atom">h5g_close</span><span class="p">,</span> <span class="s s-Atom">gid</span>
-<a name="ln-164"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-165"></a>                    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">flatten</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-166"></a>                        <span class="s s-Atom">var_names</span> <span class="o">=</span> <span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">)</span>
-<a name="ln-167"></a>                        <span class="s s-Atom">var_name</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">var_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="err">$</span>
-<a name="ln-168"></a>                                   <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">used_names</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-169"></a>                                   <span class="s s-Atom">post</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="nf">string</span><span class="p">(</span><span class="s s-Atom">i</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">remove_all</span><span class="p">))</span>
-<a name="ln-170"></a>                        <span class="s s-Atom">used_names</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">used_names</span><span class="p">,</span><span class="s s-Atom">var_name</span><span class="p">]</span>
-<a name="ln-171"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-172"></a>                    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-173"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="nf">create_nested_struct</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">var</span><span class="p">))</span>
-<a name="ln-174"></a>                    <span class="s s-Atom">endelse</span>
-<a name="ln-175"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-176"></a>            <span class="nv">END</span>
-<a name="ln-177"></a>            <span class="s s-Atom">&#39;DATASET&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-178"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_dataset</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-179"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-180"></a>                    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">flatten</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-181"></a>                        <span class="s s-Atom">var_names</span> <span class="o">=</span> <span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">)</span>
-<a name="ln-182"></a>                        <span class="s s-Atom">var_name</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">var_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="err">$</span>
-<a name="ln-183"></a>                                   <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">used_names</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-184"></a>                                   <span class="s s-Atom">post</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="nf">string</span><span class="p">(</span><span class="s s-Atom">i</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">remove_all</span><span class="p">))</span>
-<a name="ln-185"></a>                        <span class="s s-Atom">used_names</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">used_names</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">]</span>
-<a name="ln-186"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-187"></a>                    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-188"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="nf">create_nested_struct</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">var</span><span class="p">))</span>
-<a name="ln-189"></a>                    <span class="s s-Atom">endelse</span>
-<a name="ln-190"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-191"></a>            <span class="nv">END</span>
-<a name="ln-192"></a>            <span class="s s-Atom">&#39;TYPE&#39;:</span> <span class="nv">BEGIN</span>
-<a name="ln-193"></a>                <span class="s s-Atom">tid</span> <span class="o">=</span> <span class="nf">h5t_open</span><span class="p">(</span><span class="s s-Atom">id</span><span class="p">,</span> <span class="s s-Atom">path</span><span class="p">)</span>
-<a name="ln-194"></a>                <span class="s s-Atom">var</span> <span class="o">=</span> <span class="nf">hdf5_read_attributes</span><span class="p">(</span><span class="s s-Atom">tid</span><span class="p">)</span>
-<a name="ln-195"></a>                <span class="s s-Atom">h5t_close</span><span class="p">,</span> <span class="s s-Atom">tid</span>
-<a name="ln-196"></a>                <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">var</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-197"></a>                    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">flatten</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-198"></a>                        <span class="s s-Atom">var_names</span> <span class="o">=</span> <span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">)</span>
-<a name="ln-199"></a>                        <span class="s s-Atom">var_name</span> <span class="o">=</span> <span class="nf">valid_name</span><span class="p">(</span><span class="s s-Atom">var_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="err">$</span>
-<a name="ln-200"></a>                                   <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">used_names</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-201"></a>                                   <span class="s s-Atom">post</span><span class="o">=</span><span class="nf">strcompress</span><span class="p">(</span><span class="nf">string</span><span class="p">(</span><span class="s s-Atom">i</span><span class="p">),</span><span class="o">/</span><span class="s s-Atom">remove_all</span><span class="p">))</span>
-<a name="ln-202"></a>                        <span class="s s-Atom">used_names</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">used_names</span><span class="p">,</span><span class="s s-Atom">var_name</span><span class="p">]</span>
-<a name="ln-203"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">var_name</span><span class="p">,</span> <span class="s s-Atom">var</span><span class="p">)</span>
-<a name="ln-204"></a>                    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-205"></a>                        <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="nf">create_nested_struct</span><span class="p">(</span><span class="s s-Atom">path</span><span class="p">,</span><span class="s s-Atom">var</span><span class="p">))</span>
-<a name="ln-206"></a>                    <span class="s s-Atom">endelse</span>
-<a name="ln-207"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-208"></a>            <span class="nv">END</span>
-<a name="ln-209"></a>            <span class="nv">ELSE</span><span class="s s-Atom">:</span>
-<a name="ln-210"></a>        <span class="nv">ENDCASE</span>
-<a name="ln-211"></a>        <span class="s s-Atom">i</span> <span class="o">=</span> <span class="s s-Atom">i</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-212"></a>    <span class="s s-Atom">endwhile</span>
+<a name="ln-155"></a>        <span class="k">CASE</span> obj_type <span class="k">OF</span>
+<a name="ln-156"></a>            <span class="s1">&#39;LINK&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-157"></a>                var_name <span class="o">=</span> h5g_get_linkval(id,path)
+<a name="ln-158"></a>                var_paths <span class="o">=</span> [var_paths,var_name]
+<a name="ln-159"></a>             <span class="k">END</span>
+<a name="ln-160"></a>            <span class="s1">&#39;GROUP&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-161"></a>                gid <span class="o">=</span> h5g_open(id,path)
+<a name="ln-162"></a>                var <span class="o">=</span> hdf5_read_group(gid,shallow<span class="o">=</span>shallow)
+<a name="ln-163"></a>                h5g_close, gid
+<a name="ln-164"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-165"></a>                    <span class="k">if</span> <span class="nb">keyword_set</span>(flatten) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-166"></a>                        var_names <span class="o">=</span> <span class="nb">strsplit</span>(path,<span class="s1">&#39;/&#39;</span>,<span class="o">/</span>extract)
+<a name="ln-167"></a>                        var_name <span class="o">=</span> valid_name(var_names[<span class="o">-</span><span class="mi">1</span>], $
+<a name="ln-168"></a>                                   bad_names<span class="o">=</span>used_names, $
+<a name="ln-169"></a>                                   post<span class="o">=</span><span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all))
+<a name="ln-170"></a>                        used_names <span class="o">=</span> [used_names,var_name]
+<a name="ln-171"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-172"></a>                    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-173"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, create_nested_struct(path,var))
+<a name="ln-174"></a>                    <span class="k">endelse</span>
+<a name="ln-175"></a>                <span class="k">endif</span>
+<a name="ln-176"></a>            <span class="k">END</span>
+<a name="ln-177"></a>            <span class="s1">&#39;DATASET&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-178"></a>                var <span class="o">=</span> hdf5_read_dataset(id,path,shallow<span class="o">=</span>shallow)
+<a name="ln-179"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-180"></a>                    <span class="k">if</span> <span class="nb">keyword_set</span>(flatten) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-181"></a>                        var_names <span class="o">=</span> <span class="nb">strsplit</span>(path,<span class="s1">&#39;/&#39;</span>,<span class="o">/</span>extract)
+<a name="ln-182"></a>                        var_name <span class="o">=</span> valid_name(var_names[<span class="o">-</span><span class="mi">1</span>], $
+<a name="ln-183"></a>                                   bad_names<span class="o">=</span>used_names, $
+<a name="ln-184"></a>                                   post<span class="o">=</span><span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all))
+<a name="ln-185"></a>                        used_names <span class="o">=</span> [used_names, var_name]
+<a name="ln-186"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-187"></a>                    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-188"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, create_nested_struct(path,var))
+<a name="ln-189"></a>                    <span class="k">endelse</span>
+<a name="ln-190"></a>                <span class="k">endif</span>
+<a name="ln-191"></a>            <span class="k">END</span>
+<a name="ln-192"></a>            <span class="s1">&#39;TYPE&#39;</span><span class="o">:</span> <span class="k">BEGIN</span>
+<a name="ln-193"></a>                tid <span class="o">=</span> h5t_open(id, path)
+<a name="ln-194"></a>                var <span class="o">=</span> hdf5_read_attributes(tid)
+<a name="ln-195"></a>                h5t_close, tid
+<a name="ln-196"></a>                <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-197"></a>                    <span class="k">if</span> <span class="nb">keyword_set</span>(flatten) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-198"></a>                        var_names <span class="o">=</span> <span class="nb">strsplit</span>(path,<span class="s1">&#39;/&#39;</span>,<span class="o">/</span>extract)
+<a name="ln-199"></a>                        var_name <span class="o">=</span> valid_name(var_names[<span class="o">-</span><span class="mi">1</span>], $
+<a name="ln-200"></a>                                   bad_names<span class="o">=</span>used_names, $
+<a name="ln-201"></a>                                   post<span class="o">=</span><span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all))
+<a name="ln-202"></a>                        used_names <span class="o">=</span> [used_names,var_name]
+<a name="ln-203"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, var_name, var)
+<a name="ln-204"></a>                    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-205"></a>                        d <span class="o">=</span> <span class="nb">create_struct</span>(d, create_nested_struct(path,var))
+<a name="ln-206"></a>                    <span class="k">endelse</span>
+<a name="ln-207"></a>                <span class="k">endif</span>
+<a name="ln-208"></a>            <span class="k">END</span>
+<a name="ln-209"></a>            <span class="k">ELSE</span><span class="o">:</span>
+<a name="ln-210"></a>        <span class="k">ENDCASE</span>
+<a name="ln-211"></a>        i <span class="o">=</span> i <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-212"></a>    <span class="k">endwhile</span>
 <a name="ln-213"></a>
-<a name="ln-214"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">d</span>
+<a name="ln-214"></a>    <span class="nb">return</span>, d
 <a name="ln-215"></a>
-<a name="ln-216"></a><span class="nv">END</span>
+<a name="ln-216"></a><span class="k">END</span>
 <a name="ln-217"></a>
-<a name="ln-218"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_hdf5</span><span class="p">,</span><span class="s s-Atom">filename</span><span class="p">,</span><span class="s s-Atom">paths</span><span class="o">=</span><span class="s s-Atom">paths</span><span class="p">,</span><span class="s s-Atom">flatten</span><span class="o">=</span><span class="s s-Atom">flatten</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span>
-<a name="ln-219"></a>    <span class="p">;</span><span class="s s-Atom">+#read_hdf5</span>
-<a name="ln-220"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Reads</span> <span class="nv">HDF5</span> <span class="s s-Atom">file</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">and</span> <span class="s s-Atom">attributes</span>
-<a name="ln-221"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-222"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-223"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**filename**:</span> <span class="nv">HDF5</span> <span class="s s-Atom">file</span>
-<a name="ln-224"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-225"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
-<a name="ln-226"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**paths**:</span> <span class="nv">Paths</span> <span class="s s-Atom">to</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">to</span> <span class="s s-Atom">be</span> <span class="s s-Atom">read</span>
-<a name="ln-227"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-228"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**flatten**:</span> <span class="nv">Flatten</span> <span class="s s-Atom">tree</span> <span class="s s-Atom">structure</span>
-<a name="ln-229"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-230"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**shallow**:</span> <span class="nv">Performs</span> <span class="s s-Atom">a</span> <span class="s s-Atom">shallow</span> <span class="s s-Atom">read</span> <span class="s s-Atom">i</span><span class="p">.</span><span class="s s-Atom">e</span><span class="p">.</span> <span class="s s-Atom">no</span> <span class="s s-Atom">dataset</span><span class="o">/</span><span class="s s-Atom">group</span> <span class="s s-Atom">attributes</span>
-<a name="ln-231"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-232"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-233"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Structure</span> <span class="s s-Atom">containing</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">and</span> <span class="s s-Atom">attributes</span>
-<a name="ln-234"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-235"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-236"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-237"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">a</span> <span class="o">=</span> <span class="nf">read_hdf5</span><span class="p">(</span><span class="s2">&quot;./test_1a_geometry.h5&quot;</span><span class="p">)</span>
-<a name="ln-238"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">b</span> <span class="o">=</span> <span class="nf">read_hdf5</span><span class="p">(</span><span class="s2">&quot;./test_1a_geometry.h5&quot;</span><span class="p">,</span><span class="s s-Atom">paths=</span><span class="s2">&quot;/spec/lens&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">flatten</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-239"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-240"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-241"></a>        <span class="p">;;</span> <span class="nv">Open</span> <span class="s s-Atom">file</span>
-<a name="ln-242"></a>        <span class="s s-Atom">fid</span> <span class="o">=</span> <span class="nf">h5f_open</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span>
+<a name="ln-218"></a><span class="k">FUNCTION</span> read_hdf5,filename,paths<span class="o">=</span>paths,flatten<span class="o">=</span>flatten,shallow<span class="o">=</span>shallow
+<a name="ln-219"></a><span class="c1">    ;+#read_hdf5</span>
+<a name="ln-220"></a><span class="c1">    ;+Reads HDF5 file variables and attributes</span>
+<a name="ln-221"></a><span class="c1">    ;+***</span>
+<a name="ln-222"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-223"></a><span class="c1">    ;+    **filename**: HDF5 file</span>
+<a name="ln-224"></a><span class="c1">    ;+</span>
+<a name="ln-225"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a name="ln-226"></a><span class="c1">    ;+    **paths**: Paths to variables to be read</span>
+<a name="ln-227"></a><span class="c1">    ;+</span>
+<a name="ln-228"></a><span class="c1">    ;+    **flatten**: Flatten tree structure</span>
+<a name="ln-229"></a><span class="c1">    ;+</span>
+<a name="ln-230"></a><span class="c1">    ;+    **shallow**: Performs a shallow read i.e. no dataset/group attributes</span>
+<a name="ln-231"></a><span class="c1">    ;+</span>
+<a name="ln-232"></a><span class="c1">    ;+##Return Value</span>
+<a name="ln-233"></a><span class="c1">    ;+Structure containing variables and attributes</span>
+<a name="ln-234"></a><span class="c1">    ;+</span>
+<a name="ln-235"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-236"></a><span class="c1">    ;+```idl</span>
+<a name="ln-237"></a><span class="c1">    ;+IDL&gt; a = read_hdf5(&quot;./test_1a_geometry.h5&quot;)</span>
+<a name="ln-238"></a><span class="c1">    ;+IDL&gt; b = read_hdf5(&quot;./test_1a_geometry.h5&quot;,paths=&quot;/spec/lens&quot;,/flatten,/shallow)</span>
+<a name="ln-239"></a><span class="c1">    ;+```</span>
+<a name="ln-240"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-241"></a><span class="c1">        ;; Open file</span>
+<a name="ln-242"></a>        fid <span class="o">=</span> h5f_open(filename)
 <a name="ln-243"></a>
-<a name="ln-244"></a>        <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">paths</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-245"></a>            <span class="p">;;</span> <span class="nv">Read</span> <span class="s s-Atom">group</span> <span class="s s-Atom">and</span> <span class="s s-Atom">sub</span><span class="o">-</span><span class="s s-Atom">groups</span>
-<a name="ln-246"></a>            <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">hdf5_read_group</span><span class="p">(</span><span class="s s-Atom">fid</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-247"></a>        <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-248"></a>            <span class="p">;;</span> <span class="nv">Read</span> <span class="s s-Atom">datasets</span> <span class="s s-Atom">from</span> <span class="s s-Atom">list</span>
-<a name="ln-249"></a>            <span class="s s-Atom">d</span> <span class="o">=</span> <span class="nf">hdf5_read_from_list</span><span class="p">(</span><span class="s s-Atom">fid</span><span class="p">,</span><span class="s s-Atom">paths</span><span class="p">,</span><span class="s s-Atom">flatten</span><span class="o">=</span><span class="s s-Atom">flatten</span><span class="p">,</span><span class="s s-Atom">shallow</span><span class="o">=</span><span class="s s-Atom">shallow</span><span class="p">)</span>
-<a name="ln-250"></a>        <span class="s s-Atom">endelse</span>
+<a name="ln-244"></a>        <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(paths) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-245"></a><span class="c1">            ;; Read group and sub-groups</span>
+<a name="ln-246"></a>            d <span class="o">=</span> hdf5_read_group(fid,shallow<span class="o">=</span>shallow)
+<a name="ln-247"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-248"></a><span class="c1">            ;; Read datasets from list</span>
+<a name="ln-249"></a>            d <span class="o">=</span> hdf5_read_from_list(fid,paths,flatten<span class="o">=</span>flatten,shallow<span class="o">=</span>shallow)
+<a name="ln-250"></a>        <span class="k">endelse</span>
 <a name="ln-251"></a>
-<a name="ln-252"></a>        <span class="p">;;</span> <span class="nv">Close</span> <span class="s s-Atom">file</span>
-<a name="ln-253"></a>        <span class="s s-Atom">h5f_close</span><span class="p">,</span><span class="s s-Atom">fid</span>
-<a name="ln-254"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-255"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;File does not exist&#39;</span>
-<a name="ln-256"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="mi">0</span>
-<a name="ln-257"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-252"></a><span class="c1">        ;; Close file</span>
+<a name="ln-253"></a>        h5f_close,fid
+<a name="ln-254"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-255"></a>        <span class="nb">print</span>,<span class="s1">&#39;File does not exist&#39;</span>
+<a name="ln-256"></a>        <span class="nb">return</span>, <span class="mi">0</span>
+<a name="ln-257"></a>    <span class="k">endelse</span>
 <a name="ln-258"></a>
-<a name="ln-259"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">d</span>
+<a name="ln-259"></a>    <span class="nb">return</span>, d
 <a name="ln-260"></a>
-<a name="ln-261"></a><span class="nv">END</span>
+<a name="ln-261"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -524,7 +524,7 @@ IDL<span class="o">&gt;</span> b <span class="o">=</span> read_hdf5(<span class=
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

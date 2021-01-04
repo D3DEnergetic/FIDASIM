@@ -202,7 +202,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Structure containing NetCDF variables</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_ncdf(<span class="s2">&quot;./123324H01_fi_1.cdf&quot;</span>)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_ncdf(<span class="s2">&quot;./123324H01_fi_1.cdf&quot;</span>)
 </code></pre></div>
       <br>
     
@@ -248,59 +248,59 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_ncdf</span><span class="p">,</span><span class="s s-Atom">file</span><span class="p">,</span><span class="s s-Atom">vars</span><span class="o">=</span><span class="s s-Atom">vars</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#read_ncdf</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Reads</span> <span class="s s-Atom">a</span> <span class="s s-Atom">flat</span> <span class="nv">NetCDF</span> <span class="s s-Atom">file</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**file**:</span> <span class="nv">NetCDF</span> <span class="s s-Atom">file</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**vars**:</span> <span class="nv">List</span> <span class="s s-Atom">of</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">to</span> <span class="s s-Atom">read</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Structure</span> <span class="s s-Atom">containing</span> <span class="nv">NetCDF</span> <span class="s s-Atom">variables</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">a</span> <span class="o">=</span> <span class="nf">read_ncdf</span><span class="p">(</span><span class="s2">&quot;./123324H01_fi_1.cdf&quot;</span><span class="p">)</span>
-<a name="ln-17"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> read_ncdf,file,vars<span class="o">=</span>vars
+<a name="ln-2"></a><span class="c1">    ;+#read_ncdf</span>
+<a name="ln-3"></a><span class="c1">    ;+Reads a flat NetCDF file</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+    **file**: NetCDF file</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a name="ln-9"></a><span class="c1">    ;+    **vars**: List of variables to read</span>
+<a name="ln-10"></a><span class="c1">    ;+</span>
+<a name="ln-11"></a><span class="c1">    ;+##Return Value</span>
+<a name="ln-12"></a><span class="c1">    ;+Structure containing NetCDF variables</span>
+<a name="ln-13"></a><span class="c1">    ;+</span>
+<a name="ln-14"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-15"></a><span class="c1">    ;+```idl</span>
+<a name="ln-16"></a><span class="c1">    ;+IDL&gt; a = read_ncdf(&quot;./123324H01_fi_1.cdf&quot;)</span>
+<a name="ln-17"></a><span class="c1">    ;+```</span>
 <a name="ln-18"></a>
-<a name="ln-19"></a>    <span class="p">;;</span><span class="nv">List</span> <span class="s s-Atom">of</span> <span class="s s-Atom">reserved</span> <span class="s s-Atom">names</span>
-<a name="ln-20"></a>    <span class="s s-Atom">reserved</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">&#39;AND&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BEGIN&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BREAK&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;CASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMMON&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMPILE_OPT&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-21"></a>              <span class="s s-Atom">&#39;CONTINUE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;DO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ELSE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;END&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDCASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDELSE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-22"></a>              <span class="s s-Atom">&#39;ENDFOR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDFOREACH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDIF&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDREP&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDSWITCH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDWHILE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-23"></a>              <span class="s s-Atom">&#39;EQ&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FOR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FOREACH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FORWARD_FUNCTION&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;FUNCTION&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;GE&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-24"></a>              <span class="s s-Atom">&#39;GOTO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;GT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;IF&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;INHERITS&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;LE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;LT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;MOD&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;NE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;NOT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;OF&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-25"></a>              <span class="s s-Atom">&#39;ON_IOERROR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;OR&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;PRO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;REPEAT&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;SWITCH&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;THEN&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;UNTIL&#39;</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-26"></a>              <span class="s s-Atom">&#39;WHILE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;X0R&#39;</span><span class="p">]</span>
-<a name="ln-27"></a>    <span class="s s-Atom">d=</span><span class="p">{</span><span class="nn">err</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
-<a name="ln-28"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">file</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-29"></a>        <span class="s s-Atom">d</span><span class="p">.</span><span class="s s-Atom">err</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-30"></a>        <span class="s s-Atom">ncid</span><span class="o">=</span><span class="nf">ncdf_open</span><span class="p">(</span><span class="s s-Atom">file</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">nowrite</span><span class="p">)</span>
-<a name="ln-31"></a>        <span class="s s-Atom">info</span><span class="o">=</span><span class="nf">ncdf_inquire</span><span class="p">(</span><span class="s s-Atom">ncid</span><span class="p">)</span>
-<a name="ln-32"></a>        <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">vars</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">nvars</span><span class="o">=</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">vars</span><span class="p">)</span> <span class="s s-Atom">else</span> <span class="s s-Atom">nvars</span><span class="o">=</span><span class="s s-Atom">info</span><span class="p">.</span><span class="s s-Atom">nvars</span>
-<a name="ln-33"></a>        <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nvars</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
-<a name="ln-34"></a>            <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">vars</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-35"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="s s-Atom">vars</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-36"></a>                <span class="nv">CATCH</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-37"></a>                <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-38"></a>                    <span class="nv">CATCH</span><span class="p">,</span><span class="o">/</span><span class="nv">CANCEL</span>
-<a name="ln-39"></a>                    <span class="s s-Atom">continue</span>
-<a name="ln-40"></a>                <span class="s s-Atom">endif</span>
-<a name="ln-41"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span>
-<a name="ln-42"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-43"></a>                <span class="s s-Atom">var_info</span><span class="o">=</span><span class="nf">ncdf_varinq</span><span class="p">(</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span>
-<a name="ln-44"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="nf">strjoin</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">var_info</span><span class="p">.</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">),</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
-<a name="ln-45"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">tmp</span>
-<a name="ln-46"></a>            <span class="s s-Atom">endelse</span>
-<a name="ln-47"></a>            <span class="s s-Atom">if</span> <span class="nf">total</span><span class="p">(</span><span class="nf">strmatch</span><span class="p">(</span><span class="s s-Atom">reserved</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="nv">FOLD_CASE</span><span class="p">))</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">name+=&#39;_&#39;</span>
-<a name="ln-48"></a>            <span class="s s-Atom">d</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span><span class="p">)</span>
-<a name="ln-49"></a>        <span class="s s-Atom">endfor</span>
-<a name="ln-50"></a>	<span class="s s-Atom">ncdf_close</span><span class="p">,</span><span class="s s-Atom">ncid</span>
-<a name="ln-51"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">message</span><span class="p">,</span><span class="s s-Atom">&#39;FILE DOES NOT EXIST: &#39;</span><span class="o">+</span><span class="s s-Atom">file</span>
-<a name="ln-52"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">d</span>
-<a name="ln-53"></a><span class="nv">END</span>
+<a name="ln-19"></a><span class="c1">    ;;List of reserved names</span>
+<a name="ln-20"></a>    reserved<span class="o">=</span>[<span class="s1">&#39;AND&#39;</span>,<span class="s1">&#39;BEGIN&#39;</span>,<span class="s1">&#39;BREAK&#39;</span>,<span class="s1">&#39;CASE&#39;</span>,<span class="s1">&#39;COMMON&#39;</span>,<span class="s1">&#39;COMPILE_OPT&#39;</span>,$
+<a name="ln-21"></a>              <span class="s1">&#39;CONTINUE&#39;</span>,<span class="s1">&#39;DO&#39;</span>,<span class="s1">&#39;ELSE&#39;</span>,<span class="s1">&#39;END&#39;</span>,<span class="s1">&#39;ENDCASE&#39;</span>,<span class="s1">&#39;ENDELSE&#39;</span>,$
+<a name="ln-22"></a>              <span class="s1">&#39;ENDFOR&#39;</span>,<span class="s1">&#39;ENDFOREACH&#39;</span>,<span class="s1">&#39;ENDIF&#39;</span>,<span class="s1">&#39;ENDREP&#39;</span>,<span class="s1">&#39;ENDSWITCH&#39;</span>,<span class="s1">&#39;ENDWHILE&#39;</span>,$
+<a name="ln-23"></a>              <span class="s1">&#39;EQ&#39;</span>,<span class="s1">&#39;FOR&#39;</span>,<span class="s1">&#39;FOREACH&#39;</span>,<span class="s1">&#39;FORWARD_FUNCTION&#39;</span>,<span class="s1">&#39;FUNCTION&#39;</span>,<span class="s1">&#39;GE&#39;</span>,$
+<a name="ln-24"></a>              <span class="s1">&#39;GOTO&#39;</span>,<span class="s1">&#39;GT&#39;</span>,<span class="s1">&#39;IF&#39;</span>,<span class="s1">&#39;INHERITS&#39;</span>,<span class="s1">&#39;LE&#39;</span>,<span class="s1">&#39;LT&#39;</span>,<span class="s1">&#39;MOD&#39;</span>,<span class="s1">&#39;NE&#39;</span>,<span class="s1">&#39;NOT&#39;</span>,<span class="s1">&#39;OF&#39;</span>,$
+<a name="ln-25"></a>              <span class="s1">&#39;ON_IOERROR&#39;</span>,<span class="s1">&#39;OR&#39;</span>,<span class="s1">&#39;PRO&#39;</span>,<span class="s1">&#39;REPEAT&#39;</span>,<span class="s1">&#39;SWITCH&#39;</span>,<span class="s1">&#39;THEN&#39;</span>,<span class="s1">&#39;UNTIL&#39;</span>,$
+<a name="ln-26"></a>              <span class="s1">&#39;WHILE&#39;</span>,<span class="s1">&#39;X0R&#39;</span>]
+<a name="ln-27"></a>    d<span class="o">=</span>{err<span class="o">:</span><span class="mi">1</span>}
+<a name="ln-28"></a>    <span class="k">if</span> <span class="nb">file_test</span>(file) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-29"></a>        d.err<span class="o">=</span><span class="mi">0</span>
+<a name="ln-30"></a>        ncid<span class="o">=</span>ncdf_open(file,<span class="o">/</span>nowrite)
+<a name="ln-31"></a>        info<span class="o">=</span>ncdf_inquire(ncid)
+<a name="ln-32"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(vars) <span class="k">then</span> nvars<span class="o">=</span><span class="nb">n_elements</span>(vars) <span class="k">else</span> nvars<span class="o">=</span>info.nvars
+<a name="ln-33"></a>        <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nvars<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-34"></a>            <span class="k">if</span> <span class="nb">keyword_set</span>(vars) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-35"></a>                name<span class="o">=</span>vars[i]
+<a name="ln-36"></a>                <span class="nb">CATCH</span>, err_status
+<a name="ln-37"></a>                <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-38"></a>                    <span class="nb">CATCH</span>,<span class="o">/</span>CANCEL
+<a name="ln-39"></a>                    <span class="k">continue</span>
+<a name="ln-40"></a>                <span class="k">endif</span>
+<a name="ln-41"></a>                ncdf_varget,ncid,name,tmp
+<a name="ln-42"></a>            <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-43"></a>                var_info<span class="o">=</span>ncdf_varinq(ncid,i)
+<a name="ln-44"></a>                name<span class="o">=</span><span class="nb">strjoin</span>(<span class="nb">strsplit</span>(var_info.name,<span class="s2">&quot;.&quot;</span>,<span class="o">/</span>extract),<span class="s2">&quot;_&quot;</span>)
+<a name="ln-45"></a>                ncdf_varget,ncid,i,tmp
+<a name="ln-46"></a>            <span class="k">endelse</span>
+<a name="ln-47"></a>            <span class="k">if</span> <span class="nb">total</span>(<span class="nb">strmatch</span>(reserved,name,<span class="o">/</span>FOLD_CASE)) <span class="k">gt</span> <span class="mi">0</span> <span class="k">then</span> name<span class="o">+=</span><span class="s1">&#39;_&#39;</span>
+<a name="ln-48"></a>            d<span class="o">=</span><span class="nb">create_struct</span>(d,name,tmp)
+<a name="ln-49"></a>        <span class="k">endfor</span>
+<a name="ln-50"></a>	ncdf_close,ncid
+<a name="ln-51"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="nb">message</span>,<span class="s1">&#39;FILE DOES NOT EXIST: &#39;</span><span class="o">+</span>file
+<a name="ln-52"></a>    <span class="nb">return</span>,d
+<a name="ln-53"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -313,7 +313,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

@@ -180,21 +180,21 @@
 </ul>
 <h2 id="running-interactively">Running Interactively</h2>
 <p>For OpenMP parallelized FIDASIM run with 16 threads run</p>
-<div class="bash codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat <span class="m">16</span>
+<div class="codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat <span class="m">16</span>
 </code></pre></div>
 
 <p>For MPI parallelized FIDASIM run with 16 processes run</p>
-<div class="bash codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% mpirun -np <span class="m">16</span> ./fidasim /p/fida/lstagner/TEST/test_inputs.dat
+<div class="codehilite"><pre><span></span><code><span class="o">[</span>lstagner@dawson061<span class="o">]</span>% mpirun -np <span class="m">16</span> ./fidasim /p/fida/lstagner/TEST/test_inputs.dat
 </code></pre></div>
 
 <h2 id="submitting-to-a-cluster-job-schedular">Submitting to a cluster job schedular</h2>
 <p>The recommended way of running FIDASIM is through a job schedular such as Slurm or PBS. </p>
 <p>FIDASIM provides <code>submit_fidasim</code>: a python script that schedules a FIDASIM job on a cluster. For example</p>
-<div class="bash codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
+<div class="codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
 </code></pre></div>
 
 <p>will submit any incomplete FIDASIM runs in the <code>/u/lstagner/TEST</code> directory. Alternatively</p>
-<div class="bash codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_inputs.dat
+<div class="codehilite"><pre><span></span><code>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_inputs.dat
 </code></pre></div>
 
 <p>will submit just the <code>test</code> FIDASIM run.
@@ -328,7 +328,7 @@ Slurm and PBS resource managers are supported. <code>submit_fidasim</code> works
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

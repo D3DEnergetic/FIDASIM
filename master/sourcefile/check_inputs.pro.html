@@ -198,7 +198,7 @@
 <h2 id="input-arguments">Input Arguments</h2>
 <p><strong>inputs</strong>: input structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> check_inputs, inputs
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> check_inputs, inputs
 </code></pre></div>
       <br>
     
@@ -244,125 +244,126 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">check_inputs</span><span class="p">,</span> <span class="s s-Atom">inputs</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#check_inputs</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Checks</span> <span class="s s-Atom">if</span> <span class="s s-Atom">input</span> <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">valid</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Input</span> <span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**inputs**:</span> <span class="s s-Atom">input</span> <span class="s s-Atom">structure</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span> 
-<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">check_inputs</span><span class="p">,</span> <span class="s s-Atom">inputs</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-12"></a>    <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;Checking simulation settings...&#39;</span>
-<a name="ln-13"></a>    <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-14"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-15"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-16"></a>    <span class="s s-Atom">zero_long</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;LONG&#39;</span><span class="p">}</span>
-<a name="ln-17"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-18"></a>    <span class="s s-Atom">three_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="mi">3</span><span class="p">],</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-19"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">comment</span><span class="p">:</span><span class="s s-Atom">zero_string</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-20"></a>              <span class="nn">shot</span><span class="p">:</span><span class="s s-Atom">zero_long</span><span class="p">,</span> <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-21"></a>              <span class="nn">runid</span><span class="p">:</span><span class="s s-Atom">zero_string</span><span class="p">,</span> <span class="nn">device</span><span class="p">:</span><span class="s s-Atom">zero_string</span><span class="p">,</span> <span class="err">$</span> 
-<a name="ln-22"></a>              <span class="s s-Atom">tables_file:zero_string</span><span class="p">,</span> <span class="s s-Atom">result_dir:zero_string</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-23"></a>              <span class="nn">nlambda</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">lambdamin</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">lambdamax</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-24"></a>              <span class="nn">nx</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">ny</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-25"></a>              <span class="nn">alpha</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">beta</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">gamma</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-26"></a>              <span class="nn">origin</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="nn">xmin</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">xmax</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-27"></a>              <span class="nn">ymin</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">ymax</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">zmin</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">zmax</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-28"></a>              <span class="nn">ab</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="s s-Atom">current_fractions:three_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-29"></a>              <span class="nn">pinj</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="nn">einj</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-30"></a>              <span class="s s-Atom">n_fida:zero_long</span><span class="p">,</span> <span class="s s-Atom">n_pfida:zero_long</span><span class="p">,</span> <span class="s s-Atom">n_nbi:zero_long</span><span class="p">,</span> <span class="s s-Atom">n_dcx:zero_long</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-31"></a>              <span class="s s-Atom">n_npa:zero_long</span><span class="p">,</span> <span class="s s-Atom">n_pnpa:zero_long</span><span class="p">,</span><span class="s s-Atom">n_halo:zero_long</span><span class="p">,</span> <span class="s s-Atom">n_birth:zero_long</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-32"></a>              <span class="s s-Atom">ne_wght:zero_int</span><span class="p">,</span> <span class="s s-Atom">np_wght:zero_int</span><span class="p">,</span> <span class="s s-Atom">nphi_wght:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-33"></a>              <span class="s s-Atom">emax_wght:zero_double</span><span class="p">,</span> <span class="s s-Atom">nlambda_wght:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-34"></a>              <span class="s s-Atom">lambdamin_wght:zero_double</span><span class="p">,</span> <span class="s s-Atom">lambdamax_wght:zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-35"></a>              <span class="s s-Atom">calc_npa:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_fida:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_bes:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-36"></a>              <span class="s s-Atom">calc_dcx:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_halo:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_cold:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-37"></a>	      <span class="s s-Atom">calc_pnpa:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_pfida:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-38"></a>              <span class="s s-Atom">calc_brems:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_birth:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_neutron:zero_int</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-39"></a>              <span class="s s-Atom">calc_fida_wght:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_npa_wght:zero_int</span><span class="p">}</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> check_inputs, inputs
+<a name="ln-2"></a><span class="c1">    ;+#check_inputs</span>
+<a name="ln-3"></a><span class="c1">    ;+Checks if input structure is valid</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+     **inputs**: input structure</span>
+<a name="ln-7"></a><span class="c1">    ;+ </span>
+<a name="ln-8"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-9"></a><span class="c1">    ;+```idl</span>
+<a name="ln-10"></a><span class="c1">    ;+IDL&gt; check_inputs, inputs</span>
+<a name="ln-11"></a><span class="c1">    ;+```</span>
+<a name="ln-12"></a>    info,<span class="s1">&#39;Checking simulation settings...&#39;</span>
+<a name="ln-13"></a>    err_status <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-14"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>,type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
+<a name="ln-15"></a>    zero_int <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>,type<span class="o">:</span><span class="s1">&#39;INT&#39;</span>}
+<a name="ln-16"></a>    zero_long <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>,type<span class="o">:</span><span class="s1">&#39;LONG&#39;</span>}
+<a name="ln-17"></a>    zero_double <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>,type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-18"></a>    three_double <span class="o">=</span> {dims<span class="o">:</span>[<span class="mi">3</span>],type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-19"></a>    schema <span class="o">=</span> {comment<span class="o">:</span>zero_string, $
+<a name="ln-20"></a>              shot<span class="o">:</span>zero_long, time<span class="o">:</span>zero_double, $
+<a name="ln-21"></a>              runid<span class="o">:</span>zero_string, <span class="nb">device</span><span class="o">:</span>zero_string, $ 
+<a name="ln-22"></a>              tables_file<span class="o">:</span>zero_string, result_dir<span class="o">:</span>zero_string, $
+<a name="ln-23"></a>              nlambda<span class="o">:</span>zero_int, lambdamin<span class="o">:</span>zero_double, lambdamax<span class="o">:</span>zero_double, $
+<a name="ln-24"></a>              nx<span class="o">:</span>zero_int, ny<span class="o">:</span>zero_int, nz<span class="o">:</span>zero_int, $
+<a name="ln-25"></a>              alpha<span class="o">:</span>zero_double, <span class="nb">beta</span><span class="o">:</span>zero_double, <span class="nb">gamma</span><span class="o">:</span>zero_double, $
+<a name="ln-26"></a>              origin<span class="o">:</span>three_double, xmin<span class="o">:</span>zero_double, xmax<span class="o">:</span>zero_double, $
+<a name="ln-27"></a>              ymin<span class="o">:</span>zero_double, ymax<span class="o">:</span>zero_double, zmin<span class="o">:</span>zero_double, zmax<span class="o">:</span>zero_double, $
+<a name="ln-28"></a>              ab<span class="o">:</span>zero_double, current_fractions<span class="o">:</span>three_double, $
+<a name="ln-29"></a>              pinj<span class="o">:</span>zero_double, einj<span class="o">:</span>zero_double, $
+<a name="ln-30"></a>              n_fida<span class="o">:</span>zero_long, n_pfida<span class="o">:</span>zero_long, n_nbi<span class="o">:</span>zero_long, n_dcx<span class="o">:</span>zero_long, $
+<a name="ln-31"></a>              n_npa<span class="o">:</span>zero_long, n_pnpa<span class="o">:</span>zero_long,n_halo<span class="o">:</span>zero_long, n_birth<span class="o">:</span>zero_long, $
+<a name="ln-32"></a>              ne_wght<span class="o">:</span>zero_int, np_wght<span class="o">:</span>zero_int, nphi_wght<span class="o">:</span>zero_int, $
+<a name="ln-33"></a>              emax_wght<span class="o">:</span>zero_double, nlambda_wght<span class="o">:</span>zero_int, $
+<a name="ln-34"></a>              lambdamin_wght<span class="o">:</span>zero_double, lambdamax_wght<span class="o">:</span>zero_double, $
+<a name="ln-35"></a>              calc_npa<span class="o">:</span>zero_int, calc_fida<span class="o">:</span>zero_int, calc_bes<span class="o">:</span>zero_int, $
+<a name="ln-36"></a>              calc_dcx<span class="o">:</span>zero_int, calc_halo<span class="o">:</span>zero_int, calc_cold<span class="o">:</span>zero_int, $
+<a name="ln-37"></a>	      calc_pnpa<span class="o">:</span>zero_int, calc_pfida<span class="o">:</span>zero_int, $
+<a name="ln-38"></a>              calc_brems<span class="o">:</span>zero_int, calc_birth<span class="o">:</span>zero_int, calc_neutron<span class="o">:</span>zero_int,$
+<a name="ln-39"></a>              calc_fida_wght<span class="o">:</span>zero_int, calc_npa_wght<span class="o">:</span>zero_int}
 <a name="ln-40"></a>
-<a name="ln-41"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span> <span class="s s-Atom">schema</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;simulation settings&quot;</span>
-<a name="ln-42"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-43"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-44"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-41"></a>    check_struct_schema, schema, inputs, err_status, desc<span class="o">=</span><span class="s2">&quot;simulation settings&quot;</span>
+<a name="ln-42"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-43"></a>        <span class="k">goto</span>, GET_OUT
+<a name="ln-44"></a>    <span class="k">endif</span>
 <a name="ln-45"></a>
-<a name="ln-46"></a>    <span class="p">;</span><span class="nv">Normalize</span> <span class="nv">File</span> <span class="nv">Paths</span>
-<a name="ln-47"></a>    <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span> <span class="o">=</span> <span class="nf">expand_path</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="p">)</span>
+<a name="ln-46"></a><span class="c1">    ;Normalize File Paths</span>
+<a name="ln-47"></a>    inputs.result_dir <span class="o">=</span> <span class="nb">expand_path</span>(inputs.result_dir)
 <a name="ln-48"></a>
-<a name="ln-49"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">alpha</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-50"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">beta</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-51"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">gamma</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-52"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Angles must be in radians&#39;</span>
-<a name="ln-53"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-54"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-49"></a>    <span class="k">if</span> inputs.alpha <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
+<a name="ln-50"></a>       inputs.<span class="nb">beta</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
+<a name="ln-51"></a>       inputs.<span class="nb">gamma</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-52"></a>        error,<span class="s1">&#39;Angles must be in radians&#39;</span>
+<a name="ln-53"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-54"></a>    <span class="k">endif</span>
 <a name="ln-55"></a>
-<a name="ln-56"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-57"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
-<a name="ln-58"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-59"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-56"></a>    <span class="k">if</span> inputs.lambdamin <span class="k">ge</span> inputs.lambdamax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-57"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
+<a name="ln-58"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-59"></a>    <span class="k">endif</span>
 <a name="ln-60"></a>
-<a name="ln-61"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin_wght</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax_wght</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-62"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
-<a name="ln-63"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-64"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-61"></a>    <span class="k">if</span> inputs.lambdamin_wght <span class="k">ge</span> inputs.lambdamax_wght <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-62"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
+<a name="ln-63"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-64"></a>    <span class="k">endif</span>
 <a name="ln-65"></a>
-<a name="ln-66"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-67"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
-<a name="ln-68"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-69"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-66"></a>    <span class="k">if</span> inputs.xmin <span class="k">ge</span> inputs.xmax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-67"></a>        error,<span class="s1">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
+<a name="ln-68"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-69"></a>    <span class="k">endif</span>
 <a name="ln-70"></a>
-<a name="ln-71"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-72"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
-<a name="ln-73"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-74"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-71"></a>    <span class="k">if</span> inputs.ymin <span class="k">ge</span> inputs.ymax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-72"></a>        error,<span class="s1">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
+<a name="ln-73"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-74"></a>    <span class="k">endif</span>
 <a name="ln-75"></a>
-<a name="ln-76"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-77"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
-<a name="ln-78"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-79"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-76"></a>    <span class="k">if</span> inputs.zmin <span class="k">ge</span> inputs.zmax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-77"></a>        error,<span class="s1">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
+<a name="ln-78"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-79"></a>    <span class="k">endif</span>
 <a name="ln-80"></a>
-<a name="ln-81"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span> <span class="s s-Atom">le</span> <span class="mf">0.</span> <span class="s s-Atom">or</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-82"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;The selected source is not on&#39;</span>
-<a name="ln-83"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;einj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span>
-<a name="ln-84"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;pinj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span>
-<a name="ln-85"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-86"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-81"></a>    <span class="k">if</span> inputs.pinj <span class="k">le</span> <span class="mi">0</span>. <span class="k">or</span> inputs.einj <span class="k">le</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-82"></a>        error,<span class="s1">&#39;The selected source is not on&#39;</span>
+<a name="ln-83"></a>        <span class="nb">print</span>,<span class="s1">&#39;einj = &#39;</span>,inputs.einj
+<a name="ln-84"></a>        <span class="nb">print</span>,<span class="s1">&#39;pinj = &#39;</span>,inputs.pinj
+<a name="ln-85"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-86"></a>    <span class="k">endif</span>
 <a name="ln-87"></a>
-<a name="ln-88"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">1.</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">3</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-89"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;current_fractions do not sum to 1.0&#39;</span>
-<a name="ln-90"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;sum(current_fractions) = &#39;</span><span class="p">,</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span>
-<a name="ln-91"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-92"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-88"></a>    <span class="k">if</span> <span class="nb">abs</span>(<span class="nb">total</span>(inputs.current_fractions) <span class="o">-</span> <span class="mf">1.0</span>) <span class="k">gt</span> <span class="mf">1.d-3</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-89"></a>        error,<span class="s1">&#39;current_fractions do not sum to 1.0&#39;</span>
+<a name="ln-90"></a>        <span class="nb">print</span>,<span class="s1">&#39;sum(current_fractions) = &#39;</span>,<span class="nb">total</span>(inputs.current_fractions)
+<a name="ln-91"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-92"></a>    <span class="k">endif</span>
 <a name="ln-93"></a>
-<a name="ln-94"></a>    <span class="s s-Atom">ps</span> <span class="o">=</span> <span class="nf">path_sep</span><span class="p">()</span>
-<a name="ln-95"></a>    <span class="s s-Atom">input_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_inputs.dat&#39;</span>
-<a name="ln-96"></a>    <span class="s s-Atom">equilibrium_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_equilibrium.h5&#39;</span>
-<a name="ln-97"></a>    <span class="s s-Atom">geometry_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_geometry.h5&#39;</span>
-<a name="ln-98"></a>    <span class="s s-Atom">distribution_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_distribution.h5&#39;</span>
-<a name="ln-99"></a>    <span class="s s-Atom">neutrals_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_neutrals.h5&#39;</span>
+<a name="ln-94"></a>    ps <span class="o">=</span> <span class="nb">path_sep</span>()
+<a name="ln-95"></a>    input_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_inputs.dat&#39;</span>
+<a name="ln-96"></a>    equilibrium_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_equilibrium.h5&#39;</span>
+<a name="ln-97"></a>    geometry_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_geometry.h5&#39;</span>
+<a name="ln-98"></a>    distribution_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_distribution.h5&#39;</span>
+<a name="ln-99"></a>    neutrals_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_neutrals.h5&#39;</span>
 <a name="ln-100"></a>
-<a name="ln-101"></a>    <span class="s s-Atom">inputs</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span><span class="s s-Atom">&#39;input_file&#39;</span><span class="p">,</span><span class="s s-Atom">input_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-102"></a>                                  <span class="s s-Atom">&#39;equilibrium_file&#39;</span><span class="p">,</span><span class="s s-Atom">equilibrium_file</span><span class="p">,</span><span class="err">$</span> 
-<a name="ln-103"></a>                                  <span class="s s-Atom">&#39;geometry_file&#39;</span><span class="p">,</span><span class="s s-Atom">geometry_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-104"></a>                                  <span class="s s-Atom">&#39;distribution_file&#39;</span><span class="p">,</span><span class="s s-Atom">distribution_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-105"></a>                                  <span class="s s-Atom">&#39;load_neutrals&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-106"></a>                                  <span class="s s-Atom">&#39;flr&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-107"></a>                                  <span class="s s-Atom">&#39;verbose&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-108"></a>                                  <span class="s s-Atom">&#39;seed&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-109"></a>                                  <span class="s s-Atom">&#39;stark_components&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-110"></a>                                  <span class="s s-Atom">&#39;neutrals_file&#39;</span><span class="p">,</span><span class="s s-Atom">neutrals_file</span><span class="p">)</span>
-<a name="ln-111"></a>
-<a name="ln-112"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-113"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-114"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid simulation settings. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-115"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-116"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Simulation settings are valid&#39;</span>
-<a name="ln-117"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-118"></a>
-<a name="ln-119"></a><span class="nv">END</span>
+<a name="ln-101"></a>    inputs <span class="o">=</span> <span class="nb">create_struct</span>(inputs,<span class="s1">&#39;input_file&#39;</span>,input_file, $
+<a name="ln-102"></a>                                  <span class="s1">&#39;equilibrium_file&#39;</span>,equilibrium_file,$ 
+<a name="ln-103"></a>                                  <span class="s1">&#39;geometry_file&#39;</span>,geometry_file, $
+<a name="ln-104"></a>                                  <span class="s1">&#39;distribution_file&#39;</span>,distribution_file, $
+<a name="ln-105"></a>                                  <span class="s1">&#39;load_neutrals&#39;</span>, <span class="mi">0</span>, $
+<a name="ln-106"></a>                                  <span class="s1">&#39;flr&#39;</span>,<span class="mi">2</span>, $
+<a name="ln-107"></a>                                  <span class="s1">&#39;verbose&#39;</span>, <span class="mi">1</span>, $
+<a name="ln-108"></a>                                  <span class="s1">&#39;seed&#39;</span>, <span class="o">-</span><span class="mi">1</span>, $
+<a name="ln-109"></a>                                  <span class="s1">&#39;stark_components&#39;</span>, <span class="mi">0</span>, $
+<a name="ln-110"></a>                                  <span class="s1">&#39;neutrals_file&#39;</span>,neutrals_file)
+<a name="ln-111"></a>    <span class="k">if</span> (<span class="nb">total</span>(<span class="nb">tag_names</span>(inputs) <span class="k">EQ</span> <span class="s1">&#39;OUTPUT_NEUTRAL_RESERVOIR&#39;</span>) <span class="k">EQ</span> <span class="mi">0</span>) <span class="k">then</span> inputs<span class="o">=</span><span class="nb">create_struct</span>(inputs,<span class="s1">&#39;output_neutral_reservoir&#39;</span>,<span class="mi">1</span>)
+<a name="ln-112"></a>
+<a name="ln-113"></a>    GET_OUT<span class="o">:</span>
+<a name="ln-114"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-115"></a>        error,<span class="s1">&#39;Invalid simulation settings. Exiting...&#39;</span>,<span class="o">/</span>halt
+<a name="ln-116"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-117"></a>        success,<span class="s1">&#39;Simulation settings are valid&#39;</span>
+<a name="ln-118"></a>    <span class="k">endelse</span>
+<a name="ln-119"></a>
+<a name="ln-120"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -375,7 +376,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

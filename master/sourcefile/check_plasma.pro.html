@@ -200,7 +200,7 @@
 <p><strong>grid</strong>: Interpolation grid structure</p>
 <p><strong>plasma</strong>: Plasma parameters structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> check_plasma, inputs, grid, plasma
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> check_plasma, inputs, grid, plasma
 </code></pre></div>
       <br>
     
@@ -246,105 +246,105 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">check_plasma</span><span class="p">,</span> <span class="s s-Atom">inp</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">plasma</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#check_plasma</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Checks</span> <span class="s s-Atom">if</span> <span class="s s-Atom">plasma</span> <span class="s s-Atom">paramters</span> <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">valid</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Input</span> <span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**inputs**:</span> <span class="nv">Input</span> <span class="s s-Atom">structure</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**grid**:</span> <span class="nv">Interpolation</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">structure</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**plasma**:</span> <span class="nv">Plasma</span> <span class="s s-Atom">parameters</span> <span class="s s-Atom">structure</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">check_plasma</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">plasma</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-16"></a>    <span class="s s-Atom">err_status</span><span class="o">=</span><span class="mi">0</span>
-<a name="ln-17"></a>    <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;Checking plasma parameters...&#39;</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> check_plasma, inp, grid, plasma
+<a name="ln-2"></a><span class="c1">    ;+#check_plasma</span>
+<a name="ln-3"></a><span class="c1">    ;+Checks if plasma paramters structure is valid</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+     **inputs**: Input structure</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+     **grid**: Interpolation grid structure</span>
+<a name="ln-9"></a><span class="c1">    ;+</span>
+<a name="ln-10"></a><span class="c1">    ;+     **plasma**: Plasma parameters structure</span>
+<a name="ln-11"></a><span class="c1">    ;+</span>
+<a name="ln-12"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-13"></a><span class="c1">    ;+```idl</span>
+<a name="ln-14"></a><span class="c1">    ;+IDL&gt; check_plasma, inputs, grid, plasma</span>
+<a name="ln-15"></a><span class="c1">    ;+```</span>
+<a name="ln-16"></a>    err_status<span class="o">=</span><span class="mi">0</span>
+<a name="ln-17"></a>    info,<span class="s1">&#39;Checking plasma parameters...&#39;</span>
 <a name="ln-18"></a>
-<a name="ln-19"></a>    <span class="s s-Atom">nr</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span>
-<a name="ln-20"></a>    <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span>
-<a name="ln-21"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nphi&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_NAMES</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-22"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-23"></a>        <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nphi&quot; is missing from the plasma, assuming axisymmetry&#39;</span>
-<a name="ln-24"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-25"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-26"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span>
-<a name="ln-27"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-19"></a>    nr <span class="o">=</span> grid.nr
+<a name="ln-20"></a>    nz <span class="o">=</span> grid.nz
+<a name="ln-21"></a>    w <span class="o">=</span> <span class="nb">where</span>(<span class="s2">&quot;nphi&quot;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">TAG_NAMES</span>(grid)),nw)
+<a name="ln-22"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-23"></a>        info,<span class="s1">&#39;&quot;nphi&quot; is missing from the plasma, assuming axisymmetry&#39;</span>
+<a name="ln-24"></a>        nphi <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-25"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-26"></a>        nphi <span class="o">=</span> grid.nphi
+<a name="ln-27"></a>    <span class="k">endelse</span>
 <a name="ln-28"></a>
-<a name="ln-29"></a>    <span class="s s-Atom">nthermal</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">nthermal</span>
-<a name="ln-30"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-31"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-32"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-33"></a>    <span class="s s-Atom">nthermal_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nthermal</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-34"></a>    <span class="s s-Atom">nrnznphi_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-35"></a>    <span class="s s-Atom">ntnrnznphi_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nthermal</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-36"></a>    <span class="s s-Atom">nrnznphi_int</span>    <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-37"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-38"></a>              <span class="nn">nthermal</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-39"></a>              <span class="s s-Atom">impurity_charge:zero_int</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-40"></a>              <span class="s s-Atom">species_mass:nthermal_double</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-41"></a>              <span class="nn">vr</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-42"></a>              <span class="nn">vt</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-43"></a>              <span class="nn">vz</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-44"></a>              <span class="nn">dene</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-45"></a>              <span class="nn">denimp</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-46"></a>              <span class="nn">deni</span><span class="p">:</span><span class="s s-Atom">ntnrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-47"></a>              <span class="nn">denn</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-48"></a>	      <span class="nn">ti</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-49"></a>              <span class="nn">te</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-50"></a>              <span class="nn">zeff</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-51"></a>              <span class="nn">mask</span><span class="p">:</span><span class="s s-Atom">nrnznphi_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-52"></a>              <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
+<a name="ln-29"></a>    nthermal <span class="o">=</span> plasma.nthermal
+<a name="ln-30"></a>    zero_int <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;INT&#39;</span>}
+<a name="ln-31"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
+<a name="ln-32"></a>    zero_double <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-33"></a>    nthermal_double <span class="o">=</span> {dims<span class="o">:</span>[nthermal], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-34"></a>    nrnznphi_double <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-35"></a>    ntnrnznphi_double <span class="o">=</span> {dims<span class="o">:</span>[nthermal,nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a name="ln-36"></a>    nrnznphi_int    <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;INT&#39;</span>}
+<a name="ln-37"></a>    schema <span class="o">=</span> {time<span class="o">:</span>zero_double, $
+<a name="ln-38"></a>              nthermal<span class="o">:</span>zero_int,$
+<a name="ln-39"></a>              impurity_charge<span class="o">:</span>zero_int,$
+<a name="ln-40"></a>              species_mass<span class="o">:</span>nthermal_double,$
+<a name="ln-41"></a>              vr<span class="o">:</span>nrnznphi_double, $
+<a name="ln-42"></a>              vt<span class="o">:</span>nrnznphi_double, $
+<a name="ln-43"></a>              vz<span class="o">:</span>nrnznphi_double, $
+<a name="ln-44"></a>              dene<span class="o">:</span>nrnznphi_double, $
+<a name="ln-45"></a>              denimp<span class="o">:</span>nrnznphi_double, $
+<a name="ln-46"></a>              deni<span class="o">:</span>ntnrnznphi_double, $
+<a name="ln-47"></a>              denn<span class="o">:</span>nrnznphi_double, $
+<a name="ln-48"></a>	      ti<span class="o">:</span>nrnznphi_double, $
+<a name="ln-49"></a>              te<span class="o">:</span>nrnznphi_double, $
+<a name="ln-50"></a>              zeff<span class="o">:</span>nrnznphi_double, $
+<a name="ln-51"></a>              mask<span class="o">:</span>nrnznphi_int, $
+<a name="ln-52"></a>              data_source<span class="o">:</span>zero_string}
 <a name="ln-53"></a>
-<a name="ln-54"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">plasma</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span><span class="s s-Atom">desc</span> <span class="o">=</span> <span class="s2">&quot;plasma parameters&quot;</span>
-<a name="ln-55"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-56"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-57"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-54"></a>    check_struct_schema,schema,plasma,err_status,desc <span class="o">=</span> <span class="s2">&quot;plasma parameters&quot;</span>
+<a name="ln-55"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-56"></a>        <span class="k">goto</span>, GET_OUT
+<a name="ln-57"></a>    <span class="k">endif</span>
 <a name="ln-58"></a>
-<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">data_source</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-60"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
-<a name="ln-61"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-62"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-59"></a>    <span class="k">if</span> plasma.data_source <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-60"></a>        error, <span class="s1">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
+<a name="ln-61"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-62"></a>    <span class="k">endif</span>
 <a name="ln-63"></a>
-<a name="ln-64"></a>    <span class="p">;;</span><span class="nv">Electron</span> <span class="s s-Atom">density</span>
-<a name="ln-65"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">dene</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">dene</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="mi">1</span><span class="o">/</span><span class="s s-Atom">cm^</span><span class="mi">3</span><span class="p">]</span>
+<a name="ln-64"></a><span class="c1">    ;;Electron density</span>
+<a name="ln-65"></a>    plasma.dene <span class="o">=</span> plasma.dene <span class="o">&gt;</span> <span class="mi">0</span>. ;[<span class="mi">1</span><span class="o">/</span>cm<span class="o">^</span><span class="mi">3</span>]
 <a name="ln-66"></a>
-<a name="ln-67"></a>    <span class="p">;;</span><span class="nv">Impurity</span> <span class="s s-Atom">density</span>
-<a name="ln-68"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">denimp</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">denimp</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="mi">1</span><span class="o">/</span><span class="s s-Atom">cm^</span><span class="mi">3</span><span class="p">]</span>
+<a name="ln-67"></a><span class="c1">    ;;Impurity density</span>
+<a name="ln-68"></a>    plasma.denimp <span class="o">=</span> plasma.denimp <span class="o">&gt;</span> <span class="mi">0</span>. ;[<span class="mi">1</span><span class="o">/</span>cm<span class="o">^</span><span class="mi">3</span>]
 <a name="ln-69"></a>
-<a name="ln-70"></a>    <span class="p">;;</span><span class="nv">Ion</span> <span class="nv">Density</span>
-<a name="ln-71"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">deni</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">deni</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="mi">1</span><span class="o">/</span><span class="s s-Atom">cm^</span><span class="mi">3</span><span class="p">]</span>
+<a name="ln-70"></a><span class="c1">    ;;Ion Density</span>
+<a name="ln-71"></a>    plasma.deni <span class="o">=</span> plasma.deni <span class="o">&gt;</span> <span class="mi">0</span>. ;[<span class="mi">1</span><span class="o">/</span>cm<span class="o">^</span><span class="mi">3</span>]
 <a name="ln-72"></a>
-<a name="ln-73"></a>    <span class="p">;;</span><span class="nv">Neutral</span> <span class="s s-Atom">density</span>
-<a name="ln-74"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">denn</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">denn</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="mi">1</span><span class="o">/</span><span class="s s-Atom">cm^</span><span class="mi">3</span><span class="p">]</span>
+<a name="ln-73"></a><span class="c1">    ;;Neutral density</span>
+<a name="ln-74"></a>    plasma.denn <span class="o">=</span> plasma.denn <span class="o">&gt;</span> <span class="mi">0</span>. ;[<span class="mi">1</span><span class="o">/</span>cm<span class="o">^</span><span class="mi">3</span>]
 <a name="ln-75"></a>
-<a name="ln-76"></a>    <span class="p">;;</span><span class="nv">Zeff</span>
-<a name="ln-77"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">zeff</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">impurity_charge</span> <span class="o">&lt;</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">zeff</span> <span class="o">&gt;</span> <span class="mf">1.0</span>
+<a name="ln-76"></a><span class="c1">    ;;Zeff</span>
+<a name="ln-77"></a>    plasma.zeff <span class="o">=</span> plasma.impurity_charge <span class="o">&lt;</span> plasma.zeff <span class="o">&gt;</span> <span class="mf">1.0</span>
 <a name="ln-78"></a>
-<a name="ln-79"></a>    <span class="p">;;</span><span class="nv">Electron</span> <span class="s s-Atom">temperature</span>
-<a name="ln-80"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">te</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">te</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="s s-Atom">keV</span><span class="p">]</span>
+<a name="ln-79"></a><span class="c1">    ;;Electron temperature</span>
+<a name="ln-80"></a>    plasma.te <span class="o">=</span> plasma.te <span class="o">&gt;</span> <span class="mi">0</span>. ;[keV]
 <a name="ln-81"></a>
-<a name="ln-82"></a>    <span class="p">;;</span><span class="nv">Ion</span> <span class="s s-Atom">temperature</span>
-<a name="ln-83"></a>    <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">ti</span> <span class="o">=</span> <span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">ti</span> <span class="o">&gt;</span> <span class="mf">0.</span> <span class="p">;[</span><span class="s s-Atom">keV</span><span class="p">]</span>
+<a name="ln-82"></a><span class="c1">    ;;Ion temperature</span>
+<a name="ln-83"></a>    plasma.ti <span class="o">=</span> plasma.ti <span class="o">&gt;</span> <span class="mi">0</span>. ;[keV]
 <a name="ln-84"></a>
-<a name="ln-85"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">-</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.02</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-86"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Plasma time and input time do not match&#39;</span>
-<a name="ln-87"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Input time: &#39;</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span>
-<a name="ln-88"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Plasma time: &#39;</span><span class="p">,</span><span class="s s-Atom">plasma</span><span class="p">.</span><span class="s s-Atom">time</span>
-<a name="ln-89"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-85"></a>    <span class="k">if</span> <span class="nb">abs</span>(plasma.time <span class="o">-</span> inp.time) <span class="k">gt</span> <span class="mf">0.02</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-86"></a>        warn,<span class="s1">&#39;Plasma time and input time do not match&#39;</span>
+<a name="ln-87"></a>        <span class="nb">print</span>,<span class="s1">&#39;Input time: &#39;</span>,inp.time
+<a name="ln-88"></a>        <span class="nb">print</span>,<span class="s1">&#39;Plasma time: &#39;</span>,plasma.time
+<a name="ln-89"></a>    <span class="k">endif</span>
 <a name="ln-90"></a>
-<a name="ln-91"></a>    <span class="s s-Atom">plasma</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">plasma</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">)</span>
+<a name="ln-91"></a>    plasma <span class="o">=</span> <span class="nb">create_struct</span>(plasma, grid)
 <a name="ln-92"></a>
-<a name="ln-93"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-94"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-95"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid plasma parameters. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-96"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-97"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Plasma parameters are valid&#39;</span>
-<a name="ln-98"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-99"></a><span class="nv">END</span>
+<a name="ln-93"></a>    GET_OUT<span class="o">:</span>
+<a name="ln-94"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-95"></a>        error,<span class="s1">&#39;Invalid plasma parameters. Exiting...&#39;</span>,<span class="o">/</span>halt
+<a name="ln-96"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-97"></a>        success,<span class="s1">&#39;Plasma parameters are valid&#39;</span>
+<a name="ln-98"></a>    <span class="k">endelse</span>
+<a name="ln-99"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -357,7 +357,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

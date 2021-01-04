@@ -205,7 +205,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Interpolation grid structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(<span class="mf">100.d0</span>,<span class="mf">240.d0</span>,<span class="mi">70</span>,<span class="o">-</span><span class="mf">100.d0</span>,<span class="mf">100.d0</span>,<span class="mi">100</span>,phimin<span class="o">=-</span>!dpi<span class="o">/</span><span class="mi">6</span>,phimax<span class="o">=</span>!dpi<span class="o">/</span><span class="mi">6</span>,nphi<span class="o">=</span><span class="mi">5</span>)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(<span class="mf">100.d0</span>,<span class="mf">240.d0</span>,<span class="mi">70</span>,<span class="o">-</span><span class="mf">100.d0</span>,<span class="mf">100.d0</span>,<span class="mi">100</span>,phimin<span class="o">=-</span>!dpi<span class="o">/</span><span class="mi">6</span>,phimax<span class="o">=</span>!dpi<span class="o">/</span><span class="mi">6</span>,nphi<span class="o">=</span><span class="mi">5</span>)
 </code></pre></div>
       <br>
     
@@ -251,54 +251,54 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">rz_grid</span><span class="p">,</span><span class="s s-Atom">rmin</span><span class="p">,</span><span class="s s-Atom">rmax</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">zmin</span><span class="p">,</span><span class="s s-Atom">zmax</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">phimin</span><span class="o">=</span><span class="s s-Atom">phimin</span><span class="p">,</span><span class="s s-Atom">phimax</span><span class="o">=</span><span class="s s-Atom">phimax</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="o">=</span><span class="s s-Atom">nphi</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#rz_grid</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Creates</span> <span class="s s-Atom">interpolation</span> <span class="s s-Atom">grid</span>
-<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rmin**:</span> <span class="nv">Minimum</span> <span class="s s-Atom">radius</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rmax**:</span> <span class="nv">Maximum</span> <span class="s s-Atom">radius</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nr**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">radii</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zmin**:</span> <span class="nv">Minimum</span> <span class="nv">Z</span> <span class="s s-Atom">value</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zmax**:</span> <span class="nv">Maximum</span> <span class="nv">Z</span> <span class="s s-Atom">value</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nz**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">z</span> <span class="s s-Atom">values</span>
-<a name="ln-17"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-18"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-19"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Interpolation</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">structure</span>
-<a name="ln-20"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-21"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-22"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-23"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="nf">rz_grid</span><span class="p">(</span><span class="mf">100.</span><span class="s s-Atom">d0</span><span class="p">,</span><span class="mf">240.</span><span class="s s-Atom">d0</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="o">-</span><span class="mf">100.</span><span class="s s-Atom">d0</span><span class="p">,</span><span class="mf">100.</span><span class="s s-Atom">d0</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="s s-Atom">phimin=-</span><span class="p">!</span><span class="s s-Atom">dpi</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span><span class="s s-Atom">phimax=</span><span class="p">!</span><span class="s s-Atom">dpi</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<a name="ln-24"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin<span class="o">=</span>phimin,phimax<span class="o">=</span>phimax,nphi<span class="o">=</span>nphi
+<a name="ln-2"></a><span class="c1">    ;+#rz_grid</span>
+<a name="ln-3"></a><span class="c1">    ;+Creates interpolation grid</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+    **rmin**: Minimum radius [cm]</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+    **rmax**: Maximum radius [cm]</span>
+<a name="ln-9"></a><span class="c1">    ;+</span>
+<a name="ln-10"></a><span class="c1">    ;+    **nr**: Number of radii</span>
+<a name="ln-11"></a><span class="c1">    ;+</span>
+<a name="ln-12"></a><span class="c1">    ;+    **zmin**: Minimum Z value [cm]</span>
+<a name="ln-13"></a><span class="c1">    ;+</span>
+<a name="ln-14"></a><span class="c1">    ;+    **zmax**: Maximum Z value [cm]</span>
+<a name="ln-15"></a><span class="c1">    ;+</span>
+<a name="ln-16"></a><span class="c1">    ;+    **nz**: Number of z values</span>
+<a name="ln-17"></a><span class="c1">    ;+</span>
+<a name="ln-18"></a><span class="c1">    ;+##Return Value</span>
+<a name="ln-19"></a><span class="c1">    ;+Interpolation grid structure</span>
+<a name="ln-20"></a><span class="c1">    ;+</span>
+<a name="ln-21"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-22"></a><span class="c1">    ;+```idl</span>
+<a name="ln-23"></a><span class="c1">    ;+IDL&gt; grid = rz_grid(100.d0,240.d0,70,-100.d0,100.d0,100,phimin=-!dpi/6,phimax=!dpi/6,nphi=5)</span>
+<a name="ln-24"></a><span class="c1">    ;+```</span>
 <a name="ln-25"></a>
-<a name="ln-26"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">phimin</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">phimin</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span><span class="s s-Atom">rad</span>
-<a name="ln-27"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">phimax</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">phimax</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span><span class="s s-Atom">rad</span>
-<a name="ln-28"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">nphi</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-26"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(phimin) <span class="k">then</span> phimin <span class="o">=</span> <span class="mf">0.0</span> ;rad
+<a name="ln-27"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(phimax) <span class="k">then</span> phimax <span class="o">=</span> <span class="mf">0.0</span> ;rad
+<a name="ln-28"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(nphi) <span class="k">then</span> nphi <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-29"></a>
-<a name="ln-30"></a>    <span class="s s-Atom">dr</span> <span class="o">=</span> <span class="nf">double</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">rmax</span><span class="o">-</span><span class="s s-Atom">rmin</span><span class="p">))</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-31"></a>    <span class="s s-Atom">dz</span> <span class="o">=</span> <span class="nf">double</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">zmax</span><span class="o">-</span><span class="s s-Atom">zmin</span><span class="p">))</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-32"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nphi</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-33"></a>        <span class="s s-Atom">dphi</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a name="ln-34"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-35"></a>        <span class="s s-Atom">dphi</span> <span class="o">=</span> <span class="nf">double</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">phimax</span><span class="o">-</span><span class="s s-Atom">phimin</span><span class="p">))</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nphi</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-36"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-30"></a>    dr <span class="o">=</span> <span class="nb">double</span>(<span class="nb">abs</span>(rmax<span class="o">-</span>rmin))<span class="o">/</span>(nr<span class="o">-</span><span class="mi">1</span>)
+<a name="ln-31"></a>    dz <span class="o">=</span> <span class="nb">double</span>(<span class="nb">abs</span>(zmax<span class="o">-</span>zmin))<span class="o">/</span>(nz<span class="o">-</span><span class="mi">1</span>)
+<a name="ln-32"></a>    <span class="k">if</span> nphi <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-33"></a>        dphi <span class="o">=</span> <span class="mf">0.0</span>
+<a name="ln-34"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-35"></a>        dphi <span class="o">=</span> <span class="nb">double</span>(<span class="nb">abs</span>(phimax<span class="o">-</span>phimin))<span class="o">/</span>(nphi<span class="o">-</span><span class="mi">1</span>)
+<a name="ln-36"></a>    <span class="k">endelse</span>
 <a name="ln-37"></a>
-<a name="ln-38"></a>    <span class="s s-Atom">r</span> <span class="o">=</span> <span class="s s-Atom">rmin</span> <span class="o">+</span> <span class="s s-Atom">dr</span><span class="o">*</span><span class="nf">dindgen</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="p">)</span>
-<a name="ln-39"></a>    <span class="s s-Atom">z</span> <span class="o">=</span> <span class="s s-Atom">zmin</span> <span class="o">+</span> <span class="s s-Atom">dz</span><span class="o">*</span><span class="nf">dindgen</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="p">)</span>
-<a name="ln-40"></a>    <span class="s s-Atom">phi</span> <span class="o">=</span> <span class="s s-Atom">phimin</span> <span class="o">+</span> <span class="s s-Atom">dphi</span><span class="o">*</span><span class="nf">dindgen</span><span class="p">(</span><span class="s s-Atom">nphi</span><span class="p">)</span>
+<a name="ln-38"></a>    r <span class="o">=</span> rmin <span class="o">+</span> dr<span class="o">*</span><span class="nb">dindgen</span>(nr)
+<a name="ln-39"></a>    z <span class="o">=</span> zmin <span class="o">+</span> dz<span class="o">*</span><span class="nb">dindgen</span>(nz)
+<a name="ln-40"></a>    phi <span class="o">=</span> phimin <span class="o">+</span> dphi<span class="o">*</span><span class="nb">dindgen</span>(nphi)
 <a name="ln-41"></a>
-<a name="ln-42"></a>    <span class="s s-Atom">r2d</span> <span class="o">=</span> <span class="s s-Atom">r</span> <span class="s s-Atom">#</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">)</span>
-<a name="ln-43"></a>    <span class="s s-Atom">z2d</span> <span class="o">=</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">)</span> <span class="s s-Atom">#</span> <span class="s s-Atom">z</span>
+<a name="ln-42"></a>    r2d <span class="o">=</span> r <span class="o">#</span> <span class="nb">replicate</span>(<span class="mi">1</span>,nz)
+<a name="ln-43"></a>    z2d <span class="o">=</span> <span class="nb">replicate</span>(<span class="mi">1</span>,nr) <span class="o">#</span> z
 <a name="ln-44"></a>
-<a name="ln-45"></a>    <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">r2d:r2d</span><span class="p">,</span><span class="s s-Atom">z2d:z2d</span><span class="p">,</span><span class="nn">r</span><span class="p">:</span><span class="s s-Atom">r</span><span class="p">,</span><span class="nn">z</span><span class="p">:</span><span class="s s-Atom">z</span><span class="p">,</span><span class="nn">phi</span><span class="p">:</span><span class="s s-Atom">phi</span><span class="p">,</span><span class="nn">nr</span><span class="p">:</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="nn">nphi</span><span class="p">:</span><span class="s s-Atom">nphi</span><span class="p">}</span>
+<a name="ln-45"></a>    grid <span class="o">=</span> {r2d<span class="o">:</span>r2d,z2d<span class="o">:</span>z2d,r<span class="o">:</span>r,z<span class="o">:</span>z,phi<span class="o">:</span>phi,nr<span class="o">:</span>nr,nz<span class="o">:</span>nz,nphi<span class="o">:</span>nphi}
 <a name="ln-46"></a>
-<a name="ln-47"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">grid</span>
-<a name="ln-48"></a><span class="nv">END</span>
+<a name="ln-47"></a>    <span class="nb">return</span>, grid
+<a name="ln-48"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -311,7 +311,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

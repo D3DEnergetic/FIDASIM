@@ -199,7 +199,7 @@ Falls back to reading VERSION file when git is not available</p>
 <h2 id="input-arguments">Input Arguments</h2>
 <p><strong>fidasim_dir</strong>: FIDASIM install directory</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="idl codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> version <span class="o">=</span> get_version(<span class="nb">getenv</span>(<span class="s2">&quot;FIDASIM_DIR&quot;</span>))
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> version <span class="o">=</span> get_version(<span class="nb">getenv</span>(<span class="s2">&quot;FIDASIM_DIR&quot;</span>))
 </code></pre></div>
       <br>
     
@@ -245,41 +245,41 @@ Falls back to reading VERSION file when git is not available</p>
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">get_version</span><span class="p">,</span> <span class="s s-Atom">fidasim_dir</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#get_version</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Gets</span> <span class="nv">FIDASIM</span> <span class="s s-Atom">version</span> <span class="s s-Atom">number</span> <span class="s s-Atom">from</span> <span class="s s-Atom">git</span><span class="p">.</span> 
-<a name="ln-4"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Falls</span> <span class="s s-Atom">back</span> <span class="s s-Atom">to</span> <span class="s s-Atom">reading</span> <span class="nv">VERSION</span> <span class="s s-Atom">file</span> <span class="s s-Atom">when</span> <span class="s s-Atom">git</span> <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">available</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Input</span> <span class="nv">Arguments</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**fidasim_dir**:</span> <span class="nv">FIDASIM</span> <span class="s s-Atom">install</span> <span class="s s-Atom">directory</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">version</span> <span class="o">=</span> <span class="nf">get_version</span><span class="p">(</span><span class="nf">getenv</span><span class="p">(</span><span class="s2">&quot;FIDASIM_DIR&quot;</span><span class="p">))</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> get_version, fidasim_dir
+<a name="ln-2"></a><span class="c1">    ;+#get_version</span>
+<a name="ln-3"></a><span class="c1">    ;+ Gets FIDASIM version number from git. </span>
+<a name="ln-4"></a><span class="c1">    ;+ Falls back to reading VERSION file when git is not available</span>
+<a name="ln-5"></a><span class="c1">    ;+***</span>
+<a name="ln-6"></a><span class="c1">    ;+##Input Arguments</span>
+<a name="ln-7"></a><span class="c1">    ;+    **fidasim_dir**: FIDASIM install directory</span>
+<a name="ln-8"></a><span class="c1">    ;+</span>
+<a name="ln-9"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-10"></a><span class="c1">    ;+```idl</span>
+<a name="ln-11"></a><span class="c1">    ;+IDL&gt; version = get_version(getenv(&quot;FIDASIM_DIR&quot;))</span>
+<a name="ln-12"></a><span class="c1">    ;+```</span>
 <a name="ln-13"></a>
-<a name="ln-14"></a>    <span class="s s-Atom">version</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-15"></a>    <span class="s s-Atom">git_dir</span> <span class="o">=</span> <span class="s s-Atom">fidasim_dir+&#39;/.git&#39;</span>
-<a name="ln-16"></a>    <span class="s s-Atom">if</span> <span class="nf">strcmp</span><span class="p">(!</span><span class="nv">VERSION</span><span class="p">.</span><span class="nv">OS_FAMILY</span> <span class="p">,</span><span class="s s-Atom">&#39;windows&#39;</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-17"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">&#39;command -v git &#39;</span><span class="p">,</span><span class="s s-Atom">git_command</span>
-<a name="ln-18"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-19"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">&#39;command -v git &#39;</span><span class="p">,</span><span class="s s-Atom">git_command</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">sh</span>
-<a name="ln-20"></a>    <span class="s s-Atom">endelse</span>    
-<a name="ln-21"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_command</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_dir</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">dir</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-22"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">git_command+&#39; --git-dir=&#39;</span><span class="o">+</span><span class="s s-Atom">git_dir+&#39; describe --tags --always --dirty&#39;</span><span class="p">,</span><span class="s s-Atom">version</span><span class="p">,</span><span class="s s-Atom">err_status</span>
-<a name="ln-23"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-24"></a>        <span class="s s-Atom">version_file</span> <span class="o">=</span> <span class="s s-Atom">fidasim_dir+&#39;/VERSION&#39;</span>
-<a name="ln-25"></a>        <span class="s s-Atom">version</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-26"></a>        <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">version_file</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-27"></a>            <span class="s s-Atom">openr</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version_file</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">get_lun</span>
-<a name="ln-28"></a>            <span class="s s-Atom">readf</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version</span>
-<a name="ln-29"></a>            <span class="s s-Atom">free_lun</span><span class="p">,</span> <span class="s s-Atom">lun</span>
-<a name="ln-30"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-31"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-14"></a>    version <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-15"></a>    git_dir <span class="o">=</span> fidasim_dir<span class="o">+</span><span class="s1">&#39;/.git&#39;</span>
+<a name="ln-16"></a>    <span class="k">if</span> <span class="nb">strcmp</span>(!VERSION.OS_FAMILY ,<span class="s1">&#39;windows&#39;</span>, <span class="o">/</span>fold_case) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-17"></a>        <span class="nb">spawn</span>,<span class="s1">&#39;command -v git &#39;</span>,git_command
+<a name="ln-18"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-19"></a>        <span class="nb">spawn</span>,<span class="s1">&#39;command -v git &#39;</span>,git_command,<span class="o">/</span>sh
+<a name="ln-20"></a>    <span class="k">endelse</span>    
+<a name="ln-21"></a>    <span class="k">if</span> <span class="nb">file_test</span>(git_command) <span class="k">and</span> <span class="nb">file_test</span>(git_dir,<span class="o">/</span>dir) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-22"></a>        <span class="nb">spawn</span>,git_command<span class="o">+</span><span class="s1">&#39; --git-dir=&#39;</span><span class="o">+</span>git_dir<span class="o">+</span><span class="s1">&#39; describe --tags --always --dirty&#39;</span>,version,err_status
+<a name="ln-23"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-24"></a>        version_file <span class="o">=</span> fidasim_dir<span class="o">+</span><span class="s1">&#39;/VERSION&#39;</span>
+<a name="ln-25"></a>        version <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-26"></a>        <span class="k">if</span> <span class="nb">file_test</span>(version_file) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-27"></a>            openr, lun, version_file, <span class="o">/</span><span class="nb">get_lun</span>
+<a name="ln-28"></a>            readf, lun, version
+<a name="ln-29"></a>            <span class="nb">free_lun</span>, lun
+<a name="ln-30"></a>        <span class="k">endif</span>
+<a name="ln-31"></a>    <span class="k">endelse</span>
 <a name="ln-32"></a>
-<a name="ln-33"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">version</span>
+<a name="ln-33"></a>    <span class="nb">return</span>, version
 <a name="ln-34"></a>
-<a name="ln-35"></a><span class="nv">END</span>
+<a name="ln-35"></a><span class="k">END</span>
 </pre></div>
 
     </section>
@@ -292,7 +292,7 @@ Falls back to reading VERSION file when git is not available</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

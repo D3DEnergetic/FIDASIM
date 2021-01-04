@@ -151,18 +151,18 @@ Please try these solutions before <a href="https://github.com/D3DEnergetic/FIDAS
 <h1 id="segfaults">Segfaults</h1>
 <p>If you encounter a segfault make sure you have set the stacksize limit to unlimited.</p>
 <p>To do this for the bash shell run</p>
-<div class="bash codehilite"><pre><span></span><code><span class="nb">ulimit</span> -s unlimited
+<div class="codehilite"><pre><span></span><code><span class="nb">ulimit</span> -s unlimited
 </code></pre></div>
 
 <p>or for the tcsh shell run</p>
-<div class="tcsh codehilite"><pre><span></span><code><span class="nb">limit </span>stacksize unlimited
+<div class="codehilite"><pre><span></span><code><span class="nb">limit </span>stacksize unlimited
 </code></pre></div>
 
 <h1 id="execution-hangs-when-using-openmp">Execution Hangs when using OpenMP</h1>
 <p>By default FIDASIM will use all the threads available when using OpenMP.
 If another process is hogging a core it will cause FIDASIM to stall.
 To prevent this use the <code>num_threads</code> optional argument as shown below</p>
-<div class="bash codehilite"><pre><span></span><code>fidasim ./test_inputs.dat <span class="m">8</span>
+<div class="codehilite"><pre><span></span><code>fidasim ./test_inputs.dat <span class="m">8</span>
 </code></pre></div>
     </div>
     
@@ -293,7 +293,7 @@ To prevent this use the <code>num_threads</code> optional argument as shown belo
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

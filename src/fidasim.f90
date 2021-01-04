@@ -119,7 +119,7 @@ integer :: n_thermal = 1
 real(Float64) :: thermal_mass(max_species) = 0.d0
     !+ Thermal ion species mass [amu]
 real(Float64) :: thermal_lambda0(max_species) = 0.d0
-    !+ Reference wavelengths for thermal species/isotopes
+    !+ Reference wavelengths for thermal species/isotopes [nm]
 integer :: impurity_charge = 1
     !+ Charge of main impurity (boron=5, carbon=6,...)
 real(Float64) :: impurity_mass = 0.d0
@@ -997,6 +997,8 @@ type SimulationInputs
         !+ Total number of spectral switches on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
+    integer(Int32) :: output_neutral_reservoir
+        !+ Output neutral reservoir: 0 = off, 1=on
     integer(Int32) :: calc_npa
         !+ Calculate Active NPA: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_pnpa
@@ -1872,6 +1874,7 @@ subroutine read_inputs
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,flr,split,stark_components
+    integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1888,7 +1891,7 @@ subroutine read_inputs
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
-        ab, pinj, einj, current_fractions, &
+        ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
@@ -1929,6 +1932,7 @@ subroutine read_inputs
     calc_fida_wght=0
     calc_npa_wght=0
     load_neutrals=0
+    output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
     n_fida=0
@@ -2041,6 +2045,8 @@ subroutine read_inputs
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
+    inputs%output_neutral_reservoir=output_neutral_reservoir
+
     inputs%verbose=verbose
     inputs%flr = flr
     inputs%stark_components = stark_components
@@ -2219,10 +2225,12 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
 
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
-        
-        write(*, '(a)') "---- Identify Transition ----"
-        write(*, '(a)') "The Transition is Balmer-alpha."
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+           write(*, '(a)') "---- Identify Transition ----"
+           write(*, '(a)') "The Transition is Balmer-alpha."
+           write(*,*) ''
+        endif
+
 
     else if (inputs%lambdamin > 103.0d0 .and. inputs%lambdamax < 136.0d0) then
         ! Assigns stark varibales to Lyman alpha transition
@@ -2245,9 +2253,12 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
        
-        write(*, '(a)') "---- Identify Transition ----"
-        write(*, '(a)') "The Transition is Lyman-alpha."
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+           write(*, '(a)') "---- Identify Transition ----"
+           write(*, '(a)') "The Transition is Lyman-alpha."
+           write(*,*) ''
+        endif
+
    endif
   
 end subroutine identify_transition
@@ -4476,27 +4487,28 @@ subroutine write_neutral_population(id, pop, error)
     enddo
 
     !Create reservoir group
-    call h5gcreate_f(id, "reservoir", gid, error)
-    call h5ltset_attribute_string_f(id,"reservoir","description", &
-         "Neutral Particle Reservoir",error)
+    if(inputs%output_neutral_reservoir.eq.1) then
+       call h5gcreate_f(id, "reservoir", gid, error)
+       call h5ltset_attribute_string_f(id,"reservoir","description", &
+            "Neutral Particle Reservoir",error)
 
-    call h5ltmake_dataset_int_f(gid,"k", 0, d, [maxval(pop%res%k)], error)
-    call h5ltset_attribute_string_f(gid,"k","description", &
-         "Reservoir Size", error)
+       call h5ltmake_dataset_int_f(gid,"k", 0, d, [maxval(pop%res%k)], error)
+       call h5ltset_attribute_string_f(gid,"k","description", &
+            "Reservoir Size", error)
 
-    call h5ltmake_compressed_dataset_int_f(gid, "n", 3, dims4(2:4), n, error)
-    call h5ltset_attribute_string_f(gid, "n", "description", &
-         "Number of particles in each reservoir", error)
+       call h5ltmake_compressed_dataset_int_f(gid, "n", 3, dims4(2:4), n, error)
+       call h5ltset_attribute_string_f(gid, "n", "description", &
+            "Number of particles in each reservoir", error)
 
-    call h5ltmake_compressed_dataset_double_f(gid, "w", 4, dims5(2:5), w, error, compress=.False.)
-    call h5ltset_attribute_string_f(gid, "w", "description", &
-         "Neutral Particle Weight", error)
+       call h5ltmake_compressed_dataset_double_f(gid, "w", 4, dims5(2:5), w, error, compress=.False.)
+       call h5ltset_attribute_string_f(gid, "w", "description", &
+            "Neutral Particle Weight", error)
 
-    call h5ltmake_compressed_dataset_double_f(gid, "v", 5, dims5, v, error, compress=.False.)
-    call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
-    call h5ltset_attribute_string_f(gid,"v","description", &
-         "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
-
+       call h5ltmake_compressed_dataset_double_f(gid, "v", 5, dims5, v, error, compress=.False.)
+       call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
+       call h5ltset_attribute_string_f(gid,"v","description", &
+            "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
+    endif
     !Close grid group
     call h5gclose_f(gid, error)
 
@@ -5099,6 +5111,19 @@ subroutine write_spectra
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
         endif
     endif
+
+    if((inputs%calc_halo.ge.1) .or. (inputs%calc_dcx.ge.1)) then
+       call h5ltmake_compressed_dataset_double_f(fid, "/thermal_mass", 1, dims(4:4), thermal_mass(1:n_thermal), error)
+       call h5ltset_attribute_string_f(fid,"/thermal_mass","description", &
+            "Mass of each of the thermal ions: thermal_mass(species)", error)
+       call h5ltset_attribute_string_f(fid,"/thermal_mass", "units", "amu", error)
+
+       call h5ltmake_compressed_dataset_double_f(fid, "/thermal_lambda0", 1, dims(4:4), thermal_lambda0(1:n_thermal), error)
+       call h5ltset_attribute_string_f(fid,"/thermal_lambda0","description", &
+            "Rest wavelength of the thermal species lines: thermal_lambda0(species)", error)
+       call h5ltset_attribute_string_f(fid,"/thermal_lambda0", "units", "nm", error)
+    endif
+
 
     if(inputs%calc_cold.ge.1) then
         spec%cold = factor*spec%cold

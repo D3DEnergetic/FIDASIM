@@ -108,6 +108,7 @@ PRO check_inputs, inputs
                                   'seed', -1, $
                                   'stark_components', 0, $
                                   'neutrals_file',neutrals_file)
+    if (total(tag_names(inputs) EQ 'OUTPUT_NEUTRAL_RESERVOIR') EQ 0) then inputs=create_struct(inputs,'output_neutral_reservoir',1)
 
     GET_OUT:
     if err_status ne 0 then begin

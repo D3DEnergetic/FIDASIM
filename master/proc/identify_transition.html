@@ -132,19 +132,19 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">43 statements</a>
+    title=" 0.3% of total for procedures.">39 statements</a>
      </li> 
      
      
      
-    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/libfida.f90"> Source File</a></li>
      
      
   </ul>
   <ol class="breadcrumb in-well text-right">
   
     
-     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+     <li><a href='../sourcefile/libfida.f90.html'>libfida.f90</a></li>
     
      <li><a href='../module/libfida.html'>libfida</a></li>
     
@@ -528,12 +528,10 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
 
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_sigma</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stark_pi</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">           write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
-           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Balmer-alpha.&quot;</span>
-           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">endif</span>
-
+        
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Balmer-alpha.&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
 
     <span class="k">else if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="mf">3.0d0</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="mf">6.0d0</span><span class="p">)</span> <span class="k">then</span>
         <span class="c">! Assigns stark varibales to Lyman alpha transition</span>
@@ -556,12 +554,9 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_sigma</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stark_pi</span>
        
-        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">           write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
-           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Lyman-alpha.&quot;</span>
-           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">endif</span>
-
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Lyman-alpha.&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
    <span class="n">endif</span>
   
 <span class="k">end subroutine </span><span class="n">identify_transition</span>

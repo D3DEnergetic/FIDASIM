@@ -8384,18 +8384,21 @@ subroutine neutral_cx_rate(denn, res, v_ion, rates)
 
     integer :: i
     real(Float64), dimension(nlevs) :: rates_i
-    real(Float64) :: vn(3)
+    real(Float64) :: vn(3), totw
 
     !! Average CX rate over Reservoir
     rates = 0.d0
     if(res%n.eq.0) return
+
+    totw = sum(res%R%w)
+    if(totw.eq.0.d0) return
 
     do i=1, min(res%n,res%k)
         vn = res%R(i)%v
         call bb_cx_rates(denn,vn,v_ion,rates_i)
         rates = rates + res%R(i)%w*rates_i
     enddo
-    rates = rates/sum(res%R%w)
+    rates = rates/totw
 
 end subroutine neutral_cx_rate
 

@@ -132,19 +132,19 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">39 statements</a>
+    title=" 0.3% of total for procedures.">45 statements</a>
      </li> 
      
      
      
-    <li><i class="fa fa-code"></i><a href="../src/libfida.f90"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
      
      
   </ul>
   <ol class="breadcrumb in-well text-right">
   
     
-     <li><a href='../sourcefile/libfida.f90.html'>libfida.f90</a></li>
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
     
      <li><a href='../module/libfida.html'>libfida</a></li>
     
@@ -495,7 +495,7 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">identify_transition</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span> <span class="n">stark_pi</span><span class="p">,</span> <span class="n">stark_sigma</span><span class="p">,</span> <span class="p">&amp;</span>
                                 <span class="n">stark_intens</span><span class="p">,</span> <span class="n">stark_wavel</span><span class="p">,</span> <span class="n">line_lambda0</span><span class="p">)</span>
     <span class="c">! Determines the type of transition from user defined inputs</span>
-    
+
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>                                     <span class="kd">::</span> <span class="n">n_stark</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">stark_pi</span><span class="p">,</span> <span class="n">stark_sigma</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">FLoat64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">stark_intens</span><span class="p">,</span> <span class="n">stark_wavel</span>
@@ -514,24 +514,27 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
             <span class="p">[</span> <span class="mf">1.000d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">8.00d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">6.00d0</span><span class="p">,</span> <span class="mi">168</span><span class="mf">1.d0</span><span class="p">,</span> <span class="mi">230</span><span class="mf">4.d0</span><span class="p">,</span> <span class="p">&amp;</span>
               <span class="mi">72</span><span class="mf">9.0d0</span><span class="p">,</span> <span class="mi">193</span><span class="mf">6.d0</span><span class="p">,</span> <span class="mi">549</span><span class="mf">0.d0</span><span class="p">,</span> <span class="mi">193</span><span class="mf">6.d0</span><span class="p">,</span> <span class="mi">72</span><span class="mf">9.0d0</span><span class="p">,</span> <span class="p">&amp;</span>
               <span class="mi">230</span><span class="mf">4.d0</span><span class="p">,</span> <span class="mi">168</span><span class="mf">1.d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">6.00d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">8.00d0</span><span class="p">,</span> <span class="mf">1.000d0</span>  <span class="p">]</span>
-       
+
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_wavel</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_wavel</span> <span class="o">=</span> <span class="p">&amp;</span>
             <span class="p">[</span><span class="o">-</span><span class="mf">2.20200d-07</span><span class="p">,</span><span class="o">-</span><span class="mf">1.65200d-07</span><span class="p">,</span><span class="o">-</span><span class="mf">1.37700d-07</span><span class="p">,</span><span class="o">-</span><span class="mf">1.10200d-07</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="o">-</span><span class="mf">8.26400d-08</span><span class="p">,</span><span class="o">-</span><span class="mf">5.51000d-08</span><span class="p">,</span><span class="o">-</span><span class="mf">2.75600d-08</span><span class="p">,</span> <span class="mf">0.00000d0</span><span class="p">,</span>   <span class="p">&amp;</span>
               <span class="mf">2.75700d-08</span><span class="p">,</span> <span class="mf">5.51500d-08</span><span class="p">,</span> <span class="mf">8.27400d-08</span><span class="p">,</span> <span class="mf">1.10300d-07</span><span class="p">,</span> <span class="p">&amp;</span>
               <span class="mf">1.38000d-07</span><span class="p">,</span> <span class="mf">1.65600d-07</span><span class="p">,</span> <span class="mf">2.20900d-07</span>               <span class="p">]</span>
-        
+
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_pi</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_pi</span> <span class="o">=</span> <span class="p">&amp;</span>
             <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_sigma</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stark_pi</span>
-        
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Balmer-alpha.&quot;</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">           write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Atomic Transition ----&quot;</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Balmer-alpha: 3 -&gt; 2&quot;</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, &quot;H/D/T wavelengths: [&quot;, f8.3, &quot;,&quot;, f8.3, &quot;,&quot;, f8.3, &quot;] nm&quot;)&#39;</span><span class="p">)</span> <span class="n">line_lambda0</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">endif</span>
+
 
     <span class="k">else if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="mf">3.0d0</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="mf">6.0d0</span><span class="p">)</span> <span class="k">then</span>
         <span class="c">! Assigns stark varibales to Lyman alpha transition</span>
@@ -547,18 +550,22 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
 
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_wavel</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_wavel</span> <span class="o">=</span> <span class="p">[</span> <span class="o">-</span><span class="mf">8.25800d-8</span><span class="p">,</span> <span class="mf">0.00000d0</span><span class="p">,</span> <span class="mf">8.25800d-8</span> <span class="p">]</span>
-        
+
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_pi</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_pi</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
         <span class="k">allocate</span><span class="p">(</span><span class="n">stark_sigma</span><span class="p">(</span><span class="n">n_stark</span><span class="p">))</span>
         <span class="n">stark_sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stark_pi</span>
-       
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Identify Transition ----&quot;</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;The Transition is Lyman-alpha.&quot;</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">           write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Atomic Transition ----&quot;</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Lyman-alpha: 2 -&gt; 1&quot;</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, &quot;H/D/T wavelengths: [&quot;, f8.3, &quot;,&quot;, f8.3, &quot;,&quot;, f8.3, &quot;] nm&quot;)&#39;</span><span class="p">)</span> <span class="n">line_lambda0</span>
+           <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">endif</span>
+
    <span class="n">endif</span>
-  
+
 <span class="k">end subroutine </span><span class="n">identify_transition</span>
 </pre></div>
 

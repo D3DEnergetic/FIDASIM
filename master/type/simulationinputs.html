@@ -132,19 +132,19 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>11.3% of total for derived types.</p>Including implementation: 56 statements, 11.3% of total for derived types.">56 statements</a>
+    title="<p>11.4% of total for derived types.</p>Including implementation: 57 statements, 11.4% of total for derived types.">57 statements</a>
      </li> 
      
      
      
-    <li><i class="fa fa-code"></i><a href="../src/libfida.f90"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
      
      
   </ul>
   <ol class="breadcrumb in-well text-right">
   
     
-     <li><a href='../sourcefile/libfida.f90.html'>libfida.f90</a></li>
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
     
      <li><a href='../module/libfida.html'>libfida</a></li>
     
@@ -240,6 +240,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-tot_spectra">tot_spectra</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-load_neutrals">load_neutrals</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-output_neutral_reservoir">output_neutral_reservoir</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_npa">calc_npa</a>
       
@@ -404,6 +406,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-tot_spectra">tot_spectra</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-load_neutrals">load_neutrals</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-output_neutral_reservoir">output_neutral_reservoir</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_npa">calc_npa</a>
       
@@ -952,6 +956,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-output_neutral_reservoir"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>output_neutral_reservoir</strong></td><td></td><td></td><td><p>Output neutral reservoir: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-calc_npa"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -1343,6 +1361,8 @@
         <span class="c">!+ Total number of spectral switches on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">load_neutrals</span>
         <span class="c">!+ Load neutrals from file: 0 = off, 1=on</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">output_neutral_reservoir</span>
+        <span class="c">!+ Output neutral reservoir: 0 = off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_npa</span>
         <span class="c">!+ Calculate Active NPA: 0 = off, 1=on, 2=on++</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_pnpa</span>

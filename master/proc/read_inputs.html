@@ -132,19 +132,19 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.9% of total for procedures.">250 statements</a>
+    title=" 1.9% of total for procedures.">253 statements</a>
      </li> 
      
      
      
-    <li><i class="fa fa-code"></i><a href="../src/libfida.f90"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
      
      
   </ul>
   <ol class="breadcrumb in-well text-right">
   
     
-     <li><a href='../sourcefile/libfida.f90.html'>libfida.f90</a></li>
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
     
      <li><a href='../module/libfida.html'>libfida</a></li>
     
@@ -511,6 +511,7 @@ public subroutine read_inputs()
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_fida</span><span class="p">,</span> <span class="n">calc_pfida</span><span class="p">,</span> <span class="n">calc_npa</span><span class="p">,</span> <span class="n">calc_pnpa</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_birth</span><span class="p">,</span><span class="n">calc_fida_wght</span><span class="p">,</span><span class="n">calc_npa_wght</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">load_neutrals</span><span class="p">,</span><span class="n">verbose</span><span class="p">,</span><span class="n">flr</span><span class="p">,</span><span class="n">split</span><span class="p">,</span><span class="n">stark_components</span>
+    <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">output_neutral_reservoir</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">n_fida</span><span class="p">,</span><span class="n">n_pfida</span><span class="p">,</span><span class="n">n_npa</span><span class="p">,</span><span class="n">n_pnpa</span><span class="p">,</span><span class="n">n_nbi</span><span class="p">,</span><span class="n">n_halo</span><span class="p">,</span><span class="n">n_dcx</span><span class="p">,</span><span class="n">n_birth</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">shot</span><span class="p">,</span><span class="n">nlambda</span><span class="p">,</span><span class="n">ne_wght</span><span class="p">,</span><span class="n">np_wght</span><span class="p">,</span><span class="n">nphi_wght</span><span class="p">,</span><span class="n">nlambda_wght</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="nb">time</span><span class="p">,</span><span class="n">lambdamin</span><span class="p">,</span><span class="n">lambdamax</span><span class="p">,</span><span class="n">emax_wght</span>
@@ -527,7 +528,7 @@ public subroutine read_inputs()
         <span class="n">calc_pfida</span><span class="p">,</span> <span class="n">calc_npa</span><span class="p">,</span> <span class="n">calc_pnpa</span><span class="p">,</span><span class="n">calc_birth</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">flr</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">calc_fida_wght</span><span class="p">,</span> <span class="n">calc_npa_wght</span><span class="p">,</span> <span class="n">load_neutrals</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">stark_components</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">calc_neutron</span><span class="p">,</span> <span class="n">n_fida</span><span class="p">,</span> <span class="n">n_pfida</span><span class="p">,</span> <span class="n">n_npa</span><span class="p">,</span> <span class="n">n_pnpa</span><span class="p">,</span> <span class="n">n_nbi</span><span class="p">,</span> <span class="n">n_halo</span><span class="p">,</span> <span class="n">n_dcx</span><span class="p">,</span> <span class="n">n_birth</span><span class="p">,</span> <span class="p">&amp;</span>
-        <span class="n">ab</span><span class="p">,</span> <span class="n">pinj</span><span class="p">,</span> <span class="n">einj</span><span class="p">,</span> <span class="n">current_fractions</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">ab</span><span class="p">,</span> <span class="n">pinj</span><span class="p">,</span> <span class="n">einj</span><span class="p">,</span> <span class="n">current_fractions</span><span class="p">,</span> <span class="n">output_neutral_reservoir</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">origin</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="nb">gamma</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">ne_wght</span><span class="p">,</span> <span class="n">np_wght</span><span class="p">,</span> <span class="n">nphi_wght</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -568,6 +569,7 @@ public subroutine read_inputs()
     <span class="n">calc_fida_wght</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_npa_wght</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">load_neutrals</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">output_neutral_reservoir</span><span class="o">=</span><span class="mi">1</span>
     <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_neutron</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">n_fida</span><span class="o">=</span><span class="mi">0</span>
@@ -680,6 +682,8 @@ public subroutine read_inputs()
 
     <span class="c">!! Misc. Settings</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">load_neutrals</span><span class="o">=</span><span class="n">load_neutrals</span>
+    <span class="n">inputs</span><span class="p">%</span><span class="n">output_neutral_reservoir</span><span class="o">=</span><span class="n">output_neutral_reservoir</span>
+
     <span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">flr</span> <span class="o">=</span> <span class="n">flr</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">stark_components</span> <span class="o">=</span> <span class="n">stark_components</span>
@@ -815,11 +819,11 @@ public subroutine read_inputs()
     <span class="k">if</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        stop</span>
 <span class="k">    </span><span class="n">endif</span>
-    
-    <span class="c">! Identify the transition from lambdamax and lambdamin    </span>
+
+    <span class="c">! Identify the transition from lambdamax and lambdamin</span>
     <span class="k">call </span><span class="n">identify_transition</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span> <span class="n">stark_pi</span><span class="p">,</span> <span class="n">stark_sigma</span><span class="p">,</span> <span class="p">&amp;</span>
                                 <span class="n">stark_intens</span><span class="p">,</span> <span class="n">stark_wavel</span><span class="p">,</span> <span class="n">line_lambda0</span><span class="p">)</span>
-  
+
 <span class="k">end subroutine </span><span class="n">read_inputs</span>
 </pre></div>
 

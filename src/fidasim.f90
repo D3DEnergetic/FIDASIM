@@ -2182,17 +2182,17 @@ subroutine read_inputs
     if(error) then
         stop
     endif
-    
-    ! Identify the transition from lambdamax and lambdamin    
+
+    ! Identify the transition from lambdamax and lambdamin
     call identify_transition(n_stark, stark_pi, stark_sigma, &
                                 stark_intens, stark_wavel, line_lambda0)
-  
+
 end subroutine read_inputs
 
 subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
                                 stark_intens, stark_wavel, line_lambda0)
     ! Determines the type of transition from user defined inputs
-    
+
     integer, intent(out)                                     :: n_stark
     integer, dimension(:), allocatable, intent(out)          :: stark_pi, stark_sigma
     real(FLoat64), dimension(:), allocatable, intent(out)    :: stark_intens, stark_wavel
@@ -2211,14 +2211,14 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
             [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
               729.0d0, 1936.d0, 5490.d0, 1936.d0, 729.0d0, &
               2304.d0, 1681.d0, 16.00d0, 18.00d0, 1.000d0  ]
-       
+
         allocate(stark_wavel(n_stark))
         stark_wavel = &
             [-2.20200d-07,-1.65200d-07,-1.37700d-07,-1.10200d-07, &
              -8.26400d-08,-5.51000d-08,-2.75600d-08, 0.00000d0,   &
               2.75700d-08, 5.51500d-08, 8.27400d-08, 1.10300d-07, &
               1.38000d-07, 1.65600d-07, 2.20900d-07               ]
-        
+
         allocate(stark_pi(n_stark))
         stark_pi = &
             [1, 0 , 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
@@ -2226,8 +2226,9 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
         if(inputs%verbose.ge.1) then
-           write(*, '(a)') "---- Identify Transition ----"
-           write(*, '(a)') "The Transition is Balmer-alpha."
+           write(*, '(a)') "---- Atomic Transition ----"
+           write(*, '(T2, a)') "Balmer-alpha: 3 -> 2"
+           write(*, '(T2, "H/D/T wavelengths: [", f8.3, ",", f8.3, ",", f8.3, "] nm")') line_lambda0
            write(*,*) ''
         endif
 
@@ -2246,21 +2247,22 @@ subroutine identify_transition(n_stark, stark_pi, stark_sigma, &
 
         allocate(stark_wavel(n_stark))
         stark_wavel = [ -8.25800d-8, 0.00000d0, 8.25800d-8 ]
-        
+
         allocate(stark_pi(n_stark))
         stark_pi = [1, 0, 1]
 
         allocate(stark_sigma(n_stark))
         stark_sigma = 1 - stark_pi
-       
+
         if(inputs%verbose.ge.1) then
-           write(*, '(a)') "---- Identify Transition ----"
-           write(*, '(a)') "The Transition is Lyman-alpha."
+           write(*, '(a)') "---- Atomic Transition ----"
+           write(*, '(T2, a)') "Lyman-alpha: 2 -> 1"
+           write(*, '(T2, "H/D/T wavelengths: [", f8.3, ",", f8.3, ",", f8.3, "] nm")') line_lambda0
            write(*,*) ''
         endif
 
    endif
-  
+
 end subroutine identify_transition
 
 subroutine make_beam_grid
@@ -2860,6 +2862,7 @@ subroutine read_beam
         write(*,'(T2,"Beam: ",a)') nbi%name
         write(*,'(T2,"Power:   ",f5.2," [MW]")') nbi%pinj
         write(*,'(T2,"Voltage: ",f6.2," [keV]")') nbi%einj
+        write(*,'(T2,"Current fractions: [",f5.2,",",f5.2,",",f5.2,"]")') nbi%current_fractions
         write(*,*) ''
     endif
 
@@ -8683,7 +8686,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     where (dens.lt.0)
         dens = 0.d0
     endwhere
-    
+
     photons=dens(initial_state)*tables%einstein(final_state,initial_state) !! - [Ph/(s*cm^3)] - !!
 
 end subroutine colrad
@@ -9727,6 +9730,8 @@ subroutine ndmc
     loop_over_markers: do ii=istart,inputs%n_nbi,istep
         energy_fractions: do neut_type=1,3
             !! (type = 1: full energy, =2: half energy, =3: third energy
+            if(nbi%current_fractions(neut_type).eq.0.d0) cycle energy_fractions
+
             call mc_nbi(vnbi,neut_type,rnbi,err)
             if(err) cycle energy_fractions
 

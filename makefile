@@ -181,7 +181,7 @@ docs:
 
 .PHONY: python
 python:
-	@ln -s $(PYTHON_EXEC) $(DEPS_DIR)/python
+	@ln -sf $(PYTHON_EXEC) $(DEPS_DIR)/python
 
 clean_all: clean clean_deps clean_docs
 

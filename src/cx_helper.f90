@@ -1,13 +1,28 @@
 module cx_helper
     implicit none
+    integer :: initialized = 0
     private
     public :: cx_matrix, cx_rates
     contains
+    subroutine init_atomic_data() bind(C,name="init_atomic_data")
+        use libfida, only : SimulationInputs,read_tables, impurity_charge, inputs
+        implicit none
+        impurity_charge = 6
+        
+        inputs%verbose = 1
+        inputs%tables_file = '/Users/lmorton/Code/FIDASIM_lib/tables/atomic_tables.h5'
+        inputs%calc_neutron = 0
+        if (initialized.eq.0) then
+            call read_tables
+            initialized = 1
+        endif
+    end subroutine init_atomic_data
+
     subroutine cx_matrix(velocity,nlevels,rates) bind(C,name="cx_matrix")!{{{
         !! Calculate the charge-exchange cross-section matrix for a given relative collision velocity in [cm/s].
         !! The matrix gives rates of the incoming (n) & outgoing (n') energy levels of the electron, up to n=6
         !! The rates are given in [cm^-3*s^-1]
-        use libfida, only : SimulationInputs,bb_cx_rates,read_tables, nlevs,inputs,impurity_charge
+        use libfida, only : bb_cx_rates, nlevs
         use, intrinsic :: iso_c_binding, only: c_int, c_double
         implicit none
         real(c_double), intent(in) :: velocity
@@ -22,12 +37,7 @@ module cx_helper
             stop
         endif 
         vn(1) = velocity
-        impurity_charge = 6
-
-        inputs%verbose = 1
-        inputs%tables_file = '/Users/lmorton/Code/FIDASIM_lib/tables/atomic_tables.h5'
-        inputs%calc_neutron = 0
-        call read_tables
+        call init_atomic_data
         do n_in=1,6
             denn = 0.0
             denn(n_in) = 1.0
@@ -43,7 +53,7 @@ module cx_helper
         !! and fixed neutral velocity vector.
         !! The output array gives rates of the production of outgoing energy levels of neutral, up to n=6
         !! The rates are given in [per particle per second]
-        use libfida, only : SimulationInputs,bb_cx_rates,read_tables, nlevs,inputs,impurity_charge
+        use libfida, only : bb_cx_rates, nlevs
         use, intrinsic :: iso_c_binding, only: c_int64_t, c_double
         implicit none
         integer(c_int64_t), intent(in) :: nlevels
@@ -57,14 +67,7 @@ module cx_helper
             print *,"nlevels must be less than ",nlevs
             stop
         endif 
-        impurity_charge = 6
-        
-        inputs%verbose = 1
-        inputs%tables_file = '/Users/lmorton/Code/FIDASIM_lib/tables/atomic_tables.h5'
-        inputs%calc_neutron = 0
-        if () then
-            call read_tables
-        endif
+        call init_atomic_data
         do i_ion=1,num_ions
             call bb_cx_rates(denn,vn,vi(:,i_ion),rates(:,i_ion))
         enddo

@@ -42,15 +42,42 @@ def cx_rates(neutral_density,neutral_velocity,ion_velocities):
     space_dimensions = 3
     nlevels = 6
     assert neutral_density.shape == (nlevels,)
+    assert neutral_density.dtype.name == 'float64'
+    assert neutral_velocity.dtype.name == 'float64'
     assert neutral_velocity.shape == (space_dimensions,)
-    assert ion_velocities.shape[0] == space_dimensions
+    
+    assert ion_velocities.dtype.name == 'float64'
     assert ion_velocities.ndim == 2
+    assert ion_velocities.shape[0] == space_dimensions
+    assert ion_velocities.flags['F_CONTIGUOUS']
+    
+    
     num_ions = ion_velocities.shape[1]
-    rates = np.empty((nlevels,num_ions),dtype='float64')
+    num_ions_arr = np.array([num_ions],dtype='int64')
+    rates = np.zeros((nlevels,num_ions),dtype='float64',order='F')
     lib.cx_rates(ref(neutral_density),
                 ref(neutral_velocity),
-                ref(ion_velocities),
-                scref(num_ions,'int64'),
-                scref(nlevels,'int64'),
+                ref(np.asfortranarray(ion_velocities)),
+                ref(num_ions_arr),
+                ref(np.array([nlevels],dtype='int64')),
                 ref(rates))
+    return rates
+
+from matplotlib.pyplot import loglog,legend,xlabel,ylabel
+def test_rates():
+    nlevels = 6
+    space_dims = 3
+    velocity_resolution = 50
+    neutral_density = np.zeros((nlevels))
+    neutral_density[0] = 1.0
+    neutral_velocity = np.zeros((3))
+    ion_velocities = np.zeros((space_dims,velocity_resolution),dtype='float64',order='F')
+    v_range = np.logspace(6,9,velocity_resolution)
+    ion_velocities[0,:]=v_range
+    rates = cx_rates(neutral_density,neutral_velocity,ion_velocities)
+    for ii in range(nlevels):
+        loglog(v_range,rates[ii],label=(ii+1))
+    legend(title='n=')
+    xlabel('Velocity [cm/s]')
+    ylabel('CX rate [cm^-3*s^-1]')
     return rates

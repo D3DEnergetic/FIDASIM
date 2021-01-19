@@ -54,11 +54,11 @@ module cx_helper
         !! The output array gives rates of the production of outgoing energy levels of neutral, up to n=6
         !! The rates are given in [per particle per second]
         use libfida, only : bb_cx_rates, nlevs
-        use, intrinsic :: iso_c_binding, only: c_int64_t, c_double
+        use, intrinsic :: iso_c_binding, only: c_long, c_double
         implicit none
-        integer(c_int64_t), intent(in) :: nlevels
-        integer(c_int64_t), intent(in) :: num_ions !! Length of the array of ion velocities
-        real(c_double), dimension(nlevels,nlevels), intent(inout) :: rates !! catches the output from bb_cx_rates
+        integer(c_long), intent(in) :: nlevels
+        integer(c_long), intent(in) :: num_ions !! Length of the array of ion velocities
+        real(c_double), dimension(nlevels,num_ions), intent(inout) :: rates !! catches the output from bb_cx_rates
         integer :: i_ion !! index for looping over the ions
         real(c_double), dimension(nlevels), intent(in) :: denn  !! density [cm^-3] of each energy state of neutrals
         real(c_double), dimension(3), intent(in) :: vn !! cm/s x,y,z components of velocity of neutral

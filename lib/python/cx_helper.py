@@ -1,7 +1,10 @@
 from cffi import FFI
 import numpy as np
+import os
 ffi = FFI()
-lib = ffi.dlopen("/Users/lmorton/Code/FIDASIM_lib/src/cx_helper.so")
+fida_dir = os.environ['FIDASIM_DIR']
+cx_helper_path = os.path.join(fida_dir,'src','cx_helper.so')
+lib = ffi.dlopen(cx_helper_path)
 ffi.cdef("void cx_matrix(double arg1[], int arg2[], double arg3[]);")
 ffi.cdef("void cx_rates(double arg1[], double arg2[], double arg3[], long arg4[], long arg5[], double arg6[]);")
 converter = {'float64':'double*',
@@ -15,22 +18,13 @@ def ref(x):
     ctype = converter[xdtype.name]
     return ffi.cast(ctype,x.__array_interface__['data'][0])
 
-def scalar(x,ctype):
-    """
-    Array-wrap non-arrays, especially scalars
-    """
-    return np.array(x,dtype=ctype,order='F')
-
-def unscalar(x):
-    """
-    Unwrap single-element array
-    """
-    return x.item()
-
 def scref(x,ctype):
     return ref(scalar(x,ctype))
 
 def cx_matrix(velocity):
+    """
+    Wrapper around cx_helper.f90:cx_matrix
+    """
     nlevels = 6
     arg3 = np.empty((nlevels,nlevels),order='F',dtype= 'float64')
     lib.cx_matrix(scref(velocity,'float64'),
@@ -39,6 +33,9 @@ def cx_matrix(velocity):
     return arg3
 
 def cx_rates(neutral_density,neutral_velocity,ion_velocities):
+    """
+    Wrapper around cx_helper.f90:cx_rates
+    """
     space_dimensions = 3
     nlevels = 6
     assert neutral_density.shape == (nlevels,)
@@ -64,12 +61,12 @@ def cx_rates(neutral_density,neutral_velocity,ion_velocities):
     return rates
 
 from matplotlib.pyplot import loglog,legend,xlabel,ylabel
-def test_rates():
+def test_rates(n=1):
     nlevels = 6
     space_dims = 3
     velocity_resolution = 50
     neutral_density = np.zeros((nlevels))
-    neutral_density[0] = 1.0
+    neutral_density[n-1] = 1.0
     neutral_velocity = np.zeros((3))
     ion_velocities = np.zeros((space_dims,velocity_resolution),dtype='float64',order='F')
     v_range = np.logspace(6,9,velocity_resolution)

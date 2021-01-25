@@ -1111,6 +1111,8 @@ type ProtonTable
         !+ Number of channels
     real(Float64) :: dl
         !+ Step length [cm]
+    real(Float64) :: dE
+        !+ Proton energy bin width [keV]
     real(Float64), dimension(:), allocatable :: earray
         !+ Energies of proton orbits [keV]: earray(E3)
     real(Float64), dimension(:,:,:), allocatable :: nactual
@@ -3283,6 +3285,8 @@ subroutine read_cfpd
     uvwf(2) = rpzf(1)*sin(rpzf(2))
     uvwf(3) = rpzf(3)
     ptable%dl = norm2(uvwf-uvwi)
+
+    ptable%dE = ptable%earray(2)-ptable%earray(1)
 
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
 
@@ -5587,6 +5591,7 @@ subroutine write_proton_weights
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(3:3), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(4:4), fbm%pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ptable%earray, error)
 
         call h5ltset_attribute_string_f(fid,"/flux", "description", &
              "Proton flux: flux(energy,chan)", error)
@@ -5612,6 +5617,9 @@ subroutine write_proton_weights
         call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
         call h5ltset_attribute_string_f(fid,"/pitch", "description", &
              "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/earray","description", &
+             "E3 energy array", error)
+        call h5ltset_attribute_string_f(fid,"/earray", "units","keV", error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -8901,7 +8909,6 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
         return
     endif
 
-    !!! put error checks for all denominators
     !! Get plasma rotation components in (b,a,c) coords
     if (all(vrot.eq.0.d0)) then
         vb = 0.d0
@@ -8945,6 +8952,186 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     gam0=acos(cosgam0)
 
 endsubroutine get_pgyro
+
+subroutine new_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
+    !+ Returns fraction of gyroangles that can produce a reaction with
+    !+ given inputs
+    type(LocalEMFields), intent(in) :: fields
+        !+ Electromagneticfields in beam coordinates
+    real(Float64), intent(in)       :: E3
+        !+ E3 proton energy [keV]
+    real(Float64), intent(in) :: E1
+        !+ E1 fast-ion energy [keV]
+    real(Float64), intent(in) :: pitch
+        !+ pitch  fast ion pitch relative to the field
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters in beam coordinates
+    real(Float64), dimension(3), intent(in) :: v3_xyz
+        !+ Proton velocity in beam coorindates
+    real(Float64), intent(out) :: pgyro
+        !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
+    real(Float64), intent(out) :: gam0
+        !+ Gyro angle of fast ion [rad]
+
+    real(Float64), dimension(3) :: a_hat, vrot
+    real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,E3max,E3min
+    real(Float64) :: phip,cosphip,cosphib,cosphia,rhs,gammaplus,gammaminus
+    real(Float64) :: eps,bracket,ccminus,ccplus,bbminus,bbplus,v3minus,v3plus
+    real(Float64) :: E3minus,E3plus,v3plusmag,v3minusmag,v3maxmag,v3minmag
+    real(Float64) :: DeltaE3
+
+    pgyro = 0.d0
+    gam0 = 0.d0
+
+    ! Preliminaries [SI units]
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 4.04*JMeV ![J]
+    norm_v3 = sqrt(E3/(H1_amu*v2_to_E_per_amu)) / 100 ![m/s]
+    norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
+    vpar = norm_v1*pitch ![m/s]
+    vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
+    vrot = plasma%vrot/100.d0 ![m/s]
+    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz) !(b,a,c)
+
+    !! First, check E3 limits are valid for the given inputs
+    !! Assumes cos(gamma) = +/- 1 and vrot = 0
+    cosphip = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
+    phip = acos(cosphip)
+
+    !! Get plasma rotation components in (b,a,c) coords
+    if (all(vrot.eq.0.d0)) then
+        vb = 0.d0
+        va = 0.d0
+    else
+        cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
+        vb = norm2(vrot)*cosphib ![m/s]
+        cosphia = dot_product(vrot, a_hat) / norm2(vrot)
+        va = norm2(vrot)*cosphia ![m/s]
+    endif
+
+    ! LHS coefficient teeny (step #0)
+    bracket = vperp*(sin(phip)-2*va/norm_v3)
+    if (abs(bracket).lt.1.d-5) then !'Case 0'
+        return
+    endif
+
+    ! Find E3 limits for these parameters (step #1)
+    ccminus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) - vperp*va
+    ccplus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) + vperp*va
+    bbminus = -vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
+    bbplus = vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
+    v3minus = 0.5*(-bbminus + sqrt(bbminus**2+4*ccminus))
+    v3plus = 0.5*(-bbplus + sqrt(bbplus**2+4*ccplus))
+    E3minus = 0.5*mp*v3minus**2 / JkeV
+    E3plus = 0.5*mp*v3plus**2 / JkeV
+    E3min = min(E3plus,E3minus) ![keV]
+    E3max = max(E3plus,E3minus) ![keV]
+
+    ! Now E3plus and E3minus are proton energies at edge of bin
+    ! 'Case 1'
+    E3plus = E3 + 0.5*ptable%dE
+    E3minus = E3 - 0.5*ptable%dE
+
+    ! Bin misses gamma curve altogether  (step #2)
+    if ((E3plus.le.E3min) .or. (E3minus.ge.E3max)) then !'Case 2'
+        return
+    endif
+
+    ! Get gammaplus and gammaminus  (step #3)
+    v3plusmag = sqrt(2*E3plus*JkeV/mp)
+    v3minusmag = sqrt(2*E3minus*JkeV/mp)
+    v3maxmag = sqrt(2*E3plus*JkeV/mp)
+    v3minmag = sqrt(2*E3minus*JkeV/mp)
+
+    if (E3plus.gt.E3max) then !'Case 3'
+        norm_v3 = v3maxmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaplus = 0.
+            else
+                gammaplus = pi 
+            endif
+        else
+            gammaplus = acos(rhs/bracket)
+        endif
+    else
+        norm_v3 = v3plusmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaplus = 0.
+            else
+                gammaplus = pi
+            endif
+        else
+            gammaplus = acos(rhs/bracket)
+        endif
+    endif
+
+    if (E3minus.lt.E3min) then !'Case 3'
+        norm_v3 = v3minmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+               - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaminus = 0.
+            else
+                gammaminus = pi
+            endif
+        else
+            gammaminus = acos(rhs/bracket)
+        endif
+    else
+        norm_v3 = v3minusmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaminus = 0.
+            else
+                gammaminus = pi
+            endif
+        else
+            gammaminus = acos(rhs/bracket)
+        endif
+    endif
+
+    gam0 = (gammaplus + gammaminus) / 2.d0 ! return mean gyroangle
+    !!! should there be modifications in gamma in if statements below
+
+    if ((E3plus.ge.E3max) .and. (E3minus.le.E3min)) then !'Case 4a'
+        pgyro = 1.d0
+        return
+    else if ((E3plus.lt.E3max) .and. (E3minus.gt.E3min)) then !'Case 4b'
+        pgyro = abs(gammaplus-gammaminus)/pi
+        return
+    else if((E3plus.ge.E3max) .and. (E3minus.gt.E3min)) then
+        !'Case 4c'
+        if (gammaplus.gt.gammaminus) then
+            pgyro = (pi-gammaminus)/pi
+            return
+        else
+            pgyro = gammaminus/pi
+            return
+        endif
+    else if ((E3plus.lt.E3max) .and. (E3minus.le.E3min)) then
+        !'Case 4d'
+        if (gammaminus.gt.gammaplus) then
+            pgyro = (pi-gammaplus)/pi
+            return
+        else
+            pgyro = gammaplus/pi
+            return
+        endif
+    endif
+
+
+endsubroutine new_pgyro
 
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
@@ -12069,13 +12256,12 @@ end subroutine neutron_f
 
 subroutine proton_f
     !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
-    real(Float64), dimension(3) :: ri, vi, vi_norm, v3_xyz, xyz, r_gyro
-    integer, dimension(3) :: ind
+    real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, phi, vnet_square, factor, vabs
+    real(Float64) :: pgyro, vnet_square, factor, vabs
     real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
-    integer :: ir, iz, iphi, ie, ip, ich, ie3, iray, ist, cnt
+    integer :: ie, ip, ich, ie3, iray, ist, cnt
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
@@ -12100,8 +12286,8 @@ subroutine proton_f
 
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ptable%dl !0.5 for TRANSP-pitch (E,p) space factor
-    !$OMP PARALLEL DO schedule(guided) private(ri,vi,vi_norm,v3_xyz,xyz,r_gyro,ind,plasma,fields,pgyro,phi,&
-    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ir,iz,iphi,ie,ip,ich,ie3,iray,ist,cnt)
+    !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt)
     channel_loop: do ich=1, ptable%nchan
         E3_loop: do ie3=1, ptable%nenergy
             cnt = 0
@@ -12127,7 +12313,7 @@ subroutine proton_f
                             eb = fbm%energy(ie)
 
                             !! Get the probability factor
-                            call get_pgyro(fields,ptable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
+                            call new_pgyro(fields,ptable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1
 
@@ -12144,8 +12330,6 @@ subroutine proton_f
                                 call get_ep_denf(eb,pitch,fbm_denf,pos=(xyz+r_gyro))
                             endif
                             if (fbm_denf.ne.fbm_denf) cycle energy_loop
-                            call get_interpolation_grid_indices(xyz, ind, input_coords=0)
-                            ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
                             !! Calculate effective beam energy
                             vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]

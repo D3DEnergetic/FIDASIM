@@ -220,6 +220,7 @@ def check_inputs(inputs, use_abs_path=True):
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
+<<<<<<< HEAD
     if (inputs['adaptive'] < 0):
         error('Invalid adaptive switch. Expected value >= 0')
         print('adaptive = {}'.format(inputs['adaptive']))
@@ -235,6 +236,17 @@ def check_inputs(inputs, use_abs_path=True):
         print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
         err = True
 
+||||||| merged common ancestors
+=======
+    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
+        error('Invalid cell_split marker. Expected 0, 1, or 2')
+        err = True
+
+    if (inputs['tol'] < 0.0) or (inputs['tol'] > 1.0):
+        error('Invalid tolerance. Expected positive value, less than 1.0')
+        err = True
+
+>>>>>>> Adaptive time step for track subroutine with electron density parameter.
     ps = os.path.sep
     input_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_inputs.dat'
     equilibrium_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_equilibrium.h5'
@@ -1374,11 +1386,19 @@ def write_namelist(filename, inputs):
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
 
+<<<<<<< HEAD
         f.write("!! Adaptive time step settings\n")
         f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
         f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
         f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
 
+||||||| merged common ancestors
+=======
+        f.write("!! Adaptive time step settings\n")
+        f.write("cell_split = {:d}     !! 0: split off, 1: user-input split, 2: tolerance split\n".format(inputs['cell_split']))
+        f.write("tol = {:f}     !! Tolerance for adaptive step size\n\n".format(inputs['tol']))
+
+>>>>>>> Adaptive time step for track subroutine with electron density parameter.
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))
         f.write("lambdamin = {:f}    !! Minimum Wavelength [nm]\n".format(inputs['lambdamin']))

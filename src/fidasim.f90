@@ -1063,6 +1063,14 @@ type SimulationInputs
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
         !+ Maximum wavelength in weight functions [nm]
+        
+    !! Adaptive time step settings
+    integer(Int32) :: cell_split
+        !+ Simulation switch for cell splitting, 0 (no split, WIP), 1 (split into n_cells), 2 (split according to tol)
+    integer(Int32) :: n_cells
+        !+ Number of splits for each cell
+    real(Float64)  :: tol
+        !+ Tolerance level for splitting cells
 end type SimulationInputs
 
 type ParticleTrack
@@ -1938,12 +1946,14 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    integer(Int32)     :: cell_split, n_cells
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
+    real(Float64)      :: tol
     logical            :: exis, error
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
@@ -1957,7 +1967,8 @@ subroutine read_inputs
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
-        nlambda_wght,lambdamin_wght,lambdamax_wght
+        nlambda_wght,lambdamin_wght,lambdamax_wght, &
+        cell_split, n_cells, tol
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2032,6 +2043,9 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
+    cell_split=0
+    n_cells=0
+    tol=0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2145,6 +2159,11 @@ subroutine read_inputs
     inputs%lambdamin=lambdamin
     inputs%lambdamax=lambdamax
     inputs%dlambda=(inputs%lambdamax-inputs%lambdamin)/inputs%nlambda
+
+    !!Adaptive Time Step Settings
+    inputs%cell_split=cell_split
+    inputs%n_cells=n_cells
+    inputs%tol=tol
 
     !!Beam Grid Settings
     beam_grid%nx=nx
@@ -2368,7 +2387,7 @@ subroutine make_beam_grid
 
     beam_grid%drmin  = minval(beam_grid%dr)
     beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
-    beam_grid%ntrack = beam_grid%nx+beam_grid%ny+beam_grid%nz
+    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*50
     beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
 
     beam_grid%dims(1) = beam_grid%nx
@@ -7394,20 +7413,22 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, j, ii, mind,ncross, id
+    integer :: cc, i, j, ii, mind, ncross, id, jj, k, cell_split
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
-    real(Float64) :: dT, dt1, inv_50
+    real(Float64) :: dT, dt1, inv_50, dt2, n_cells, tol, inv_ne, inv_tol, inv_N, dene_sum
     real(Float64), dimension(3) :: dt_arr, dr
     real(Float64), dimension(3) :: vn, inv_vn, vp
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     type(LocalEMFields) :: fields
+    type(LocalProfiles) :: plasma1, plasma2
     type(LOSInters) :: inter
     real(Float64), dimension(n_stark) :: lambda
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+    cell_split = 0; n_cells = 1.0; tol = 0.0
 
     los_inter=.False.
     if(.not.present(los_intersect)) then
@@ -7433,6 +7454,21 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
         if (vn(i).lt.0.0) sgn(i) =-1
         if (vn(i).eq.0.0) vn(i)  = 1.0d-3
     enddo
+
+    cell_split = inputs%cell_split
+    if(cell_split.eq.1) then
+        n_cells = inputs%n_cells
+        if(n_cells.le.0.0) then
+            n_cells = 1.0
+        endif
+    elseif(cell_split.eq.2) then
+        tol = inputs%tol
+        if(tol.eq.0.0) then
+            cell_split = 0
+        else
+            inv_tol = 1.0/tol
+        endif
+    endif
 
     dr = beam_grid%dr*sgn
     inv_vn = 1/vn
@@ -7479,6 +7515,45 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             tracks(cc+1)%ind = ind
             cc = cc + 2
             ncross = ncross + 1
+        elseif(cell_split.eq.0) then
+            tracks(cc)%pos = ri + 0.5*dT*vn
+            tracks(cc)%time = dT
+            tracks(cc)%ind = ind
+            cc = cc + 1
+        elseif(cell_split.eq.1) then
+            dt2 = 0.0
+            inv_N = 1.0/n_cells
+            split_loop1: do jj=1,int(n_cells)
+                dt2 = dt2 + dT*inv_N
+                tracks(cc)%pos = ri + 0.5*dt2*vn
+                tracks(cc)%time = dT*inv_N
+                tracks(cc)%ind = ind
+                cc = cc + 1
+            enddo split_loop1
+        elseif(cell_split.eq.2) then
+            dt2 = 0.0
+            call get_plasma(plasma1, ri)
+            call get_plasma(plasma2, ri_tmp)
+            dene_sum = plasma2%dene + plasma1%dene
+            if(dene_sum.le.0.0) then
+                inv_ne = 1.0
+            else
+                inv_ne = 2.0/dene_sum
+            endif
+            n_cells = ceiling(abs(plasma1%dene - plasma2%dene)*inv_ne*inv_tol)
+            if(n_cells.gt.50.0) then
+                n_cells = 50.0
+            elseif(n_cells.lt.1.0) then
+                n_cells = 1.0
+            endif
+            inv_N = 1.0/n_cells
+            split_loop2: do k=1,int(n_cells)
+                dt2 = dt2 + dT*inv_N
+                tracks(cc)%pos = ri + 0.5*dt2*vn
+                tracks(cc)%time = dT*inv_N
+                tracks(cc)%ind = ind
+                cc = cc + 1
+            enddo split_loop2
         else
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT

@@ -220,6 +220,14 @@ def check_inputs(inputs, use_abs_path=True):
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
+    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
+        error('Invalid cell_split marker. Expected 0, 1, or 2')
+        err = True
+
+    if (inputs['tol'] < 0.0) or (inputs['tol'] > 1.0):
+        error('Invalid tolerance. Expected positive value, less than 1.0')
+        err = True
+
     ps = os.path.sep
     input_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_inputs.dat'
     equilibrium_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_equilibrium.h5'
@@ -1358,6 +1366,10 @@ def write_namelist(filename, inputs):
         f.write("origin(1) = {:f}     !! U value [cm]\n".format(inputs['origin'][0]))
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
+
+        f.write("!! Adaptive time step settings\n")
+        f.write("cell_split = {:d}     !! 0: split off, 1: user-input split, 2: tolerance split\n".format(inputs['cell_split']))
+        f.write("tol = {:f}     !! Tolerance for adaptive step size\n\n".format(inputs['tol']))
 
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))

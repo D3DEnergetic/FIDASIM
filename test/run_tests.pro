@@ -52,7 +52,7 @@ PRO run_tests,result_dir,runid = runid
 
    pfile = test_dir+'test_profiles.cdf'
    plasma = test_profiles(pfile,grid,rho)
-   plasma.deni = (plasma.deni - rebin(fbm.denf,1,grid.nr,grid.nz)) > 0.0
+   plasma.deni = (plasma.deni - reform(fbm.denf,1,grid.nr,grid.nz)) > 0.0
 
    prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
 

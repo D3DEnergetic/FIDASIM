@@ -28,7 +28,7 @@ FUNCTION test_profiles,filename,grid,rhogrid
     nz = n_elements(dene[0,*])
     dene=rebin(dene,nr,nz,grid.nphi)
     denimp=rebin(denimp,nr,nz,grid.nphi)
-    deni=rebin(denimp,nthermal,nr,nz,grid.nphi)
+    deni=reform(deni,nthermal,nr,nz,grid.nphi)
     denn=rebin(denn,nr,nz,grid.nphi)
     mask=rebin(mask,nr,nz,grid.nphi)
     te=rebin(te,nr,nz,grid.nphi)

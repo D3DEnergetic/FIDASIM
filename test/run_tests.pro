@@ -23,7 +23,7 @@ PRO run_tests,result_dir,runid = runid
                    n_halo:500000L,n_dcx:500000L,n_birth:10000L,$
                    ne_wght:50,np_wght:50,nphi_wght:100,emax_wght:100.0d0,$
                    nlambda_wght:1000,lambdamin_wght:647.d0,lambdamax_wght:667.d0,$
-                   calc_npa:2,calc_brems:1,calc_fida:1,calc_neutron:1,$
+                   calc_npa:2,calc_brems:1,calc_fida:1,calc_neutron:1,calc_proton:0,$
                    calc_bes:1,calc_dcx:1,calc_halo:1,calc_cold:1,$
                    calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,calc_pfida:1,calc_pnpa:2,$
                    result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}

@@ -3221,12 +3221,14 @@ subroutine read_cfpd
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
 
+    if(inputs%verbose.ge.1) write(*,'(a)') "---- CFPD settings ----"
     !!Check if CFPD group exists
     call h5ltpath_valid_f(fid, "/cfpd", .True., path_valid, error)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'CFPD geometry is not in the geometry file'
             write(*,'(a)') 'Continuing without CFPD diagnostics'
+            write(*,*) ''
         endif
         inputs%calc_proton = 0
         call h5fclose_f(fid, error)
@@ -3241,7 +3243,6 @@ subroutine read_cfpd
     call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", ptable%nchan, error)
 
     if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- CFPD settings ----"
         write(*,'(T2,"CFPD System: ", a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i3)') ptable%nchan
     endif

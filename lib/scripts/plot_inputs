@@ -207,7 +207,7 @@ def main():
     lineouts[1,2,1] = args.rplineout
 
     # Set colormap
-    cmap = cm.get_cmap('viridis', args.nlevels)
+    cmap = cm.get_cmap('inferno', args.nlevels)
     cmap_list = ["black"]
     for i in range(cmap.N):
         rgb = cmap(i)
@@ -468,7 +468,7 @@ def main():
             plt.tight_layout()
 
             #Save
-            important_labels = ['Te','Ti','Nd','Ne','Nn']
+            important_labels = ['Te','Ti','Ni','Ne','Nn']
             if len(args.saveimportant)>0 and fig_labels[i] in important_labels:
                 plt.savefig(args.saveimportant+fig_labels[i])
 

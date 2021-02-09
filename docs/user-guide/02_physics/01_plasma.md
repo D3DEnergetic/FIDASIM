@@ -56,7 +56,7 @@ where the `plasma` group has the following datasets
 | `dene`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Electron density                                             |
 | `denimp`            | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Impurity density                                             |
 | `deni`              | Float64 | 3/4  | [`nthermal`,`nr`,`nz`[,`nphi`]] | cm^-3 | Ion density for each thermal species                         |
-| `denn`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Cold neutral density                                         |
+| `denn`              | Float64 | 2/3  | [`nlevs`,`nthermal`,`nr`,`nz`[,`nphi`]]            | cm^-3 | Cold neutral density                                         |
 | `zeff`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | NA    | Z-effective                                                  |
 | `vr`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Radial component of the bulk plasma rotation/flow            |
 | `vt`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow      |

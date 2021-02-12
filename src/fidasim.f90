@@ -1063,7 +1063,6 @@ type SimulationInputs
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
         !+ Maximum wavelength in weight functions [nm]
-<<<<<<< HEAD
         
     !! Adaptive time step settings
     integer(Int32) :: adaptive
@@ -1072,17 +1071,7 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
-||||||| merged common ancestors
-=======
-        
-    !! Adaptive time step settings
-    integer(Int32) :: cell_split
-        !+ Simulation switch for cell splitting, 0 (no split, WIP), 1 (split into n_cells), 2 (split according to tol)
-    integer(Int32) :: n_cells
-        !+ Number of splits for each cell
-    real(Float64)  :: tol
-        !+ Tolerance level for splitting cells
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
+
 end type SimulationInputs
 
 type ParticleTrack
@@ -1958,24 +1947,14 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-<<<<<<< HEAD
     integer(Int32)     :: adaptive, max_cell_splits
-||||||| merged common ancestors
-=======
-    integer(Int32)     :: cell_split, n_cells
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
-<<<<<<< HEAD
     real(Float64)      :: split_tol
-||||||| merged common ancestors
-=======
-    real(Float64)      :: tol
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
     logical            :: exis, error
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
@@ -1989,15 +1968,8 @@ subroutine read_inputs
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
-<<<<<<< HEAD
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol
-||||||| merged common ancestors
-        nlambda_wght,lambdamin_wght,lambdamax_wght
-=======
-        nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        cell_split, n_cells, tol
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2072,16 +2044,9 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
-<<<<<<< HEAD
     adaptive=0
     max_cell_splits=0
     split_tol=0
-||||||| merged common ancestors
-=======
-    cell_split=0
-    n_cells=0
-    tol=0
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2196,20 +2161,11 @@ subroutine read_inputs
     inputs%lambdamax=lambdamax
     inputs%dlambda=(inputs%lambdamax-inputs%lambdamin)/inputs%nlambda
 
-<<<<<<< HEAD
     !!Adaptive Time Step Settings
     inputs%adaptive=adaptive !! 0 no split, 1 dene, 2 denf
     inputs%max_cell_splits=max_cell_splits
     inputs%split_tol=split_tol
 
-||||||| merged common ancestors
-=======
-    !!Adaptive Time Step Settings
-    inputs%cell_split=cell_split
-    inputs%n_cells=n_cells
-    inputs%tol=tol
-
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
     !!Beam Grid Settings
     beam_grid%nx=nx
     beam_grid%ny=ny
@@ -2432,13 +2388,7 @@ subroutine make_beam_grid
 
     beam_grid%drmin  = minval(beam_grid%dr)
     beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
-<<<<<<< HEAD
     beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*inputs%max_cell_splits
-||||||| merged common ancestors
-    beam_grid%ntrack = beam_grid%nx+beam_grid%ny+beam_grid%nz
-=======
-    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*50
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
     beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
 
     beam_grid%dims(1) = beam_grid%nx
@@ -7464,7 +7414,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, j, ii, mind, ncross, id, jj, k, cell_split
+    integer :: cc, i, j, ii, mind, ncross, id, k, adaptive
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     real(Float64) :: dT, dt1, inv_50, dt2, max_cell_splits, n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2

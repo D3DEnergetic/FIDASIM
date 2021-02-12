@@ -175,15 +175,14 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int,
-              'cell_split': zero_int}
+              'adaptive': zero_int,
+              'split_tol': zero_double,
+              'max_cell_splits': zero_int}
 
-    if 'cell_split' in inputs:
-        if inputs['cell_split'] == 1:
-            schema['n_cells'] = zero_int
-        elif inputs['cell_split'] == 2:
-            schema['tol'] = zero_double
-    else:
-        inputs['cell_split'] = 0
+    # If user doesn't provide adaptive time step parameters, set default to off
+    inputs.setdefault('adaptive', 0)
+    inputs.setdefault('split_tol', 0.0)
+    inputs.setdefault('max_cell_splits', 1)
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -228,12 +227,19 @@ def check_inputs(inputs, use_abs_path=True):
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
-    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
-        error('Invalid cell_split marker. Expected 0, 1, or 2')
+    if (inputs['adaptive'] < 0):
+        error('Invalid adaptive switch. Expected value >= 0')
+        print('adaptive = {}'.format(inputs['adaptive']))
         err = True
 
-    if (inputs['tol'] < 0.0) or (inputs['tol'] > 1.0):
+    if (inputs['split_tol'] < 0.0) or (inputs['split_tol'] > 1.0):
         error('Invalid tolerance. Expected positive value, less than 1.0')
+        print('split_tol = {}'.format(inputs['split_tol']))
+        err = True
+
+    if (inputs['max_cell_splits'] <= 0):
+        error('Invalid max cell splits. Expected value positive value')
+        print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
         err = True
 
     ps = os.path.sep
@@ -1265,8 +1271,9 @@ def write_namelist(filename, inputs):
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
 
         f.write("!! Adaptive time step settings\n")
-        f.write("cell_split = {:d}     !! 0: split off, 1: user-input split, 2: tolerance split\n".format(inputs['cell_split']))
-        f.write("tol = {:f}     !! Tolerance for adaptive step size\n\n".format(inputs['tol']))
+        f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
+        f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
+        f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
 
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))

@@ -120,8 +120,8 @@ FUNCTION test_cfpd, tname, gname
         RC(4-1) = 1.343e-3
 
     geometry = {rdist:RDist, zdist:ZDist, v:v, d:D, rc:RC}
-    earray = 2730. + 150.*findgen(6)
-    cfpd_table = proton_table(tname, gname, earray=earray, geometry=geometry, step=0.10, $
+    earray = 2460. + 285.*findgen(5)
+    cfpd_table = cfpd_table(tname, gname, earray=earray, geometry=geometry, step=0.10, $
                               nsteps=300)
     cfpd = create_struct(cfpd_chords, cfpd_table)
 

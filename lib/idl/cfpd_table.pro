@@ -1,5 +1,5 @@
-FUNCTION proton_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show, flip_bpol=flip_bpol, geometry=geometry
-    ;+#proton_table
+FUNCTION cfpd_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show, flip_bpol=flip_bpol, geometry=geometry
+    ;+#cfpd_table
     ;+Generates charged fusion product table
     ;+***
     ;+##Arguments
@@ -26,8 +26,8 @@ FUNCTION proton_table, tname, gname, earray=earray, nrays=nrays, step=step, nste
     ;+```idl
     ;+IDL> tname = 'mast.idl'
     ;+IDL> gname = 'g000001.01000'
-    ;+IDL> earray = 2730. + 150.*findgen(6)
-    ;+IDL> proton_table, tname, gname, earray=earray
+    ;+IDL> earray = 2460. + 285.*findgen(5)
+    ;+IDL> cfpd_table, tname, gname, earray=earray
     ;+```
 
     if ~keyword_set(earray) then earray = 2700. + 40*findgen(19)
@@ -40,7 +40,7 @@ FUNCTION proton_table, tname, gname, earray=earray, nrays=nrays, step=step, nste
 
     g=readg(gname)
     if ~keyword_set(geometry) then begin
-        print, 'Acquiring detector aperture geometry'
+        print, 'Acquiring diagnostic geometry from definitions in detector_aperture_geometry.pro'
         if flip_bpol eq 1 then begin
             g.cpasma = -g.cpasma
             detector_aperture_geometry,g,1,rdist,zdist,v,d,rc
@@ -49,7 +49,7 @@ FUNCTION proton_table, tname, gname, earray=earray, nrays=nrays, step=step, nste
             detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
         endelse
     endif else begin
-        print, 'User provided detector aperture geometry'
+        print, 'User provided diagnostic geometry structure'
         rdist = geometry.rdist
         zdist = geometry.zdist
         v = geometry.v
@@ -57,12 +57,12 @@ FUNCTION proton_table, tname, gname, earray=earray, nrays=nrays, step=step, nste
         rc = geometry.rc
     endelse
 
-    orb0 = orb_proton(g,rdist,zdist,v,d,rc,e0=earray[0],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
+    orb0 = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[0],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
     orb = replicate(orb0, nenergy)
     orb[0] = orb0
 
     for i=1,nenergy-1 do begin
-        orb[i] = orb_proton(g,rdist,zdist,v,d,rc,e0=earray[i],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
+        orb[i] = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[i],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
     endfor
 
     save,filename=tname,orb,earray

@@ -1,6 +1,6 @@
 function sunflower,n,alpha=alpha,doplot=doplot
     ;+#sunflower
-    ;+Generates 2D array of `n` cartesian points (x,y) that are approximately uniformly spaced
+    ;+Generates 2D array of `n` cartesian points in (x,y) that are approximately uniformly spaced
     ;+***
     ;+##Arguments
     ;+    **n**: Number of desired points
@@ -256,8 +256,8 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,step=ste
 
 
 
-FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show
-    ;+#orb_proton
+FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show
+    ;+#orb_cfpd
     ;+Returns all of the orbit-related quantities for a given energy
     ;+***
     ;+##Arguments
@@ -288,7 +288,7 @@ FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, n
     ;+```idl
     ;+IDL> g = 'g000001.01000'
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
-    ;+IDL> orb = orb_proton(g,rdist,zdist,v,d,rc,e0=3030,nrays=50,nsteps=110)
+    ;+IDL> orb = orb_cfpd(g,rdist,zdist,v,d,rc,e0=3030,nrays=50,nsteps=110)
     ;+```
 
   common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz

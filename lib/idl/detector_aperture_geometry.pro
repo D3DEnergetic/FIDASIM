@@ -1,9 +1,9 @@
 PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+#detector_aperture_geometry
-    ;+ Defines 3 MeV proton diagnostic geometry
-    ;+ Source: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
+    ;+ Defines charged fusion product diagnostic geometry
+    ;+ Sources: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
     ;+ NOTE: This file is hardcoded to be useful for developers. General users could modify parameters under
-    ;+       wn = 0 or 1, and correspondingly set the wn flag when calling detector_aperture_geometry.
+    ;+       wn = 0 or 1, and correspondingly set the wn flag when calling detector_aperture_geometry.pro
     ;+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
     ;+***
     ;+##Arguments
@@ -28,11 +28,9 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+```
 
-    if wn eq 1 then begin
+    if wn eq 1 then begin ; Source: MAST_29908_221_g_ensemble.nml
         print, 'Using MAST geometry 1 (Werner)'
-        ; Convert Alexander's input data file into IDL
-
-        ;# detectors orientation
+        ;; Detector orientation
         theta_port=fltarr(4)
             theta_port(1-1)= 40.0
             theta_port(2-1)= 40.0
@@ -40,8 +38,8 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
             theta_port(4-1)= 40.0
         theta_port*=!pi/180
 
-        ;In MAST_29908_221_g_ensemble.nml, phi_port < 0, but it is positive here for
-        ;comparison with Netepenko's data
+        ;In MAST_29908_221_g_ensemble.nml, phi_port < 0, but it is made positive here for
+        ;comparison with detector_aperture_geometry.dat
         phi_port=fltarr(4)
             phi_port(1-1)=  30.0
             phi_port(2-1)=  35.0
@@ -50,58 +48,47 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
         phi_port*=!pi/180
 
         v=fltarr(3,4)
-        ;    # radial direction
-            v(0,*) = - sin(theta_port)*cos(phi_port)
+            v(0,*) = - sin(theta_port)*cos(phi_port);    radial direction
+            v(1,*) = - sin(phi_port)                ;    toroidal direction
+            v(2,*) = cos(theta_port)*cos(phi_port)  ;    vertical direction
 
-        ;    # toroidal direction
-            v(1,*) = - sin(phi_port)
-
-        ;    # vertical direction
-            v(2,*) = cos(theta_port)*cos(phi_port)
-
-        ;&detection (m)
-
-        ;    #detectors position
-
-        ;    #vertical coordinate
-        ZDist=fltarr(4)
+        ;; Detector position
+        ZDist=fltarr(4)         ;    vertical coordinate
             ZDist(1-1)= 0.030014
             ZDist(2-1)= 0.038311
             ZDist(3-1)= 0.013981
             ZDist(4-1)= 0.024414
 
-        ;    #radial coordinate
-        RDist=fltarr(4)
+        RDist=fltarr(4)         ;    radial coordinate
             RDist(1-1)= 1.668328
             RDist(2-1)= 1.661375
             RDist(3-1)= 1.648754
             RDist(4-1)= 1.64
 
-        ;    #toroidal angle
-        PHDangle=fltarr(4)
+        PHDangle=fltarr(4)      ;    toroidal angle
             PHDangle(1-1)= 1.38277674641
             PHDangle(2-1)= 1.39294543453
             PHDangle(3-1)= 1.37658569418
             PHDangle(4-1)= 1.3855051501
 
-            D = 0.0357      ;                       ! detector-collimator spacing (m)
+        D = 0.0357      ;                        detector-collimator spacing (m)
 
         RC=fltarr(4)
-            RC(1-1) = 2.5e-3  ;                     ! outer collimator radius (m)
+            RC(1-1) = 2.5e-3  ;                      outer collimator radius (m)
             RC(2-1) = 2.5e-3
             RC(3-1) = 2.5e-3
             RC(4-1) = 2.5e-3
 
         RCD=fltarr(4)
-            RCD(1-1) = 2.5e-3 ;             ! inner collimator radius (detector radius) (m)
+            RCD(1-1) = 2.5e-3 ;              inner collimator radius (detector radius) (m)
             RCD(2-1) = 2.5e-3
             RCD(3-1) = 2.5e-3
             RCD(4-1) = 2.5e-3
-    endif else begin
-        print, 'Using MAST geometry 0 (Netepenko)'
-        ; Convert Alexander's input data file into IDL
 
-        ;# detectors orientation
+    endif else begin ; Source: detector_aperture_geometry.dat
+        print, 'Using MAST geometry 0 (Netepenko)'
+
+        ;; Detector orientation
         theta_port=fltarr(4)
             theta_port(1-1)= 46.6875370324
             theta_port(2-1)= 47.6648339458
@@ -117,54 +104,44 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
         phi_port*=!pi/180
 
         v=fltarr(3,4)
-        ;    # radial direction
-            v(0,*) = - sin(theta_port)*cos(phi_port)
+            v(0,*) = - sin(theta_port)*cos(phi_port);    radial direction
+            v(1,*) = - sin(phi_port)                ;    toroidal direction
+            v(2,*) = cos(theta_port)*cos(phi_port)  ;    vertical direction
 
-        ;    # toroidal direction
-            v(1,*) = - sin(phi_port)
-
-        ;    # vertical direction
-            v(2,*) = cos(theta_port)*cos(phi_port)
-
-        ;&detection (m)
-
-        ;    #detectors position
-
-        ;    #vertical coordinate
-        ZDist=fltarr(4)
+        ;; Detector position
+        ZDist=fltarr(4)     ;    vertical coordinate
             ZDist(1-1)= 0.036701870576
             ZDist(2-1)= 0.0409530530375
             ZDist(3-1)= 0.0232888146809
             ZDist(4-1)= 0.0301116448993
 
-        ;    #radial coordinate
-        RDist=fltarr(4)
+        RDist=fltarr(4)     ;    radial coordinate
             RDist(1-1)= 1.66830563971
             RDist(2-1)= 1.67508495819
             RDist(3-1)= 1.68813419386
             RDist(4-1)= 1.69658132076
 
-        ;    #toroidal angle
-        PHDangle=fltarr(4)
+        PHDangle=fltarr(4)  ;    toroidal angle
             PHDangle(1-1)= 79.8774705956
             PHDangle(2-1)= 79.2421358615
             PHDangle(3-1)= 80.3144072462
             PHDangle(4-1)= 79.7395308235
         PHDangle*=!pi/180
 
-            D = 0.04      ;                       ! detector-collimator spacing (m)
+        D = 0.04      ;                        detector-collimator spacing (m)
 
         RC=fltarr(4)
-            RC(1-1) = 1.288e-3  ;                     ! outer collimator radius (m)
+            RC(1-1) = 1.288e-3  ;                      outer collimator radius (m)
             RC(2-1) = 1.294e-3
             RC(3-1) = 1.318e-3
             RC(4-1) = 1.343e-3
 
         RCD=fltarr(4)
-            RCD(1-1) = 1.288e-3 ;                    ! inner collimator radius (detector radius) (m)
+            RCD(1-1) = 1.288e-3 ;                     inner collimator radius (detector radius) (m)
             RCD(2-1) = 1.294e-3
             RCD(3-1) = 1.318e-3
             RCD(4-1) = 1.343e-3
+
     endelse
 
 end

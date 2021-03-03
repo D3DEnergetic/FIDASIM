@@ -1,6 +1,6 @@
-PRO plot_orbits, orb, g
-    ;+#plot_orbits
-    ;+Plots charged fusion product orbits
+PRO plot_cfpd_orbits, orb, g
+    ;+#plot_cfpd_orbits
+    ;+Plots charged fusion product orbit trajectories
     ;+***
     ;+##Arguments
     ;+    **orb**: Orbits structure (table)
@@ -11,7 +11,7 @@ PRO plot_orbits, orb, g
     ;+```idl
     ;+IDL> restore, 'mast.idl'
     ;+IDL> g = 'g99999K26'
-    ;+IDL> plot_orbits, orb, g
+    ;+IDL> plot_cfpd_orbits, orb, g
     ;+```
 
     device, decomposed=0

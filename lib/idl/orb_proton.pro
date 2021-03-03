@@ -8,6 +8,8 @@ function sunflower,n,alpha=alpha,doplot=doplot
     ;+##Keyword Arguments
     ;+    **alpha**: Parameter that determines boundary points
     ;+
+    ;+    **doplot**: Plot samples
+    ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> n = 10000
@@ -37,7 +39,7 @@ function sunflower,n,alpha=alpha,doplot=doplot
 end
 
 
-PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,nsteps=nsteps,step=step,e0=e0,amu=amu,z=z,narea=narea,straight=straight
+PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
     ;+#orb_collimator
     ;+Calculates solid-angle weights of different velocity vectors that exit the collimator
     ;+***
@@ -55,15 +57,15 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,nsteps=n
     ;+    **naperture**: Number of velocities to launch
     ;+
     ;+##Keyword Arguments
-    ;+    **nsteps**: Number of steps
-    ;+
     ;+    **step**: Step length [m]
+    ;+
+    ;+    **nsteps**: Number of steps
     ;+
     ;+    **e0**: Energy [keV]
     ;+
     ;+    **amu**: Atomic mass unit
     ;+
-    ;+    **z**:
+    ;+    **z**: Zeff
     ;+
     ;+    **narea**: Number of positions to launch from
     ;+
@@ -74,22 +76,22 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,nsteps=n
     ;+
     ;+    **frac**:  Fraction of area that clears collimator -- size(naperture)
     ;+
-    ;+    **norm**:  norm*total(frac) should equal A*Omega
+    ;+    **norm**:  norm*total(frac) equals A*Omega
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> g = 'g99999K26'
+    ;+IDL> g = 'g000001.01000'
+    ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+IDL> InitialPosition = [rdist[0],0,zdist[0]]
     ;+IDL> ivel = -reform(v[*,0])
-    ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+IDL> orb_collimator,g,InitialPosition,ivel,d,rc[0],50,vsave,frac,norm
     ;+```
 
   common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
 
   ; Ion orbit parameters
-  if not keyword_set(step) then step=.001	; step length in m
-  if not keyword_set(nsteps) then nsteps=fix(1.1*d/step)
+  if not keyword_set(step) then step=0.01	; step length in m
+  if not keyword_set(nsteps) then nsteps=110
   if not keyword_set(e0) then e0=3030.			; keV
   if not keyword_set(amu) then amu=1. & mp=1.67e-27
   if not keyword_set(z) then z=1.
@@ -254,22 +256,22 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,nsteps=n
 
 
 
-FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, nsteps=nsteps, plot_show=plot_show
+FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show
     ;+#orb_proton
     ;+Returns all of the orbit-related quantities for a given energy
     ;+***
     ;+##Arguments
     ;+    **g**: GEQDSK file
     ;+
-    ;+    **rdist**: Detector-aperture geometry parameter
+    ;+    **rdist**: Radial coordinates of detector [m]
     ;+
-    ;+    **zdist**: Detector-aperture geometry parameter
+    ;+    **zdist**: Vertical coordinates of detector [m]
     ;+
-    ;+    **v**: Detector-aperture geometry parameter
+    ;+    **v**: Detector orientations [m/s, rad/s, m/s]
     ;+
-    ;+    **d**: Detector-aperture geometry parameter
+    ;+    **d**: Collimator length [m]
     ;+
-    ;+    **rc**: Detector-aperture geometry parameter
+    ;+    **rc**: Outer collimator spacing [m]
     ;+
     ;+##Keyword Arguments
     ;+    **e0**: Energy (keV)
@@ -278,14 +280,15 @@ FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, nsteps=nstep
     ;+
     ;+    **nsteps**: Number of steps
     ;+
-    ;+    **plot_show**: Interactively plot orbit bundles -- (1) on (0) off
+    ;+    **step**: Step length [m]
+    ;+
+    ;+    **plot_show**: Plot orbit bundles -- (1) on (0) off
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> g = 'g99999K26'
+    ;+IDL> g = 'g000001.01000'
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
-    ;+IDL> earray = 2730. + 150.*findgen(5)
-    ;+IDL> sightline = orb_proton(g,rdist,zdist,v,d,rc,e0=earray[0],nrays=50,nsteps=110)
+    ;+IDL> orb = orb_proton(g,rdist,zdist,v,d,rc,e0=3030,nrays=50,nsteps=110)
     ;+```
 
   common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
@@ -293,6 +296,7 @@ FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, nsteps=nstep
   if ~keyword_set(e0) then e0=3030.; keV
   if ~keyword_set(nrays) then nrays=50
   if ~keyword_set(nsteps) then nsteps=110
+  if ~keyword_set(step) then step=0.01
   if ~keyword_set(plot_show) then plot_show=0
 
   ; storage arrays
@@ -316,7 +320,6 @@ FUNCTION orb_proton, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, nsteps=nstep
   ; As in orb_collimator, embed it to avoid unnecessary repetition
 
   ; Ion orbit parameters
-  step=.01 * 300/nsteps ; [m]
   amu=1. & mp=1.67e-27 & z=1.
   time_reverse=1
 

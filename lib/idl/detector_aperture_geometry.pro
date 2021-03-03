@@ -2,6 +2,9 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+#detector_aperture_geometry
     ;+ Defines 3 MeV proton diagnostic geometry
     ;+ Source: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
+    ;+ NOTE: This file is hardcoded to be useful for developers. General users could modify parameters under
+    ;+       wn = 0 or 1, and correspondingly set the wn flag when calling detector_aperture_geometry.
+    ;+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
     ;+***
     ;+##Arguments
     ;+    **g**: GEQDSK file
@@ -9,24 +12,24 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+    **wn**: indicates Werner (1) or Netepneko (0) diagnostic geometry
     ;+
     ;+##Outputs
-    ;+    **rdist**: Detector-aperture geometry parameter
+    ;+    **rdist**: Radial coordinates of detector [m]
     ;+
-    ;+    **zdist**: Detector-aperture geometry parameter
+    ;+    **zdist**: Vertical coordinates of detector [m]
     ;+
-    ;+    **v**: Detector-aperture geometry parameter
+    ;+    **v**: Detector orientations [m/s, rad/s, m/s]
     ;+
-    ;+    **d**: Detector-aperture geometry parameter
+    ;+    **d**: Collimator length [m]
     ;+
-    ;+    **rc**: Detector-aperture geometry parameter
+    ;+    **rc**: Outer collimator spacing [m]
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> g = 'g99999K26'
+    ;+IDL> g = 'g000001.01000'
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+```
 
     if wn eq 1 then begin
-        info, 'Using MAST geometry data 1 (Werner) and flipping the direction of B poloidal'
+        print, 'Using MAST geometry 1 (Werner)'
         ; Convert Alexander's input data file into IDL
 
         ;# detectors orientation
@@ -95,7 +98,7 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
             RCD(3-1) = 2.5e-3
             RCD(4-1) = 2.5e-3
     endif else begin
-        info, 'Using MAST geometry data 0 (Netepenko)'
+        print, 'Using MAST geometry 0 (Netepenko)'
         ; Convert Alexander's input data file into IDL
 
         ;# detectors orientation
@@ -163,11 +166,5 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
             RCD(3-1) = 1.318e-3
             RCD(4-1) = 1.343e-3
     endelse
-
-    ;orb_mast,g,[rdist[0],0,zdist[0]],-reform(v[*,0])
-
-    ; Looks qualitatively like Ramona's figures but not quantitatively
-    ; Get midplane crossings of [1.015,1.055,1.134,1.188] for the four
-    ; channels.  Seems reasonable.
 
 end

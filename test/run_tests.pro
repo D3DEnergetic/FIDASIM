@@ -49,11 +49,12 @@ PRO run_tests,result_dir,runid = runid
 
    spec = test_chords()
    npa = test_npa()
+   cfpd = test_cfpd(result_dir+'/'+runid+'.idl', test_dir+'g000001.01000')
 
    pfile = test_dir+'test_profiles.cdf'
    plasma = test_profiles(pfile,grid,rho)
    plasma.deni = (plasma.deni - reform(fbm.denf,1,grid.nr,grid.nz)) > 0.0
 
-   prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
+   prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa, cfpd=cfpd
 
 end

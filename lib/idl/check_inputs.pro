@@ -36,7 +36,7 @@ PRO check_inputs, inputs
               calc_dcx:zero_int, calc_halo:zero_int, calc_cold:zero_int, $
 	      calc_pnpa:zero_int, calc_pfida:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
-              calc_proton:zero_int,$
+              calc_cfpd:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int}
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"

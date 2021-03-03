@@ -851,17 +851,17 @@ type NeutronRate
         !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
-type ProtonRate
-    !+ Proton storage structure
+type CFPDRate
+    !+ CFPD storage structure
     real(Float64), dimension(:,:,:,:), allocatable :: weight
-        !+ Proton rate weight: weight(Ep,Ch,E,p)
+        !+ CFPD rate weight: weight(Ep,Ch,E,p)
     real(Float64), dimension(:,:), allocatable         :: flux
-        !+ Proton flux: flux(E3,chan) [protons/(s*dE)]
+        !+ CFPD flux: flux(E3,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: prob
-        !+ Proton flux: probability_gyro(E3,chan) [unity]
+        !+ CFPD flux: probability_gyro(E3,chan) [unity]
     real(Float64), dimension(:,:), allocatable         :: gam
-        !+ Proton flux: gyro(E3,chan) [rad]
-end type ProtonRate
+        !+ CFPD flux: gyro(E3,chan) [rad]
+end type CFPDRate
 
 type NeutralParticle
     real(Float64) :: w = 1.d0
@@ -1023,8 +1023,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
-    integer(Int32) :: calc_proton
-        !+ Calculate 3 MeV proton flux: 0 = off, 1=on
+    integer(Int32) :: calc_cfpd
+        !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1099,10 +1099,10 @@ type GyroSurface
         !+ Basis of coordinate system of gyrosurface
 end type GyroSurface
 
-type ProtonTable
-    !+ Defines 3 MeV proton orbit trajectories
+type CFPDTable
+    !+ Defines Charged Fusion Product orbit trajectories
     integer :: nenergy = 0
-        !+ Number of proton energies
+        !+ Number of cfpd energies
     integer :: nrays = 0
         !+ Number of "rays"
     integer :: nsteps = 0
@@ -1112,9 +1112,9 @@ type ProtonTable
     real(Float64) :: dl
         !+ Step length [cm]
     real(Float64) :: dE
-        !+ Proton energy bin width [keV]
+        !+ CFPD energy bin width [keV]
     real(Float64), dimension(:), allocatable :: earray
-        !+ Energies of proton orbits [keV]: earray(E3)
+        !+ Energies of cfpd orbits [keV]: earray(E3)
     real(Float64), dimension(:,:,:), allocatable :: nactual
         !+ Number of spatial steps: nactual(E3,ray,channel)
     real(Float64), dimension(:,:,:), allocatable :: daomega
@@ -1122,7 +1122,7 @@ type ProtonTable
     real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
         !+ Velocity [cm/s] and position [cm] in cylindrical (R,Phi,Z) coordinates:
         !+ sightline(E3,:,step,ray,channel)
-end type ProtonTable
+end type CFPDTable
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
@@ -1135,19 +1135,19 @@ end interface
 
 interface operator(+)
     !+ Allows for adding [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]]
+    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]]
     module procedure pp_add,lplp_add,ff_add,lflf_add,oo_add
 end interface
 
 interface operator(-)
     !+ Allows for subtracting [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]]
+    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]]
     module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract,oo_subtract
 end interface
 
 interface operator(*)
     !+ Allows for multiplying [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]] by scalars
+    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]] by scalars
     module procedure sp_multiply, ps_multiply, lps_multiply, slp_multiply, &
                      sf_multiply, fs_multiply, lfs_multiply, slf_multiply, &
                      soo_multiply, oos_multiply
@@ -1155,7 +1155,7 @@ end interface
 
 interface operator(/)
     !+ Allows for dividing [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[ProtonTable]] by scalars
+    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]] by scalars
     module procedure ps_divide, lps_divide, fs_divide, lfs_divide, oos_divide
 end interface
 
@@ -1194,14 +1194,14 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(ProtonRate), save          :: proton
-    !+ Variable for storing the 3 MeV proton rate
+type(CFPDRate), save          :: cfpd
+    !+ Variable for storing the Charged Fusion Product rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
-type(ProtonTable), save       :: ptable
-    !+ Variable for storing the calculated 3 MeV proton orbits
+type(CFPDTable), save       :: ptable
+    !+ Variable for storing the calculated Charged Fusion Product orbits
 
 contains
 
@@ -1905,9 +1905,9 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
 end function lfs_divide
 
 elemental function oo_add(p1, p2) result (p3)
-    !+ Defines how to add two [[ProtonTable]] types
-    type(ProtonTable), intent(in) :: p1,p2
-    type(ProtonTable)             :: p3
+    !+ Defines how to add two [[CFPDTable]] types
+    type(CFPDTable), intent(in) :: p1,p2
+    type(CFPDTable)             :: p3
 
     p3%nenergy   = p1%nenergy   + p2%nenergy
     p3%nrays     = p1%nrays     + p2%nrays
@@ -1920,9 +1920,9 @@ elemental function oo_add(p1, p2) result (p3)
 end function oo_add
 
 elemental function oo_subtract(p1, p2) result (p3)
-    !+ Defines how to subtract two [[ProtonTable]] types
-    type(ProtonTable), intent(in) :: p1,p2
-    type(ProtonTable)             :: p3
+    !+ Defines how to subtract two [[CFPDTable]] types
+    type(CFPDTable), intent(in) :: p1,p2
+    type(CFPDTable)             :: p3
 
     p3%nenergy   = p1%nenergy   - p2%nenergy
     p3%nrays     = p1%nrays     - p2%nrays
@@ -1935,10 +1935,10 @@ elemental function oo_subtract(p1, p2) result (p3)
 end function oo_subtract
 
 elemental function oos_multiply(p1, real_scalar) result (p3)
-    !+ Defines how to multiply two [[ProtonTable]] types
-    type(ProtonTable), intent(in) :: p1
+    !+ Defines how to multiply two [[CFPDTable]] types
+    type(CFPDTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(ProtonTable)             :: p3
+    type(CFPDTable)             :: p3
 
     p3%nenergy   = p1%nenergy   * real_scalar
     p3%nrays     = p1%nrays     * real_scalar
@@ -1951,29 +1951,29 @@ elemental function oos_multiply(p1, real_scalar) result (p3)
 end function oos_multiply
 
 elemental function soo_multiply(real_scalar, p1) result (p3)
-    !+ Defines how to multiply [[ProtonTable]] types by a scalar
-    type(ProtonTable), intent(in) :: p1
+    !+ Defines how to multiply [[CFPDTable]] types by a scalar
+    type(CFPDTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(ProtonTable)             :: p3
+    type(CFPDTable)             :: p3
 
     p3 = p1*real_scalar
 
 end function soo_multiply
 
 elemental function oos_divide(p1, real_scalar) result (p3)
-    !+ Defines how to divide [[ProtonTable]] types by a scalar
-    type(ProtonTable), intent(in) :: p1
+    !+ Defines how to divide [[CFPDTable]] types by a scalar
+    type(CFPDTable), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
-    type(ProtonTable)             :: p3
+    type(CFPDTable)             :: p3
 
     p3 = p1*(1.d0/real_scalar)
 
 end function oos_divide
 
 pure subroutine oo_assign(p1, p2)
-    !+ Defines how to assign [[ProtonTable]] types to eachother
-    type(ProtonTable), intent(in)  :: p2
-    type(ProtonTable), intent(out) :: p1
+    !+ Defines how to assign [[CFPDTable]] types to eachother
+    type(CFPDTable), intent(in)  :: p2
+    type(CFPDTable), intent(out) :: p1
 
     p1%nenergy   = p2%nenergy
     p1%nrays     = p2%nrays
@@ -1994,7 +1994,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed, calc_proton
+    integer            :: pathlen, calc_neutron, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
@@ -2015,7 +2015,7 @@ subroutine read_inputs
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
-        calc_neutron, calc_proton, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -2060,7 +2060,7 @@ subroutine read_inputs
     output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
-    calc_proton=0
+    calc_cfpd=0
     n_fida=0
     n_pfida=0
     n_npa=0
@@ -2168,7 +2168,7 @@ subroutine read_inputs
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
-    inputs%calc_proton=calc_proton
+    inputs%calc_cfpd=calc_cfpd
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -3230,7 +3230,7 @@ subroutine read_cfpd
             write(*,'(a)') 'Continuing without CFPD diagnostics'
             write(*,*) ''
         endif
-        inputs%calc_proton = 0
+        inputs%calc_cfpd = 0
         call h5fclose_f(fid, error)
         call h5close_f(error)
         return
@@ -4259,7 +4259,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
-        inputs%calc_proton=0
+        inputs%calc_cfpd=0
         return
     endif
 
@@ -4287,7 +4287,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
-        inputs%calc_proton=0
+        inputs%calc_cfpd=0
         return
     endif
 
@@ -4373,7 +4373,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1.or.inputs%calc_proton.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.ge.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
     endif
 
@@ -5558,8 +5558,8 @@ subroutine write_neutrons
 
 end subroutine write_neutrons
 
-subroutine write_proton_weights
-    !+ Writes [[libfida:proton]] to a HDF5 file
+subroutine write_cfpd_weights
+    !+ Writes [[libfida:cfpd]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(2) :: dim2
@@ -5569,7 +5569,7 @@ subroutine write_proton_weights
     character(charlim) :: filename
 
     !! write to file
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_protons.h5"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_cfpd.h5"
 
     !Open HDF5 interface
     call h5open_f(error)
@@ -5583,10 +5583,10 @@ subroutine write_proton_weights
         dim2 = [ptable%nenergy, ptable%nchan]
         dim4 = [ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch]
 
-        call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, proton%flux, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, proton%prob, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, proton%gam, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, proton%weight, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, cfpd%gam, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, cfpd%weight, error)
 
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
@@ -5595,18 +5595,18 @@ subroutine write_proton_weights
         call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ptable%earray, error)
 
         call h5ltset_attribute_string_f(fid,"/flux", "description", &
-             "Proton flux: flux(energy,chan)", error)
+             "CFPD flux: flux(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/flux", "units", &
-             "protons/(s*dE)", error)
+             "kHz", error)
 
         call h5ltset_attribute_string_f(fid,"/prob", "description", &
-             "Proton average nonzero probability: prob(energy,chan)", error)
+             "CFPD average nonzero probability: prob(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/gam", "description", &
-             "Proton average nonzero gyroangle: gam(energy,chan)", error)
+             "CFPD average nonzero gyroangle: gam(energy,chan)", error)
         call h5ltset_attribute_string_f(fid,"/gam", "units", "rad", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
-             "Proton Weight Function: weight(Ch,E3,E,p), rate = sum(f*weight)", error)
-        call h5ltset_attribute_string_f(fid,"/weight", "units","protons*cm^3*dE*dp/fast-ion*s", error)
+             "CFPD Weight Function: weight(Ch,E3,E,p), rate = sum(f*weight)", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "units","products*cm^3*dE*dp/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
              "Number of distribution function energy values", error)
@@ -5625,7 +5625,7 @@ subroutine write_proton_weights
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
-         "Proton signals calculated by FIDASIM", error)
+         "CFPD signals calculated by FIDASIM", error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -5634,10 +5634,10 @@ subroutine write_proton_weights
     call h5close_f(error)
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'Protons written to: ', trim(filename)
+        write(*,'(T4,a,a)') 'Charged fusion products written to: ', trim(filename)
     endif
 
-end subroutine write_proton_weights
+end subroutine write_cfpd_weights
 
 subroutine write_fida_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
@@ -6822,7 +6822,7 @@ end subroutine uvw_to_cyl
 subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
     !+ Convert sightline position and velocity from cylindrical coordinate `rpz` to beam coordinate `xyz`
     integer, intent(in) :: ie3
-        !+ Proton energy index
+        !+ CFPD energy index
     integer, intent(in) :: ist
         !+ Step index
     integer, intent(in) :: iray
@@ -8715,7 +8715,7 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
     real(Float64), intent(out)      :: rate
         !+ Neutron reaction rate [1/s]
     integer, intent(in), optional   :: branch
-        !+ Indicates 1 for proton rate and 2 for neutron rate
+        !+ Indicates 1 for cfpd rate and 2 for neutron rate
 
     integer :: err_status, neb, nt, ebi, tii, is, ib
     real(Float64) :: dlogE, dlogT, logEmin, logTmin
@@ -8781,7 +8781,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     real(Float64), dimension(3), intent(in) :: v1
         !+ Beam velocity [cm/s]
     real(Float64), dimension(3), intent(in) :: v3
-        !+ 3 MeV proton velocity [cm/s]
+        !+ Charged Fusion Product velocity [cm/s]
     real(Float64), intent(out)              :: kappa
         !+ Anisotropy factor
     !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
@@ -8859,7 +8859,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     type(LocalEMFields), intent(in) :: fields
         !+ Electromagneticfields in beam coordinates
     real(Float64), intent(in)       :: E3
-        !+ E3 proton energy [keV]
+        !+ E3 charged fusion product energy [keV]
     real(Float64), intent(in) :: E1
         !+ E1 fast-ion energy [keV]
     real(Float64), intent(in) :: pitch
@@ -8867,7 +8867,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     type(LocalProfiles), intent(in)         :: plasma
         !+ Plasma Paramters in beam coordinates
     real(Float64), dimension(3), intent(in) :: v3_xyz
-        !+ Proton velocity in beam coorindates
+        !+ Charged fusion product velocity in beam coorindates
     real(Float64), intent(out) :: pgyro
         !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
     real(Float64), intent(out) :: gam0
@@ -8929,7 +8929,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     E3min = min(E3plus,E3minus) ![keV]
     E3max = max(E3plus,E3minus) ![keV]
 
-    ! Now E3plus and E3minus are proton energies at edge of bin
+    ! Now E3plus and E3minus are charged fusion product energies at edge of bin
     ! 'Case 1'
     E3plus = E3 + 0.5*ptable%dE
     E3minus = E3 - 0.5*ptable%dE
@@ -12154,8 +12154,8 @@ subroutine neutron_f
 
 end subroutine neutron_f
 
-subroutine proton_f
-    !+ Calculate proton emission rate using a fast-ion distribution function F(E,p,r,z)
+subroutine cfpd_f
+    !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
     real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -12164,25 +12164,25 @@ subroutine proton_f
     integer :: ie, ip, ich, ie3, iray, ist, cnt
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
-        write(*,'(T2,a)') 'PROTON_F: Thermal Deuterium is not present in plasma'
+        write(*,'(T2,a)') 'CFPD_F: Thermal Deuterium is not present in plasma'
         return
     endif
     if(any(thermal_mass.eq.H3_amu)) then
-        write(*,'(T2,a)') 'PROTON_F: D-T proton production is not implemented'
+        write(*,'(T2,a)') 'CFPD_F: D-T cfpd production is not implemented'
     endif
     if(beam_mass.ne.H2_amu) then
-        write(*,'(T2,a)') 'PROTON_F: Fast-ion species is not Deuterium'
+        write(*,'(T2,a)') 'CFPD_F: Fast-ion species is not Deuterium'
         return
     endif
 
-    allocate(proton%flux(ptable%nenergy, ptable%nchan))
-    allocate(proton%prob(ptable%nenergy, ptable%nchan))
-    allocate(proton%gam(ptable%nenergy, ptable%nchan))
-    allocate(proton%weight(ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch))
-    proton%flux = 0.d0
-    proton%prob = 0.d0
-    proton%gam = 0.d0
-    proton%weight = 0.d0
+    allocate(cfpd%flux(ptable%nenergy, ptable%nchan))
+    allocate(cfpd%prob(ptable%nenergy, ptable%nchan))
+    allocate(cfpd%gam(ptable%nenergy, ptable%nchan))
+    allocate(cfpd%weight(ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch))
+    cfpd%flux = 0.d0
+    cfpd%prob = 0.d0
+    cfpd%gam = 0.d0
+    cfpd%weight = 0.d0
 
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ptable%dl !0.5 for TRANSP-pitch (E,p) space factor
@@ -12235,53 +12235,53 @@ subroutine proton_f
                             vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
-                            !! Get the proton production rate and anisotropy term
+                            !! Get the cfpd production rate and anisotropy term
                             call get_dd_rate(plasma, erel, rate, branch=1)
                             call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
 
-                            !$OMP CRITICAL(proton_weight)
-                            proton%weight(ie3,ich,ie,ip) = proton%weight(ie3,ich,ie,ip) &
+                            !$OMP CRITICAL(cfpd_weight)
+                            cfpd%weight(ie3,ich,ie,ip) = cfpd%weight(ie3,ich,ie,ip) &
                                                             + rate * kappa * pgyro &
                                                             * ptable%daomega(ie3,iray,ich) &
                                                             * factor / (fbm%dE*fbm%dp)
-                            proton%prob(ie3,ich) = proton%prob(ie3,ich) + pgyro
-                            proton%gam(ie3,ich) = proton%gam(ie3,ich) + gyro
-                            proton%flux(ie3,ich) = proton%flux(ie3,ich) + rate * kappa * pgyro &
+                            cfpd%prob(ie3,ich) = cfpd%prob(ie3,ich) + pgyro
+                            cfpd%gam(ie3,ich) = cfpd%gam(ie3,ich) + gyro
+                            cfpd%flux(ie3,ich) = cfpd%flux(ie3,ich) + rate * kappa * pgyro &
                                                                         * ptable%daomega(ie3,iray,ich) &
                                                                         * fbm_denf * factor
-                            !$OMP END CRITICAL(proton_weight)
+                            !$OMP END CRITICAL(cfpd_weight)
 
                         enddo energy_loop
                     enddo pitch_loop
                 enddo step_loop
             enddo ray_loop
             !$OMP CRITICAL(pweight_cnt)
-            proton%prob(ie3,ich) = proton%prob(ie3,ich) / cnt
-            proton%gam(ie3,ich) = proton%gam(ie3,ich) / cnt
+            cfpd%prob(ie3,ich) = cfpd%prob(ie3,ich) / cnt
+            cfpd%gam(ie3,ich) = cfpd%gam(ie3,ich) / cnt
             !$OMP END CRITICAL(pweight_cnt)
         enddo E3_loop
     enddo channel_loop
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call parallel_sum(proton%flux)
-    call parallel_sum(proton%weight)
-    call parallel_sum(proton%prob)
-    call parallel_sum(proton%gam)
+    call parallel_sum(cfpd%flux)
+    call parallel_sum(cfpd%weight)
+    call parallel_sum(cfpd%prob)
+    call parallel_sum(cfpd%gam)
 #endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(30X,a)') ''
-        write(*,*) 'write protons:    ' , time(time_start)
+        write(*,*) 'write charged fusion products:    ' , time(time_start)
     endif
 
 #ifdef _MPI
-    if(my_rank().eq.0) call write_proton_weights()
+    if(my_rank().eq.0) call write_cfpd_weights()
 #else
-    call write_proton_weights()
+    call write_cfpd_weights()
 #endif
 
-end subroutine proton_f
+end subroutine cfpd_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
@@ -13104,7 +13104,7 @@ program fidasim
         call read_npa()
     endif
 
-    if(inputs%calc_proton.ge.1) then
+    if(inputs%calc_cfpd.ge.1) then
         call read_cfpd()
     endif
 
@@ -13386,11 +13386,11 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if(inputs%calc_proton.ge.1) then
+    if(inputs%calc_cfpd.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'proton rate:    ', time(time_start)
+            write(*,*) 'charged fusion products:    ', time(time_start)
         endif
-        call proton_f()
+        call cfpd_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

@@ -175,7 +175,7 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int,
-              'calc_proton': zero_int}
+              'calc_cfpd': zero_int}
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -1306,7 +1306,7 @@ def write_namelist(filename, inputs):
         f.write("calc_pfida = {:d}    !! Calculate Passive FIDA Spectra\n".format(inputs['calc_pfida']))
         f.write("calc_pnpa = {:d}   !! Calculate Passive NPA\n".format(inputs['calc_pnpa']))
         f.write("calc_neutron = {:d}   !! Calculate B-T Neutron Rate\n".format(inputs['calc_neutron']))
-        f.write("calc_proton = {:d}   !! Calculate B-T Proton Energy Resolved Count Rate\n".format(inputs['calc_proton']))
+        f.write("calc_cfpd = {:d}   !! Calculate B-T CFPD Energy Resolved Count Rate\n".format(inputs['calc_cfpd']))
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))

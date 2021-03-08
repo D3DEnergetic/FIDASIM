@@ -852,7 +852,7 @@ type NeutronRate
 end type NeutronRate
 
 type CFPDRate
-    !+ CFPD storage structure
+    !+ Charged Fusion Product (CFPD) storage structure
     real(Float64), dimension(:,:,:,:), allocatable :: weight
         !+ CFPD rate weight: weight(Ep,Ch,E,p)
     real(Float64), dimension(:,:), allocatable         :: flux
@@ -1200,7 +1200,7 @@ type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
-type(CFPDTable), save       :: ptable
+type(CFPDTable), save       :: ctable
     !+ Variable for storing the calculated Charged Fusion Product orbits
 
 contains
@@ -3204,7 +3204,7 @@ subroutine read_npa
 end subroutine read_npa
 
 subroutine read_cfpd
-    !+ Reads the CFPD geometry and stores the quantities in [[libfida:ptable]]
+    !+ Reads the CFPD geometry and stores the quantities in [[libfida:ctable]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(3) :: dims3
     integer(HSIZE_T), dimension(5) :: dims5
@@ -3240,28 +3240,28 @@ subroutine read_cfpd
     call h5gopen_f(fid, "/cfpd", gid, error)
 
     call h5ltread_dataset_string_f(gid, "/cfpd/system", system, error)
-    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", ptable%nchan, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", ctable%nchan, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"CFPD System: ", a)') trim(adjustl(system))
-        write(*,'(T2,"Number of channels: ",i3)') ptable%nchan
+        write(*,'(T2,"Number of channels: ",i3)') ctable%nchan
     endif
 
-    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ptable%nenergy, error)
-    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ptable%nrays, error)
-    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ptable%nsteps, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ctable%nenergy, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ctable%nrays, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ctable%nsteps, error)
 
-    allocate(ptable%earray(ptable%nenergy))
-    allocate(ptable%nactual(ptable%nenergy, ptable%nrays, ptable%nchan))
-    allocate(ptable%daomega(ptable%nenergy, ptable%nrays, ptable%nchan))
-    allocate(ptable%sightline(ptable%nenergy, 6, ptable%nsteps, ptable%nrays, ptable%nchan))
+    allocate(ctable%earray(ctable%nenergy))
+    allocate(ctable%nactual(ctable%nenergy, ctable%nrays, ctable%nchan))
+    allocate(ctable%daomega(ctable%nenergy, ctable%nrays, ctable%nchan))
+    allocate(ctable%sightline(ctable%nenergy, 6, ctable%nsteps, ctable%nrays, ctable%nchan))
 
-    dims3 = [ptable%nenergy, ptable%nrays, ptable%nchan]
-    dims5 = [ptable%nenergy, 6, ptable%nsteps, ptable%nrays, ptable%nchan]
-    call h5ltread_dataset_double_f(gid, "/cfpd/earray", ptable%earray, dims3(1:1), error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ptable%nactual, dims3, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ptable%daomega, dims3, error)
-    call h5ltread_dataset_double_f(gid, "/cfpd/sightline", ptable%sightline, dims5, error)
+    dims3 = [ctable%nenergy, ctable%nrays, ctable%nchan]
+    dims5 = [ctable%nenergy, 6, ctable%nsteps, ctable%nrays, ctable%nchan]
+    call h5ltread_dataset_double_f(gid, "/cfpd/earray", ctable%earray, dims3(1:1), error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ctable%nactual, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ctable%daomega, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/sightline", ctable%sightline, dims5, error)
 
     !!Close CFPD group
     call h5gclose_f(gid, error)
@@ -3272,12 +3272,12 @@ subroutine read_cfpd
     !!Close HDF5 interface
     call h5close_f(error)
 
-    rpzi(1) = ptable%sightline(1,4,1,1,1)
-    rpzi(2) = ptable%sightline(1,5,1,1,1)
-    rpzi(3) = ptable%sightline(1,6,1,1,1)
-    rpzf(1) = ptable%sightline(1,4,2,1,1)
-    rpzf(2) = ptable%sightline(1,5,2,1,1)
-    rpzf(3) = ptable%sightline(1,6,2,1,1)
+    rpzi(1) = ctable%sightline(1,4,1,1,1)
+    rpzi(2) = ctable%sightline(1,5,1,1,1)
+    rpzi(3) = ctable%sightline(1,6,1,1,1)
+    rpzf(1) = ctable%sightline(1,4,2,1,1)
+    rpzf(2) = ctable%sightline(1,5,2,1,1)
+    rpzf(3) = ctable%sightline(1,6,2,1,1)
 
     uvwi(1) = rpzi(1)*cos(rpzi(2))
     uvwi(2) = rpzi(1)*sin(rpzi(2))
@@ -3285,9 +3285,9 @@ subroutine read_cfpd
     uvwf(1) = rpzf(1)*cos(rpzf(2))
     uvwf(2) = rpzf(1)*sin(rpzf(2))
     uvwf(3) = rpzf(3)
-    ptable%dl = norm2(uvwf-uvwi)
+    ctable%dl = norm2(uvwf-uvwi)
 
-    ptable%dE = ptable%earray(2)-ptable%earray(1)
+    ctable%dE = ctable%earray(2)-ctable%earray(1)
 
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
 
@@ -5580,8 +5580,8 @@ subroutine write_cfpd_weights
     !Write variables
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
-        dim2 = [ptable%nenergy, ptable%nchan]
-        dim4 = [ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch]
+        dim2 = [ctable%nenergy, ctable%nchan]
+        dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
@@ -5592,7 +5592,7 @@ subroutine write_cfpd_weights
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(3:3), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(4:4), fbm%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ptable%earray, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ctable%earray, error)
 
         call h5ltset_attribute_string_f(fid,"/flux", "description", &
              "CFPD flux: flux(energy,chan)", error)
@@ -6838,9 +6838,9 @@ subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
     real(Float64) :: phi
 
     !! Position
-    rpz(1) = ptable%sightline(ie3,4,ist,iray,ich)
-    rpz(2) = ptable%sightline(ie3,5,ist,iray,ich)
-    rpz(3) = ptable%sightline(ie3,6,ist,iray,ich)
+    rpz(1) = ctable%sightline(ie3,4,ist,iray,ich)
+    rpz(2) = ctable%sightline(ie3,5,ist,iray,ich)
+    rpz(3) = ctable%sightline(ie3,6,ist,iray,ich)
 
     phi = rpz(2)
     uvw(1) = rpz(1)*cos(phi)
@@ -6849,9 +6849,9 @@ subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
     call uvw_to_xyz(uvw, xyz)
 
     !! Velocity
-    v3_rpz(1) = ptable%sightline(ie3,1,ist,iray,ich)
-    v3_rpz(2) = ptable%sightline(ie3,2,ist,iray,ich)
-    v3_rpz(3) = ptable%sightline(ie3,3,ist,iray,ich)
+    v3_rpz(1) = ctable%sightline(ie3,1,ist,iray,ich)
+    v3_rpz(2) = ctable%sightline(ie3,2,ist,iray,ich)
+    v3_rpz(3) = ctable%sightline(ie3,3,ist,iray,ich)
 
     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
@@ -8931,8 +8931,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
 
     ! Now E3plus and E3minus are charged fusion product energies at edge of bin
     ! 'Case 1'
-    E3plus = E3 + 0.5*ptable%dE
-    E3minus = E3 - 0.5*ptable%dE
+    E3plus = E3 + 0.5*ctable%dE
+    E3minus = E3 - 0.5*ctable%dE
 
     ! Bin misses gamma curve altogether  (step #2)
     if ((E3plus.le.E3min) .or. (E3minus.ge.E3max)) then !'Case 2'
@@ -12175,25 +12175,25 @@ subroutine cfpd_f
         return
     endif
 
-    allocate(cfpd%flux(ptable%nenergy, ptable%nchan))
-    allocate(cfpd%prob(ptable%nenergy, ptable%nchan))
-    allocate(cfpd%gam(ptable%nenergy, ptable%nchan))
-    allocate(cfpd%weight(ptable%nenergy, ptable%nchan, fbm%nenergy, fbm%npitch))
+    allocate(cfpd%flux(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%prob(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%gam(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%weight(ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch))
     cfpd%flux = 0.d0
     cfpd%prob = 0.d0
     cfpd%gam = 0.d0
     cfpd%weight = 0.d0
 
     rate = 0.d0
-    factor = 0.5d0*fbm%dE*fbm%dp*ptable%dl !0.5 for TRANSP-pitch (E,p) space factor
+    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
     !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt)
-    channel_loop: do ich=1, ptable%nchan
-        E3_loop: do ie3=1, ptable%nenergy
+    channel_loop: do ich=1, ctable%nchan
+        E3_loop: do ie3=1, ctable%nenergy
             cnt = 0
-            ray_loop: do iray=1, ptable%nrays
-                step_loop: do ist=1, ptable%nsteps
-                    if (ist.gt.ptable%nactual(ie3,iray,ich)) cycle ray_loop
+            ray_loop: do iray=1, ctable%nrays
+                step_loop: do ist=1, ctable%nsteps
+                    if (ist.gt.ctable%nactual(ie3,iray,ich)) cycle ray_loop
 
                     !! Calculate position and velocity in beam coordinates
                     call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
@@ -12213,7 +12213,7 @@ subroutine cfpd_f
                             eb = fbm%energy(ie)
 
                             !! Get the probability factor
-                            call get_pgyro(fields,ptable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
+                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1
 
@@ -12242,12 +12242,12 @@ subroutine cfpd_f
                             !$OMP CRITICAL(cfpd_weight)
                             cfpd%weight(ie3,ich,ie,ip) = cfpd%weight(ie3,ich,ie,ip) &
                                                             + rate * kappa * pgyro &
-                                                            * ptable%daomega(ie3,iray,ich) &
+                                                            * ctable%daomega(ie3,iray,ich) &
                                                             * factor / (fbm%dE*fbm%dp)
                             cfpd%prob(ie3,ich) = cfpd%prob(ie3,ich) + pgyro
                             cfpd%gam(ie3,ich) = cfpd%gam(ie3,ich) + gyro
                             cfpd%flux(ie3,ich) = cfpd%flux(ie3,ich) + rate * kappa * pgyro &
-                                                                        * ptable%daomega(ie3,iray,ich) &
+                                                                        * ctable%daomega(ie3,iray,ich) &
                                                                         * fbm_denf * factor
                             !$OMP END CRITICAL(cfpd_weight)
 

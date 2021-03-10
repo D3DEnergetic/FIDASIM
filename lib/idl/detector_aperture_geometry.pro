@@ -7,7 +7,7 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
     ;+***
     ;+##Arguments
-    ;+    **g**: GEQDSK file
+    ;+    **g**: GEQDSK structure
     ;+
     ;+    **wn**: indicates Werner (1) or Netepneko (0) diagnostic geometry
     ;+
@@ -24,7 +24,7 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> g = 'g000001.01000'
+    ;+IDL> g = readg('g000001.01000')
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+```
 
@@ -73,7 +73,7 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
 
         RDist = [1.66830563971, 1.67508495819, 1.68813419386, 1.69658132076]
 
-        PHDangle = 79.8774705956, 79.2421358615, 80.3144072462, 79.7395308235] * !pi/180
+        PHDangle = [79.8774705956, 79.2421358615, 80.3144072462, 79.7395308235] * !pi/180
 
         D = 0.04      ;                        detector-collimator spacing (m)
 

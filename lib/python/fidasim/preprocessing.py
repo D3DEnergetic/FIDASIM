@@ -1517,6 +1517,10 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
             # Dataset attributes
             cfpd_description = {'data_source': 'Source of the CFPD geometry',
                                'nchan': 'Number of channels',
+                               'nrays': 'Number of rays',
+                               'nsteps': 'Maximum number of orbit steps',
+                               'nenergy': 'Number of energies',
+                               'nactual': 'Number of orbital spatial steps',
                                'system': 'Names of the different CFPD systems',
                                'id': 'Line of sight ID',
                                'd_shape': 'Shape of the detector: 1="rectangular", 2="circular"',
@@ -1527,7 +1531,10 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
                                'a_cent': 'Center of the aperture',
                                'a_tedge': 'Center of the apertures top edge',
                                'a_redge': 'Center of the apertures right edge',
-                               'radius': 'Line of sight radius at midplane or tangency point'}
+                               'radius': 'Line of sight radius at midplane or tangency point',
+                               'earray': 'Energy array',
+                               'sightline': 'Velocity and position in (R,Phi,Z)',
+                               'daomega': 'Transmission factor'}
 
             cfpd_units = {'d_cent': 'cm',
                          'd_tedge': 'cm',
@@ -1535,7 +1542,10 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
                          'a_cent': 'cm',
                          'a_tedge': 'cm',
                          'radius': 'cm',
-                         'a_redge': 'cm'}
+                         'a_redge': 'cm',
+                         'earray': 'keV',
+                         'sightline': 'cm/s and cm',
+                         'daomega': 'cm^2'}
 
             write_data(g_cfpd, cfpd, desc = cfpd_description, units = cfpd_units, name='cfpd')
 

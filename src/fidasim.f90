@@ -1052,7 +1052,9 @@ type SimulationInputs
         
     !! Adaptive time step settings
     integer(Int32) :: adaptive
-        !+ Simulation switch for cell splitting, 0 (no split), 1 (electron density), 2 (fast ion density)
+        !+ Simulation switch for adaptive time step, 0:split off, 1:dene, 2:avg(denn(1,:)), 3:denf, 4:avg(deni), 5:denimp, 6:te, 7:ti
+    integer(Int32) :: p_adaptive
+        !+ Adaptive switch for passive grid
     integer(Int32) :: max_cell_splits
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
@@ -1885,7 +1887,7 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: adaptive, p_adaptive, max_cell_splits
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
@@ -1907,7 +1909,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        adaptive, p_adaptive, max_cell_splits, split_tol
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -1982,7 +1984,8 @@ subroutine read_inputs
     lambdamin_wght=0
     lambdamax_wght=0
     adaptive=0
-    max_cell_splits=0
+    p_adaptive=0
+    max_cell_splits=1
     split_tol=0
 
     open(13,file=namelist_file)
@@ -2098,7 +2101,8 @@ subroutine read_inputs
     inputs%dlambda=(inputs%lambdamax-inputs%lambdamin)/inputs%nlambda
 
     !!Adaptive Time Step Settings
-    inputs%adaptive=adaptive !! 0 no split, 1 dene, 2 denf
+    inputs%adaptive=adaptive
+    inputs%p_adaptive=p_adaptive
     inputs%max_cell_splits=max_cell_splits
     inputs%split_tol=split_tol
 
@@ -7080,10 +7084,10 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, j, ii, mind, ncross, id, k, adaptive
+    integer :: cc, i, j, ii, mind, ncross, id, k, adaptive,  max_cell_splits
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
-    real(Float64) :: dT, dt1, inv_50, dt2, max_cell_splits, n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
+    real(Float64) :: dT, dt1, inv_50, dt2, n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
     real(Float64), dimension(3) :: dt_arr, dr
     real(Float64), dimension(3) :: vn, inv_vn, vp
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
@@ -7095,7 +7099,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: gdims
 
     vn = vin ; ri = rin ; sgn = 0 ; ntrack = 0
-    adaptive = 0; max_cell_splits = 1.0; split_tol = 0.0
+    adaptive = 0; max_cell_splits = 1; split_tol = 0.0
 
     los_inter=.False.
     if(.not.present(los_intersect)) then
@@ -7124,6 +7128,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
     !! Check adaptive switch, adaptive > 0 activates splitting
     adaptive = inputs%adaptive
+    max_cell_splits = inputs%max_cell_splits
     if(adaptive.gt.0) then
         split_tol = inputs%split_tol
         if(split_tol.eq.0.0) then
@@ -7194,8 +7199,23 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
                     param1 = plasma1%dene
                     param2 = plasma2%dene
                 case(2)
+                    param1 = sum(plasma1%denn(1,:))/size(plasma1%denn(1,:))
+                    param2 = sum(plasma2%denn(1,:))/size(plasma2%denn(1,:))
+                case(3)
                     param1 = plasma1%denf
                     param2 = plasma2%denf
+                case(4)
+                    param1 = sum(plasma1%deni(:))/size(plasma1%deni(:))
+                    param2 = sum(plasma2%deni(:))/size(plasma2%deni(:))
+                case(5)
+                    param1 = plasma1%denimp
+                    param2 = plasma2%denimp
+                case(6)
+                    param1 = plasma1%te
+                    param2 = plasma2%te
+                case(7)
+                    param1 = plasma1%ti
+                    param2 = plasma2%ti
                 case default
                     param1 = plasma1%dene
                     param2 = plasma2%dene
@@ -7276,8 +7296,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: ind
     real(Float64) :: dT, dt1, inv_50, dt2
     real(Float64) :: s, c, phi
-    real(Float64) :: max_cell_splits, n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
-    integer :: cc, i, j, ii, mind, ncross, id, k, adaptive
+    real(Float64) :: n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
+    integer :: cc, i, j, ii, mind, ncross, id, k, p_adaptive, max_cell_splits
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma1, plasma2
     type(LOSInters) :: inter
@@ -7286,6 +7306,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer :: ir, iz, iphi
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+    p_adaptive = 0; max_cell_splits = 1; split_tol = 0.0
 
     los_inter=.False.
     if(.not.present(los_intersect)) then
@@ -7367,12 +7388,13 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     call cyl_to_uvw(tedge_cyl,tedge)
     call plane_basis(v_plane, redge, tedge, basis)
 
-    !! Check adaptive switch, adaptive > 0 activates splitting
-    adaptive = inputs%adaptive
-    if(adaptive.gt.0) then
+    !! Check passive adaptive switch, p_adaptive > 0 activates splitting
+    p_adaptive = inputs%p_adaptive
+    max_cell_splits = inputs%max_cell_splits
+    if(p_adaptive.gt.0) then
         split_tol = inputs%split_tol
         if(split_tol.eq.0.0) then
-            adaptive = 0
+            p_adaptive = 0
         else
             inv_tol = 1.0/split_tol
         endif
@@ -7427,24 +7449,39 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             tracks(cc+1)%ind = ind
             cc = cc + 2
             ncross = ncross + 1
-        elseif(adaptive.eq.0) then
+        elseif(p_adaptive.eq.0) then
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT
             tracks(cc)%ind = ind
             cc = cc + 1
-        elseif(adaptive.gt.0) then !! If splitting is activated, calculate n_cells based on gradient between entrance and exit points
+        elseif(p_adaptive.gt.0) then !! If splitting is activated, calculate n_cells based on gradient between entrance and exit points
             dt2 = 0.0
             call get_plasma(plasma1, ri, input_coords=1)
             call get_plasma(plasma2, ri_tmp, input_coords=1)
 
-            !! Split cell according to gradient of parameter, parameter is selected according to value of adaptive
-            select case (adaptive)
+            !! Split cell according to gradient of parameter, parameter is selected according to value of p_adaptive
+            select case (p_adaptive)
                 case(1)
                     param1 = plasma1%dene
                     param2 = plasma2%dene
                 case(2)
+                    param1 = sum(plasma1%denn(1,:))/size(plasma1%denn(1,:))
+                    param2 = sum(plasma2%denn(1,:))/size(plasma2%denn(1,:))
+                case(3)
                     param1 = plasma1%denf
                     param2 = plasma2%denf
+                case(4)
+                    param1 = sum(plasma1%deni(:))/size(plasma1%deni(:))
+                    param2 = sum(plasma2%deni(:))/size(plasma2%deni(:))
+                case(5)
+                    param1 = plasma1%denimp
+                    param2 = plasma2%denimp
+                case(6)
+                    param1 = plasma1%te
+                    param2 = plasma2%te
+                case(7)
+                    param1 = plasma1%ti
+                    param2 = plasma2%ti
                 case default
                     param1 = plasma1%dene
                     param2 = plasma2%dene

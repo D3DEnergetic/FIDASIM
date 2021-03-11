@@ -177,11 +177,13 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_neutron': zero_int,
               'calc_cfpd': zero_int,
               'adaptive': zero_int,
+              'p_dapative' : zero_int,
               'split_tol': zero_double,
               'max_cell_splits': zero_int}
 
     # If user doesn't provide adaptive time step parameters, set default to off
     inputs.setdefault('adaptive', 0)
+    inputs.setdefault('p_adaptive', 0)
     inputs.setdefault('split_tol', 0.0)
     inputs.setdefault('max_cell_splits', 1)
 
@@ -228,75 +230,26 @@ def check_inputs(inputs, use_abs_path=True):
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     if (inputs['adaptive'] < 0):
         error('Invalid adaptive switch. Expected value >= 0')
         print('adaptive = {}'.format(inputs['adaptive']))
         err = True
 
+    if (inputs['p_adaptive'] < 0):
+        error('Invalid passive adaptive switch. Expected value >= 0')
+        print('p_adaptive = {}'.format(inputs['p_adaptive']))
+        err = True
+
     if (inputs['split_tol'] < 0.0) or (inputs['split_tol'] > 1.0):
-        error('Invalid tolerance. Expected positive value, less than 1.0')
+        error('Invalid split tolerance. Expected value between 0 and 1')
         print('split_tol = {}'.format(inputs['split_tol']))
         err = True
 
     if (inputs['max_cell_splits'] <= 0):
-        error('Invalid max cell splits. Expected value positive value')
+        error('Invalid max cell splits. Expected positive value')
         print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
         err = True
 
-||||||| merged common ancestors
-=======
-    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
-        error('Invalid cell_split marker. Expected 0, 1, or 2')
-||||||| merged common ancestors
-    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
-        error('Invalid cell_split marker. Expected 0, 1, or 2')
-=======
-    if (inputs['adaptive'] < 0):
-        error('Invalid adaptive switch. Expected value >= 0')
-        print('adaptive = {}'.format(inputs['adaptive']))
->>>>>>> Implement adaptive time step for track_cylindrical
-        err = True
-
-    if (inputs['split_tol'] < 0.0) or (inputs['split_tol'] > 1.0):
-        error('Invalid tolerance. Expected positive value, less than 1.0')
-        print('split_tol = {}'.format(inputs['split_tol']))
-        err = True
-
-    if (inputs['max_cell_splits'] <= 0):
-        error('Invalid max cell splits. Expected value positive value')
-        print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
-        err = True
-
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
-||||||| merged common ancestors
-=======
-    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
-        error('Invalid cell_split marker. Expected 0, 1, or 2')
-||||||| merged common ancestors
-    if (inputs['cell_split'] < 0) or (inputs['cell_split'] > 2):
-        error('Invalid cell_split marker. Expected 0, 1, or 2')
-=======
-    if (inputs['adaptive'] < 0):
-        error('Invalid adaptive switch. Expected value >= 0')
-        print('adaptive = {}'.format(inputs['adaptive']))
->>>>>>> Implement adaptive time step for track_cylindrical
-        err = True
-
-    if (inputs['split_tol'] < 0.0) or (inputs['split_tol'] > 1.0):
-        error('Invalid tolerance. Expected positive value, less than 1.0')
-        print('split_tol = {}'.format(inputs['split_tol']))
-        err = True
-
-    if (inputs['max_cell_splits'] <= 0):
-        error('Invalid max cell splits. Expected value positive value')
-        print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
-        err = True
-
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
     ps = os.path.sep
     input_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_inputs.dat'
     equilibrium_file = inputs['result_dir'].rstrip(ps) + ps + inputs['runid'] + '_equilibrium.h5'
@@ -1436,29 +1389,11 @@ def write_namelist(filename, inputs):
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         f.write("!! Adaptive time step settings\n")
         f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
         f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
         f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
 
-||||||| merged common ancestors
-=======
-        f.write("!! Adaptive time step settings\n")
-        f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
-        f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
-        f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
-
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
-||||||| merged common ancestors
-=======
-        f.write("!! Adaptive time step settings\n")
-        f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
-        f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
-        f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
-
->>>>>>> Adaptive time step for track subroutine with electron density parameter.
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))
         f.write("lambdamin = {:f}    !! Minimum Wavelength [nm]\n".format(inputs['lambdamin']))
@@ -1472,6 +1407,12 @@ def write_namelist(filename, inputs):
         f.write("nlambda_wght = {:d}    !! Number of Wavelengths for Weights \n".format(inputs['nlambda_wght']))
         f.write("lambdamin_wght = {:f}    !! Minimum Wavelength for Weights [nm]\n".format(inputs['lambdamin_wght']))
         f.write("lambdamax_wght = {:f}    !! Maximum Wavelength for Weights [nm]\n\n".format(inputs['lambdamax_wght']))
+
+        f.write("!! Adaptive Time Step Settings\n")
+        f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))
+        f.write("p_adaptive = {:d}    !! Adaptive switch for passive grid\n".format(inputs['p_adaptive']))
+        f.write("split_tol = {:f}    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol\n".format(inputs['split_tol']))
+        f.write("max_cell_splits = {:d}    !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
         f.write("/\n\n")
 
     success("Namelist file created: {}\n".format(filename))

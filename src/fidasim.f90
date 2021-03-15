@@ -1118,7 +1118,7 @@ type CFPDTable
     real(Float64), dimension(:,:,:), allocatable :: nactual
         !+ Number of spatial steps: nactual(E3,ray,channel)
     real(Float64), dimension(:,:,:), allocatable :: daomega
-        !+ Differntial area times solid angle [cm^-2]: daomega(E3,ray,channel)
+        !+ Differntial area times solid angle [cm^2]: daomega(E3,ray,channel)
     real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
         !+ Velocity [cm/s] and position [cm] in cylindrical (R,Phi,Z) coordinates:
         !+ sightline(E3,:,step,ray,channel)
@@ -1135,28 +1135,27 @@ end interface
 
 interface operator(+)
     !+ Allows for adding [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]]
-    module procedure pp_add,lplp_add,ff_add,lflf_add,oo_add
+    !+ [[EMFields]], and [[LocalEMFields]]
+    module procedure pp_add,lplp_add,ff_add,lflf_add
 end interface
 
 interface operator(-)
     !+ Allows for subtracting [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]]
-    module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract,oo_subtract
+    !+ [[EMFields]], and [[LocalEMFields]]
+    module procedure pp_subtract,lplp_subtract,ff_subtract,lflf_subtract
 end interface
 
 interface operator(*)
     !+ Allows for multiplying [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]] by scalars
+    !+ [[EMFields]], and [[LocalEMFields]] by scalars
     module procedure sp_multiply, ps_multiply, lps_multiply, slp_multiply, &
-                     sf_multiply, fs_multiply, lfs_multiply, slf_multiply, &
-                     soo_multiply, oos_multiply
+                     sf_multiply, fs_multiply, lfs_multiply, slf_multiply
 end interface
 
 interface operator(/)
     !+ Allows for dividing [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]], [[LocalEMFields]], and [[CFPDTable]] by scalars
-    module procedure ps_divide, lps_divide, fs_divide, lfs_divide, oos_divide
+    !+ [[EMFields]], and [[LocalEMFields]] by scalars
+    module procedure ps_divide, lps_divide, fs_divide, lfs_divide
 end interface
 
 !! definition of the structures:
@@ -1904,72 +1903,6 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
 
 end function lfs_divide
 
-elemental function oo_add(p1, p2) result (p3)
-    !+ Defines how to add two [[CFPDTable]] types
-    type(CFPDTable), intent(in) :: p1,p2
-    type(CFPDTable)             :: p3
-
-    p3%nenergy   = p1%nenergy   + p2%nenergy
-    p3%nrays     = p1%nrays     + p2%nrays
-    p3%nsteps    = p1%nsteps    + p2%nsteps
-    p3%earray    = p1%earray    + p2%earray
-    p3%nactual   = p1%nactual   + p2%nactual
-    p3%daomega   = p1%daomega   + p2%daomega
-    p3%sightline = p1%sightline + p2%sightline
-
-end function oo_add
-
-elemental function oo_subtract(p1, p2) result (p3)
-    !+ Defines how to subtract two [[CFPDTable]] types
-    type(CFPDTable), intent(in) :: p1,p2
-    type(CFPDTable)             :: p3
-
-    p3%nenergy   = p1%nenergy   - p2%nenergy
-    p3%nrays     = p1%nrays     - p2%nrays
-    p3%nsteps    = p1%nsteps    - p2%nsteps
-    p3%earray    = p1%earray    - p2%earray
-    p3%nactual   = p1%nactual   - p2%nactual
-    p3%daomega   = p1%daomega   - p2%daomega
-    p3%sightline = p1%sightline - p2%sightline
-
-end function oo_subtract
-
-elemental function oos_multiply(p1, real_scalar) result (p3)
-    !+ Defines how to multiply two [[CFPDTable]] types
-    type(CFPDTable), intent(in) :: p1
-    real(Float64), intent(in)  :: real_scalar
-    type(CFPDTable)             :: p3
-
-    p3%nenergy   = p1%nenergy   * real_scalar
-    p3%nrays     = p1%nrays     * real_scalar
-    p3%nsteps    = p1%nsteps    * real_scalar
-    p3%earray    = p1%earray    * real_scalar
-    p3%nactual   = p1%nactual   * real_scalar
-    p3%daomega   = p1%daomega   * real_scalar
-    p3%sightline = p1%sightline * real_scalar
-
-end function oos_multiply
-
-elemental function soo_multiply(real_scalar, p1) result (p3)
-    !+ Defines how to multiply [[CFPDTable]] types by a scalar
-    type(CFPDTable), intent(in) :: p1
-    real(Float64), intent(in)  :: real_scalar
-    type(CFPDTable)             :: p3
-
-    p3 = p1*real_scalar
-
-end function soo_multiply
-
-elemental function oos_divide(p1, real_scalar) result (p3)
-    !+ Defines how to divide [[CFPDTable]] types by a scalar
-    type(CFPDTable), intent(in) :: p1
-    real(Float64), intent(in)  :: real_scalar
-    type(CFPDTable)             :: p3
-
-    p3 = p1*(1.d0/real_scalar)
-
-end function oos_divide
-
 pure subroutine oo_assign(p1, p2)
     !+ Defines how to assign [[CFPDTable]] types to eachother
     type(CFPDTable), intent(in)  :: p2
@@ -1978,6 +1911,9 @@ pure subroutine oo_assign(p1, p2)
     p1%nenergy   = p2%nenergy
     p1%nrays     = p2%nrays
     p1%nsteps    = p2%nsteps
+    p1%nchan     = p2%nchan
+    p1%dl        = p2%dl
+    p1%dE        = p2%dE
     p1%earray    = p2%earray
     p1%nactual   = p2%nactual
     p1%daomega   = p2%daomega

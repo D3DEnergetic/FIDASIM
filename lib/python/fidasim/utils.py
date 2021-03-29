@@ -644,7 +644,7 @@ def beam_grid(nbi, rstart,
 
     return beam_grid
 
-def detector_aperture_geometry(g,wn):
+def detector_aperture_geometry(wn):
     #+#detector_aperture_geometry
     #+ Defines charged fusion product diagnostic geometry
     #+ Sources: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
@@ -653,8 +653,6 @@ def detector_aperture_geometry(g,wn):
     #+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
     #+***
     #+##Arguments
-    #+    **g**: GEQDSK file
-    #+
     #+    **wn**: indicates Werner (1) or Netepneko (0) diagnostic geometry
     #+
     #+##Outputs
@@ -670,8 +668,7 @@ def detector_aperture_geometry(g,wn):
     #+
     #+##Example Usage
     #+```python
-    #+>>> g = 'g000001.01000'
-    #+>>> geometry = detector_aperture_geometry(g,0)
+    #+>>> geometry = detector_aperture_geometry(0)
     #+```
 
     if wn == 1: # Source: MAST_29908_221_g_ensemble.nml

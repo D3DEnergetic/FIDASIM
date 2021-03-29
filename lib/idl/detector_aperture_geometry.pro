@@ -1,4 +1,4 @@
-PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
+PRO detector_aperture_geometry,wn,rdist,zdist,v,d,rc
     ;+#detector_aperture_geometry
     ;+ Defines charged fusion product diagnostic geometry
     ;+ Sources: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
@@ -7,8 +7,6 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
     ;+***
     ;+##Arguments
-    ;+    **g**: GEQDSK structure
-    ;+
     ;+    **wn**: indicates Werner (1) or Netepneko (0) diagnostic geometry
     ;+
     ;+##Outputs
@@ -24,8 +22,7 @@ PRO detector_aperture_geometry,g,wn,rdist,zdist,v,d,rc
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> g = readg('g000001.01000')
-    ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
+    ;+IDL> detector_aperture_geometry,0,rdist,zdist,v,d,rc
     ;+```
 
     if wn eq 1 then begin ; Source: MAST_29908_221_g_ensemble.nml

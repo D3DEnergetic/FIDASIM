@@ -409,11 +409,11 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
 <span class="k">                </span><span class="n">t</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">else</span>
 <span class="k">                </span><span class="n">t</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">endif</span>
-        <span class="n">endif</span>
-    <span class="n">endif</span>
+            <span class="k">endif</span>
+<span class="k">        endif</span>
+<span class="k">    endif</span>
 
-    <span class="n">p</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">l</span> <span class="o">*</span> <span class="n">t</span>
+<span class="k">    </span><span class="n">p</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">l</span> <span class="o">*</span> <span class="n">t</span>
 
 <span class="k">end subroutine </span><span class="n">line_cylinder_intersect</span>
 </pre></div>

@@ -234,7 +234,7 @@ public subroutine store_neutrals(ind, pos, vn, neut_type, dens)
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind%7E11"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-ind%7E12"></span>integer(kind=Int32),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -249,7 +249,7 @@ public subroutine store_neutrals(ind, pos, vn, neut_type, dens)
   
 <tr>
   
-  <td><span class="anchor" id="variable-pos%7E11"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-pos%7E12"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -491,8 +491,8 @@ public subroutine store_neutrals(ind, pos, vn, neut_type, dens)
         <span class="k">case </span><span class="n">default</span>
             <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;STORE_NEUTRALS: Unknown neutral type: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">neut_type</span>
-            <span class="n">endif</span>
-            <span class="k">stop</span>
+            <span class="k">endif</span>
+<span class="k">            stop</span>
 <span class="k">    end select</span>
 
 <span class="k">end subroutine </span><span class="n">store_neutrals</span>

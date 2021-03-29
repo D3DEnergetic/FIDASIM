@@ -423,8 +423,8 @@ public subroutine Comdiv(ar, ai, br, bi, cr, ci, rc)
     <span class="k">if</span> <span class="p">(</span><span class="n">br</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">.</span><span class="nb">AND</span><span class="p">.</span><span class="n">bi</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">       </span><span class="n">rc</span> <span class="o">=</span> <span class="mi">1</span>
        <span class="k">return</span>
-<span class="k">    </span><span class="n">endif</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">dabs</span><span class="p">(</span><span class="n">br</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">dabs</span><span class="p">(</span><span class="n">bi</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">    endif</span>
+<span class="k">    if</span> <span class="p">(</span><span class="nb">dabs</span><span class="p">(</span><span class="n">br</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">dabs</span><span class="p">(</span><span class="n">bi</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">       </span><span class="n">tmp</span> <span class="o">=</span> <span class="n">bi</span> <span class="o">/</span> <span class="n">br</span>
        <span class="n">br</span>  <span class="o">=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">bi</span> <span class="o">+</span> <span class="n">br</span>
        <span class="n">cr</span>  <span class="o">=</span> <span class="p">(</span><span class="n">ar</span> <span class="o">+</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">ai</span><span class="p">)</span> <span class="o">/</span> <span class="n">br</span>
@@ -434,8 +434,8 @@ public subroutine Comdiv(ar, ai, br, bi, cr, ci, rc)
        <span class="n">bi</span>  <span class="o">=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">br</span> <span class="o">+</span> <span class="n">bi</span>
        <span class="n">cr</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">*</span> <span class="n">ar</span> <span class="o">+</span> <span class="n">ai</span><span class="p">)</span> <span class="o">/</span> <span class="n">bi</span>
        <span class="n">ci</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">*</span> <span class="n">ai</span> <span class="o">-</span> <span class="n">ar</span><span class="p">)</span> <span class="o">/</span> <span class="n">bi</span>
-    <span class="n">endif</span>
-    <span class="n">rc</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">endif</span>
+<span class="k">    </span><span class="n">rc</span> <span class="o">=</span> <span class="mi">0</span>
   <span class="k">end subroutine </span><span class="n">Comdiv</span> <span class="c">!Comdiv</span>
 </pre></div>
 

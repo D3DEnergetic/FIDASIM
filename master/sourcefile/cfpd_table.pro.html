@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>cfpd_table.pro &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>3.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>cfpd_table.pro
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/cfpd_table.pro"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">cfpd_table.pro</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/cfpd_table.pro.html#src">cfpd_table.pro</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      <h1 id="cfpd_table">cfpd_table</h1>
+<p>Generates charged fusion product table</p>
+<hr>
+<h2 id="arguments">Arguments</h2>
+<p><strong>tname</strong>: Filename of output .idl table file</p>
+<p><strong>gname</strong>: GEQDSK file</p>
+<h2 id="keyword-arguments">Keyword Arguments</h2>
+<p><strong>earray</strong>: Array of energies (keV) to use</p>
+<p><strong>nrays</strong>: Number of orbits</p>
+<p><strong>step</strong>: Step size [m]</p>
+<p><strong>nsteps</strong>: Number of steps</p>
+<p><strong>plot_show</strong>: Plot orbit bundles -- (1) on (0) off</p>
+<p><strong>flip_bpol</strong>: Reverse the direction of <code>cpasma</code> in the GEQDSK file -- (1) on (0) off</p>
+<p><strong>geometry</strong>: Structure containing diagnostic geometry -- tags(rdist,zdist,v,d,rc) in [m,rad,s]</p>
+<h2 id="example-usage">Example Usage</h2>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> tname <span class="o">=</span> <span class="s1">&#39;mast.idl&#39;</span>
+IDL<span class="o">&gt;</span> gname <span class="o">=</span> <span class="s1">&#39;g000001.01000&#39;</span>
+IDL<span class="o">&gt;</span> earray <span class="o">=</span> <span class="mi">2460</span>. <span class="o">+</span> <span class="mi">285</span>.<span class="o">*</span><span class="nb">findgen</span>(<span class="mi">5</span>)
+IDL<span class="o">&gt;</span> cfpd_table, tname, gname, earray<span class="o">=</span>earray
+</code></pre></div>
+      <br>
+    
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/cfpd_table.pro.html#src">cfpd_table.pro</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> cfpd_table, tname, gname, earray<span class="o">=</span>earray, nrays<span class="o">=</span>nrays, step<span class="o">=</span>step, nsteps<span class="o">=</span>nsteps, plot_show<span class="o">=</span>plot_show, flip_bpol<span class="o">=</span>flip_bpol, geometry<span class="o">=</span>geometry
+<a name="ln-2"></a><span class="c1">    ;+#cfpd_table</span>
+<a name="ln-3"></a><span class="c1">    ;+Generates charged fusion product table</span>
+<a name="ln-4"></a><span class="c1">    ;+***</span>
+<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a name="ln-6"></a><span class="c1">    ;+    **tname**: Filename of output .idl table file</span>
+<a name="ln-7"></a><span class="c1">    ;+</span>
+<a name="ln-8"></a><span class="c1">    ;+    **gname**: GEQDSK file</span>
+<a name="ln-9"></a><span class="c1">    ;+</span>
+<a name="ln-10"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a name="ln-11"></a><span class="c1">    ;+    **earray**: Array of energies (keV) to use</span>
+<a name="ln-12"></a><span class="c1">    ;+</span>
+<a name="ln-13"></a><span class="c1">    ;+    **nrays**: Number of orbits</span>
+<a name="ln-14"></a><span class="c1">    ;+</span>
+<a name="ln-15"></a><span class="c1">    ;+    **step**: Step size [m]</span>
+<a name="ln-16"></a><span class="c1">    ;+</span>
+<a name="ln-17"></a><span class="c1">    ;+    **nsteps**: Number of steps</span>
+<a name="ln-18"></a><span class="c1">    ;+</span>
+<a name="ln-19"></a><span class="c1">    ;+    **plot_show**: Plot orbit bundles -- (1) on (0) off</span>
+<a name="ln-20"></a><span class="c1">    ;+</span>
+<a name="ln-21"></a><span class="c1">    ;+    **flip_bpol**: Reverse the direction of `cpasma` in the GEQDSK file -- (1) on (0) off</span>
+<a name="ln-22"></a><span class="c1">    ;+</span>
+<a name="ln-23"></a><span class="c1">    ;+    **geometry**: Structure containing diagnostic geometry -- tags(rdist,zdist,v,d,rc) in [m,rad,s]</span>
+<a name="ln-24"></a><span class="c1">    ;+</span>
+<a name="ln-25"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-26"></a><span class="c1">    ;+```idl</span>
+<a name="ln-27"></a><span class="c1">    ;+IDL&gt; tname = &#39;mast.idl&#39;</span>
+<a name="ln-28"></a><span class="c1">    ;+IDL&gt; gname = &#39;g000001.01000&#39;</span>
+<a name="ln-29"></a><span class="c1">    ;+IDL&gt; earray = 2460. + 285.*findgen(5)</span>
+<a name="ln-30"></a><span class="c1">    ;+IDL&gt; cfpd_table, tname, gname, earray=earray</span>
+<a name="ln-31"></a><span class="c1">    ;+```</span>
+<a name="ln-32"></a>
+<a name="ln-33"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(earray) <span class="k">then</span> earray <span class="o">=</span> <span class="mi">2700</span>. <span class="o">+</span> <span class="mi">40</span><span class="o">*</span><span class="nb">findgen</span>(<span class="mi">19</span>)
+<a name="ln-34"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(nrays) <span class="k">then</span> nrays<span class="o">=</span><span class="mi">50</span>
+<a name="ln-35"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(nsteps) <span class="k">then</span> nsteps<span class="o">=</span><span class="mi">110</span>
+<a name="ln-36"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(step) <span class="k">then</span> step<span class="o">=</span><span class="mf">0.01</span>
+<a name="ln-37"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(plot_show) <span class="k">then</span> plot_show<span class="o">=</span><span class="mi">0</span>
+<a name="ln-38"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(flip_bpol) <span class="k">then</span> flip_bpol<span class="o">=</span><span class="mi">0</span>
+<a name="ln-39"></a>    nenergy <span class="o">=</span> <span class="nb">n_elements</span>(earray)
+<a name="ln-40"></a>
+<a name="ln-41"></a>    g<span class="o">=</span>readg(gname)
+<a name="ln-42"></a>    <span class="k">if</span> <span class="o">~</span><span class="nb">keyword_set</span>(geometry) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-43"></a>        <span class="nb">print</span>, <span class="s1">&#39;Acquiring diagnostic geometry from definitions in detector_aperture_geometry.pro&#39;</span>
+<a name="ln-44"></a>        <span class="k">if</span> flip_bpol <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-45"></a>            g.cpasma <span class="o">=</span> <span class="o">-</span>g.cpasma
+<a name="ln-46"></a>            detector_aperture_geometry,g,<span class="mi">1</span>,rdist,zdist,v,d,rc
+<a name="ln-47"></a>            <span class="nb">print</span>, <span class="s1">&#39;Flipping the direction of B poloidal&#39;</span>
+<a name="ln-48"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-49"></a>            detector_aperture_geometry,g,<span class="mi">0</span>,rdist,zdist,v,d,rc
+<a name="ln-50"></a>        <span class="k">endelse</span>
+<a name="ln-51"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-52"></a>        <span class="nb">print</span>, <span class="s1">&#39;User provided diagnostic geometry structure&#39;</span>
+<a name="ln-53"></a>        rdist <span class="o">=</span> geometry.rdist
+<a name="ln-54"></a>        zdist <span class="o">=</span> geometry.zdist
+<a name="ln-55"></a>        v <span class="o">=</span> geometry.v
+<a name="ln-56"></a>        d <span class="o">=</span> geometry.d
+<a name="ln-57"></a>        rc <span class="o">=</span> geometry.rc
+<a name="ln-58"></a>    <span class="k">endelse</span>
+<a name="ln-59"></a>
+<a name="ln-60"></a>    orb0 <span class="o">=</span> orb_cfpd(g,rdist,zdist,v,d,rc,e0<span class="o">=</span>earray[<span class="mi">0</span>],nrays<span class="o">=</span>nrays,step<span class="o">=</span>step,nsteps<span class="o">=</span>nsteps,plot_show<span class="o">=</span>plot_show)
+<a name="ln-61"></a>    orb <span class="o">=</span> <span class="nb">replicate</span>(orb0, nenergy)
+<a name="ln-62"></a>    orb[<span class="mi">0</span>] <span class="o">=</span> orb0
+<a name="ln-63"></a>
+<a name="ln-64"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">1</span>,nenergy<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-65"></a>        orb[i] <span class="o">=</span> orb_cfpd(g,rdist,zdist,v,d,rc,e0<span class="o">=</span>earray[i],nrays<span class="o">=</span>nrays,step<span class="o">=</span>step,nsteps<span class="o">=</span>nsteps,plot_show<span class="o">=</span>plot_show)
+<a name="ln-66"></a>    <span class="k">endfor</span>
+<a name="ln-67"></a>
+<a name="ln-68"></a>    <span class="nb">save</span>,filename<span class="o">=</span>tname,orb,earray
+<a name="ln-69"></a>
+<a name="ln-70"></a><span class="c1">    ;Convert to array for FIDASIM</span>
+<a name="ln-71"></a>    size_sight <span class="o">=</span> <span class="nb">size</span>(orb0.sightline, <span class="o">/</span>dimension)
+<a name="ln-72"></a>    sightline <span class="o">=</span> <span class="nb">make_array</span>([[nenergy], size_sight], <span class="o">/</span><span class="nb">double</span>, value<span class="o">=</span><span class="mf">0.d0</span>)
+<a name="ln-73"></a>    daomega <span class="o">=</span> <span class="nb">make_array</span>([[nenergy], size_sight[<span class="mi">2</span><span class="o">:</span><span class="mi">3</span>]], <span class="o">/</span><span class="nb">double</span>, value<span class="o">=</span><span class="mf">0.d0</span>)
+<a name="ln-74"></a>    nactual <span class="o">=</span> <span class="nb">make_array</span>([[nenergy], size_sight[<span class="mi">2</span><span class="o">:</span><span class="mi">3</span>]], <span class="o">/</span><span class="nb">long</span>, value<span class="o">=</span><span class="mi">0</span>)
+<a name="ln-75"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nenergy<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a name="ln-76"></a>        sightline[i,<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> orb[i].sightline[<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>]
+<a name="ln-77"></a>        daomega[i,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> orb[i].daomega[<span class="o">*</span>,<span class="o">*</span>]
+<a name="ln-78"></a>        nactual[i,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> orb[i].nactual[<span class="o">*</span>,<span class="o">*</span>]
+<a name="ln-79"></a>    <span class="k">endfor</span>
+<a name="ln-80"></a>    sightline <span class="o">*=</span> <span class="mf">100.d0</span> ;[m] to [cm]
+<a name="ln-81"></a>    sightline[<span class="o">*</span>,<span class="mi">1</span>,<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">/=</span> <span class="mf">100.d0</span> ;vphi is ok
+<a name="ln-82"></a>    sightline[<span class="o">*</span>,<span class="mi">4</span>,<span class="o">*</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">/=</span> <span class="mf">100.d0</span> ;phi is ok
+<a name="ln-83"></a>    daomega <span class="o">*=</span> <span class="mf">1.d4</span> ;[m<span class="o">^</span><span class="mi">2</span>] to [cm<span class="o">^</span><span class="mi">2</span>]
+<a name="ln-84"></a>
+<a name="ln-85"></a>    <span class="nb">return</span>, {sightline<span class="o">:</span>sightline, daomega<span class="o">:</span>daomega, nactual<span class="o">:</span>nactual, nrays<span class="o">:</span><span class="nb">long</span>(nrays), $
+<a name="ln-86"></a>             nsteps<span class="o">:</span><span class="nb">long</span>(nsteps), nenergy<span class="o">:</span><span class="nb">long</span>(nenergy), earray<span class="o">:</span><span class="nb">double</span>(earray)}
+<a name="ln-87"></a>
+<a name="ln-88"></a><span class="k">END</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

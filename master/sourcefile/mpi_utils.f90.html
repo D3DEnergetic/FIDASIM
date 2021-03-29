@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.5% of total for source files.">223 statements</a>
+    title=" 1.4% of total for source files.">223 statements</a>
      </li> 
      
      
@@ -409,10 +409,10 @@
 <a name="ln-33"></a><span class="k">     call </span><span class="n">MPI_COMM_SIZE</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">numranks</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
 <a name="ln-34"></a>     <span class="k">if</span> <span class="p">(</span><span class="n">numranks</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-35"></a><span class="k">       call </span><span class="n">MPI_COMM_RANK</span><span class="p">(</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">myrank</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-36"></a>     <span class="n">endif</span>
-<a name="ln-37"></a>   <span class="n">endif</span>
+<a name="ln-36"></a>     <span class="k">endif</span>
+<a name="ln-37"></a><span class="k">   endif</span>
 <a name="ln-38"></a>
-<a name="ln-39"></a>  <span class="k">end subroutine</span>
+<a name="ln-39"></a><span class="k">  end subroutine</span>
 <a name="ln-40"></a>
 <a name="ln-41"></a><span class="k">  subroutine </span><span class="n">cleanup_mpi</span><span class="p">()</span>
 <a name="ln-42"></a>    <span class="k">use </span><span class="n">mpi</span>
@@ -445,7 +445,7 @@
 <a name="ln-69"></a>
 <a name="ln-70"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numranks</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-71"></a><span class="k">       call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-72"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-72"></a>    <span class="k">endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-73"></a>
 <a name="ln-74"></a>  <span class="k">end subroutine</span>
 <a name="ln-75"></a>
@@ -469,8 +469,8 @@
 <a name="ln-93"></a>            <span class="k">call </span><span class="n">parallel_sum_d1</span><span class="p">(</span><span class="n">A</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-94"></a>        <span class="k">else</span>
 <a name="ln-95"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-96"></a>        <span class="n">endif</span>
-<a name="ln-97"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-96"></a>        <span class="k">endif</span>
+<a name="ln-97"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-98"></a>
 <a name="ln-99"></a>  <span class="k">end subroutine</span>
 <a name="ln-100"></a>
@@ -496,8 +496,8 @@
 <a name="ln-120"></a>            <span class="k">call </span><span class="n">parallel_sum_d1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-121"></a>        <span class="k">else</span>
 <a name="ln-122"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-123"></a>        <span class="n">endif</span>
-<a name="ln-124"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-123"></a>        <span class="k">endif</span>
+<a name="ln-124"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-125"></a>
 <a name="ln-126"></a>  <span class="k">end subroutine</span>
 <a name="ln-127"></a>
@@ -523,8 +523,8 @@
 <a name="ln-147"></a>            <span class="k">call </span><span class="n">parallel_sum_d1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-148"></a>        <span class="k">else</span>
 <a name="ln-149"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-150"></a>        <span class="n">endif</span>
-<a name="ln-151"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-150"></a>        <span class="k">endif</span>
+<a name="ln-151"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-152"></a>
 <a name="ln-153"></a>  <span class="k">end subroutine</span>
 <a name="ln-154"></a>
@@ -550,8 +550,8 @@
 <a name="ln-174"></a>            <span class="k">call </span><span class="n">parallel_sum_d1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-175"></a>        <span class="k">else</span>
 <a name="ln-176"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-177"></a>        <span class="n">endif</span>
-<a name="ln-178"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-177"></a>        <span class="k">endif</span>
+<a name="ln-178"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-179"></a>
 <a name="ln-180"></a>  <span class="k">end subroutine</span>
 <a name="ln-181"></a>
@@ -577,8 +577,8 @@
 <a name="ln-201"></a>            <span class="k">call </span><span class="n">parallel_sum_d1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-202"></a>        <span class="k">else</span>
 <a name="ln-203"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-204"></a>        <span class="n">endif</span>
-<a name="ln-205"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-204"></a>        <span class="k">endif</span>
+<a name="ln-205"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-206"></a>
 <a name="ln-207"></a>  <span class="k">end subroutine</span>
 <a name="ln-208"></a>
@@ -594,7 +594,7 @@
 <a name="ln-218"></a>
 <a name="ln-219"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numranks</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-220"></a><span class="k">       call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_INTEGER</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-221"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-221"></a>    <span class="k">endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-222"></a>
 <a name="ln-223"></a>  <span class="k">end subroutine</span>
 <a name="ln-224"></a>
@@ -618,8 +618,8 @@
 <a name="ln-242"></a>            <span class="k">call </span><span class="n">parallel_sum_i1</span><span class="p">(</span><span class="n">A</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-243"></a>        <span class="k">else</span>
 <a name="ln-244"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_INTEGER</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-245"></a>        <span class="n">endif</span>
-<a name="ln-246"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-245"></a>        <span class="k">endif</span>
+<a name="ln-246"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-247"></a>
 <a name="ln-248"></a>  <span class="k">end subroutine</span>
 <a name="ln-249"></a>
@@ -645,8 +645,8 @@
 <a name="ln-269"></a>            <span class="k">call </span><span class="n">parallel_sum_i1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-270"></a>        <span class="k">else</span>
 <a name="ln-271"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_INTEGER</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-272"></a>        <span class="n">endif</span>
-<a name="ln-273"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-272"></a>        <span class="k">endif</span>
+<a name="ln-273"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-274"></a>
 <a name="ln-275"></a>  <span class="k">end subroutine</span>
 <a name="ln-276"></a>
@@ -672,8 +672,8 @@
 <a name="ln-296"></a>            <span class="k">call </span><span class="n">parallel_sum_i1</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">sizeA</span><span class="p">))</span>
 <a name="ln-297"></a>        <span class="k">else</span>
 <a name="ln-298"></a><span class="k">            call </span><span class="n">MPI_Allreduce</span><span class="p">(</span><span class="n">MPI_IN_PLACE</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">sizeA</span><span class="p">,</span><span class="n">MPI_INTEGER</span><span class="p">,</span><span class="n">MPI_Sum</span><span class="p">,</span><span class="n">MPI_COMM_WORLD</span><span class="p">,</span><span class="n">ierr</span><span class="p">)</span>
-<a name="ln-299"></a>        <span class="n">endif</span>
-<a name="ln-300"></a>    <span class="n">endif</span> <span class="c">! else nothing to do</span>
+<a name="ln-299"></a>        <span class="k">endif</span>
+<a name="ln-300"></a><span class="k">    endif</span> <span class="c">! else nothing to do</span>
 <a name="ln-301"></a>
 <a name="ln-302"></a>  <span class="k">end subroutine</span>
 <a name="ln-303"></a>

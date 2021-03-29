@@ -359,13 +359,13 @@ public subroutine lubksb(a, indx, b)
 <span class="k">          </span><span class="n">summ</span><span class="o">=</span><span class="n">summ</span><span class="o">-</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">ii</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">b</span><span class="p">(</span><span class="n">ii</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
        <span class="k">else if</span> <span class="p">(</span><span class="n">summ</span> <span class="o">/=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">          </span><span class="n">ii</span><span class="o">=</span><span class="n">i</span>
-       <span class="n">endif</span>
-       <span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">=</span><span class="n">summ</span>
-    <span class="n">enddo</span>
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span>
+       <span class="k">endif</span>
+<span class="k">       </span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">=</span><span class="n">summ</span>
+    <span class="k">enddo</span>
+<span class="k">    do </span><span class="n">i</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span>
        <span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">),</span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)))</span><span class="o">/</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">enddo</span>
-  <span class="k">end subroutine </span><span class="n">lubksb</span>
+    <span class="k">enddo</span>
+<span class="k">  end subroutine </span><span class="n">lubksb</span>
 </pre></div>
 
     </section>

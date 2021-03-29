@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>plot_cfpd_orbits.pro &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>3.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>plot_cfpd_orbits.pro
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/plot_cfpd_orbits.pro"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">plot_cfpd_orbits.pro</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/plot_cfpd_orbits.pro.html#src">plot_cfpd_orbits.pro</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      <h1 id="plot_cfpd_orbits">plot_cfpd_orbits</h1>
+<p>Plots charged fusion product orbit trajectories</p>
+<hr>
+<h2 id="arguments">Arguments</h2>
+<p><strong>orb</strong>: Orbits structure (table)</p>
+<p><strong>g</strong>: GEQDSK file</p>
+<h2 id="example-usage">Example Usage</h2>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> <span class="nb">restore</span>, <span class="s1">&#39;mast.idl&#39;</span>
+IDL<span class="o">&gt;</span> g <span class="o">=</span> <span class="s1">&#39;g99999K26&#39;</span>
+IDL<span class="o">&gt;</span> plot_cfpd_orbits, orb, g
+</code></pre></div>
+      <br>
+    
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/plot_cfpd_orbits.pro.html#src">plot_cfpd_orbits.pro</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">plot_cfpd_orbits</span><span class="p">,</span> <span class="s s-Atom">orb</span><span class="p">,</span> <span class="s s-Atom">g</span>
+<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#plot_cfpd_orbits</span>
+<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Plots</span> <span class="s s-Atom">charged</span> <span class="s s-Atom">fusion</span> <span class="s s-Atom">product</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">trajectories</span>
+<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
+<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
+<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**orb**:</span> <span class="nv">Orbits</span> <span class="nf">structure</span> <span class="p">(</span><span class="s s-Atom">table</span><span class="p">)</span>
+<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**g**:</span> <span class="nv">GEQDSK</span> <span class="s s-Atom">file</span>
+<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-10"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">restore</span><span class="p">,</span> <span class="s s-Atom">&#39;mast.idl&#39;</span>
+<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">g</span> <span class="o">=</span> <span class="s s-Atom">&#39;g99999K26&#39;</span>
+<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">plot_cfpd_orbits</span><span class="p">,</span> <span class="s s-Atom">orb</span><span class="p">,</span> <span class="s s-Atom">g</span>
+<a name="ln-15"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-16"></a>
+<a name="ln-17"></a>    <span class="s s-Atom">device</span><span class="p">,</span> <span class="s s-Atom">decomposed</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-18"></a>
+<a name="ln-19"></a>    <span class="s s-Atom">g</span><span class="o">=</span><span class="nf">readg</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">)</span>
+<a name="ln-20"></a>    <span class="s s-Atom">finewall</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span>
+<a name="ln-21"></a>    <span class="s s-Atom">sightline</span> <span class="o">=</span> <span class="s s-Atom">orb</span><span class="p">.</span><span class="s s-Atom">sightline</span>
+<a name="ln-22"></a>    <span class="s s-Atom">daomega</span> <span class="o">=</span> <span class="s s-Atom">orb</span><span class="p">.</span><span class="s s-Atom">daomega</span>
+<a name="ln-23"></a>    <span class="s s-Atom">nactual</span> <span class="o">=</span> <span class="s s-Atom">orb</span><span class="p">.</span><span class="s s-Atom">nactual</span>
+<a name="ln-24"></a>    <span class="s s-Atom">nch</span> <span class="o">=</span> <span class="mi">4</span>
+<a name="ln-25"></a>
+<a name="ln-26"></a>    <span class="p">!</span><span class="s s-Atom">p</span><span class="p">.</span><span class="s s-Atom">multi</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<a name="ln-27"></a>    <span class="p">!</span><span class="s s-Atom">p</span><span class="p">.</span><span class="s s-Atom">background</span><span class="o">=</span><span class="mi">255</span> <span class="p">;</span><span class="s s-Atom">white</span> <span class="s s-Atom">background</span>
+<a name="ln-28"></a>    <span class="p">;</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">elevation</span>
+<a name="ln-29"></a>
+<a name="ln-30"></a>    <span class="s s-Atom">loadct</span><span class="p">,</span> <span class="mi">39</span>
+<a name="ln-31"></a>    <span class="s s-Atom">plot</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">lim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">),</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">lim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="s s-Atom">xtitle=&#39;R [m]&#39;</span><span class="p">,</span><span class="s s-Atom">ytitle=&#39;Z [m]&#39;</span><span class="p">,</span><span class="s s-Atom">charsize</span><span class="o">=</span><span class="mi">2</span>
+<a name="ln-32"></a>    <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">bdry</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:g</span><span class="p">.</span><span class="s s-Atom">nbdry</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">bdry</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:g</span><span class="p">.</span><span class="s s-Atom">nbdry</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">40</span>
+<a name="ln-33"></a>
+<a name="ln-34"></a>    <span class="s s-Atom">colors</span><span class="o">=</span><span class="mi">0</span> <span class="o">+</span> <span class="mi">80</span><span class="o">*</span><span class="nf">indgen</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<a name="ln-35"></a>    <span class="s s-Atom">nrays</span> <span class="o">=</span> <span class="s s-Atom">orb</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="s s-Atom">nrays</span>
+<a name="ln-36"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">for</span> <span class="s s-Atom">iray</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">if</span> <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="mf">0.</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-37"></a>        <span class="s s-Atom">nact</span><span class="o">=</span><span class="s s-Atom">nactual</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-38"></a>        <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="s s-Atom">psym</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">color</span><span class="o">=</span><span class="s s-Atom">colors</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]</span>
+<a name="ln-39"></a>    <span class="s s-Atom">end</span>
+<a name="ln-40"></a>
+<a name="ln-41"></a>    <span class="p">;</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">phi</span><span class="p">)</span> <span class="s s-Atom">plan</span>
+<a name="ln-42"></a>    <span class="s s-Atom">theta</span><span class="o">=</span><span class="mf">2.</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span><span class="o">/</span><span class="mf">30.</span>
+<a name="ln-43"></a>
+<a name="ln-44"></a>    <span class="s s-Atom">plot</span><span class="p">,</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="s s-Atom">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">],</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span><span class="s s-Atom">xstyle</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="err">$</span>
+<a name="ln-45"></a>         <span class="s s-Atom">xtitle=&#39;X [m]&#39;</span><span class="p">,</span><span class="s s-Atom">ytitle=&#39;Y [m]&#39;</span><span class="p">,</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">charsize</span><span class="o">=</span><span class="mi">2</span>
+<a name="ln-46"></a>    <span class="s s-Atom">oplot</span><span class="p">,</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-47"></a>
+<a name="ln-48"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">for</span> <span class="s s-Atom">iray</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">if</span> <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="mf">0.</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-49"></a>         <span class="s s-Atom">nact</span><span class="o">=</span><span class="s s-Atom">nactual</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-50"></a>         <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]),</span> <span class="err">$</span>
+<a name="ln-51"></a>               <span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="s s-Atom">colors</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]</span>
+<a name="ln-52"></a>    <span class="s s-Atom">end</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>
+<a name="ln-55"></a><span class="nv">END</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

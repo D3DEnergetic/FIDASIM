@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 5.0% of total for source files.">758 statements</a>
+    title=" 4.9% of total for source files.">758 statements</a>
      </li> 
      
      
@@ -386,22 +386,22 @@
 <a name="ln-46"></a>          <span class="n">r</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-47"></a>          <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-48"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">j</span><span class="p">)</span>  <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-49"></a>          <span class="n">enddo</span>
-<a name="ln-50"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-49"></a>          <span class="k">enddo</span>
+<a name="ln-50"></a><span class="k">          if</span> <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-51"></a><span class="k">             </span><span class="n">scal</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">j</span>
 <a name="ln-52"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">k</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-53"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-54"></a>                   <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
-<a name="ln-55"></a>                <span class="n">enddo</span>
-<a name="ln-56"></a>                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-55"></a>                <span class="k">enddo</span>
+<a name="ln-56"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-57"></a>                   <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-58"></a>                <span class="n">enddo</span>
-<a name="ln-59"></a>             <span class="n">endif</span>
-<a name="ln-60"></a>             <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-58"></a>                <span class="k">enddo</span>
+<a name="ln-59"></a><span class="k">             endif</span>
+<a name="ln-60"></a><span class="k">             </span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-61"></a>             <span class="n">iter</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-62"></a>          <span class="n">endif</span>
-<a name="ln-63"></a>       <span class="n">enddo</span> <span class="c">!j loop</span>
-<a name="ln-64"></a>    <span class="n">enddo</span> <span class="c">!while iter=1</span>
+<a name="ln-62"></a>          <span class="k">endif</span>
+<a name="ln-63"></a><span class="k">       enddo</span> <span class="c">!j loop</span>
+<a name="ln-64"></a>    <span class="k">enddo</span> <span class="c">!while iter=1</span>
 <a name="ln-65"></a>    <span class="n">iter</span><span class="o">=</span><span class="mi">1</span>
 <a name="ln-66"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">iter</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-67"></a>       <span class="n">iter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -409,28 +409,28 @@
 <a name="ln-69"></a>          <span class="n">c</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-70"></a>          <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-71"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">j</span><span class="p">)</span>  <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-72"></a>          <span class="n">enddo</span>
-<a name="ln-73"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-72"></a>          <span class="k">enddo</span>
+<a name="ln-73"></a><span class="k">          if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-74"></a><span class="k">             </span><span class="n">scal</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">j</span>
 <a name="ln-75"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">m</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-76"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-77"></a>                   <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="p">))</span>
-<a name="ln-78"></a>                <span class="n">enddo</span>
-<a name="ln-79"></a>                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-78"></a>                <span class="k">enddo</span>
+<a name="ln-79"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-80"></a>                   <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-81"></a>                <span class="n">enddo</span>
-<a name="ln-82"></a>             <span class="n">endif</span>
-<a name="ln-83"></a>             <span class="n">m</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-81"></a>                <span class="k">enddo</span>
+<a name="ln-82"></a><span class="k">             endif</span>
+<a name="ln-83"></a><span class="k">             </span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span>
 <a name="ln-84"></a>             <span class="n">iter</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-85"></a>          <span class="n">endif</span>
-<a name="ln-86"></a>       <span class="n">enddo</span> <span class="c">!j loop</span>
-<a name="ln-87"></a>    <span class="n">enddo</span> <span class="c">!while iter=1</span>
+<a name="ln-85"></a>          <span class="k">endif</span>
+<a name="ln-86"></a><span class="k">       enddo</span> <span class="c">!j loop</span>
+<a name="ln-87"></a>    <span class="k">enddo</span> <span class="c">!while iter=1</span>
 <a name="ln-88"></a>    <span class="n">low</span> <span class="o">=</span> <span class="n">m</span>
 <a name="ln-89"></a>    <span class="n">high</span> <span class="o">=</span> <span class="n">k</span>
 <a name="ln-90"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-91"></a>       <span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
-<a name="ln-92"></a>    <span class="n">enddo</span>
-<a name="ln-93"></a>    <span class="n">iter</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-92"></a>    <span class="k">enddo</span>
+<a name="ln-93"></a><span class="k">    </span><span class="n">iter</span><span class="o">=</span><span class="mi">1</span>
 <a name="ln-94"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">iter</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-95"></a>       <span class="n">iter</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-96"></a>       <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span>
@@ -439,33 +439,33 @@
 <a name="ln-99"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">i</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-100"></a><span class="k">                </span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
 <a name="ln-101"></a>                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-102"></a>             <span class="n">endif</span>
-<a name="ln-103"></a>          <span class="n">enddo</span>
-<a name="ln-104"></a>          <span class="n">g</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">basis</span>
+<a name="ln-102"></a>             <span class="k">endif</span>
+<a name="ln-103"></a><span class="k">          enddo</span>
+<a name="ln-104"></a><span class="k">          </span><span class="n">g</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">basis</span>
 <a name="ln-105"></a>          <span class="n">f</span> <span class="o">=</span> <span class="n">ONE</span>
 <a name="ln-106"></a>          <span class="n">s</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">r</span>
 <a name="ln-107"></a>          <span class="k">do while</span> <span class="p">(</span><span class="n">c</span> <span class="o">&lt;</span> <span class="n">g</span><span class="p">)</span>
 <a name="ln-108"></a>             <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">basis</span>
 <a name="ln-109"></a>             <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="n">b2</span>
-<a name="ln-110"></a>          <span class="n">enddo</span>
-<a name="ln-111"></a>          <span class="n">g</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">basis</span>
+<a name="ln-110"></a>          <span class="k">enddo</span>
+<a name="ln-111"></a><span class="k">          </span><span class="n">g</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">basis</span>
 <a name="ln-112"></a>          <span class="k">do while</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;=</span> <span class="n">g</span><span class="p">)</span>
 <a name="ln-113"></a>             <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">basis</span>
 <a name="ln-114"></a>             <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">/</span> <span class="n">b2</span>
-<a name="ln-115"></a>          <span class="n">enddo</span>
-<a name="ln-116"></a>          <span class="k">if</span> <span class="p">((</span><span class="n">c</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span> <span class="o">&lt;</span> <span class="mf">0.95</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-115"></a>          <span class="k">enddo</span>
+<a name="ln-116"></a><span class="k">          if</span> <span class="p">((</span><span class="n">c</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span> <span class="o">&lt;</span> <span class="mf">0.95</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-117"></a><span class="k">             </span><span class="n">g</span> <span class="o">=</span> <span class="n">ONE</span> <span class="o">/</span> <span class="n">f</span>
 <a name="ln-118"></a>             <span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">f</span>
 <a name="ln-119"></a>             <span class="n">iter</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-120"></a>             <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-121"></a>                <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">g</span>
-<a name="ln-122"></a>             <span class="n">enddo</span>
-<a name="ln-123"></a>             <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k</span>
+<a name="ln-122"></a>             <span class="k">enddo</span>
+<a name="ln-123"></a><span class="k">             do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">k</span>
 <a name="ln-124"></a>                <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">f</span>
-<a name="ln-125"></a>             <span class="n">enddo</span>
-<a name="ln-126"></a>          <span class="n">endif</span>
-<a name="ln-127"></a>       <span class="n">enddo</span> <span class="c">!i loop</span>
-<a name="ln-128"></a>    <span class="n">enddo</span> <span class="c">!while iter=1</span>
+<a name="ln-125"></a>             <span class="k">enddo</span>
+<a name="ln-126"></a><span class="k">          endif</span>
+<a name="ln-127"></a><span class="k">       enddo</span> <span class="c">!i loop</span>
+<a name="ln-128"></a>    <span class="k">enddo</span> <span class="c">!while iter=1</span>
 <a name="ln-129"></a>    <span class="k">return</span>
 <a name="ln-130"></a><span class="k">  end subroutine </span><span class="n">balance</span>
 <a name="ln-131"></a>  <span class="k">subroutine </span><span class="n">balback</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">scal</span><span class="p">,</span> <span class="n">eivec</span> <span class="p">)</span>
@@ -488,25 +488,25 @@
 <a name="ln-148"></a>       <span class="n">s</span> <span class="o">=</span> <span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-149"></a>       <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-150"></a>      <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
-<a name="ln-151"></a>       <span class="n">enddo</span>
-<a name="ln-152"></a>    <span class="n">enddo</span>
-<a name="ln-153"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+<a name="ln-151"></a>       <span class="k">enddo</span>
+<a name="ln-152"></a><span class="k">    enddo</span>
+<a name="ln-153"></a><span class="k">    do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 <a name="ln-154"></a>       <span class="n">k</span> <span class="o">=</span> <span class="nb">Int</span><span class="p">(</span><span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 <a name="ln-155"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">i</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-156"></a><span class="k">          do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-157"></a>             <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">eivec</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-158"></a>          <span class="n">enddo</span>
-<a name="ln-159"></a>       <span class="n">endif</span>
-<a name="ln-160"></a>    <span class="n">enddo</span>
-<a name="ln-161"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">high</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-158"></a>          <span class="k">enddo</span>
+<a name="ln-159"></a><span class="k">       endif</span>
+<a name="ln-160"></a><span class="k">    enddo</span>
+<a name="ln-161"></a><span class="k">    do </span><span class="n">i</span> <span class="o">=</span> <span class="n">high</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-162"></a>       <span class="n">k</span> <span class="o">=</span> <span class="nb">Int</span><span class="p">(</span><span class="n">scal</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 <a name="ln-163"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">i</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-164"></a><span class="k">          do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-165"></a>             <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">eivec</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-166"></a>          <span class="n">enddo</span>
-<a name="ln-167"></a>       <span class="n">endif</span>
-<a name="ln-168"></a>    <span class="n">enddo</span>
-<a name="ln-169"></a>    <span class="k">return</span>
+<a name="ln-166"></a>          <span class="k">enddo</span>
+<a name="ln-167"></a><span class="k">       endif</span>
+<a name="ln-168"></a><span class="k">    enddo</span>
+<a name="ln-169"></a><span class="k">    return</span>
 <a name="ln-170"></a><span class="k">  end subroutine </span><span class="n">balback</span>
 <a name="ln-171"></a>  <span class="k">subroutine </span><span class="n">elmhes</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">perm</span> <span class="p">)</span>
 <a name="ln-172"></a>    <span class="c">!+Transforms the matrix `mat` to upper Hessenberg form.</span>
@@ -532,18 +532,18 @@
 <a name="ln-192"></a>          <span class="k">if</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">DABS</span> <span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">then</span>
 <a name="ln-193"></a><span class="k">             </span><span class="n">x</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-194"></a>             <span class="n">i</span> <span class="o">=</span> <span class="n">j</span>
-<a name="ln-195"></a>          <span class="n">endif</span>
-<a name="ln-196"></a>       <span class="n">enddo</span>
-<a name="ln-197"></a>       <span class="n">perm</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
+<a name="ln-195"></a>          <span class="k">endif</span>
+<a name="ln-196"></a><span class="k">       enddo</span>
+<a name="ln-197"></a><span class="k">       </span><span class="n">perm</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-198"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">m</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-199"></a><span class="k">          do </span><span class="n">j</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-200"></a>             <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-201"></a>          <span class="n">enddo</span>
-<a name="ln-202"></a>          <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span>
+<a name="ln-201"></a>          <span class="k">enddo</span>
+<a name="ln-202"></a><span class="k">          do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-203"></a>             <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">),</span> <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">m</span><span class="p">))</span>
-<a name="ln-204"></a>          <span class="n">enddo</span>
-<a name="ln-205"></a>       <span class="n">endif</span>
-<a name="ln-206"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-204"></a>          <span class="k">enddo</span>
+<a name="ln-205"></a><span class="k">       endif</span>
+<a name="ln-206"></a><span class="k">       if</span> <span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-207"></a><span class="k">          do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-208"></a>             <span class="n">y</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-209"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
@@ -551,14 +551,14 @@
 <a name="ln-211"></a>                <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">y</span>
 <a name="ln-212"></a>                <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-213"></a>                   <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">mat</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
-<a name="ln-214"></a>                <span class="n">enddo</span>
-<a name="ln-215"></a>                <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span>
+<a name="ln-214"></a>                <span class="k">enddo</span>
+<a name="ln-215"></a><span class="k">                do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-216"></a>                   <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">mat</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-217"></a>                <span class="n">enddo</span>
-<a name="ln-218"></a>             <span class="n">endif</span>
-<a name="ln-219"></a>          <span class="n">enddo</span> <span class="c">!i loop</span>
-<a name="ln-220"></a>       <span class="n">endif</span> <span class="c">!x &lt;&gt; ZERO</span>
-<a name="ln-221"></a>    <span class="n">enddo</span> <span class="c">!m loop</span>
+<a name="ln-217"></a>                <span class="k">enddo</span>
+<a name="ln-218"></a><span class="k">             endif</span>
+<a name="ln-219"></a><span class="k">          enddo</span> <span class="c">!i loop</span>
+<a name="ln-220"></a>       <span class="k">endif</span> <span class="c">!x &lt;&gt; ZERO</span>
+<a name="ln-221"></a>    <span class="k">enddo</span> <span class="c">!m loop</span>
 <a name="ln-222"></a>  <span class="k">end subroutine </span><span class="n">elmhes</span>
 <a name="ln-223"></a>  <span class="k">Subroutine </span><span class="n">elmtrans</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">perm</span><span class="p">,</span> <span class="n">h</span>  <span class="p">)</span>
 <a name="ln-224"></a>    <span class="c">!+  Elmtrans copies the Hessenberg matrix stored in `mat` to `h`</span>
@@ -578,23 +578,23 @@
 <a name="ln-238"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-239"></a>       <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-240"></a>      <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
-<a name="ln-241"></a>       <span class="n">enddo</span>
-<a name="ln-242"></a>       <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
-<a name="ln-243"></a>    <span class="n">enddo</span>
-<a name="ln-244"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">low</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+<a name="ln-241"></a>       <span class="k">enddo</span>
+<a name="ln-242"></a><span class="k">       </span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
+<a name="ln-243"></a>    <span class="k">enddo</span>
+<a name="ln-244"></a><span class="k">    do </span><span class="n">i</span> <span class="o">=</span> <span class="n">high</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">low</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 <a name="ln-245"></a>       <span class="n">j</span> <span class="o">=</span> <span class="n">perm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-246"></a>       <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-247"></a>      <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-248"></a>       <span class="n">enddo</span>
-<a name="ln-249"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">j</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-248"></a>       <span class="k">enddo</span>
+<a name="ln-249"></a><span class="k">       if</span> <span class="p">(</span><span class="n">i</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">j</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-250"></a><span class="k">          do </span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-251"></a>             <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
 <a name="ln-252"></a>             <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
-<a name="ln-253"></a>          <span class="n">enddo</span>
-<a name="ln-254"></a>          <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
-<a name="ln-255"></a>       <span class="n">endif</span>
-<a name="ln-256"></a>    <span class="n">enddo</span>
-<a name="ln-257"></a>  <span class="k">end subroutine </span><span class="n">elmtrans</span>
+<a name="ln-253"></a>          <span class="k">enddo</span>
+<a name="ln-254"></a><span class="k">          </span><span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
+<a name="ln-255"></a>       <span class="k">endif</span>
+<a name="ln-256"></a><span class="k">    enddo</span>
+<a name="ln-257"></a><span class="k">  end subroutine </span><span class="n">elmtrans</span>
 <a name="ln-258"></a>  <span class="k">subroutine </span><span class="n">Comdiv</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span> <span class="n">ai</span><span class="p">,</span> <span class="n">br</span><span class="p">,</span> <span class="n">bi</span><span class="p">,</span> <span class="n">cr</span><span class="p">,</span> <span class="n">ci</span><span class="p">,</span> <span class="n">rc</span> <span class="p">)</span>
 <a name="ln-259"></a>    <span class="c">!+ Performs complex division `c` = `a` / `b`</span>
 <a name="ln-260"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">)</span> <span class="kd">::</span>  <span class="n">ar</span>
@@ -616,8 +616,8 @@
 <a name="ln-276"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">br</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">.</span><span class="nb">AND</span><span class="p">.</span><span class="n">bi</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-277"></a><span class="k">       </span><span class="n">rc</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-278"></a>       <span class="k">return</span>
-<a name="ln-279"></a><span class="k">    </span><span class="n">endif</span>
-<a name="ln-280"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">dabs</span><span class="p">(</span><span class="n">br</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">dabs</span><span class="p">(</span><span class="n">bi</span><span class="p">))</span> <span class="k">then</span>
+<a name="ln-279"></a><span class="k">    endif</span>
+<a name="ln-280"></a><span class="k">    if</span> <span class="p">(</span><span class="nb">dabs</span><span class="p">(</span><span class="n">br</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">dabs</span><span class="p">(</span><span class="n">bi</span><span class="p">))</span> <span class="k">then</span>
 <a name="ln-281"></a><span class="k">       </span><span class="n">tmp</span> <span class="o">=</span> <span class="n">bi</span> <span class="o">/</span> <span class="n">br</span>
 <a name="ln-282"></a>       <span class="n">br</span>  <span class="o">=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">bi</span> <span class="o">+</span> <span class="n">br</span>
 <a name="ln-283"></a>       <span class="n">cr</span>  <span class="o">=</span> <span class="p">(</span><span class="n">ar</span> <span class="o">+</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">ai</span><span class="p">)</span> <span class="o">/</span> <span class="n">br</span>
@@ -627,8 +627,8 @@
 <a name="ln-287"></a>       <span class="n">bi</span>  <span class="o">=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">br</span> <span class="o">+</span> <span class="n">bi</span>
 <a name="ln-288"></a>       <span class="n">cr</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">*</span> <span class="n">ar</span> <span class="o">+</span> <span class="n">ai</span><span class="p">)</span> <span class="o">/</span> <span class="n">bi</span>
 <a name="ln-289"></a>       <span class="n">ci</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">*</span> <span class="n">ai</span> <span class="o">-</span> <span class="n">ar</span><span class="p">)</span> <span class="o">/</span> <span class="n">bi</span>
-<a name="ln-290"></a>    <span class="n">endif</span>
-<a name="ln-291"></a>    <span class="n">rc</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-290"></a>    <span class="k">endif</span>
+<a name="ln-291"></a><span class="k">    </span><span class="n">rc</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-292"></a>  <span class="k">end subroutine </span><span class="n">Comdiv</span> <span class="c">!Comdiv</span>
 <a name="ln-293"></a>  <span class="k">function </span><span class="n">comabs</span><span class="p">(</span><span class="n">ar</span><span class="p">,</span><span class="n">ai</span><span class="p">)</span>
 <a name="ln-294"></a>    <span class="c">!+ Calculates absolute value of a complex number `a`</span>
@@ -642,18 +642,18 @@
 <a name="ln-302"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">ar</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-303"></a><span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-304"></a>       <span class="k">return</span>
-<a name="ln-305"></a><span class="k">    </span><span class="n">endif</span>
-<a name="ln-306"></a>    <span class="n">ar</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ar</span><span class="p">)</span>
+<a name="ln-305"></a><span class="k">    endif</span>
+<a name="ln-306"></a><span class="k">    </span><span class="n">ar</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ar</span><span class="p">)</span>
 <a name="ln-307"></a>    <span class="n">ai</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span>
 <a name="ln-308"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">&gt;</span> <span class="n">ar</span><span class="p">)</span> <span class="k">then</span>                                  <span class="c">!Switch  ai and ar</span>
 <a name="ln-309"></a>       <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">ar</span><span class="p">)</span>
-<a name="ln-310"></a>    <span class="n">endif</span>
-<a name="ln-311"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-310"></a>    <span class="k">endif</span>
+<a name="ln-311"></a><span class="k">    if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-312"></a><span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ar</span>
 <a name="ln-313"></a>    <span class="k">else</span>
 <a name="ln-314"></a><span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="nb">DSQRT</span><span class="p">(</span><span class="n">ONE</span> <span class="o">+</span> <span class="n">ai</span> <span class="o">/</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">ai</span> <span class="o">/</span> <span class="n">ar</span><span class="p">)</span>
-<a name="ln-315"></a>    <span class="n">endif</span>
-<a name="ln-316"></a>  <span class="k">end function </span><span class="n">comabs</span>
+<a name="ln-315"></a>    <span class="k">endif</span>
+<a name="ln-316"></a><span class="k">  end function </span><span class="n">comabs</span>
 <a name="ln-317"></a>  <span class="k">subroutine  </span><span class="n">hqrvec</span><span class="p">(</span><span class="n">n</span><span class="p">,</span>     <span class="p">&amp;</span> <span class="c">!Dimension of matrix .......</span>
 <a name="ln-318"></a>       <span class="n">low</span><span class="p">,</span>   <span class="p">&amp;</span> <span class="c">!first nonzero row .........</span>
 <a name="ln-319"></a>       <span class="n">high</span><span class="p">,</span>  <span class="p">&amp;</span> <span class="c">!last nonzero row ..........</span>
@@ -695,13 +695,13 @@
 <a name="ln-355"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>                               <span class="c">!find norm of h</span>
 <a name="ln-356"></a>       <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-357"></a>          <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-<a name="ln-358"></a>       <span class="n">enddo</span>
-<a name="ln-359"></a>    <span class="n">enddo</span>
-<a name="ln-360"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">norm</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-358"></a>       <span class="k">enddo</span>
+<a name="ln-359"></a><span class="k">    enddo</span>
+<a name="ln-360"></a><span class="k">    if</span> <span class="p">(</span><span class="n">norm</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-361"></a><span class="k">       </span><span class="n">rc</span> <span class="o">=</span> <span class="mi">1</span>                                    <span class="c">!zero matrix</span>
 <a name="ln-362"></a>       <span class="k">return</span>
-<a name="ln-363"></a><span class="k">    </span><span class="n">endif</span>
-<a name="ln-364"></a>    <span class="k">do </span><span class="n">en</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>                          <span class="c">!transform back</span>
+<a name="ln-363"></a><span class="k">    endif</span>
+<a name="ln-364"></a><span class="k">    do </span><span class="n">en</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>                          <span class="c">!transform back</span>
 <a name="ln-365"></a>       <span class="n">p</span> <span class="o">=</span> <span class="n">wr</span><span class="p">(</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-366"></a>       <span class="n">q</span> <span class="o">=</span> <span class="n">wi</span><span class="p">(</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-367"></a>       <span class="n">na</span> <span class="o">=</span> <span class="n">en</span> <span class="o">-</span> <span class="mi">1</span>
@@ -713,8 +713,8 @@
 <a name="ln-373"></a>             <span class="n">r</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-374"></a>             <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">na</span>
 <a name="ln-375"></a>                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
-<a name="ln-376"></a>             <span class="n">enddo</span>
-<a name="ln-377"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-376"></a>             <span class="k">enddo</span>
+<a name="ln-377"></a><span class="k">             if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-378"></a><span class="k">                </span><span class="n">z</span> <span class="o">=</span> <span class="n">w</span>
 <a name="ln-379"></a>                <span class="n">s</span> <span class="o">=</span> <span class="n">r</span>
 <a name="ln-380"></a>             <span class="k">else</span>
@@ -724,8 +724,8 @@
 <a name="ln-384"></a><span class="k">                      </span><span class="n">temp</span> <span class="o">=</span> <span class="n">w</span>
 <a name="ln-385"></a>                   <span class="k">else</span>
 <a name="ln-386"></a><span class="k">                      </span><span class="n">temp</span><span class="o">=</span><span class="n">XMACH_EPS</span> <span class="o">*</span> <span class="n">norm</span>
-<a name="ln-387"></a>                   <span class="n">endif</span>
-<a name="ln-388"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">r</span><span class="o">/</span><span class="n">temp</span>
+<a name="ln-387"></a>                   <span class="k">endif</span>
+<a name="ln-388"></a><span class="k">                   </span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">r</span><span class="o">/</span><span class="n">temp</span>
 <a name="ln-389"></a>                <span class="k">else</span>
 <a name="ln-390"></a>                   <span class="c">!Solve the linear system:</span>
 <a name="ln-391"></a>                   <span class="c">!| w   x |  | h[i][en]   |   | -r |</span>
@@ -740,11 +740,11 @@
 <a name="ln-400"></a><span class="k">                      </span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">w</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span>
 <a name="ln-401"></a>                   <span class="k">else</span>
 <a name="ln-402"></a><span class="k">                      </span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="n">y</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">z</span>
-<a name="ln-403"></a>                   <span class="n">endif</span>
-<a name="ln-404"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">temp</span>
-<a name="ln-405"></a>                <span class="n">endif</span>
-<a name="ln-406"></a>             <span class="n">endif</span> <span class="c">!wi[i] &lt; 0</span>
-<a name="ln-407"></a>          <span class="n">enddo</span> <span class="c">!i loop</span>
+<a name="ln-403"></a>                   <span class="k">endif</span>
+<a name="ln-404"></a><span class="k">                   </span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">temp</span>
+<a name="ln-405"></a>                <span class="k">endif</span>
+<a name="ln-406"></a><span class="k">             endif</span> <span class="c">!wi[i] &lt; 0</span>
+<a name="ln-407"></a>          <span class="k">enddo</span> <span class="c">!i loop</span>
 <a name="ln-408"></a>       <span class="k">else if</span> <span class="p">(</span><span class="n">q</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-409"></a><span class="k">          </span><span class="n">m</span> <span class="o">=</span> <span class="n">na</span>
 <a name="ln-410"></a>          <span class="k">if</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="p">)))</span> <span class="k">then</span>
@@ -752,8 +752,8 @@
 <a name="ln-412"></a>             <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span> <span class="n">q</span> <span class="o">/</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
 <a name="ln-413"></a>          <span class="k">else</span>
 <a name="ln-414"></a><span class="k">             call </span><span class="n">Comdiv</span><span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="p">),</span><span class="mf">0.d0</span><span class="p">,</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">na</span><span class="p">)</span><span class="o">-</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">na</span><span class="p">),</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="p">),</span><span class="n">code</span><span class="p">)</span>
-<a name="ln-415"></a>          <span class="n">endif</span>
-<a name="ln-416"></a>          <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
+<a name="ln-415"></a>          <span class="k">endif</span>
+<a name="ln-416"></a><span class="k">          </span><span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">ONE</span>
 <a name="ln-417"></a>          <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-418"></a>          <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">na</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 <a name="ln-419"></a>             <span class="n">w</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span>
@@ -762,8 +762,8 @@
 <a name="ln-422"></a>             <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">na</span>
 <a name="ln-423"></a>                <span class="n">ra</span> <span class="o">=</span> <span class="n">ra</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
 <a name="ln-424"></a>                <span class="n">sa</span> <span class="o">=</span> <span class="n">sa</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
-<a name="ln-425"></a>             <span class="n">enddo</span>
-<a name="ln-426"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-425"></a>             <span class="k">enddo</span>
+<a name="ln-426"></a><span class="k">             if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-427"></a><span class="k">                </span><span class="n">z</span> <span class="o">=</span> <span class="n">w</span>
 <a name="ln-428"></a>                <span class="n">r</span> <span class="o">=</span> <span class="n">ra</span>
 <a name="ln-429"></a>                <span class="n">s</span> <span class="o">=</span> <span class="n">sa</span>
@@ -783,9 +783,9 @@
 <a name="ln-443"></a>                   <span class="k">if</span> <span class="p">(</span><span class="n">vr</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">.</span><span class="nb">AND</span><span class="p">.</span><span class="n">vi</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-444"></a><span class="k">                      </span><span class="n">vr</span> <span class="o">=</span> <span class="n">XMACH_EPS</span> <span class="o">*</span> <span class="n">norm</span> <span class="o">*</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>  <span class="p">&amp;</span>
 <a name="ln-445"></a>                           <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
-<a name="ln-446"></a>                   <span class="n">endif</span>
+<a name="ln-446"></a>                   <span class="k">endif</span>
 <a name="ln-447"></a>
-<a name="ln-448"></a>                   <span class="k">call </span><span class="n">Comdiv</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">r</span><span class="o">-</span><span class="n">z</span><span class="o">*</span><span class="n">ra</span><span class="o">+</span><span class="n">q</span><span class="o">*</span><span class="n">sa</span><span class="p">,</span><span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="o">-</span><span class="n">z</span><span class="o">*</span><span class="n">sa</span><span class="o">-</span><span class="n">q</span><span class="o">*</span><span class="n">ra</span> <span class="p">&amp;</span>
+<a name="ln-448"></a><span class="k">                   call </span><span class="n">Comdiv</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">r</span><span class="o">-</span><span class="n">z</span><span class="o">*</span><span class="n">ra</span><span class="o">+</span><span class="n">q</span><span class="o">*</span><span class="n">sa</span><span class="p">,</span><span class="n">x</span><span class="o">*</span><span class="n">s</span><span class="o">-</span><span class="n">z</span><span class="o">*</span><span class="n">sa</span><span class="o">-</span><span class="n">q</span><span class="o">*</span><span class="n">ra</span> <span class="p">&amp;</span>
 <a name="ln-449"></a>                        <span class="p">,</span><span class="n">vr</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">),</span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">),</span><span class="n">code</span><span class="p">)</span>
 <a name="ln-450"></a>                   <span class="k">if</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="k">then</span>
 <a name="ln-451"></a><span class="k">                      </span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">ra</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">))</span> <span class="o">/</span> <span class="n">x</span>
@@ -793,27 +793,27 @@
 <a name="ln-453"></a>                   <span class="k">else</span>
 <a name="ln-454"></a><span class="k">                      call </span><span class="n">Comdiv</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">),</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="p">&amp;</span>
 <a name="ln-455"></a>                           <span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">na</span><span class="p">),</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">en</span><span class="p">),</span><span class="n">code</span><span class="p">)</span>
-<a name="ln-456"></a>                   <span class="n">endif</span>
-<a name="ln-457"></a>                <span class="n">endif</span> <span class="c">!wi[i] = 0</span>
-<a name="ln-458"></a>             <span class="n">endif</span> <span class="c">!wi[i] &lt; 0</span>
-<a name="ln-459"></a>          <span class="n">enddo</span> <span class="c">!i loop</span>
-<a name="ln-460"></a>       <span class="n">endif</span> <span class="c">!else if q &lt; 0</span>
-<a name="ln-461"></a>    <span class="n">enddo</span> <span class="c">!en loop</span>
+<a name="ln-456"></a>                   <span class="k">endif</span>
+<a name="ln-457"></a><span class="k">                endif</span> <span class="c">!wi[i] = 0</span>
+<a name="ln-458"></a>             <span class="k">endif</span> <span class="c">!wi[i] &lt; 0</span>
+<a name="ln-459"></a>          <span class="k">enddo</span> <span class="c">!i loop</span>
+<a name="ln-460"></a>       <span class="k">endif</span> <span class="c">!else if q &lt; 0</span>
+<a name="ln-461"></a>    <span class="k">enddo</span> <span class="c">!en loop</span>
 <a name="ln-462"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>                        <span class="c">!Eigenvectors for the evalues for</span>
 <a name="ln-463"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">)</span> <span class="k">then</span>      <span class="c">!rows &lt; low  and rows  &gt; high</span>
 <a name="ln-464"></a>          <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-465"></a>             <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
-<a name="ln-466"></a>          <span class="n">enddo</span>
-<a name="ln-467"></a>       <span class="n">endif</span>
-<a name="ln-468"></a>    <span class="n">enddo</span>
-<a name="ln-469"></a>    <span class="n">j</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-466"></a>          <span class="k">enddo</span>
+<a name="ln-467"></a><span class="k">       endif</span>
+<a name="ln-468"></a><span class="k">    enddo</span>
+<a name="ln-469"></a><span class="k">    </span><span class="n">j</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-470"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">j</span><span class="o">&gt;=</span><span class="n">low</span><span class="p">)</span>
 <a name="ln-471"></a>       <span class="k">if</span><span class="p">(</span><span class="n">j</span><span class="o">&lt;=</span><span class="n">high</span><span class="p">)</span><span class="k">then</span>
 <a name="ln-472"></a><span class="k">          </span><span class="n">m</span> <span class="o">=</span><span class="n">j</span>
 <a name="ln-473"></a>       <span class="k">else</span>
 <a name="ln-474"></a><span class="k">          </span><span class="n">j</span> <span class="o">=</span> <span class="n">high</span>
-<a name="ln-475"></a>       <span class="n">endif</span>
-<a name="ln-476"></a>       <span class="k">if</span><span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-475"></a>       <span class="k">endif</span>
+<a name="ln-476"></a><span class="k">       if</span><span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">exit</span>
 <a name="ln-477"></a><span class="k">       if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-478"></a><span class="k">          </span><span class="n">l</span><span class="o">=</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-479"></a>          <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
@@ -821,23 +821,23 @@
 <a name="ln-481"></a>             <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">m</span>
 <a name="ln-482"></a>                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">l</span><span class="p">)</span>
 <a name="ln-483"></a>                <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
-<a name="ln-484"></a>             <span class="n">enddo</span>
-<a name="ln-485"></a>             <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">l</span><span class="p">)</span> <span class="o">=</span> <span class="n">y</span>
+<a name="ln-484"></a>             <span class="k">enddo</span>
+<a name="ln-485"></a><span class="k">             </span><span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">l</span><span class="p">)</span> <span class="o">=</span> <span class="n">y</span>
 <a name="ln-486"></a>             <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">z</span>
-<a name="ln-487"></a>          <span class="n">enddo</span>
-<a name="ln-488"></a>       <span class="k">else</span>
+<a name="ln-487"></a>          <span class="k">enddo</span>
+<a name="ln-488"></a><span class="k">       else</span>
 <a name="ln-489"></a><span class="k">          if</span> <span class="p">(</span><span class="n">wi</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-490"></a><span class="k">             do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-491"></a>                <span class="n">z</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-492"></a>                <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">m</span>
 <a name="ln-493"></a>                   <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
-<a name="ln-494"></a>                <span class="n">enddo</span>
-<a name="ln-495"></a>                <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">z</span>
-<a name="ln-496"></a>             <span class="n">enddo</span>
-<a name="ln-497"></a>          <span class="n">endif</span>
-<a name="ln-498"></a>       <span class="n">endif</span>
-<a name="ln-499"></a>       <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
-<a name="ln-500"></a>    <span class="n">enddo</span> <span class="c">!j loop</span>
+<a name="ln-494"></a>                <span class="k">enddo</span>
+<a name="ln-495"></a><span class="k">                </span><span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">z</span>
+<a name="ln-496"></a>             <span class="k">enddo</span>
+<a name="ln-497"></a><span class="k">          endif</span>
+<a name="ln-498"></a><span class="k">       endif</span>
+<a name="ln-499"></a><span class="k">       </span><span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span>
+<a name="ln-500"></a>    <span class="k">enddo</span> <span class="c">!j loop</span>
 <a name="ln-501"></a>    <span class="n">rc</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-502"></a>  <span class="k">end subroutine </span><span class="n">hqrvec</span>
 <a name="ln-503"></a>  <span class="k">subroutine </span><span class="n">hqr2</span><span class="p">(</span><span class="n">n</span><span class="p">,</span>    <span class="p">&amp;</span>  <span class="c">!Dimension of matrix .........</span>
@@ -905,9 +905,9 @@
 <a name="ln-565"></a><span class="k">          </span><span class="n">wr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-566"></a>          <span class="n">wi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-567"></a>          <span class="n">cnt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-568"></a>       <span class="n">endif</span>
-<a name="ln-569"></a>    <span class="n">enddo</span>
-<a name="ln-570"></a>    <span class="n">en</span> <span class="o">=</span> <span class="n">high</span>
+<a name="ln-568"></a>       <span class="k">endif</span>
+<a name="ln-569"></a><span class="k">    enddo</span>
+<a name="ln-570"></a><span class="k">    </span><span class="n">en</span> <span class="o">=</span> <span class="n">high</span>
 <a name="ln-571"></a>    <span class="n">t</span> <span class="o">=</span> <span class="n">ZERO</span>
 <a name="ln-572"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">en</span> <span class="o">&gt;=</span> <span class="n">low</span><span class="p">)</span>
 <a name="ln-573"></a>       <span class="n">iter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -919,14 +919,14 @@
 <a name="ln-579"></a>             <span class="k">if</span><span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">&lt;=</span><span class="n">XMACH_EPS</span><span class="o">*</span><span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">l</span><span class="p">))))</span><span class="k">then</span>
 <a name="ln-580"></a><span class="k">                </span><span class="n">ll</span><span class="o">=</span><span class="n">l</span><span class="p">;</span>      <span class="c">!save current index</span>
 <a name="ln-581"></a>                <span class="k">goto </span><span class="mi">10</span>    <span class="c">!exit l loop</span>
-<a name="ln-582"></a>             <span class="n">endif</span>
-<a name="ln-583"></a>          <span class="n">enddo</span>
+<a name="ln-582"></a>             <span class="k">endif</span>
+<a name="ln-583"></a><span class="k">          enddo</span>
 <a name="ln-584"></a><span class="mi">10</span>        <span class="k">if</span><span class="p">(</span><span class="n">ll</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mi">999</span><span class="p">)</span><span class="k">then</span>
 <a name="ln-585"></a><span class="k">             </span><span class="n">l</span><span class="o">=</span><span class="n">ll</span>
 <a name="ln-586"></a>      <span class="k">else</span>
 <a name="ln-587"></a><span class="k">             </span><span class="n">l</span><span class="o">=</span><span class="mi">0</span>          <span class="c">!restore l</span>
-<a name="ln-588"></a>          <span class="n">endif</span>
-<a name="ln-589"></a>          <span class="n">x</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
+<a name="ln-588"></a>          <span class="k">endif</span>
+<a name="ln-589"></a><span class="k">          </span><span class="n">x</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-590"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">==</span> <span class="n">en</span><span class="p">)</span> <span class="k">then</span>                         <span class="c">!found one evalue</span>
 <a name="ln-591"></a>             <span class="n">wr</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">t</span>
 <a name="ln-592"></a>             <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">t</span>
@@ -934,8 +934,8 @@
 <a name="ln-594"></a>             <span class="n">cnt</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">iter</span>
 <a name="ln-595"></a>             <span class="n">en</span> <span class="o">=</span> <span class="n">en</span> <span class="o">-</span> <span class="mi">1</span>
 <a name="ln-596"></a>             <span class="k">goto </span><span class="mi">15</span>      <span class="c">!exit from loop while(True)</span>
-<a name="ln-597"></a>          <span class="n">endif</span>
-<a name="ln-598"></a>          <span class="n">y</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
+<a name="ln-597"></a>          <span class="k">endif</span>
+<a name="ln-598"></a><span class="k">          </span><span class="n">y</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
 <a name="ln-599"></a>          <span class="n">w</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-600"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">l</span> <span class="o">==</span> <span class="n">na</span><span class="p">)</span> <span class="k">then</span>                         <span class="c">!found two evalues</span>
 <a name="ln-601"></a>             <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5d0</span>
@@ -951,8 +951,8 @@
 <a name="ln-611"></a><span class="k">                   </span><span class="n">z</span><span class="o">=</span><span class="n">p</span><span class="o">-</span><span class="n">z</span>
 <a name="ln-612"></a>                <span class="k">else</span>
 <a name="ln-613"></a><span class="k">                   </span><span class="n">z</span><span class="o">=</span><span class="n">p</span><span class="o">+</span><span class="n">z</span>
-<a name="ln-614"></a>                <span class="n">endif</span>
-<a name="ln-615"></a>                <span class="n">r_z</span> <span class="o">=</span> <span class="mf">1.0d0</span><span class="o">/</span><span class="n">z</span>
+<a name="ln-614"></a>                <span class="k">endif</span>
+<a name="ln-615"></a><span class="k">                </span><span class="n">r_z</span> <span class="o">=</span> <span class="mf">1.0d0</span><span class="o">/</span><span class="n">z</span>
 <a name="ln-616"></a>                <span class="n">wr</span><span class="p">(</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span>
 <a name="ln-617"></a>                <span class="n">wr</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">r_z</span>
 <a name="ln-618"></a>                <span class="n">s</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="n">w</span> <span class="o">*</span> <span class="n">r_z</span>
@@ -967,42 +967,42 @@
 <a name="ln-627"></a>                   <span class="n">z</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
 <a name="ln-628"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">z</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
 <a name="ln-629"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">z</span>
-<a name="ln-630"></a>                <span class="n">enddo</span>
-<a name="ln-631"></a>                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">en</span>
+<a name="ln-630"></a>                <span class="k">enddo</span>
+<a name="ln-631"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">en</span>
 <a name="ln-632"></a>                   <span class="n">z</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
 <a name="ln-633"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">z</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-634"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">z</span>
-<a name="ln-635"></a>                <span class="n">enddo</span>
-<a name="ln-636"></a>                <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
+<a name="ln-635"></a>                <span class="k">enddo</span>
+<a name="ln-636"></a><span class="k">                do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-637"></a>                   <span class="n">z</span> <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">)</span>
 <a name="ln-638"></a>                   <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">z</span> <span class="o">+</span> <span class="n">p</span> <span class="o">*</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span>
 <a name="ln-639"></a>                   <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">en</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">z</span>
-<a name="ln-640"></a>                <span class="n">enddo</span>
-<a name="ln-641"></a>             <span class="k">else</span>                                  <span class="c">!pair of complex</span>
+<a name="ln-640"></a>                <span class="k">enddo</span>
+<a name="ln-641"></a><span class="k">             else</span>                                  <span class="c">!pair of complex</span>
 <a name="ln-642"></a>                <span class="n">wr</span><span class="p">(</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">p</span>
 <a name="ln-643"></a>                <span class="n">wr</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">p</span>
 <a name="ln-644"></a>                <span class="n">wi</span><span class="p">(</span><span class="n">na</span><span class="p">)</span> <span class="o">=</span>   <span class="n">z</span>
 <a name="ln-645"></a>                <span class="n">wi</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span> <span class="n">z</span>
-<a name="ln-646"></a>             <span class="n">endif</span> <span class="c">!if q&gt;=ZERO</span>
+<a name="ln-646"></a>             <span class="k">endif</span> <span class="c">!if q&gt;=ZERO</span>
 <a name="ln-647"></a>             <span class="n">en</span> <span class="o">=</span> <span class="n">en</span> <span class="o">-</span> <span class="mi">2</span>
 <a name="ln-648"></a>             <span class="k">goto </span><span class="mi">15</span>                               <span class="c">!exit while(1&lt;2)</span>
-<a name="ln-649"></a>          <span class="n">endif</span> <span class="c">!if l = na</span>
+<a name="ln-649"></a>          <span class="k">endif</span> <span class="c">!if l = na</span>
 <a name="ln-650"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">iter</span> <span class="o">&gt;=</span> <span class="n">MAXIT</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-651"></a><span class="k">             </span><span class="n">cnt</span><span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="o">=</span> <span class="n">MAXIT</span> <span class="o">+</span> <span class="mi">1</span>
 <a name="ln-652"></a>             <span class="n">rc</span> <span class="o">=</span> <span class="n">en</span>
 <a name="ln-653"></a>             <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39; stop at iter &gt;= MAXIT.&#39;</span>
 <a name="ln-654"></a>             <span class="k">return</span>
-<a name="ln-655"></a><span class="k">          </span><span class="n">endif</span>
-<a name="ln-656"></a>          <span class="k">if</span> <span class="p">(</span><span class="n">iter</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.</span><span class="nb">and</span><span class="p">.</span><span class="nb">MOD</span><span class="p">(</span><span class="n">iter</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-655"></a><span class="k">          endif</span>
+<a name="ln-656"></a><span class="k">          if</span> <span class="p">(</span><span class="n">iter</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.</span><span class="nb">and</span><span class="p">.</span><span class="nb">MOD</span><span class="p">(</span><span class="n">iter</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-657"></a><span class="k">             </span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">x</span>
 <a name="ln-658"></a>             <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">en</span>
 <a name="ln-659"></a>                <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
-<a name="ln-660"></a>             <span class="n">enddo</span>
-<a name="ln-661"></a>             <span class="n">s</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">))</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+<a name="ln-660"></a>             <span class="k">enddo</span>
+<a name="ln-661"></a><span class="k">             </span><span class="n">s</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">en</span><span class="p">,</span><span class="n">na</span><span class="p">))</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">na</span><span class="p">,</span><span class="n">en</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span>
 <a name="ln-662"></a>             <span class="n">x</span> <span class="o">=</span> <span class="mf">0.75d0</span> <span class="o">*</span> <span class="n">s</span><span class="p">;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
 <a name="ln-663"></a>             <span class="n">w</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.4375d0</span> <span class="o">*</span> <span class="n">s</span> <span class="o">*</span> <span class="n">s</span>
-<a name="ln-664"></a>          <span class="n">endif</span>
-<a name="ln-665"></a>          <span class="n">iter</span> <span class="o">=</span> <span class="n">iter</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-664"></a>          <span class="k">endif</span>
+<a name="ln-665"></a><span class="k">          </span><span class="n">iter</span> <span class="o">=</span> <span class="n">iter</span> <span class="o">+</span> <span class="mi">1</span>
 <a name="ln-666"></a>          <span class="k">do </span><span class="n">m</span> <span class="o">=</span> <span class="n">en</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
 <a name="ln-667"></a>             <span class="n">z</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
 <a name="ln-668"></a>             <span class="n">r</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">z</span>
@@ -1019,15 +1019,15 @@
 <a name="ln-679"></a>             <span class="k">if</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">XMACH_EPS</span> <span class="o">*</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">&amp;</span>
 <a name="ln-680"></a>                  <span class="o">*</span> <span class="p">(</span><span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">h</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span> <span class="k">then</span>
 <a name="ln-681"></a><span class="k">                goto </span><span class="mi">12</span>                <span class="c">!exit m loop</span>
-<a name="ln-682"></a>             <span class="n">endif</span>
-<a name="ln-683"></a>          <span class="n">enddo</span>
+<a name="ln-682"></a>             <span class="k">endif</span>
+<a name="ln-683"></a><span class="k">          enddo</span>
 <a name="ln-684"></a><span class="mi">12</span>        <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">en</span>
 <a name="ln-685"></a>             <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
-<a name="ln-686"></a>          <span class="n">enddo</span>
-<a name="ln-687"></a>          <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">en</span>
+<a name="ln-686"></a>          <span class="k">enddo</span>
+<a name="ln-687"></a><span class="k">          do </span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">en</span>
 <a name="ln-688"></a>             <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">ZERO</span>
-<a name="ln-689"></a>          <span class="n">enddo</span>
-<a name="ln-690"></a>          <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">na</span>
+<a name="ln-689"></a>          <span class="k">enddo</span>
+<a name="ln-690"></a><span class="k">          do </span><span class="n">k</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="n">na</span>
 <a name="ln-691"></a>             <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">m</span><span class="p">)</span><span class="k">then</span><span class="c">!double QR step, for rows l to en and columns m to en</span>
 <a name="ln-692"></a>                <span class="n">p</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-693"></a>                <span class="n">q</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -1035,23 +1035,23 @@
 <a name="ln-695"></a><span class="k">                   </span><span class="n">r</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-696"></a>                <span class="k">else</span>
 <a name="ln-697"></a><span class="k">                   </span><span class="n">r</span> <span class="o">=</span> <span class="n">ZERO</span>
-<a name="ln-698"></a>                <span class="n">endif</span>
-<a name="ln-699"></a>                <span class="n">x</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<a name="ln-698"></a>                <span class="k">endif</span>
+<a name="ln-699"></a><span class="k">                </span><span class="n">x</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <a name="ln-700"></a>                <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">goto </span><span class="mi">30</span>                  <span class="c">!next k</span>
 <a name="ln-701"></a>                <span class="n">r_x</span> <span class="o">=</span> <span class="mf">1.0d0</span><span class="o">/</span><span class="n">x</span>
 <a name="ln-702"></a>                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r_x</span>
 <a name="ln-703"></a>                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r_x</span>
 <a name="ln-704"></a>                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">r_x</span>
-<a name="ln-705"></a>             <span class="n">endif</span>
-<a name="ln-706"></a>             <span class="n">s</span> <span class="o">=</span> <span class="nb">DSQRT</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+<a name="ln-705"></a>             <span class="k">endif</span>
+<a name="ln-706"></a><span class="k">             </span><span class="n">s</span> <span class="o">=</span> <span class="nb">DSQRT</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">+</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
 <a name="ln-707"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">ZERO</span><span class="p">)</span> <span class="n">s</span> <span class="o">=</span> <span class="o">-</span><span class="n">s</span>
 <a name="ln-708"></a>             <span class="n">r_s</span> <span class="o">=</span> <span class="mf">1.0d0</span><span class="o">/</span><span class="n">s</span>
 <a name="ln-709"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">m</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-710"></a><span class="k">                </span><span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">s</span> <span class="o">*</span> <span class="n">x</span>
 <a name="ln-711"></a>             <span class="k">else if</span> <span class="p">(</span><span class="n">l</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">m</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-712"></a><span class="k">                </span><span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-713"></a>             <span class="n">endif</span>
-<a name="ln-714"></a>             <span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">s</span>
+<a name="ln-713"></a>             <span class="k">endif</span>
+<a name="ln-714"></a><span class="k">             </span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">s</span>
 <a name="ln-715"></a>             <span class="n">r_p</span> <span class="o">=</span> <span class="mf">1.0d0</span><span class="o">/</span><span class="n">p</span>
 <a name="ln-716"></a>             <span class="n">x</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r_s</span>
 <a name="ln-717"></a>             <span class="n">y</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">r_s</span>
@@ -1063,38 +1063,38 @@
 <a name="ln-723"></a>                <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">na</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-724"></a><span class="k">                   </span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
 <a name="ln-725"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">z</span>
-<a name="ln-726"></a>                <span class="n">endif</span>
-<a name="ln-727"></a>                <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">y</span>
+<a name="ln-726"></a>                <span class="k">endif</span>
+<a name="ln-727"></a><span class="k">                </span><span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">y</span>
 <a name="ln-728"></a>                <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>   <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">x</span>
-<a name="ln-729"></a>             <span class="n">enddo</span>
-<a name="ln-730"></a>             <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">3</span> <span class="o">&lt;</span> <span class="n">en</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-729"></a>             <span class="k">enddo</span>
+<a name="ln-730"></a><span class="k">             if</span> <span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">3</span> <span class="o">&lt;</span> <span class="n">en</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-731"></a><span class="k">                </span><span class="n">j</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">3</span>
 <a name="ln-732"></a>             <span class="k">else</span>
 <a name="ln-733"></a><span class="k">                </span><span class="n">j</span><span class="o">=</span><span class="n">en</span>
-<a name="ln-734"></a>             <span class="n">endif</span>
-<a name="ln-735"></a>             <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span>                            <span class="c">!modify columns</span>
+<a name="ln-734"></a>             <span class="k">endif</span>
+<a name="ln-735"></a><span class="k">             do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span>                            <span class="c">!modify columns</span>
 <a name="ln-736"></a>                <span class="n">p</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-737"></a>                <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">na</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-738"></a><span class="k">                   </span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-739"></a>                   <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span>
-<a name="ln-740"></a>                <span class="n">endif</span>
-<a name="ln-741"></a>                <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+<a name="ln-740"></a>                <span class="k">endif</span>
+<a name="ln-741"></a><span class="k">                </span><span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
 <a name="ln-742"></a>                <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>   <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span>
-<a name="ln-743"></a>             <span class="n">enddo</span>
-<a name="ln-744"></a>             <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
+<a name="ln-743"></a>             <span class="k">enddo</span>
+<a name="ln-744"></a><span class="k">             do </span><span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span>
 <a name="ln-745"></a>                <span class="n">p</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-746"></a>                <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">na</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-747"></a><span class="k">                   </span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-748"></a>                   <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">r</span>
-<a name="ln-749"></a>                <span class="n">endif</span>
-<a name="ln-750"></a>                <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+<a name="ln-749"></a>                <span class="k">endif</span>
+<a name="ln-750"></a><span class="k">                </span><span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
 <a name="ln-751"></a>                <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>   <span class="o">=</span> <span class="n">eivec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="n">p</span>
-<a name="ln-752"></a>             <span class="n">enddo</span>
+<a name="ln-752"></a>             <span class="k">enddo</span>
 <a name="ln-753"></a><span class="mi">30</span>           <span class="k">continue</span>
-<a name="ln-754"></a><span class="k">          </span><span class="n">enddo</span> <span class="c">!k loop</span>
-<a name="ln-755"></a>       <span class="n">enddo</span> <span class="c">!while(1&lt;2)</span>
+<a name="ln-754"></a><span class="k">          enddo</span> <span class="c">!k loop</span>
+<a name="ln-755"></a>       <span class="k">enddo</span> <span class="c">!while(1&lt;2)</span>
 <a name="ln-756"></a><span class="mi">15</span>  <span class="k">continue</span>
-<a name="ln-757"></a><span class="k">    </span><span class="n">enddo</span> <span class="c">!while en &gt;= low                         All evalues found</span>
+<a name="ln-757"></a><span class="k">    enddo</span> <span class="c">!while en &gt;= low                         All evalues found</span>
 <a name="ln-758"></a>    <span class="c">!transform evectors back</span>
 <a name="ln-759"></a>    <span class="k">call </span><span class="n">hqrvec</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">wr</span><span class="p">,</span> <span class="n">wi</span><span class="p">,</span> <span class="n">eivec</span><span class="p">,</span><span class="n">rc</span><span class="p">)</span>
 <a name="ln-760"></a>  <span class="k">end subroutine </span><span class="n">hqr2</span>
@@ -1176,8 +1176,8 @@
 <a name="ln-836"></a><span class="k">      print</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;matrix = &#39;</span>
 <a name="ln-837"></a>      <span class="k">print</span><span class="o">*</span><span class="p">,</span> <span class="n">matrix</span>
 <a name="ln-838"></a>      <span class="k">stop</span> <span class="s1">&#39;problem in eigen!&#39;</span>
-<a name="ln-839"></a>    <span class="n">endif</span>
-<a name="ln-840"></a>    <span class="n">eigval</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="n">valre</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-839"></a>    <span class="k">endif</span>
+<a name="ln-840"></a><span class="k">    </span><span class="n">eigval</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="n">valre</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-841"></a>    <span class="n">eigvec</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="n">eivec</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-842"></a>  <span class="k">end subroutine </span><span class="n">eigen</span>
 <a name="ln-843"></a>
@@ -1216,13 +1216,13 @@
 <a name="ln-876"></a><span class="k">          call </span><span class="n">swap</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">imax</span><span class="p">,:),</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="p">,:))</span>
 <a name="ln-877"></a>          <span class="n">d</span><span class="o">=-</span><span class="n">d</span>
 <a name="ln-878"></a>          <span class="n">vv</span><span class="p">(</span><span class="n">imax</span><span class="p">)</span><span class="o">=</span><span class="n">vv</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-<a name="ln-879"></a>       <span class="n">endif</span>
-<a name="ln-880"></a>       <span class="n">indx</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">=</span><span class="n">imax</span>
+<a name="ln-879"></a>       <span class="k">endif</span>
+<a name="ln-880"></a><span class="k">       </span><span class="n">indx</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">=</span><span class="n">imax</span>
 <a name="ln-881"></a>       <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="o">=</span><span class="mf">1.0d-20</span>
 <a name="ln-882"></a>       <span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="o">=</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="o">/</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
 <a name="ln-883"></a>       <span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">outerprod</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span><span class="n">j</span><span class="p">),</span><span class="n">a</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">))</span>
-<a name="ln-884"></a>    <span class="n">enddo</span>
-<a name="ln-885"></a>  <span class="k">end subroutine </span><span class="n">ludcmp</span>
+<a name="ln-884"></a>    <span class="k">enddo</span>
+<a name="ln-885"></a><span class="k">  end subroutine </span><span class="n">ludcmp</span>
 <a name="ln-886"></a>  <span class="k">subroutine </span><span class="n">lubksb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">indx</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
 <a name="ln-887"></a>    <span class="c">!+ Does LU back substitution</span>
 <a name="ln-888"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span><span class="k">intent</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">a</span>
@@ -1240,13 +1240,13 @@
 <a name="ln-900"></a><span class="k">          </span><span class="n">summ</span><span class="o">=</span><span class="n">summ</span><span class="o">-</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">ii</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">b</span><span class="p">(</span><span class="n">ii</span><span class="p">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 <a name="ln-901"></a>       <span class="k">else if</span> <span class="p">(</span><span class="n">summ</span> <span class="o">/=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-902"></a><span class="k">          </span><span class="n">ii</span><span class="o">=</span><span class="n">i</span>
-<a name="ln-903"></a>       <span class="n">endif</span>
-<a name="ln-904"></a>       <span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">=</span><span class="n">summ</span>
-<a name="ln-905"></a>    <span class="n">enddo</span>
-<a name="ln-906"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-903"></a>       <span class="k">endif</span>
+<a name="ln-904"></a><span class="k">       </span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">=</span><span class="n">summ</span>
+<a name="ln-905"></a>    <span class="k">enddo</span>
+<a name="ln-906"></a><span class="k">    do </span><span class="n">i</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-907"></a>       <span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">),</span><span class="n">b</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)))</span><span class="o">/</span><span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-908"></a>    <span class="n">enddo</span>
-<a name="ln-909"></a>  <span class="k">end subroutine </span><span class="n">lubksb</span>
+<a name="ln-908"></a>    <span class="k">enddo</span>
+<a name="ln-909"></a><span class="k">  end subroutine </span><span class="n">lubksb</span>
 <a name="ln-910"></a>  <span class="k">subroutine </span><span class="n">matinv</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 <a name="ln-911"></a>    <span class="c">!+ Matrix inversion with LU-decomposition</span>
 <a name="ln-912"></a>    <span class="c">!====================================================</span>
@@ -1262,12 +1262,12 @@
 <a name="ln-922"></a>    <span class="n">y</span>  <span class="o">=</span> <span class="mf">0.</span>
 <a name="ln-923"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span>
 <a name="ln-924"></a>       <span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.d0</span>
-<a name="ln-925"></a>    <span class="n">enddo</span>
-<a name="ln-926"></a>    <span class="k">call </span><span class="n">ludcmp</span><span class="p">(</span><span class="n">ah</span><span class="p">,</span><span class="n">indx</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+<a name="ln-925"></a>    <span class="k">enddo</span>
+<a name="ln-926"></a><span class="k">    call </span><span class="n">ludcmp</span><span class="p">(</span><span class="n">ah</span><span class="p">,</span><span class="n">indx</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
 <a name="ln-927"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span>
 <a name="ln-928"></a>       <span class="k">call </span><span class="n">lubksb</span><span class="p">(</span><span class="n">ah</span><span class="p">,</span><span class="n">indx</span><span class="p">,</span><span class="n">y</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-929"></a>    <span class="n">enddo</span>
-<a name="ln-930"></a>    <span class="n">b</span> <span class="o">=</span> <span class="n">y</span>
+<a name="ln-929"></a>    <span class="k">enddo</span>
+<a name="ln-930"></a><span class="k">    </span><span class="n">b</span> <span class="o">=</span> <span class="n">y</span>
 <a name="ln-931"></a>  <span class="k">end subroutine </span><span class="n">matinv</span>
 <a name="ln-932"></a>
 <a name="ln-933"></a>

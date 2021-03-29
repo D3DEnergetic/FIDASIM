@@ -333,28 +333,28 @@ public function time(time_start) result(time_str)
     <span class="n">ts</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">ts</span> <span class="o">=</span> <span class="n">time_start</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
-    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ta</span><span class="p">)</span>
+<span class="k">    call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ta</span><span class="p">)</span>
     <span class="n">hour</span> <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">minu</span> <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
     <span class="n">sec</span>  <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">minu</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">+</span> <span class="mi">60</span>
         <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">endif</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
+    <span class="k">endif</span>
+<span class="k">    if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">sec</span>  <span class="o">=</span> <span class="n">sec</span> <span class="o">+</span> <span class="mi">60</span>
         <span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2,&quot; --- elapsed:&quot;,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
             <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">hour</span><span class="p">,</span><span class="n">minu</span><span class="p">,</span><span class="n">sec</span>
     <span class="k">else</span>
 <span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
             <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
 <span class="k">end function </span><span class="nb">time</span>
 </pre></div>

@@ -237,7 +237,7 @@ public subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind%7E18"></span>integer,</td>
+  <td><span class="anchor" id="variable-ind%7E19"></span>integer,</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -282,7 +282,7 @@ public subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E7"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E8"></span>real(kind=Float64),</td>
   <td>intent(out)</td>
   <td></td>
   
@@ -616,15 +616,15 @@ public subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
                     <span class="k">if</span> <span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">xyz_ape</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">aoffy</span><span class="p">(</span><span class="n">j</span><span class="p">)).</span><span class="n">gt</span><span class="p">.</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidy</span><span class="p">(</span><span class="n">j</span><span class="p">)).</span><span class="nb">or</span><span class="p">.&amp;</span>
                         <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">xyz_ape</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">aoffz</span><span class="p">(</span><span class="n">j</span><span class="p">)).</span><span class="n">gt</span><span class="p">.</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidz</span><span class="p">(</span><span class="n">j</span><span class="p">)))</span> <span class="k">then</span>
 <span class="k">                        cycle </span><span class="n">rejection_loop</span>
-                    <span class="n">endif</span>
-                <span class="k">case</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">endif</span>
+<span class="k">                case</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
                     <span class="k">if</span> <span class="p">((((</span><span class="n">xyz_ape</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">aoffy</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="o">*</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidz</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">&amp;</span>
                          <span class="p">((</span><span class="n">xyz_ape</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">aoffz</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="o">*</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidy</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span> <span class="p">&amp;</span>
                          <span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidy</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">*</span><span class="n">nbi</span><span class="p">%</span><span class="n">awidz</span><span class="p">(</span><span class="n">j</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                        cycle </span><span class="n">rejection_loop</span>
-                    <span class="n">endif</span>
-            <span class="k">end select</span>
-<span class="k">        </span><span class="n">enddo</span> <span class="n">aperture_loop</span>
+                    <span class="k">endif</span>
+<span class="k">            end select</span>
+<span class="k">        enddo </span><span class="n">aperture_loop</span>
         <span class="n">valid_trajectory</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
 
         <span class="c">!! Convert to beam centerline coordinates to beam grid coordinates</span>
@@ -633,7 +633,7 @@ public subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
         <span class="n">vnbi</span> <span class="o">=</span> <span class="n">nbi</span><span class="p">%</span><span class="n">vinj</span><span class="o">*</span><span class="n">uvw_ray</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">uvw_ray</span><span class="p">)</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">neut_type</span><span class="p">))</span>
 
         <span class="k">exit </span><span class="n">rejection_loop</span>
-    <span class="n">enddo</span> <span class="n">rejection_loop</span>
+    <span class="k">enddo </span><span class="n">rejection_loop</span>
 
     <span class="c">!Set Default trajectory in case rejection sampling fails</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">valid_trajectory</span><span class="p">)</span><span class="k">then</span>
@@ -641,7 +641,7 @@ public subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
         <span class="n">uvw_rf</span> <span class="o">=</span> <span class="n">rc</span> <span class="o">+</span> <span class="p">(</span><span class="n">randomu</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span>
         <span class="n">uvw_ray</span> <span class="o">=</span> <span class="n">uvw_rf</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">src</span>
         <span class="n">vnbi</span> <span class="o">=</span> <span class="n">nbi</span><span class="p">%</span><span class="n">vinj</span><span class="o">*</span><span class="n">uvw_ray</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">uvw_ray</span><span class="p">)</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">neut_type</span><span class="p">))</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
     <span class="c">!! Find probability of trajectory</span>
     <span class="n">vy</span> <span class="o">=</span> <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">xyz_ray</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

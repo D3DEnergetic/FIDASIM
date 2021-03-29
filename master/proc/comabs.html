@@ -442,18 +442,18 @@ public function comabs(ar, ai)
     <span class="k">if</span> <span class="p">(</span><span class="n">ar</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ZERO</span>
        <span class="k">return</span>
-<span class="k">    </span><span class="n">endif</span>
-    <span class="n">ar</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ar</span><span class="p">)</span>
+<span class="k">    endif</span>
+<span class="k">    </span><span class="n">ar</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ar</span><span class="p">)</span>
     <span class="n">ai</span> <span class="o">=</span> <span class="nb">DABS</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">&gt;</span> <span class="n">ar</span><span class="p">)</span> <span class="k">then</span>                                  <span class="c">!Switch  ai and ar</span>
        <span class="k">call </span><span class="n">RSWAP</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">ar</span><span class="p">)</span>
-    <span class="n">endif</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
+    <span class="k">endif</span>
+<span class="k">    if</span> <span class="p">(</span><span class="n">ai</span> <span class="o">==</span> <span class="n">ZERO</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ar</span>
     <span class="k">else</span>
 <span class="k">       </span><span class="n">Comabs</span> <span class="o">=</span> <span class="n">ar</span> <span class="o">*</span> <span class="nb">DSQRT</span><span class="p">(</span><span class="n">ONE</span> <span class="o">+</span> <span class="n">ai</span> <span class="o">/</span> <span class="n">ar</span> <span class="o">*</span> <span class="n">ai</span> <span class="o">/</span> <span class="n">ar</span><span class="p">)</span>
-    <span class="n">endif</span>
-  <span class="k">end function </span><span class="n">comabs</span>
+    <span class="k">endif</span>
+<span class="k">  end function </span><span class="n">comabs</span>
 </pre></div>
 
     </section>

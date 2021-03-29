@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>orb_cfpd.pro &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>3.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>orb_cfpd.pro
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/orb_cfpd.pro"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">orb_cfpd.pro</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/orb_cfpd.pro.html#src">orb_cfpd.pro</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      <h1 id="sunflower">sunflower</h1>
+<p>Generates 2D array of <code>n</code> cartesian points in (x,y) that are approximately uniformly spaced</p>
+<hr>
+<h2 id="arguments">Arguments</h2>
+<p><strong>n</strong>: Number of desired points</p>
+<h2 id="keyword-arguments">Keyword Arguments</h2>
+<p><strong>alpha</strong>: Parameter that determines boundary points</p>
+<p><strong>doplot</strong>: Plot samples</p>
+<h2 id="example-usage">Example Usage</h2>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> n <span class="o">=</span> <span class="mi">10000</span>
+IDL<span class="o">&gt;</span> da <span class="o">=</span> sunflower(n)
+</code></pre></div>
+
+<h1 id="orb_collimator">orb_collimator</h1>
+<p>Calculates solid-angle weights of different velocity vectors that exit the collimator</p>
+<hr>
+<h2 id="arguments_1">Arguments</h2>
+<p><strong>g</strong>: GEQDSK file</p>
+<p><strong>InitialPosition</strong>: Centered on detector in (R,phi,z) coordinates [m,radians,m]</p>
+<p><strong>ivel</strong>: Axis orientation of collimator, i.e. velocity components in (R,phi,z) coordinates</p>
+<p><strong>d</strong>: Collimator length [m]</p>
+<p><strong>a</strong>: Collimator radius [m]</p>
+<p><strong>naperture</strong>: Number of velocities to launch</p>
+<h2 id="keyword-arguments_1">Keyword Arguments</h2>
+<p><strong>step</strong>: Step length [m]</p>
+<p><strong>nsteps</strong>: Number of steps</p>
+<p><strong>e0</strong>: Energy [keV]</p>
+<p><strong>amu</strong>: Atomic mass unit</p>
+<p><strong>z</strong>: Zeff</p>
+<p><strong>narea</strong>: Number of positions to launch from</p>
+<p><strong>straight</strong>: Bypass orbit calculation and use straight rays for testing</p>
+<h2 id="outputs">Outputs</h2>
+<p><strong>vsave</strong>: Launch velocity vectors -- size(3,naperture)</p>
+<p><strong>frac</strong>:  Fraction of area that clears collimator -- size(naperture)</p>
+<p><strong>norm</strong>:  norm<em>total(frac) equals A</em>Omega</p>
+<h2 id="example-usage_1">Example Usage</h2>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> g <span class="o">=</span> <span class="s1">&#39;g000001.01000&#39;</span>
+IDL<span class="o">&gt;</span> detector_aperture_geometry,g,<span class="mi">0</span>,rdist,zdist,v,d,rc
+IDL<span class="o">&gt;</span> InitialPosition <span class="o">=</span> [rdist[<span class="mi">0</span>],<span class="mi">0</span>,zdist[<span class="mi">0</span>]]
+IDL<span class="o">&gt;</span> ivel <span class="o">=</span> <span class="o">-</span><span class="nb">reform</span>(v[<span class="o">*</span>,<span class="mi">0</span>])
+IDL<span class="o">&gt;</span> orb_collimator,g,InitialPosition,ivel,d,rc[<span class="mi">0</span>],<span class="mi">50</span>,vsave,frac,<span class="nb">norm</span>
+</code></pre></div>
+
+<h1 id="orb_cfpd">orb_cfpd</h1>
+<p>Returns all of the orbit-related quantities for a given energy</p>
+<hr>
+<h2 id="arguments_2">Arguments</h2>
+<p><strong>g</strong>: GEQDSK file</p>
+<p><strong>rdist</strong>: Radial coordinates of detector [m]</p>
+<p><strong>zdist</strong>: Vertical coordinates of detector [m]</p>
+<p><strong>v</strong>: Detector orientations [m/s, rad/s, m/s]</p>
+<p><strong>d</strong>: Collimator length [m]</p>
+<p><strong>rc</strong>: Outer collimator spacing [m]</p>
+<h2 id="keyword-arguments_2">Keyword Arguments</h2>
+<p><strong>e0</strong>: Energy (keV)</p>
+<p><strong>nrays</strong>: Number of orbits</p>
+<p><strong>nsteps</strong>: Number of steps</p>
+<p><strong>step</strong>: Step length [m]</p>
+<p><strong>plot_show</strong>: Plot orbit bundles -- (1) on (0) off</p>
+<h2 id="example-usage_2">Example Usage</h2>
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> g <span class="o">=</span> <span class="s1">&#39;g000001.01000&#39;</span>
+IDL<span class="o">&gt;</span> detector_aperture_geometry,g,<span class="mi">0</span>,rdist,zdist,v,d,rc
+IDL<span class="o">&gt;</span> orb <span class="o">=</span> orb_cfpd(g,rdist,zdist,v,d,rc,e0<span class="o">=</span><span class="mi">3030</span>,nrays<span class="o">=</span><span class="mi">50</span>,nsteps<span class="o">=</span><span class="mi">110</span>)
+</code></pre></div>
+      <br>
+    
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/orb_cfpd.pro.html#src">orb_cfpd.pro</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="s s-Atom">function</span> <span class="s s-Atom">sunflower</span><span class="p">,</span><span class="s s-Atom">n</span><span class="p">,</span><span class="s s-Atom">alpha</span><span class="o">=</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">doplot</span><span class="o">=</span><span class="s s-Atom">doplot</span>
+<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#sunflower</span>
+<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Generates</span> <span class="mi">2</span><span class="nv">D</span> <span class="s s-Atom">array</span> <span class="s s-Atom">of</span> <span class="err">`</span><span class="s s-Atom">n</span><span class="err">`</span> <span class="s s-Atom">cartesian</span> <span class="s s-Atom">points</span> <span class="nf">in</span> <span class="p">(</span><span class="s s-Atom">x</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span> <span class="s s-Atom">that</span> <span class="s s-Atom">are</span> <span class="s s-Atom">approximately</span> <span class="s s-Atom">uniformly</span> <span class="s s-Atom">spaced</span>
+<a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
+<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
+<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**n**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">desired</span> <span class="s s-Atom">points</span>
+<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-8"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
+<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**alpha**:</span> <span class="nv">Parameter</span> <span class="s s-Atom">that</span> <span class="s s-Atom">determines</span> <span class="s s-Atom">boundary</span> <span class="s s-Atom">points</span>
+<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**doplot**:</span> <span class="nv">Plot</span> <span class="s s-Atom">samples</span>
+<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-13"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-14"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">da</span> <span class="o">=</span> <span class="nf">sunflower</span><span class="p">(</span><span class="s s-Atom">n</span><span class="p">)</span>
+<a name="ln-17"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-18"></a>
+<a name="ln-19"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">alpha</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">alpha</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-20"></a>
+<a name="ln-21"></a>    <span class="s s-Atom">b</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="s s-Atom">alpha</span><span class="o">*</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">n</span><span class="p">))</span>  <span class="p">;</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">boundary</span> <span class="s s-Atom">pts</span>
+<a name="ln-22"></a>    <span class="s s-Atom">phi=</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>       <span class="p">;</span> <span class="s s-Atom">golden</span> <span class="s s-Atom">ratio</span>
+<a name="ln-23"></a>    <span class="s s-Atom">r</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="s s-Atom">n</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">theta</span><span class="o">=</span><span class="s s-Atom">r</span>
+<a name="ln-24"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">n</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-25"></a>      <span class="s s-Atom">if</span> <span class="s s-Atom">i</span> <span class="s s-Atom">gt</span> <span class="s s-Atom">n</span><span class="o">-</span><span class="s s-Atom">b</span> <span class="s s-Atom">then</span> <span class="s s-Atom">r</span><span class="p">[</span><span class="s s-Atom">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="mf">1.</span> <span class="s s-Atom">else</span> <span class="s s-Atom">r</span><span class="p">[</span><span class="s s-Atom">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">i-.</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">n</span><span class="o">-</span><span class="mf">0.5</span><span class="s s-Atom">*</span><span class="p">(</span><span class="s s-Atom">b</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-26"></a>      <span class="s s-Atom">theta</span><span class="p">[</span><span class="s s-Atom">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="s s-Atom">i</span><span class="o">/</span><span class="s s-Atom">phi^</span><span class="mi">2</span>
+<a name="ln-27"></a>    <span class="s s-Atom">end</span>
+<a name="ln-28"></a>
+<a name="ln-29"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">doplot</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-30"></a>      <span class="s s-Atom">plot</span><span class="p">,</span><span class="s s-Atom">r</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="s s-Atom">r</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="s s-Atom">psym</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="s s-Atom">xrange</span><span class="o">=</span><span class="mf">1.1</span><span class="o">*</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="mf">1.1</span><span class="o">*</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<a name="ln-31"></a>      <span class="s s-Atom">phi</span><span class="o">=</span><span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span>
+<a name="ln-32"></a>      <span class="s s-Atom">oplot</span><span class="p">,</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">phi</span><span class="p">),</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">phi</span><span class="p">),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">100</span>
+<a name="ln-33"></a>    <span class="s s-Atom">end</span>
+<a name="ln-34"></a>
+<a name="ln-35"></a>    <span class="s s-Atom">a</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s s-Atom">n</span><span class="p">)</span>
+<a name="ln-36"></a>    <span class="s s-Atom">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">r</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">a</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">r</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">)</span>
+<a name="ln-37"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">a</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a><span class="s s-Atom">end</span>
+<a name="ln-40"></a>
+<a name="ln-41"></a>
+<a name="ln-42"></a><span class="nv">PRO</span> <span class="s s-Atom">orb_collimator</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="nv">InitialPosition</span><span class="p">,</span><span class="s s-Atom">ivel</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">a</span><span class="p">,</span><span class="s s-Atom">naperture</span><span class="p">,</span><span class="s s-Atom">vsave</span><span class="p">,</span><span class="s s-Atom">frac</span><span class="p">,</span><span class="s s-Atom">norm</span><span class="p">,</span><span class="s s-Atom">step</span><span class="o">=</span><span class="s s-Atom">step</span><span class="p">,</span><span class="s s-Atom">nsteps</span><span class="o">=</span><span class="s s-Atom">nsteps</span><span class="p">,</span><span class="s s-Atom">e0</span><span class="o">=</span><span class="s s-Atom">e0</span><span class="p">,</span><span class="s s-Atom">amu</span><span class="o">=</span><span class="s s-Atom">amu</span><span class="p">,</span><span class="s s-Atom">z</span><span class="o">=</span><span class="s s-Atom">z</span><span class="p">,</span><span class="s s-Atom">narea</span><span class="o">=</span><span class="s s-Atom">narea</span><span class="p">,</span><span class="s s-Atom">straight</span><span class="o">=</span><span class="s s-Atom">straight</span>
+<a name="ln-43"></a>    <span class="p">;</span><span class="s s-Atom">+#orb_collimator</span>
+<a name="ln-44"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Calculates</span> <span class="s s-Atom">solid</span><span class="o">-</span><span class="s s-Atom">angle</span> <span class="s s-Atom">weights</span> <span class="s s-Atom">of</span> <span class="s s-Atom">different</span> <span class="s s-Atom">velocity</span> <span class="s s-Atom">vectors</span> <span class="s s-Atom">that</span> <span class="s s-Atom">exit</span> <span class="s s-Atom">the</span> <span class="s s-Atom">collimator</span>
+<a name="ln-45"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
+<a name="ln-46"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
+<a name="ln-47"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**g**:</span> <span class="nv">GEQDSK</span> <span class="s s-Atom">file</span>
+<a name="ln-48"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-49"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**</span><span class="nv">InitialPosition</span><span class="s s-Atom">**:</span> <span class="nv">Centered</span> <span class="s s-Atom">on</span> <span class="s s-Atom">detector</span> <span class="nf">in</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">phi</span><span class="p">,</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">coordinates</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">,</span><span class="s s-Atom">radians</span><span class="p">,</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-50"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-51"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**ivel**:</span> <span class="nv">Axis</span> <span class="s s-Atom">orientation</span> <span class="s s-Atom">of</span> <span class="s s-Atom">collimator</span><span class="p">,</span> <span class="s s-Atom">i</span><span class="p">.</span><span class="s s-Atom">e</span><span class="p">.</span> <span class="s s-Atom">velocity</span> <span class="s s-Atom">components</span> <span class="nf">in</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">phi</span><span class="p">,</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">coordinates</span>
+<a name="ln-52"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-53"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**d**:</span> <span class="nv">Collimator</span> <span class="s s-Atom">length</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-54"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-55"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**a**:</span> <span class="nv">Collimator</span> <span class="s s-Atom">radius</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-56"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-57"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**naperture**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">velocities</span> <span class="s s-Atom">to</span> <span class="s s-Atom">launch</span>
+<a name="ln-58"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-59"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
+<a name="ln-60"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**step**:</span> <span class="nv">Step</span> <span class="s s-Atom">length</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-61"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-62"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nsteps**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">steps</span>
+<a name="ln-63"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-64"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**e0**:</span> <span class="nv">Energy</span> <span class="p">[</span><span class="s s-Atom">keV</span><span class="p">]</span>
+<a name="ln-65"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-66"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**amu**:</span> <span class="nv">Atomic</span> <span class="s s-Atom">mass</span> <span class="s s-Atom">unit</span>
+<a name="ln-67"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-68"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**z**:</span> <span class="nv">Zeff</span>
+<a name="ln-69"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-70"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**narea**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">positions</span> <span class="s s-Atom">to</span> <span class="s s-Atom">launch</span> <span class="s s-Atom">from</span>
+<a name="ln-71"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-72"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**straight**:</span> <span class="nv">Bypass</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">calculation</span> <span class="s s-Atom">and</span> <span class="s s-Atom">use</span> <span class="s s-Atom">straight</span> <span class="s s-Atom">rays</span> <span class="s s-Atom">for</span> <span class="s s-Atom">testing</span>
+<a name="ln-73"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-74"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Outputs</span>
+<a name="ln-75"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**vsave**:</span> <span class="nv">Launch</span> <span class="s s-Atom">velocity</span> <span class="s s-Atom">vectors</span> <span class="s s-Atom">--</span> <span class="nf">size</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">naperture</span><span class="p">)</span>
+<a name="ln-76"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-77"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**frac**:</span>  <span class="nv">Fraction</span> <span class="s s-Atom">of</span> <span class="s s-Atom">area</span> <span class="s s-Atom">that</span> <span class="s s-Atom">clears</span> <span class="s s-Atom">collimator</span> <span class="s s-Atom">--</span> <span class="nf">size</span><span class="p">(</span><span class="s s-Atom">naperture</span><span class="p">)</span>
+<a name="ln-78"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-79"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**norm**:</span>  <span class="s s-Atom">norm</span><span class="o">*</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">frac</span><span class="p">)</span> <span class="s s-Atom">equals</span> <span class="nv">A</span><span class="o">*</span><span class="nv">Omega</span>
+<a name="ln-80"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-81"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-82"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-83"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">g</span> <span class="o">=</span> <span class="s s-Atom">&#39;g000001.01000&#39;</span>
+<a name="ln-84"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">detector_aperture_geometry</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">rdist</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">,</span><span class="s s-Atom">v</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">rc</span>
+<a name="ln-85"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="nv">InitialPosition</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">rdist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+<a name="ln-86"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">ivel</span> <span class="o">=</span> <span class="o">-</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<a name="ln-87"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">orb_collimator</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="nv">InitialPosition</span><span class="p">,</span><span class="s s-Atom">ivel</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">rc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">vsave</span><span class="p">,</span><span class="s s-Atom">frac</span><span class="p">,</span><span class="s s-Atom">norm</span>
+<a name="ln-88"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-89"></a>
+<a name="ln-90"></a>  <span class="s s-Atom">common</span> <span class="s s-Atom">bcom</span><span class="p">,</span><span class="s s-Atom">b0</span><span class="p">,</span><span class="s s-Atom">r0</span><span class="p">,</span><span class="s s-Atom">br</span><span class="p">,</span><span class="s s-Atom">bphi</span><span class="p">,</span><span class="s s-Atom">bz</span><span class="p">,</span><span class="s s-Atom">gr0</span><span class="p">,</span><span class="s s-Atom">gz0</span><span class="p">,</span><span class="s s-Atom">dr</span><span class="p">,</span><span class="s s-Atom">dz</span>
+<a name="ln-91"></a>
+<a name="ln-92"></a>  <span class="p">;</span> <span class="nv">Ion</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">parameters</span>
+<a name="ln-93"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">step</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">step</span><span class="o">=</span><span class="mf">0.01</span>	<span class="p">;</span> <span class="s s-Atom">step</span> <span class="s s-Atom">length</span> <span class="s s-Atom">in</span> <span class="s s-Atom">m</span>
+<a name="ln-94"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">nsteps</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">nsteps</span><span class="o">=</span><span class="mi">110</span>
+<a name="ln-95"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">e0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">e0</span><span class="o">=</span><span class="mf">3030.</span>			<span class="p">;</span> <span class="s s-Atom">keV</span>
+<a name="ln-96"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">amu</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">amu</span><span class="o">=</span><span class="mf">1.</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">mp</span><span class="o">=</span><span class="mf">1.67e-27</span>
+<a name="ln-97"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">z</span><span class="o">=</span><span class="mf">1.</span>
+<a name="ln-98"></a>  <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">narea</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">narea</span><span class="o">=</span><span class="mi">10000</span>
+<a name="ln-99"></a>  <span class="s s-Atom">time_reverse</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-100"></a>
+<a name="ln-101"></a>  <span class="p">;</span><span class="s s-Atom">-------------</span>
+<a name="ln-102"></a>  <span class="p">;</span> <span class="nv">Same</span> <span class="s s-Atom">for</span> <span class="s s-Atom">every</span> <span class="s s-Atom">calculation</span>
+<a name="ln-103"></a>  <span class="p">;</span> <span class="nv">Use</span> <span class="s s-Atom">eqdsk</span> <span class="s s-Atom">to</span> <span class="s s-Atom">get</span> <span class="s s-Atom">wall</span> <span class="s s-Atom">location</span> <span class="s s-Atom">and</span> <span class="s s-Atom">magnetic</span> <span class="s s-Atom">field</span> <span class="s s-Atom">grid</span>
+<a name="ln-104"></a>  <span class="s s-Atom">b0</span><span class="o">=</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">bcentr</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">r0</span><span class="o">=</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">rmaxis</span>
+<a name="ln-105"></a>  <span class="s s-Atom">finewall</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span>
+<a name="ln-106"></a>  <span class="s s-Atom">calculate_bfield</span><span class="p">,</span><span class="s s-Atom">bp</span><span class="p">,</span><span class="s s-Atom">br</span><span class="p">,</span><span class="s s-Atom">bphi</span><span class="p">,</span><span class="s s-Atom">bz</span><span class="p">,</span><span class="s s-Atom">g</span>
+<a name="ln-107"></a>  <span class="s s-Atom">br</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">br</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bphi</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bphi</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bz</span><span class="p">)</span>
+<a name="ln-108"></a>  <span class="s s-Atom">gr0</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">gz0</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<a name="ln-109"></a>  <span class="s s-Atom">dr</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">dz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<a name="ln-110"></a>  <span class="s s-Atom">br</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">br</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bphi</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bphi</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bz</span><span class="p">)</span>
+<a name="ln-111"></a>  <span class="s s-Atom">pphisgn=-g</span><span class="p">.</span><span class="s s-Atom">cpasma</span><span class="o">/</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">cpasma</span><span class="p">)</span>
+<a name="ln-112"></a>
+<a name="ln-113"></a>  <span class="p">;</span> <span class="nv">Normalization</span> <span class="s s-Atom">constants</span>
+<a name="ln-114"></a>  <span class="s s-Atom">omega</span><span class="o">=</span><span class="s s-Atom">z</span><span class="o">*</span><span class="mf">1.6e-19</span><span class="o">*</span><span class="s s-Atom">b0/</span><span class="p">(</span><span class="s s-Atom">amu</span><span class="o">*</span><span class="s s-Atom">mp</span><span class="p">)</span>
+<a name="ln-115"></a>  <span class="s s-Atom">v0</span><span class="o">=</span><span class="nf">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="s s-Atom">e0</span><span class="o">*</span><span class="mf">1.e3</span><span class="o">*</span><span class="mf">1.6e-19</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">amu</span><span class="o">*</span><span class="s s-Atom">mp</span><span class="p">))</span>
+<a name="ln-116"></a>  <span class="s s-Atom">vconstant</span><span class="o">=</span><span class="s s-Atom">v0</span><span class="o">/</span><span class="s s-Atom">omega</span>
+<a name="ln-117"></a>
+<a name="ln-118"></a>  <span class="p">;</span><span class="s s-Atom">------</span>
+<a name="ln-119"></a>  <span class="p">;</span> <span class="nv">Coordinate</span> <span class="s s-Atom">system</span> <span class="s s-Atom">along</span> <span class="s s-Atom">collimator</span> <span class="s s-Atom">tube</span>
+<a name="ln-120"></a>  <span class="p">;</span> <span class="s s-Atom">unit</span> <span class="s s-Atom">vector</span> <span class="s s-Atom">along</span> <span class="s s-Atom">tube</span>
+<a name="ln-121"></a>  <span class="s s-Atom">vr</span><span class="o">=</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">vphi</span><span class="o">=</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">vz</span><span class="o">=</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<a name="ln-122"></a>
+<a name="ln-123"></a>  <span class="p">;</span> <span class="s s-Atom">transverse</span> <span class="s s-Atom">unit</span> <span class="s s-Atom">vector</span>
+<a name="ln-124"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">vr</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">and</span> <span class="s s-Atom">vz</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-125"></a>    <span class="s s-Atom">ar</span><span class="o">=</span><span class="mf">1.</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">az</span><span class="o">=</span><span class="mf">0.</span>
+<a name="ln-126"></a>  <span class="s s-Atom">end</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-127"></a>    <span class="s s-Atom">aphi</span><span class="o">=</span><span class="mf">0.</span>
+<a name="ln-128"></a>    <span class="s s-Atom">ar</span><span class="o">=</span><span class="s s-Atom">vz</span><span class="o">/</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">vz^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">vr^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-129"></a>    <span class="s s-Atom">az=-vr</span><span class="o">/</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">vz^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">vr^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-130"></a>  <span class="s s-Atom">end</span>
+<a name="ln-131"></a>
+<a name="ln-132"></a>  <span class="p">;</span> <span class="s s-Atom">toroidal</span> <span class="s s-Atom">unit</span> <span class="s s-Atom">vector</span>
+<a name="ln-133"></a>  <span class="s s-Atom">cr=-az</span><span class="o">*</span><span class="s s-Atom">vphi</span>
+<a name="ln-134"></a>  <span class="s s-Atom">cphi</span><span class="o">=</span><span class="s s-Atom">az</span><span class="o">*</span><span class="s s-Atom">vr</span><span class="o">-</span><span class="s s-Atom">ar</span><span class="o">*</span><span class="s s-Atom">vz</span>
+<a name="ln-135"></a>  <span class="s s-Atom">cz</span><span class="o">=</span><span class="s s-Atom">ar</span><span class="o">*</span><span class="s s-Atom">vphi</span>
+<a name="ln-136"></a>
+<a name="ln-137"></a>  <span class="p">;</span><span class="s s-Atom">------------</span>
+<a name="ln-138"></a>  <span class="p">;</span> <span class="s s-Atom">delta</span> <span class="s s-Atom">positions</span> <span class="s s-Atom">on</span> <span class="s s-Atom">detector</span> <span class="s s-Atom">area</span>
+<a name="ln-139"></a>  <span class="p">;</span> <span class="s s-Atom">use</span> <span class="s s-Atom">a</span> <span class="s s-Atom">modified</span> <span class="s s-Atom">sunflower</span> <span class="s s-Atom">arrangement</span> <span class="s s-Atom">based</span> <span class="s s-Atom">on</span> <span class="s s-Atom">the</span> <span class="s s-Atom">golden</span> <span class="s s-Atom">rule</span>
+<a name="ln-140"></a>  <span class="s s-Atom">da</span><span class="o">=</span><span class="s s-Atom">a</span><span class="o">*</span><span class="nf">sunflower</span><span class="p">(</span><span class="s s-Atom">narea</span><span class="p">)</span>  <span class="p">;</span> <span class="p">(</span><span class="s s-Atom">x</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span> <span class="s s-Atom">displacement</span> <span class="s s-Atom">array</span>
+<a name="ln-141"></a>  <span class="s s-Atom">eps</span><span class="o">=</span><span class="mf">1.02</span>   <span class="p">;</span> <span class="s s-Atom">fudge</span> <span class="s s-Atom">factor</span> <span class="s s-Atom">on</span> <span class="s s-Atom">whether</span> <span class="s s-Atom">ray</span> <span class="s s-Atom">clears</span>
+<a name="ln-142"></a>
+<a name="ln-143"></a>  <span class="p">;</span><span class="s s-Atom">---------</span>
+<a name="ln-144"></a>  <span class="p">;</span> <span class="nv">Velocity</span> <span class="s s-Atom">angles</span> <span class="s s-Atom">to</span> <span class="s s-Atom">use</span>
+<a name="ln-145"></a>
+<a name="ln-146"></a>  <span class="p">;</span> <span class="nv">Find</span> <span class="s s-Atom">the</span> <span class="s s-Atom">maximum</span> <span class="s s-Atom">amount</span> <span class="s s-Atom">the</span> <span class="s s-Atom">curved</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">can</span> <span class="s s-Atom">expand</span> <span class="s s-Atom">the</span> <span class="s s-Atom">aperture</span>
+<a name="ln-147"></a>  <span class="s s-Atom">rho</span><span class="o">=</span><span class="s s-Atom">vconstant</span><span class="o">*</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">vr^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">vz^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-148"></a>  <span class="s s-Atom">expand</span><span class="o">=</span><span class="s s-Atom">rho</span> <span class="o">-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">rho^</span><span class="mi">2</span> <span class="o">-</span> <span class="s s-Atom">d^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-149"></a>  <span class="s s-Atom">aperture</span><span class="o">=</span><span class="s s-Atom">a</span> <span class="o">+</span> <span class="s s-Atom">expand</span>
+<a name="ln-150"></a>
+<a name="ln-151"></a>  <span class="p">;</span> <span class="nv">Points</span> <span class="s s-Atom">on</span> <span class="s s-Atom">effective</span> <span class="s s-Atom">aperture</span> <span class="s s-Atom">to</span> <span class="s s-Atom">aim</span> <span class="s s-Atom">velocities</span> <span class="s s-Atom">at</span>
+<a name="ln-152"></a>  <span class="s s-Atom">daperture</span><span class="o">=</span><span class="s s-Atom">aperture</span><span class="o">*</span><span class="nf">sunflower</span><span class="p">(</span><span class="s s-Atom">naperture</span><span class="p">)</span> <span class="p">;</span> <span class="p">(</span><span class="s s-Atom">x</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span> <span class="s s-Atom">target</span> <span class="s s-Atom">array</span>
+<a name="ln-153"></a>  <span class="s s-Atom">vsave</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">naperture</span><span class="p">)</span>
+<a name="ln-154"></a>  <span class="s s-Atom">frac</span><span class="o">=</span><span class="nf">replicate</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="s s-Atom">naperture</span><span class="p">)</span>
+<a name="ln-155"></a>
+<a name="ln-156"></a>  <span class="p">;</span> <span class="nv">Orbit</span> <span class="s s-Atom">initialization</span>
+<a name="ln-157"></a>  <span class="s s-Atom">ivel0</span><span class="o">=</span><span class="s s-Atom">ivel</span>
+<a name="ln-158"></a>
+<a name="ln-159"></a>  <span class="s s-Atom">first</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-160"></a>  <span class="p">;</span><span class="s s-Atom">-----------------</span>
+<a name="ln-161"></a>  <span class="p">;</span> <span class="nv">Loop</span> <span class="s s-Atom">over</span> <span class="s s-Atom">initial</span> <span class="s s-Atom">velocities</span>
+<a name="ln-162"></a>  <span class="s s-Atom">for</span> <span class="s s-Atom">iaperture</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">naperture</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-163"></a>  <span class="p">;</span>  <span class="s s-Atom">ivel</span><span class="o">=</span><span class="nf">launch_vector</span><span class="p">(</span><span class="s s-Atom">ivel0</span><span class="p">,</span><span class="nf">tan</span><span class="p">(</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="o">/</span><span class="s s-Atom">d</span><span class="p">),</span><span class="nf">tan</span><span class="p">(</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="o">/</span><span class="s s-Atom">d</span><span class="p">))</span>
+<a name="ln-164"></a>    <span class="s s-Atom">xx</span><span class="o">=</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">yy</span><span class="o">=</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span>
+<a name="ln-165"></a>    <span class="s s-Atom">ivel</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">ar</span><span class="o">*</span><span class="s s-Atom">xx</span> <span class="o">+</span> <span class="s s-Atom">cr</span><span class="o">*</span><span class="s s-Atom">yy</span> <span class="o">+</span> <span class="s s-Atom">vr</span><span class="o">*</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-166"></a>        <span class="s s-Atom">aphi</span><span class="o">*</span><span class="s s-Atom">xx</span> <span class="o">+</span> <span class="s s-Atom">cphi</span><span class="o">*</span><span class="s s-Atom">yy</span> <span class="o">+</span> <span class="s s-Atom">vphi</span><span class="o">*</span><span class="s s-Atom">d</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-167"></a>        <span class="s s-Atom">az</span><span class="o">*</span><span class="s s-Atom">xx</span> <span class="o">+</span> <span class="s s-Atom">cz</span><span class="o">*</span><span class="s s-Atom">yy</span> <span class="o">+</span> <span class="s s-Atom">vz</span><span class="o">*</span><span class="s s-Atom">d</span><span class="p">]</span>
+<a name="ln-168"></a>    <span class="s s-Atom">ivel/=</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="s s-Atom">^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="s s-Atom">^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="s s-Atom">^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-169"></a>    <span class="s s-Atom">vsave</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">ivel</span>
+<a name="ln-170"></a>
+<a name="ln-171"></a>  <span class="p">;</span> <span class="nv">Preparing</span> <span class="s s-Atom">normal</span> <span class="s s-Atom">orb_mast</span> <span class="s s-Atom">calculation</span> <span class="s s-Atom">from</span> <span class="s s-Atom">center</span> <span class="s s-Atom">of</span> <span class="s s-Atom">detector</span>
+<a name="ln-172"></a>  <span class="nv">Velocity</span><span class="o">=</span><span class="s s-Atom">vconstant</span><span class="o">*</span><span class="s s-Atom">ivel</span>
+<a name="ln-173"></a>  <span class="s s-Atom">y</span><span class="o">=</span><span class="nf">dblarr</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="nf">y</span><span class="p">(</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">)</span><span class="o">=</span><span class="nv">Velocity</span> <span class="s s-Atom">&amp;</span> <span class="nf">y</span><span class="p">(</span><span class="mi">3</span><span class="s s-Atom">:</span><span class="mi">5</span><span class="p">)</span><span class="o">=</span><span class="nv">InitialPosition</span>
+<a name="ln-174"></a>  <span class="s s-Atom">h</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">step</span><span class="o">*</span><span class="s s-Atom">omega</span><span class="o">/</span><span class="s s-Atom">v0</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">if</span> <span class="s s-Atom">time_reverse</span> <span class="s s-Atom">then</span> <span class="s s-Atom">h=-h</span>
+<a name="ln-175"></a>  <span class="s s-Atom">yout</span><span class="o">=</span><span class="nf">dblarr</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="s s-Atom">nsteps</span><span class="p">)</span>
+<a name="ln-176"></a>  <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">straight</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-177"></a>    <span class="s s-Atom">s</span><span class="o">=</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">d^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">a^</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="s s-Atom">nsteps</span><span class="p">)</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nsteps</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-178"></a>    <span class="s s-Atom">uu</span><span class="o">=</span><span class="s s-Atom">y</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">y</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">s</span><span class="o">*</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a name="ln-179"></a>    <span class="s s-Atom">vv</span><span class="o">=</span><span class="s s-Atom">y</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">y</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">+</span> <span class="s s-Atom">s</span><span class="o">*</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<a name="ln-180"></a>    <span class="s s-Atom">zz</span><span class="o">=</span><span class="s s-Atom">y</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s s-Atom">s</span><span class="o">*</span><span class="s s-Atom">ivel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<a name="ln-181"></a>    <span class="s s-Atom">yout</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="o">=</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">uu^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">vv^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-182"></a>    <span class="s s-Atom">yout</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="o">=</span><span class="nf">atan</span><span class="p">(</span><span class="s s-Atom">vv</span><span class="p">,</span><span class="s s-Atom">uu</span><span class="p">)</span>
+<a name="ln-183"></a>    <span class="s s-Atom">yout</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">zz</span>
+<a name="ln-184"></a>  <span class="s s-Atom">end</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-185"></a>  <span class="s s-Atom">dydx</span><span class="o">=</span><span class="nf">derivs</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span>
+<a name="ln-186"></a>  <span class="nf">yout</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">=</span><span class="nf">y</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">)</span>
+<a name="ln-187"></a>
+<a name="ln-188"></a>  <span class="p">;</span> <span class="nv">Orbit</span> <span class="s s-Atom">loop</span>
+<a name="ln-189"></a>  <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-190"></a>  <span class="s s-Atom">lwall</span><span class="o">=</span><span class="mi">1</span>		<span class="p">;</span> <span class="s s-Atom">logical</span> <span class="s s-Atom">to</span> <span class="s s-Atom">stop</span> <span class="s s-Atom">if</span> <span class="s s-Atom">hits</span> <span class="s s-Atom">wall</span>
+<a name="ln-191"></a>  <span class="s s-Atom">while</span> <span class="s s-Atom">i</span> <span class="s s-Atom">lt</span> <span class="s s-Atom">nsteps</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-192"></a>    <span class="s s-Atom">i</span><span class="o">=</span><span class="s s-Atom">i</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-193"></a>  <span class="p">;</span>  <span class="s s-Atom">y</span><span class="o">=</span><span class="nf">rk4</span><span class="p">(</span><span class="s s-Atom">y</span><span class="p">,</span><span class="s s-Atom">dydx</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="s s-Atom">h</span><span class="p">,</span><span class="s s-Atom">&#39;derivs&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">double</span><span class="p">)</span>
+<a name="ln-194"></a>  <span class="p">;</span> <span class="nv">Van</span> <span class="nv">Zeeland</span><span class="s s-Atom">&#39;s integrator</span>
+<a name="ln-195"></a><span class="s s-Atom">    ddeabm,&#39;derivs&#39;,0.d,y,h,epsabs=1.e-8</span>
+<a name="ln-196"></a><span class="s s-Atom">  ; force energy conservation</span>
+<a name="ln-197"></a><span class="s s-Atom">  ;  y(0:2)=y(0:2)*vconstant/sqrt(y(0)^2+y(1)^2+y(2)^2)</span>
+<a name="ln-198"></a><span class="s s-Atom">    yout(*,i)=y(*)</span>
+<a name="ln-199"></a><span class="s s-Atom">    dydx=derivs(0.,y)</span>
+<a name="ln-200"></a><span class="s s-Atom">  end</span>
+<a name="ln-201"></a><span class="s s-Atom">  end ; not straight keyword</span>
+<a name="ln-202"></a>
+<a name="ln-203"></a><span class="s s-Atom">  ;---------</span>
+<a name="ln-204"></a><span class="s s-Atom">  ; Find fraction of detector area that misses walls for this orbit</span>
+<a name="ln-205"></a><span class="s s-Atom">  ; Use an (xx,yy,zz) coordinate system with zz axis along collimator</span>
+<a name="ln-206"></a><span class="s s-Atom">  ;</span>
+<a name="ln-207"></a><span class="s s-Atom">  u=reform(yout[3,*]*cos(yout[4,*])) &amp; u-=u[0]</span>
+<a name="ln-208"></a><span class="s s-Atom">  v=reform(yout[3,*]*sin(yout[4,*])) &amp; v-=v[0]</span>
+<a name="ln-209"></a><span class="s s-Atom">  w=reform(yout[5,*]) &amp; w-=w[0]</span>
+<a name="ln-210"></a>
+<a name="ln-211"></a><span class="s s-Atom">  xx=ar*u + aphi*v + az*w</span>
+<a name="ln-212"></a><span class="s s-Atom">  yy=cr*u + cphi*v + cz*w</span>
+<a name="ln-213"></a><span class="s s-Atom">  zz=vr*u + vphi*v + vz*w</span>
+<a name="ln-214"></a><span class="s s-Atom">  zz*=-1.</span>
+<a name="ln-215"></a>
+<a name="ln-216"></a><span class="s s-Atom">  ; Truncate orbit at end of collimator</span>
+<a name="ln-217"></a><span class="s s-Atom">  w=where(zz le d)</span>
+<a name="ln-218"></a><span class="s s-Atom">  xx=xx[w] &amp; yy=yy[w] &amp; zz=zz[w]</span>
+<a name="ln-219"></a>
+<a name="ln-220"></a><span class="s s-Atom">  ; Start this trajectory from various positions on detector area</span>
+<a name="ln-221"></a><span class="s s-Atom">  ; and store how many don&#39;t</span> <span class="s s-Atom">hit</span> <span class="s s-Atom">the</span> <span class="s s-Atom">wall</span>
+<a name="ln-222"></a>
+<a name="ln-223"></a>  <span class="s s-Atom">plotarea</span><span class="o">=</span><span class="mi">0</span> <span class="p">;</span> <span class="nv">Optional</span> <span class="s s-Atom">plotting</span> <span class="s s-Atom">of</span> <span class="s s-Atom">which</span> <span class="s s-Atom">part</span> <span class="s s-Atom">of</span> <span class="s s-Atom">detector</span> <span class="s s-Atom">area</span> <span class="s s-Atom">works</span>
+<a name="ln-224"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">plotarea</span> <span class="s s-Atom">then</span> <span class="s s-Atom">plot</span><span class="p">,</span><span class="s s-Atom">a</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">),</span><span class="s s-Atom">a</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="mi">101</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">),</span> <span class="err">$</span>
+<a name="ln-225"></a>    <span class="s s-Atom">title</span><span class="o">=</span><span class="nf">string</span><span class="p">(</span><span class="mi">1</span><span class="s s-Atom">e3</span><span class="o">*</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">])</span><span class="s s-Atom">+&#39; &#39;</span><span class="o">+</span><span class="nf">string</span><span class="p">(</span><span class="mi">1</span><span class="s s-Atom">e3</span><span class="o">*</span><span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">])</span>
+<a name="ln-226"></a>  <span class="s s-Atom">for</span> <span class="s s-Atom">j</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">narea</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-227"></a>    <span class="s s-Atom">w</span><span class="o">=</span><span class="nf">where</span><span class="p">((</span><span class="s s-Atom">xx</span> <span class="o">+</span> <span class="s s-Atom">da</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">])</span><span class="s s-Atom">^</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="s s-Atom">yy</span> <span class="o">+</span> <span class="s s-Atom">da</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">])</span><span class="s s-Atom">^</span><span class="mi">2</span> <span class="s s-Atom">gt</span> <span class="s s-Atom">eps</span><span class="o">*</span><span class="s s-Atom">a^</span><span class="mi">2</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-228"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">lt</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">frac</span><span class="p">[</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="s s-Atom">+=</span><span class="mf">1.</span>
+<a name="ln-229"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">plotarea</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-230"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">lt</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">col</span><span class="o">=</span><span class="mi">250</span> <span class="s s-Atom">else</span> <span class="s s-Atom">col</span><span class="o">=</span><span class="mi">100</span>
+<a name="ln-231"></a>    <span class="s s-Atom">oplot</span><span class="p">,[</span><span class="s s-Atom">da</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">]],[</span><span class="s s-Atom">da</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">]],</span><span class="s s-Atom">color</span><span class="o">=</span><span class="s s-Atom">col</span><span class="p">,</span><span class="s s-Atom">psym</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-232"></a>  <span class="s s-Atom">end</span>
+<a name="ln-233"></a>  <span class="s s-Atom">end</span>
+<a name="ln-234"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">plotarea</span> <span class="s s-Atom">then</span> <span class="s s-Atom">wait</span><span class="p">,</span><span class="mi">5</span>
+<a name="ln-235"></a>
+<a name="ln-236"></a>  <span class="p">;</span> <span class="nv">Optional</span> <span class="s s-Atom">plotting</span> <span class="s s-Atom">of</span> <span class="s s-Atom">trajectories</span>
+<a name="ln-237"></a>  <span class="s s-Atom">doplot</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-238"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">doplot</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-239"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">first</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-240"></a>  <span class="p">!</span><span class="s s-Atom">p</span><span class="p">.</span><span class="s s-Atom">multi</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<a name="ln-241"></a>  <span class="s s-Atom">plot</span><span class="p">,</span><span class="s s-Atom">zz</span><span class="p">,</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">xx^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">yy^</span><span class="mi">2</span><span class="p">),</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="mf">1.2</span><span class="o">*</span><span class="p">[</span><span class="nf">min</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">xx^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">yy^</span><span class="mi">2</span><span class="p">)),</span><span class="nf">max</span><span class="p">(</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">xx^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">yy^</span><span class="mi">2</span><span class="p">))]</span>
+<a name="ln-242"></a>  <span class="s s-Atom">first</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-243"></a>  <span class="s s-Atom">end</span> <span class="s s-Atom">else</span> <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">zz</span><span class="p">,</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">xx^</span><span class="mi">2</span><span class="o">+</span><span class="s s-Atom">yy^</span><span class="mi">2</span><span class="p">),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">100</span><span class="o">+</span><span class="nf">fix</span><span class="p">(</span><span class="s s-Atom">frac</span><span class="p">[</span><span class="s s-Atom">iaperture</span><span class="p">])</span>
+<a name="ln-244"></a>  <span class="s s-Atom">end</span> <span class="p">;</span> <span class="s s-Atom">doplot</span>
+<a name="ln-245"></a>
+<a name="ln-246"></a>  <span class="p">;</span> <span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">)</span> <span class="s s-Atom">factor</span>
+<a name="ln-247"></a>  <span class="s s-Atom">frac</span><span class="p">[</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="s s-Atom">*=d</span><span class="o">/</span><span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">d^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="s s-Atom">^</span><span class="mi">2</span> <span class="o">+</span> <span class="s s-Atom">daperture</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">iaperture</span><span class="p">]</span><span class="s s-Atom">^</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-248"></a>
+<a name="ln-249"></a>  <span class="s s-Atom">end</span> <span class="p">;</span> <span class="s s-Atom">iaperture</span> <span class="s s-Atom">loop</span>
+<a name="ln-250"></a>
+<a name="ln-251"></a>  <span class="s s-Atom">frac/=narea</span>
+<a name="ln-252"></a>
+<a name="ln-253"></a>  <span class="s s-Atom">norm=</span><span class="p">(!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="s s-Atom">a^</span><span class="mi">2</span><span class="p">)</span><span class="s s-Atom">*</span><span class="p">(!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="s s-Atom">aperture^</span><span class="mi">2</span><span class="p">)</span><span class="s s-Atom">/</span><span class="p">(</span><span class="mi">4</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="s s-Atom">d^</span><span class="mi">2</span><span class="o">*</span><span class="s s-Atom">naperture</span><span class="p">)</span>
+<a name="ln-254"></a>
+<a name="ln-255"></a>  <span class="s s-Atom">end</span>
+<a name="ln-256"></a>
+<a name="ln-257"></a>
+<a name="ln-258"></a>
+<a name="ln-259"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">orb_cfpd</span><span class="p">,</span> <span class="s s-Atom">g</span><span class="p">,</span> <span class="s s-Atom">rdist</span><span class="p">,</span> <span class="s s-Atom">zdist</span><span class="p">,</span> <span class="s s-Atom">v</span><span class="p">,</span> <span class="s s-Atom">d</span><span class="p">,</span> <span class="s s-Atom">rc</span><span class="p">,</span> <span class="s s-Atom">e0</span><span class="o">=</span><span class="s s-Atom">e0</span><span class="p">,</span> <span class="s s-Atom">nrays</span><span class="o">=</span><span class="s s-Atom">nrays</span><span class="p">,</span> <span class="s s-Atom">step</span><span class="o">=</span><span class="s s-Atom">step</span><span class="p">,</span> <span class="s s-Atom">nsteps</span><span class="o">=</span><span class="s s-Atom">nsteps</span><span class="p">,</span> <span class="s s-Atom">plot_show</span><span class="o">=</span><span class="s s-Atom">plot_show</span>
+<a name="ln-260"></a>    <span class="p">;</span><span class="s s-Atom">+#orb_cfpd</span>
+<a name="ln-261"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Returns</span> <span class="s s-Atom">all</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">orbit</span><span class="o">-</span><span class="s s-Atom">related</span> <span class="s s-Atom">quantities</span> <span class="s s-Atom">for</span> <span class="s s-Atom">a</span> <span class="s s-Atom">given</span> <span class="s s-Atom">energy</span>
+<a name="ln-262"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
+<a name="ln-263"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
+<a name="ln-264"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**g**:</span> <span class="nv">GEQDSK</span> <span class="s s-Atom">file</span>
+<a name="ln-265"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-266"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rdist**:</span> <span class="nv">Radial</span> <span class="s s-Atom">coordinates</span> <span class="s s-Atom">of</span> <span class="s s-Atom">detector</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-267"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-268"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zdist**:</span> <span class="nv">Vertical</span> <span class="s s-Atom">coordinates</span> <span class="s s-Atom">of</span> <span class="s s-Atom">detector</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-269"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-270"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**v**:</span> <span class="nv">Detector</span> <span class="s s-Atom">orientations</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="o">/</span><span class="s s-Atom">s</span><span class="p">,</span> <span class="s s-Atom">rad</span><span class="o">/</span><span class="s s-Atom">s</span><span class="p">,</span> <span class="s s-Atom">m</span><span class="o">/</span><span class="s s-Atom">s</span><span class="p">]</span>
+<a name="ln-271"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-272"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**d**:</span> <span class="nv">Collimator</span> <span class="s s-Atom">length</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-273"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-274"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rc**:</span> <span class="nv">Outer</span> <span class="s s-Atom">collimator</span> <span class="s s-Atom">spacing</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-275"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-276"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Keyword</span> <span class="nv">Arguments</span>
+<a name="ln-277"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**e0**:</span> <span class="nv">Energy</span> <span class="p">(</span><span class="s s-Atom">keV</span><span class="p">)</span>
+<a name="ln-278"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-279"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nrays**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">orbits</span>
+<a name="ln-280"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-281"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nsteps**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">steps</span>
+<a name="ln-282"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-283"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**step**:</span> <span class="nv">Step</span> <span class="s s-Atom">length</span> <span class="p">[</span><span class="s s-Atom">m</span><span class="p">]</span>
+<a name="ln-284"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-285"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**plot_show**:</span> <span class="nv">Plot</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">bundles</span> <span class="s s-Atom">--</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="nf">on</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">off</span>
+<a name="ln-286"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-287"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-288"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-289"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">g</span> <span class="o">=</span> <span class="s s-Atom">&#39;g000001.01000&#39;</span>
+<a name="ln-290"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">detector_aperture_geometry</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">rdist</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">,</span><span class="s s-Atom">v</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">rc</span>
+<a name="ln-291"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">orb</span> <span class="o">=</span> <span class="nf">orb_cfpd</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rdist</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">,</span><span class="s s-Atom">v</span><span class="p">,</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">rc</span><span class="p">,</span><span class="s s-Atom">e0</span><span class="o">=</span><span class="mi">3030</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">nsteps</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+<a name="ln-292"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-293"></a>
+<a name="ln-294"></a>  <span class="s s-Atom">common</span> <span class="s s-Atom">bcom</span><span class="p">,</span><span class="s s-Atom">b0</span><span class="p">,</span><span class="s s-Atom">r0</span><span class="p">,</span><span class="s s-Atom">br</span><span class="p">,</span><span class="s s-Atom">bphi</span><span class="p">,</span><span class="s s-Atom">bz</span><span class="p">,</span><span class="s s-Atom">gr0</span><span class="p">,</span><span class="s s-Atom">gz0</span><span class="p">,</span><span class="s s-Atom">dr</span><span class="p">,</span><span class="s s-Atom">dz</span>
+<a name="ln-295"></a>
+<a name="ln-296"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">e0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">e0</span><span class="o">=</span><span class="mf">3030.</span><span class="p">;</span> <span class="s s-Atom">keV</span>
+<a name="ln-297"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">nrays</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">nrays</span><span class="o">=</span><span class="mi">50</span>
+<a name="ln-298"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">nsteps</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">nsteps</span><span class="o">=</span><span class="mi">110</span>
+<a name="ln-299"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">step</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">step</span><span class="o">=</span><span class="mf">0.01</span>
+<a name="ln-300"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">~</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">plot_show</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">plot_show</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-301"></a>
+<a name="ln-302"></a>  <span class="p">;</span> <span class="s s-Atom">storage</span> <span class="s s-Atom">arrays</span>
+<a name="ln-303"></a>  <span class="s s-Atom">nch</span><span class="o">=</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">rc</span><span class="p">)</span>
+<a name="ln-304"></a>  <span class="s s-Atom">daomega</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="p">)</span>
+<a name="ln-305"></a>  <span class="s s-Atom">sightline</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="s s-Atom">nsteps</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="p">)</span>
+<a name="ln-306"></a>  <span class="s s-Atom">initial_velocities</span><span class="o">=</span><span class="nf">fltarr</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="p">)</span>
+<a name="ln-307"></a>  <span class="s s-Atom">nactual</span><span class="o">=</span><span class="nf">intarr</span><span class="p">(</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="p">)</span>
+<a name="ln-308"></a>
+<a name="ln-309"></a>  <span class="p">;</span><span class="nv">TRANSMISSION</span> <span class="nv">FACTORS</span>
+<a name="ln-310"></a>  <span class="p">;</span> <span class="s s-Atom">collimator</span>
+<a name="ln-311"></a>  <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-312"></a>    <span class="s s-Atom">orb_collimator</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,[</span><span class="s s-Atom">rdist</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]],</span><span class="o">-</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">v</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]),</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">rc</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="s s-Atom">vsave</span><span class="p">,</span><span class="s s-Atom">frac</span><span class="p">,</span><span class="s s-Atom">norm</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-313"></a>      <span class="s s-Atom">e0</span><span class="o">=</span><span class="s s-Atom">e0</span>
+<a name="ln-314"></a>    <span class="s s-Atom">initial_velocities</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">vsave</span>
+<a name="ln-315"></a>    <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">norm</span><span class="o">*</span><span class="s s-Atom">frac</span>
+<a name="ln-316"></a>  <span class="s s-Atom">end</span>
+<a name="ln-317"></a>
+<a name="ln-318"></a>  <span class="p">;</span><span class="s s-Atom">---------------</span>
+<a name="ln-319"></a>  <span class="p">;</span> <span class="nv">Use</span> <span class="s s-Atom">orb</span> <span class="s s-Atom">to</span> <span class="s s-Atom">get</span> <span class="s s-Atom">sightlines</span>
+<a name="ln-320"></a>  <span class="p">;</span> <span class="nv">As</span> <span class="s s-Atom">in</span> <span class="s s-Atom">orb_collimator</span><span class="p">,</span> <span class="s s-Atom">embed</span> <span class="s s-Atom">it</span> <span class="s s-Atom">to</span> <span class="s s-Atom">avoid</span> <span class="s s-Atom">unnecessary</span> <span class="s s-Atom">repetition</span>
+<a name="ln-321"></a>
+<a name="ln-322"></a>  <span class="p">;</span> <span class="nv">Ion</span> <span class="s s-Atom">orbit</span> <span class="s s-Atom">parameters</span>
+<a name="ln-323"></a>  <span class="s s-Atom">amu</span><span class="o">=</span><span class="mf">1.</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">mp</span><span class="o">=</span><span class="mf">1.67e-27</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">z</span><span class="o">=</span><span class="mf">1.</span>
+<a name="ln-324"></a>  <span class="s s-Atom">time_reverse</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-325"></a>
+<a name="ln-326"></a>  <span class="p">;</span><span class="s s-Atom">-------------</span>
+<a name="ln-327"></a>  <span class="p">;</span> <span class="nv">Same</span> <span class="s s-Atom">for</span> <span class="s s-Atom">every</span> <span class="s s-Atom">calculation</span>
+<a name="ln-328"></a>  <span class="p">;</span> <span class="nv">Use</span> <span class="s s-Atom">eqdsk</span> <span class="s s-Atom">to</span> <span class="s s-Atom">get</span> <span class="s s-Atom">wall</span> <span class="s s-Atom">location</span> <span class="s s-Atom">and</span> <span class="s s-Atom">magnetic</span> <span class="s s-Atom">field</span> <span class="s s-Atom">grid</span>
+<a name="ln-329"></a>  <span class="s s-Atom">b0</span><span class="o">=</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">bcentr</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">r0</span><span class="o">=</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">rmaxis</span>
+<a name="ln-330"></a>  <span class="s s-Atom">finewall</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span>
+<a name="ln-331"></a>  <span class="s s-Atom">calculate_bfield</span><span class="p">,</span><span class="s s-Atom">bp</span><span class="p">,</span><span class="s s-Atom">br</span><span class="p">,</span><span class="s s-Atom">bphi</span><span class="p">,</span><span class="s s-Atom">bz</span><span class="p">,</span><span class="s s-Atom">g</span>
+<a name="ln-332"></a>  <span class="s s-Atom">br</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">br</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bphi</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bphi</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bz</span><span class="p">)</span>
+<a name="ln-333"></a>  <span class="s s-Atom">gr0</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">gz0</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<a name="ln-334"></a>  <span class="s s-Atom">dr</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">r</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">dz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">z</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<a name="ln-335"></a>  <span class="s s-Atom">br</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">br</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bphi</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bphi</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">bz</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">bz</span><span class="p">)</span>
+<a name="ln-336"></a>  <span class="s s-Atom">pphisgn=-g</span><span class="p">.</span><span class="s s-Atom">cpasma</span><span class="o">/</span><span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">cpasma</span><span class="p">)</span>
+<a name="ln-337"></a>
+<a name="ln-338"></a>  <span class="p">;</span> <span class="nv">Normalization</span> <span class="s s-Atom">constants</span>
+<a name="ln-339"></a>  <span class="s s-Atom">omega</span><span class="o">=</span><span class="s s-Atom">z</span><span class="o">*</span><span class="mf">1.6e-19</span><span class="o">*</span><span class="s s-Atom">b0/</span><span class="p">(</span><span class="s s-Atom">amu</span><span class="o">*</span><span class="s s-Atom">mp</span><span class="p">)</span>
+<a name="ln-340"></a>  <span class="s s-Atom">v0</span><span class="o">=</span><span class="nf">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="s s-Atom">e0</span><span class="o">*</span><span class="mf">1.e3</span><span class="o">*</span><span class="mf">1.6e-19</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">amu</span><span class="o">*</span><span class="s s-Atom">mp</span><span class="p">))</span>
+<a name="ln-341"></a>  <span class="s s-Atom">vconstant</span><span class="o">=</span><span class="s s-Atom">v0</span><span class="o">/</span><span class="s s-Atom">omega</span>
+<a name="ln-342"></a>
+<a name="ln-343"></a>  <span class="p">;</span><span class="s s-Atom">-----------------</span>
+<a name="ln-344"></a>  <span class="p">;</span> <span class="nv">Loop</span> <span class="s s-Atom">over</span> <span class="s s-Atom">sightlines</span>
+<a name="ln-345"></a>  <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-346"></a>    <span class="nv">InitialPosition</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">rdist</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">zdist</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]]</span>
+<a name="ln-347"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">iray</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">if</span> <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="mf">0.</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-348"></a>
+<a name="ln-349"></a>  <span class="nv">Velocity</span><span class="o">=</span><span class="s s-Atom">vconstant</span><span class="o">*</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">initial_velocities</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">])</span>
+<a name="ln-350"></a>  <span class="s s-Atom">y</span><span class="o">=</span><span class="nf">dblarr</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="nf">y</span><span class="p">(</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">)</span><span class="o">=</span><span class="nv">Velocity</span> <span class="s s-Atom">&amp;</span> <span class="nf">y</span><span class="p">(</span><span class="mi">3</span><span class="s s-Atom">:</span><span class="mi">5</span><span class="p">)</span><span class="o">=</span><span class="nv">InitialPosition</span>
+<a name="ln-351"></a>  <span class="s s-Atom">h</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="s s-Atom">step</span><span class="o">*</span><span class="s s-Atom">omega</span><span class="o">/</span><span class="s s-Atom">v0</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">if</span> <span class="s s-Atom">time_reverse</span> <span class="s s-Atom">then</span> <span class="s s-Atom">h=-h</span>
+<a name="ln-352"></a>  <span class="s s-Atom">yout</span><span class="o">=</span><span class="nf">dblarr</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="s s-Atom">nsteps</span><span class="p">)</span>
+<a name="ln-353"></a>  <span class="s s-Atom">dydx</span><span class="o">=</span><span class="nf">derivs</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span>
+<a name="ln-354"></a>  <span class="nf">yout</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">=</span><span class="nf">y</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">)</span>
+<a name="ln-355"></a>
+<a name="ln-356"></a>  <span class="p">;</span> <span class="nv">Orbit</span> <span class="s s-Atom">loop</span>
+<a name="ln-357"></a>  <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span>
+<a name="ln-358"></a>  <span class="s s-Atom">lwall</span><span class="o">=</span><span class="mi">1</span>		<span class="p">;</span> <span class="s s-Atom">logical</span> <span class="s s-Atom">to</span> <span class="s s-Atom">stop</span> <span class="s s-Atom">if</span> <span class="s s-Atom">hits</span> <span class="s s-Atom">wall</span>
+<a name="ln-359"></a>  <span class="s s-Atom">while</span> <span class="s s-Atom">i</span> <span class="s s-Atom">lt</span> <span class="s s-Atom">nsteps</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">and</span> <span class="err">$</span><span class="p">;</span> <span class="nf">check_bdry</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span><span class="p">,</span><span class="nf">y</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="nf">y</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-360"></a>    <span class="nf">check_bdry</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">,</span><span class="s s-Atom">rwall</span><span class="p">,</span><span class="s s-Atom">zwall</span><span class="p">,</span><span class="nf">y</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="nf">y</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="s s-Atom">or</span> <span class="s s-Atom">i</span> <span class="s s-Atom">lt</span> <span class="mi">100</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-361"></a>    <span class="s s-Atom">i</span><span class="o">=</span><span class="s s-Atom">i</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-362"></a>  <span class="p">;</span> <span class="nv">Van</span> <span class="nv">Zeeland</span><span class="s s-Atom">&#39;s integrator</span>
+<a name="ln-363"></a><span class="s s-Atom">    ddeabm,&#39;derivs</span><span class="err">&#39;</span><span class="p">,</span><span class="mf">0.</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">,</span><span class="s s-Atom">h</span><span class="p">,</span><span class="s s-Atom">epsabs</span><span class="o">=</span><span class="mf">1.e-8</span>
+<a name="ln-364"></a>    <span class="nf">yout</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span><span class="o">=</span><span class="nf">y</span><span class="p">(</span><span class="s s-Atom">*</span><span class="p">)</span>
+<a name="ln-365"></a>    <span class="s s-Atom">dydx</span><span class="o">=</span><span class="nf">derivs</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="s s-Atom">y</span><span class="p">)</span>
+<a name="ln-366"></a>  <span class="s s-Atom">end</span>
+<a name="ln-367"></a>  <span class="s s-Atom">nactual</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">i</span><span class="o">+</span><span class="mi">1</span>
+<a name="ln-368"></a>  <span class="s s-Atom">for</span> <span class="s s-Atom">j</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span> <span class="s s-Atom">do</span> <span class="s s-Atom">sightline</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:i</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">=</span><span class="nf">reform</span><span class="p">(</span><span class="s s-Atom">yout</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:i</span><span class="p">])</span>
+<a name="ln-369"></a>
+<a name="ln-370"></a>  <span class="s s-Atom">end</span> <span class="p">;</span> <span class="s s-Atom">iray</span> <span class="s s-Atom">loop</span>
+<a name="ln-371"></a>  <span class="s s-Atom">end</span> <span class="p">;</span> <span class="s s-Atom">ich</span> <span class="s s-Atom">loop</span>
+<a name="ln-372"></a>
+<a name="ln-373"></a>  <span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:</span><span class="mi">2</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span><span class="s s-Atom">*=omega</span>
+<a name="ln-374"></a>
+<a name="ln-375"></a>  <span class="p">;</span><span class="s s-Atom">--------------</span>
+<a name="ln-376"></a>  <span class="p">;</span> <span class="nv">Plot</span> <span class="s s-Atom">results</span>
+<a name="ln-377"></a>  <span class="s s-Atom">if</span> <span class="s s-Atom">plot_show</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-378"></a>    <span class="p">!</span><span class="s s-Atom">p</span><span class="p">.</span><span class="s s-Atom">multi</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<a name="ln-379"></a>    <span class="p">;</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">elevation</span>
+<a name="ln-380"></a>      <span class="s s-Atom">xmin</span><span class="o">=</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">xmax</span><span class="o">=</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">ymin</span><span class="o">=</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">z</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">ymax</span><span class="o">=</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">z</span><span class="p">)</span>
+<a name="ln-381"></a>
+<a name="ln-382"></a>    <span class="s s-Atom">contour</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">psirz</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">z</span><span class="p">,</span><span class="s s-Atom">nlevels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="s s-Atom">color</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-383"></a>      <span class="s s-Atom">xrange</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">xmax</span><span class="p">],</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">ymax</span><span class="p">]</span>
+<a name="ln-384"></a>    <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">lim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">),</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">lim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">)</span>
+<a name="ln-385"></a>    <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">bdry</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:g</span><span class="p">.</span><span class="s s-Atom">nbdry</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="s s-Atom">g</span><span class="p">.</span><span class="nf">bdry</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:g</span><span class="p">.</span><span class="s s-Atom">nbdry</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-386"></a>    <span class="s s-Atom">colors</span><span class="o">=</span><span class="mi">255</span> <span class="o">-</span> <span class="mi">50</span><span class="o">*</span><span class="nf">indgen</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<a name="ln-387"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">for</span> <span class="s s-Atom">iray</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">if</span> <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="mf">0.</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-388"></a>     <span class="s s-Atom">nact</span><span class="o">=</span><span class="s s-Atom">nactual</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-389"></a>     <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">],</span><span class="s s-Atom">psym</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="s s-Atom">color</span><span class="o">=</span><span class="s s-Atom">colors</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]</span>
+<a name="ln-390"></a>    <span class="s s-Atom">end</span>
+<a name="ln-391"></a>
+<a name="ln-392"></a>    <span class="p">;</span> <span class="p">(</span><span class="nv">R</span><span class="p">,</span><span class="s s-Atom">phi</span><span class="p">)</span> <span class="s s-Atom">plan</span>
+<a name="ln-393"></a>    <span class="s s-Atom">theta</span><span class="o">=</span><span class="mf">2.</span><span class="s s-Atom">*</span><span class="p">!</span><span class="s s-Atom">pi</span><span class="o">*</span><span class="nf">findgen</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span><span class="o">/</span><span class="mf">30.</span>
+<a name="ln-394"></a>      <span class="s s-Atom">xmin=-</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">xmax</span><span class="o">=</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">)</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">ymin</span><span class="o">=</span><span class="s s-Atom">xmin</span> <span class="s s-Atom">&amp;</span> <span class="s s-Atom">ymax</span><span class="o">=</span><span class="s s-Atom">xmax</span>
+<a name="ln-395"></a>    <span class="s s-Atom">plot</span><span class="p">,</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="nf">max</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span> <span class="err">$</span>
+<a name="ln-396"></a>      <span class="s s-Atom">xrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">],</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span><span class="s s-Atom">xstyle</span><span class="o">=</span><span class="mi">1</span>
+<a name="ln-397"></a>    <span class="p">;</span>  <span class="s s-Atom">xrange</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">xmax</span><span class="p">],</span><span class="s s-Atom">yrange</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">ymax</span><span class="p">]</span>
+<a name="ln-398"></a>    <span class="s s-Atom">oplot</span><span class="p">,</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">),</span><span class="nf">min</span><span class="p">(</span><span class="s s-Atom">rwall</span><span class="p">)</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">theta</span><span class="p">)</span>
+<a name="ln-399"></a>    <span class="s s-Atom">for</span> <span class="s s-Atom">ich</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nch</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">for</span> <span class="s s-Atom">iray</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nrays</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">if</span> <span class="s s-Atom">daomega</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span> <span class="s s-Atom">gt</span> <span class="mf">0.</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-400"></a>      <span class="s s-Atom">nact</span><span class="o">=</span><span class="s s-Atom">nactual</span><span class="p">[</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-401"></a>      <span class="s s-Atom">oplot</span><span class="p">,</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">*</span><span class="nf">cos</span><span class="p">(</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]),</span> <span class="err">$</span>
+<a name="ln-402"></a>            <span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]</span><span class="o">*</span><span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">sightline</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="s s-Atom">:nact</span><span class="p">,</span><span class="s s-Atom">iray</span><span class="p">,</span><span class="s s-Atom">ich</span><span class="p">]),</span><span class="s s-Atom">color</span><span class="o">=</span><span class="s s-Atom">colors</span><span class="p">[</span><span class="s s-Atom">ich</span><span class="p">]</span>
+<a name="ln-403"></a>    <span class="s s-Atom">end</span>
+<a name="ln-404"></a>  <span class="s s-Atom">endif</span>
+<a name="ln-405"></a>
+<a name="ln-406"></a>
+<a name="ln-407"></a>  <span class="s s-Atom">return</span><span class="p">,{</span><span class="nn">sightline</span><span class="p">:</span><span class="s s-Atom">sightline</span><span class="p">,</span><span class="nn">nrays</span><span class="p">:</span><span class="s s-Atom">nrays</span><span class="p">,</span><span class="nn">nch</span><span class="p">:</span><span class="s s-Atom">nch</span><span class="p">,</span><span class="nn">nactual</span><span class="p">:</span><span class="s s-Atom">nactual</span><span class="p">,</span><span class="nn">daomega</span><span class="p">:</span><span class="s s-Atom">daomega</span><span class="p">}</span>
+<a name="ln-408"></a>
+<a name="ln-409"></a><span class="s s-Atom">end</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

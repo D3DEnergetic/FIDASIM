@@ -275,31 +275,31 @@ public subroutine make_passive_grid()
 <path fill="none" stroke="#000000" d="M255.645,-54C264.67,-54 273.852,-54 282.394,-54"/>
 <polygon fill="#000000" stroke="#000000" points="282.442,-57.5001 292.442,-54 282.442,-50.5001 282.442,-57.5001"/>
 </g>
-<!-- proc~xyz_to_uvw -->
-<g id="proc~~make_passive_grid~~CallsGraph_node4" class="node"><title>proc~xyz_to_uvw</title>
-<g id="a_proc~~make_passive_grid~~CallsGraph_node4"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="463,-108 395,-108 395,-84 463,-84 463,-108"/>
-<text text-anchor="middle" x="429" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
-</a>
-</g>
-</g>
-<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="proc~~make_passive_grid~~CallsGraph_edge3" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M353.524,-65.9232C364.409,-70.3189 376.92,-75.3715 388.542,-80.0652"/>
-<polygon fill="#000000" stroke="#000000" points="387.458,-83.4018 398.041,-83.9012 390.079,-76.9111 387.458,-83.4018"/>
-</g>
 <!-- proc~cyl_to_uvw -->
-<g id="proc~~make_passive_grid~~CallsGraph_node5" class="node"><title>proc~cyl_to_uvw</title>
-<g id="a_proc~~make_passive_grid~~CallsGraph_node5"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="461.5,-66 396.5,-66 396.5,-42 461.5,-42 461.5,-66"/>
-<text text-anchor="middle" x="429" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
+<g id="proc~~make_passive_grid~~CallsGraph_node4" class="node"><title>proc~cyl_to_uvw</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node4"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="461.5,-108 396.5,-108 396.5,-84 461.5,-84 461.5,-108"/>
+<text text-anchor="middle" x="429" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
 </a>
 </g>
 </g>
 <!-- proc~in_plasma&#45;&gt;proc~cyl_to_uvw -->
-<g id="proc~~make_passive_grid~~CallsGraph_edge4" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
-<path fill="none" stroke="#000000" d="M353.524,-54C363.627,-54 375.132,-54 386.026,-54"/>
-<polygon fill="#000000" stroke="#000000" points="386.218,-57.5001 396.218,-54 386.218,-50.5001 386.218,-57.5001"/>
+<g id="proc~~make_passive_grid~~CallsGraph_edge3" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M353.524,-65.9232C364.409,-70.3189 376.92,-75.3715 388.542,-80.0652"/>
+<polygon fill="#000000" stroke="#000000" points="387.458,-83.4018 398.041,-83.9012 390.079,-76.9111 387.458,-83.4018"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_node5" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node5"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="463,-66 395,-66 395,-42 463,-42 463,-66"/>
+<text text-anchor="middle" x="429" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge4" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M353.524,-54C363.162,-54 374.077,-54 384.52,-54"/>
+<polygon fill="#000000" stroke="#000000" points="384.741,-57.5001 394.741,-54 384.741,-50.5001 384.741,-57.5001"/>
 </g>
 <!-- interface~interpol_coeff -->
 <g id="proc~~make_passive_grid~~CallsGraph_node6" class="node"><title>interface~interpol_coeff</title>
@@ -587,33 +587,33 @@ public subroutine make_passive_grid()
         <span class="k">call </span><span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">vertices_xyz</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">vertices_uvw</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
         <span class="n">xarr_beam_grid</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">vertices_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
         <span class="n">yarr_beam_grid</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">vertices_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">enddo</span>
+    <span class="k">enddo</span>
 
     <span class="c">!! Next consider passive diagnostic extrema relative to the plasma</span>
     <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span>
             <span class="n">r0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens_uvw</span>
             <span class="n">v0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">axis_uvw</span>
-        <span class="n">enddo</span>
-        <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+        <span class="k">enddo</span>
+<span class="k">        do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
             <span class="k">call </span><span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="n">r0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="o">+</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
             <span class="n">xyz_axis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span>
             <span class="n">v0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="o">+</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="n">xyz_axis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">))</span>
-        <span class="n">enddo</span>
-    <span class="k">else if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+        <span class="k">enddo</span>
+<span class="k">    else if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span>
             <span class="n">r0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens_uvw</span>
             <span class="n">v0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">axis_uvw</span>
-        <span class="n">enddo</span>
-    <span class="k">else</span> <span class="c">!pnpa&gt;=1 case</span>
+        <span class="k">enddo</span>
+<span class="k">    else</span> <span class="c">!pnpa&gt;=1 case</span>
         <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
             <span class="k">call </span><span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="n">r0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
             <span class="n">xyz_axis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span>
             <span class="n">v0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="n">xyz_axis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">))</span>
-        <span class="n">enddo</span>
-    <span class="n">endif</span>
+        <span class="k">enddo</span>
+<span class="k">    endif</span>
 
-    <span class="k">call </span><span class="n">get_plasma_extrema</span><span class="p">(</span><span class="n">r0_arr</span><span class="p">,</span><span class="n">v0_arr</span><span class="p">,</span><span class="n">extrema</span><span class="p">,</span><span class="n">xarr_beam_grid</span><span class="p">,</span><span class="n">yarr_beam_grid</span><span class="p">)</span>
+<span class="k">    call </span><span class="n">get_plasma_extrema</span><span class="p">(</span><span class="n">r0_arr</span><span class="p">,</span><span class="n">v0_arr</span><span class="p">,</span><span class="n">extrema</span><span class="p">,</span><span class="n">xarr_beam_grid</span><span class="p">,</span><span class="n">yarr_beam_grid</span><span class="p">)</span>
 
     <span class="c">!! Store the passive neutral grid</span>
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">dr</span>
@@ -631,9 +631,9 @@ public subroutine make_passive_grid()
     <span class="k">allocate</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
         <span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">extrema</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span>
-    <span class="n">enddo</span>
+    <span class="k">enddo</span>
 
-    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span>
+<span class="k">    </span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span>
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">]</span>
 
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">ntrack</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="o">+</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="o">+</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
@@ -652,7 +652,7 @@ public subroutine make_passive_grid()
               <span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">)</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;dA: &quot;, f5.2,&quot; [cm^3]&quot;)&#39;</span><span class="p">)</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">da</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
 <span class="k">end subroutine </span><span class="n">make_passive_grid</span>
 </pre></div>

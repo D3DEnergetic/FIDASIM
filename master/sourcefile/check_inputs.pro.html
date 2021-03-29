@@ -282,88 +282,89 @@
 <a name="ln-36"></a>              calc_dcx<span class="o">:</span>zero_int, calc_halo<span class="o">:</span>zero_int, calc_cold<span class="o">:</span>zero_int, $
 <a name="ln-37"></a>	      calc_pnpa<span class="o">:</span>zero_int, calc_pfida<span class="o">:</span>zero_int, $
 <a name="ln-38"></a>              calc_brems<span class="o">:</span>zero_int, calc_birth<span class="o">:</span>zero_int, calc_neutron<span class="o">:</span>zero_int,$
-<a name="ln-39"></a>              calc_fida_wght<span class="o">:</span>zero_int, calc_npa_wght<span class="o">:</span>zero_int}
-<a name="ln-40"></a>
-<a name="ln-41"></a>    check_struct_schema, schema, inputs, err_status, desc<span class="o">=</span><span class="s2">&quot;simulation settings&quot;</span>
-<a name="ln-42"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-43"></a>        <span class="k">goto</span>, GET_OUT
-<a name="ln-44"></a>    <span class="k">endif</span>
-<a name="ln-45"></a>
-<a name="ln-46"></a><span class="c1">    ;Normalize File Paths</span>
-<a name="ln-47"></a>    inputs.result_dir <span class="o">=</span> <span class="nb">expand_path</span>(inputs.result_dir)
-<a name="ln-48"></a>
-<a name="ln-49"></a>    <span class="k">if</span> inputs.alpha <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
-<a name="ln-50"></a>       inputs.<span class="nb">beta</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
-<a name="ln-51"></a>       inputs.<span class="nb">gamma</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-52"></a>        error,<span class="s1">&#39;Angles must be in radians&#39;</span>
-<a name="ln-53"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-54"></a>    <span class="k">endif</span>
-<a name="ln-55"></a>
-<a name="ln-56"></a>    <span class="k">if</span> inputs.lambdamin <span class="k">ge</span> inputs.lambdamax <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-57"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
-<a name="ln-58"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-59"></a>    <span class="k">endif</span>
-<a name="ln-60"></a>
-<a name="ln-61"></a>    <span class="k">if</span> inputs.lambdamin_wght <span class="k">ge</span> inputs.lambdamax_wght <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-62"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
-<a name="ln-63"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-64"></a>    <span class="k">endif</span>
-<a name="ln-65"></a>
-<a name="ln-66"></a>    <span class="k">if</span> inputs.xmin <span class="k">ge</span> inputs.xmax <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-67"></a>        error,<span class="s1">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
-<a name="ln-68"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-69"></a>    <span class="k">endif</span>
-<a name="ln-70"></a>
-<a name="ln-71"></a>    <span class="k">if</span> inputs.ymin <span class="k">ge</span> inputs.ymax <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-72"></a>        error,<span class="s1">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
-<a name="ln-73"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-74"></a>    <span class="k">endif</span>
-<a name="ln-75"></a>
-<a name="ln-76"></a>    <span class="k">if</span> inputs.zmin <span class="k">ge</span> inputs.zmax <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-77"></a>        error,<span class="s1">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
-<a name="ln-78"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-79"></a>    <span class="k">endif</span>
-<a name="ln-80"></a>
-<a name="ln-81"></a>    <span class="k">if</span> inputs.pinj <span class="k">le</span> <span class="mi">0</span>. <span class="k">or</span> inputs.einj <span class="k">le</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-82"></a>        error,<span class="s1">&#39;The selected source is not on&#39;</span>
-<a name="ln-83"></a>        <span class="nb">print</span>,<span class="s1">&#39;einj = &#39;</span>,inputs.einj
-<a name="ln-84"></a>        <span class="nb">print</span>,<span class="s1">&#39;pinj = &#39;</span>,inputs.pinj
-<a name="ln-85"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-86"></a>    <span class="k">endif</span>
-<a name="ln-87"></a>
-<a name="ln-88"></a>    <span class="k">if</span> <span class="nb">abs</span>(<span class="nb">total</span>(inputs.current_fractions) <span class="o">-</span> <span class="mf">1.0</span>) <span class="k">gt</span> <span class="mf">1.d-3</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-89"></a>        error,<span class="s1">&#39;current_fractions do not sum to 1.0&#39;</span>
-<a name="ln-90"></a>        <span class="nb">print</span>,<span class="s1">&#39;sum(current_fractions) = &#39;</span>,<span class="nb">total</span>(inputs.current_fractions)
-<a name="ln-91"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-92"></a>    <span class="k">endif</span>
-<a name="ln-93"></a>
-<a name="ln-94"></a>    ps <span class="o">=</span> <span class="nb">path_sep</span>()
-<a name="ln-95"></a>    input_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_inputs.dat&#39;</span>
-<a name="ln-96"></a>    equilibrium_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_equilibrium.h5&#39;</span>
-<a name="ln-97"></a>    geometry_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_geometry.h5&#39;</span>
-<a name="ln-98"></a>    distribution_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_distribution.h5&#39;</span>
-<a name="ln-99"></a>    neutrals_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_neutrals.h5&#39;</span>
-<a name="ln-100"></a>
-<a name="ln-101"></a>    inputs <span class="o">=</span> <span class="nb">create_struct</span>(inputs,<span class="s1">&#39;input_file&#39;</span>,input_file, $
-<a name="ln-102"></a>                                  <span class="s1">&#39;equilibrium_file&#39;</span>,equilibrium_file,$ 
-<a name="ln-103"></a>                                  <span class="s1">&#39;geometry_file&#39;</span>,geometry_file, $
-<a name="ln-104"></a>                                  <span class="s1">&#39;distribution_file&#39;</span>,distribution_file, $
-<a name="ln-105"></a>                                  <span class="s1">&#39;load_neutrals&#39;</span>, <span class="mi">0</span>, $
-<a name="ln-106"></a>                                  <span class="s1">&#39;flr&#39;</span>,<span class="mi">2</span>, $
-<a name="ln-107"></a>                                  <span class="s1">&#39;verbose&#39;</span>, <span class="mi">1</span>, $
-<a name="ln-108"></a>                                  <span class="s1">&#39;seed&#39;</span>, <span class="o">-</span><span class="mi">1</span>, $
-<a name="ln-109"></a>                                  <span class="s1">&#39;stark_components&#39;</span>, <span class="mi">0</span>, $
-<a name="ln-110"></a>                                  <span class="s1">&#39;neutrals_file&#39;</span>,neutrals_file)
-<a name="ln-111"></a>    <span class="k">if</span> (<span class="nb">total</span>(<span class="nb">tag_names</span>(inputs) <span class="k">EQ</span> <span class="s1">&#39;OUTPUT_NEUTRAL_RESERVOIR&#39;</span>) <span class="k">EQ</span> <span class="mi">0</span>) <span class="k">then</span> inputs<span class="o">=</span><span class="nb">create_struct</span>(inputs,<span class="s1">&#39;output_neutral_reservoir&#39;</span>,<span class="mi">1</span>)
-<a name="ln-112"></a>
-<a name="ln-113"></a>    GET_OUT<span class="o">:</span>
-<a name="ln-114"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-115"></a>        error,<span class="s1">&#39;Invalid simulation settings. Exiting...&#39;</span>,<span class="o">/</span>halt
-<a name="ln-116"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-117"></a>        success,<span class="s1">&#39;Simulation settings are valid&#39;</span>
-<a name="ln-118"></a>    <span class="k">endelse</span>
-<a name="ln-119"></a>
-<a name="ln-120"></a><span class="k">END</span>
+<a name="ln-39"></a>              calc_cfpd<span class="o">:</span>zero_int,$
+<a name="ln-40"></a>              calc_fida_wght<span class="o">:</span>zero_int, calc_npa_wght<span class="o">:</span>zero_int}
+<a name="ln-41"></a>
+<a name="ln-42"></a>    check_struct_schema, schema, inputs, err_status, desc<span class="o">=</span><span class="s2">&quot;simulation settings&quot;</span>
+<a name="ln-43"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-44"></a>        <span class="k">goto</span>, GET_OUT
+<a name="ln-45"></a>    <span class="k">endif</span>
+<a name="ln-46"></a>
+<a name="ln-47"></a><span class="c1">    ;Normalize File Paths</span>
+<a name="ln-48"></a>    inputs.result_dir <span class="o">=</span> <span class="nb">expand_path</span>(inputs.result_dir)
+<a name="ln-49"></a>
+<a name="ln-50"></a>    <span class="k">if</span> inputs.alpha <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
+<a name="ln-51"></a>       inputs.<span class="nb">beta</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">or</span> $
+<a name="ln-52"></a>       inputs.<span class="nb">gamma</span> <span class="k">gt</span> <span class="mi">2</span><span class="o">*</span>!DPI <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-53"></a>        error,<span class="s1">&#39;Angles must be in radians&#39;</span>
+<a name="ln-54"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-55"></a>    <span class="k">endif</span>
+<a name="ln-56"></a>
+<a name="ln-57"></a>    <span class="k">if</span> inputs.lambdamin <span class="k">ge</span> inputs.lambdamax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-58"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
+<a name="ln-59"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-60"></a>    <span class="k">endif</span>
+<a name="ln-61"></a>
+<a name="ln-62"></a>    <span class="k">if</span> inputs.lambdamin_wght <span class="k">ge</span> inputs.lambdamax_wght <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-63"></a>        error,<span class="s1">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
+<a name="ln-64"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-65"></a>    <span class="k">endif</span>
+<a name="ln-66"></a>
+<a name="ln-67"></a>    <span class="k">if</span> inputs.xmin <span class="k">ge</span> inputs.xmax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-68"></a>        error,<span class="s1">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
+<a name="ln-69"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-70"></a>    <span class="k">endif</span>
+<a name="ln-71"></a>
+<a name="ln-72"></a>    <span class="k">if</span> inputs.ymin <span class="k">ge</span> inputs.ymax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-73"></a>        error,<span class="s1">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
+<a name="ln-74"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-75"></a>    <span class="k">endif</span>
+<a name="ln-76"></a>
+<a name="ln-77"></a>    <span class="k">if</span> inputs.zmin <span class="k">ge</span> inputs.zmax <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-78"></a>        error,<span class="s1">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
+<a name="ln-79"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-80"></a>    <span class="k">endif</span>
+<a name="ln-81"></a>
+<a name="ln-82"></a>    <span class="k">if</span> inputs.pinj <span class="k">le</span> <span class="mi">0</span>. <span class="k">or</span> inputs.einj <span class="k">le</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-83"></a>        error,<span class="s1">&#39;The selected source is not on&#39;</span>
+<a name="ln-84"></a>        <span class="nb">print</span>,<span class="s1">&#39;einj = &#39;</span>,inputs.einj
+<a name="ln-85"></a>        <span class="nb">print</span>,<span class="s1">&#39;pinj = &#39;</span>,inputs.pinj
+<a name="ln-86"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-87"></a>    <span class="k">endif</span>
+<a name="ln-88"></a>
+<a name="ln-89"></a>    <span class="k">if</span> <span class="nb">abs</span>(<span class="nb">total</span>(inputs.current_fractions) <span class="o">-</span> <span class="mf">1.0</span>) <span class="k">gt</span> <span class="mf">1.d-3</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-90"></a>        error,<span class="s1">&#39;current_fractions do not sum to 1.0&#39;</span>
+<a name="ln-91"></a>        <span class="nb">print</span>,<span class="s1">&#39;sum(current_fractions) = &#39;</span>,<span class="nb">total</span>(inputs.current_fractions)
+<a name="ln-92"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-93"></a>    <span class="k">endif</span>
+<a name="ln-94"></a>
+<a name="ln-95"></a>    ps <span class="o">=</span> <span class="nb">path_sep</span>()
+<a name="ln-96"></a>    input_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_inputs.dat&#39;</span>
+<a name="ln-97"></a>    equilibrium_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_equilibrium.h5&#39;</span>
+<a name="ln-98"></a>    geometry_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_geometry.h5&#39;</span>
+<a name="ln-99"></a>    distribution_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_distribution.h5&#39;</span>
+<a name="ln-100"></a>    neutrals_file <span class="o">=</span> inputs.result_dir<span class="o">+</span>ps<span class="o">+</span>inputs.runid<span class="o">+</span><span class="s1">&#39;_neutrals.h5&#39;</span>
+<a name="ln-101"></a>
+<a name="ln-102"></a>    inputs <span class="o">=</span> <span class="nb">create_struct</span>(inputs,<span class="s1">&#39;input_file&#39;</span>,input_file, $
+<a name="ln-103"></a>                                  <span class="s1">&#39;equilibrium_file&#39;</span>,equilibrium_file,$ 
+<a name="ln-104"></a>                                  <span class="s1">&#39;geometry_file&#39;</span>,geometry_file, $
+<a name="ln-105"></a>                                  <span class="s1">&#39;distribution_file&#39;</span>,distribution_file, $
+<a name="ln-106"></a>                                  <span class="s1">&#39;load_neutrals&#39;</span>, <span class="mi">0</span>, $
+<a name="ln-107"></a>                                  <span class="s1">&#39;flr&#39;</span>,<span class="mi">2</span>, $
+<a name="ln-108"></a>                                  <span class="s1">&#39;verbose&#39;</span>, <span class="mi">1</span>, $
+<a name="ln-109"></a>                                  <span class="s1">&#39;seed&#39;</span>, <span class="o">-</span><span class="mi">1</span>, $
+<a name="ln-110"></a>                                  <span class="s1">&#39;stark_components&#39;</span>, <span class="mi">0</span>, $
+<a name="ln-111"></a>                                  <span class="s1">&#39;neutrals_file&#39;</span>,neutrals_file)
+<a name="ln-112"></a>    <span class="k">if</span> (<span class="nb">total</span>(<span class="nb">tag_names</span>(inputs) <span class="k">EQ</span> <span class="s1">&#39;OUTPUT_NEUTRAL_RESERVOIR&#39;</span>) <span class="k">EQ</span> <span class="mi">0</span>) <span class="k">then</span> inputs<span class="o">=</span><span class="nb">create_struct</span>(inputs,<span class="s1">&#39;output_neutral_reservoir&#39;</span>,<span class="mi">1</span>)
+<a name="ln-113"></a>
+<a name="ln-114"></a>    GET_OUT<span class="o">:</span>
+<a name="ln-115"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-116"></a>        error,<span class="s1">&#39;Invalid simulation settings. Exiting...&#39;</span>,<span class="o">/</span>halt
+<a name="ln-117"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-118"></a>        success,<span class="s1">&#39;Simulation settings are valid&#39;</span>
+<a name="ln-119"></a>    <span class="k">endelse</span>
+<a name="ln-120"></a>
+<a name="ln-121"></a><span class="k">END</span>
 </pre></div>
 
     </section>

@@ -533,10 +533,10 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Balmer-alpha: 3 -&gt; 2&quot;</span>
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, &quot;H/D/T wavelengths: [&quot;, f8.3, &quot;,&quot;, f8.3, &quot;,&quot;, f8.3, &quot;] nm&quot;)&#39;</span><span class="p">)</span> <span class="n">line_lambda0</span>
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">endif</span>
+        <span class="k">endif</span>
 
 
-    <span class="k">else if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="mf">3.0d0</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="mf">6.0d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">    else if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="mf">3.0d0</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax</span> <span class="o">&lt;</span> <span class="mi">13</span><span class="mf">6.0d0</span><span class="p">)</span> <span class="k">then</span>
         <span class="c">! Assigns stark varibales to Lyman alpha transition</span>
         <span class="n">n_stark</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">initial_state</span> <span class="o">=</span> <span class="mi">2</span>
@@ -562,9 +562,9 @@ public subroutine identify_transition(n_stark, stark_pi, stark_sigma, stark_inte
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Lyman-alpha: 2 -&gt; 1&quot;</span>
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(T2, &quot;H/D/T wavelengths: [&quot;, f8.3, &quot;,&quot;, f8.3, &quot;,&quot;, f8.3, &quot;] nm&quot;)&#39;</span><span class="p">)</span> <span class="n">line_lambda0</span>
            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">endif</span>
+        <span class="k">endif</span>
 
-   <span class="n">endif</span>
+<span class="k">   endif</span>
 
 <span class="k">end subroutine </span><span class="n">identify_transition</span>
 </pre></div>

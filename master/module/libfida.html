@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="58.0% of total for modules and submodules.">8478 statements</a>
+    title="59.4% of total for modules and submodules.">8968 statements</a>
      </li> 
      
      
@@ -305,9 +305,13 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-neutron">neutron</a>
       
+      <a class="list-group-item" href="../module/libfida.html#variable-cfpd">cfpd</a>
+      
       <a class="list-group-item" href="../module/libfida.html#variable-fweight">fweight</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nweight">nweight</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-ctable">ctable</a>
       
     </div>
   </div>
@@ -408,6 +412,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-neutronrate">NeutronRate</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-cfpdrate">CFPDRate</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-neutralparticle">NeutralParticle</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-neutralparticlereservoir">NeutralParticleReservoir</a>
@@ -425,6 +431,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-particletrack">ParticleTrack</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-gyrosurface">GyroSurface</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-cfpdtable">CFPDTable</a>
       
     </div>
   </div>
@@ -536,6 +544,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-lflf_assign">lflf_assign</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-oo_assign">oo_assign</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-read_inputs">read_inputs</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-identify_transition">identify_transition</a>
@@ -551,6 +561,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-read_chords">read_chords</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_npa">read_npa</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_cfpd">read_cfpd</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_plasma">read_plasma</a>
       
@@ -587,6 +599,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-write_spectra">write_spectra</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_neutrons">write_neutrons</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-write_cfpd_weights">write_cfpd_weights</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_fida_weights">write_fida_weights</a>
       
@@ -634,6 +648,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-uvw_to_cyl">uvw_to_cyl</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-convert_sightline_to_xyz">convert_sightline_to_xyz</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-grid_intersect">grid_intersect</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-circle_grid_intersect">circle_grid_intersect</a>
@@ -641,6 +657,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-get_indices">get_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_passive_grid_indices">get_passive_grid_indices</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_interpolation_grid_indices">get_interpolation_grid_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_plasma_extrema">get_plasma_extrema</a>
       
@@ -688,7 +706,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-bt_cx_rates">bt_cx_rates</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-get_dd_rate">get_dd_rate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_ddpt_anisotropy">get_ddpt_anisotropy</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_pgyro">get_pgyro</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-neutral_cx_rate">neutral_cx_rate</a>
       
@@ -774,6 +796,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-neutron_f">neutron_f</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-cfpd_f">cfpd_f</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-neutron_mc">neutron_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-fida_weights_mc">fida_weights_mc</a>
@@ -839,128 +863,129 @@
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: module~~libfida~~UsesGraph Pages: 1 -->
-<svg id="modulelibfidaUsesGraph" width="286pt" height="247pt"
- viewBox="0.00 0.00 286.00 246.93" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="module~~libfida~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 242.932)">
+<svg id="modulelibfidaUsesGraph" width="286pt" height="234pt"
+ viewBox="0.00 0.00 286.00 234.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~libfida~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 230)">
 <title>module~~libfida~~UsesGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-242.932 282,-242.932 282,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-230 282,-230 282,4 -4,4"/>
 <!-- module~libfida -->
 <g id="module~~libfida~~UsesGraph_node1" class="node"><title>module~libfida</title>
-<polygon fill="none" stroke="black" points="278,-127.932 224,-127.932 224,-103.932 278,-103.932 278,-127.932"/>
-<text text-anchor="middle" x="251" y="-113.532" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
+<polygon fill="none" stroke="black" points="278,-126 224,-126 224,-102 278,-102 278,-126"/>
+<text text-anchor="middle" x="251" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
+</g>
+<!-- module~eigensystem -->
+<g id="module~~libfida~~UsesGraph_node2" class="node"><title>module~eigensystem</title>
+<g id="a_module~~libfida~~UsesGraph_node2"><a xlink:href=".././module/eigensystem.html" xlink:title="eigensystem">
+<polygon fill="#337ab7" stroke="#337ab7" points="187.5,-226 114.5,-226 114.5,-202 187.5,-202 187.5,-226"/>
+<text text-anchor="middle" x="151" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem</text>
+</a>
+</g>
+</g>
+<!-- module~libfida&#45;&gt;module~eigensystem -->
+<g id="module~~libfida~~UsesGraph_edge1" class="edge"><title>module~libfida&#45;&gt;module~eigensystem</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M241.368,-126.063C230.078,-141.397 209.227,-168.247 188,-188 185.099,-190.7 181.911,-193.364 178.669,-195.897"/>
+<polygon fill="#000000" stroke="#000000" points="176.567,-193.098 170.63,-201.873 180.743,-198.716 176.567,-193.098"/>
+</g>
+<!-- H5LT -->
+<g id="module~~libfida~~UsesGraph_node3" class="node"><title>H5LT</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="66,-177 12,-177 12,-153 66,-153 66,-177"/>
+<text text-anchor="middle" x="39" y="-162.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
+</g>
+<!-- module~libfida&#45;&gt;H5LT -->
+<g id="module~~libfida~~UsesGraph_edge6" class="edge"><title>module~libfida&#45;&gt;H5LT</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M236.346,-126.08C224.472,-135.792 206.338,-148.803 188,-155 151.444,-167.353 106.98,-168.671 76.3882,-167.64"/>
+<polygon fill="#000000" stroke="#000000" points="76.3256,-164.134 66.1816,-167.192 76.0183,-171.128 76.3256,-164.134"/>
+</g>
+<!-- iso_c_binding -->
+<g id="module~~libfida~~UsesGraph_node4" class="node"><title>iso_c_binding</title>
+<g id="a_module~~libfida~~UsesGraph_node4"><a xlink:href="http://fortranwiki.org/fortran/show/ISO_C_BINDING" xlink:title="iso_c_binding">
+<polygon fill="#337ab7" stroke="#337ab7" points="78,-75 0,-75 0,-51 78,-51 78,-75"/>
+<text text-anchor="middle" x="39" y="-60.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
+</a>
+</g>
+</g>
+<!-- module~libfida&#45;&gt;iso_c_binding -->
+<g id="module~~libfida~~UsesGraph_edge3" class="edge"><title>module~libfida&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.94,-107.821C204.276,-103.369 176.577,-97.5443 152,-94"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150,-94C127.824,-90.8021 103.81,-84.3937 83.8926,-78.2293"/>
+<polygon fill="#000000" stroke="#000000" points="84.7676,-74.835 74.1773,-75.1425 82.6479,-81.5064 84.7676,-74.835"/>
 </g>
 <!-- HDF5 -->
-<g id="module~~libfida~~UsesGraph_node2" class="node"><title>HDF5</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="66,-238.932 12,-238.932 12,-214.932 66,-214.932 66,-238.932"/>
-<text text-anchor="middle" x="39" y="-224.532" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
+<g id="module~~libfida~~UsesGraph_node5" class="node"><title>HDF5</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="66,-117 12,-117 12,-93 66,-93 66,-117"/>
+<text text-anchor="middle" x="39" y="-102.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
 </g>
 <!-- module~libfida&#45;&gt;HDF5 -->
-<g id="module~~libfida~~UsesGraph_edge1" class="edge"><title>module~libfida&#45;&gt;HDF5</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M246.542,-128.227C239.589,-150.384 221.628,-196.598 188,-216.932 154.341,-237.285 108.164,-236.911 76.3872,-233.298"/>
-<polygon fill="#000000" stroke="#000000" points="76.5693,-229.793 66.2015,-231.974 75.6668,-236.734 76.5693,-229.793"/>
+<g id="module~~libfida~~UsesGraph_edge4" class="edge"><title>module~libfida&#45;&gt;HDF5</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150,-94C125.513,-90.4687 97.7956,-93.2828 76.3098,-96.9473"/>
+<polygon fill="#000000" stroke="#000000" points="75.5047,-93.5367 66.3043,-98.7905 76.7729,-100.421 75.5047,-93.5367"/>
+</g>
+<!-- module~hdf5_utils -->
+<g id="module~~libfida~~UsesGraph_node6" class="node"><title>module~hdf5_utils</title>
+<g id="a_module~~libfida~~UsesGraph_node6"><a xlink:href=".././module/hdf5_utils.html" xlink:title="hdf5_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="180,-146 122,-146 122,-122 180,-122 180,-146"/>
+<text text-anchor="middle" x="151" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_utils</text>
+</a>
+</g>
+</g>
+<!-- module~libfida&#45;&gt;module~hdf5_utils -->
+<g id="module~~libfida~~UsesGraph_edge5" class="edge"><title>module~libfida&#45;&gt;module~hdf5_utils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.995,-119.307C213.662,-121.416 201.565,-123.885 190.269,-126.19"/>
+<polygon fill="#000000" stroke="#000000" points="189.291,-122.817 180.193,-128.246 190.691,-129.676 189.291,-122.817"/>
 </g>
 <!-- module~utilities -->
-<g id="module~~libfida~~UsesGraph_node3" class="node"><title>module~utilities</title>
-<g id="a_module~~libfida~~UsesGraph_node3"><a xlink:href=".././module/utilities.html" xlink:title="utilities">
-<polygon fill="#337ab7" stroke="#337ab7" points="178,-127.932 124,-127.932 124,-103.932 178,-103.932 178,-127.932"/>
-<text text-anchor="middle" x="151" y="-113.532" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utilities</text>
+<g id="module~~libfida~~UsesGraph_node7" class="node"><title>module~utilities</title>
+<g id="a_module~~libfida~~UsesGraph_node7"><a xlink:href=".././module/utilities.html" xlink:title="utilities">
+<polygon fill="#337ab7" stroke="#337ab7" points="178,-66 124,-66 124,-42 178,-42 178,-66"/>
+<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utilities</text>
 </a>
 </g>
 </g>
 <!-- module~libfida&#45;&gt;module~utilities -->
 <g id="module~~libfida~~UsesGraph_edge2" class="edge"><title>module~libfida&#45;&gt;module~utilities</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.995,-115.932C213.031,-115.932 200.08,-115.932 188.206,-115.932"/>
-<polygon fill="#000000" stroke="#000000" points="188.126,-112.432 178.126,-115.932 188.126,-119.432 188.126,-112.432"/>
-</g>
-<!-- module~hdf5_utils -->
-<g id="module~~libfida~~UsesGraph_node4" class="node"><title>module~hdf5_utils</title>
-<g id="a_module~~libfida~~UsesGraph_node4"><a xlink:href=".././module/hdf5_utils.html" xlink:title="hdf5_utils">
-<polygon fill="#337ab7" stroke="#337ab7" points="180,-207.932 122,-207.932 122,-183.932 180,-183.932 180,-207.932"/>
-<text text-anchor="middle" x="151" y="-193.532" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_utils</text>
-</a>
-</g>
-</g>
-<!-- module~libfida&#45;&gt;module~hdf5_utils -->
-<g id="module~~libfida~~UsesGraph_edge3" class="edge"><title>module~libfida&#45;&gt;module~hdf5_utils</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M236.515,-128.309C224.156,-139.499 205.216,-156.264 188,-169.932 184.672,-172.574 181.107,-175.284 177.563,-177.91"/>
-<polygon fill="#000000" stroke="#000000" points="175.477,-175.1 169.45,-183.814 179.595,-180.76 175.477,-175.1"/>
-</g>
-<!-- H5LT -->
-<g id="module~~libfida~~UsesGraph_node5" class="node"><title>H5LT</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="66,-187.932 12,-187.932 12,-163.932 66,-163.932 66,-187.932"/>
-<text text-anchor="middle" x="39" y="-173.532" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
-</g>
-<!-- module~libfida&#45;&gt;H5LT -->
-<g id="module~~libfida~~UsesGraph_edge4" class="edge"><title>module~libfida&#45;&gt;H5LT</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.883,-125.224C212.863,-129.028 199.863,-133.365 188,-136.932 150.101,-148.329 106.205,-159.665 76.1185,-167.154"/>
-<polygon fill="#000000" stroke="#000000" points="74.9517,-163.837 66.0848,-169.636 76.6327,-170.632 74.9517,-163.837"/>
-</g>
-<!-- module~eigensystem -->
-<g id="module~~libfida~~UsesGraph_node6" class="node"><title>module~eigensystem</title>
-<g id="a_module~~libfida~~UsesGraph_node6"><a xlink:href=".././module/eigensystem.html" xlink:title="eigensystem">
-<polygon fill="#337ab7" stroke="#337ab7" points="187.5,-85.9319 114.5,-85.9319 114.5,-61.9319 187.5,-61.9319 187.5,-85.9319"/>
-<text text-anchor="middle" x="151" y="-71.5319" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem</text>
-</a>
-</g>
-</g>
-<!-- module~libfida&#45;&gt;module~eigensystem -->
-<g id="module~~libfida~~UsesGraph_edge5" class="edge"><title>module~libfida&#45;&gt;module~eigensystem</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M223.995,-104.787C213.451,-100.268 201.071,-94.9623 189.578,-90.0368"/>
-<polygon fill="#000000" stroke="#000000" points="190.763,-86.7367 180.193,-86.0145 188.005,-93.1707 190.763,-86.7367"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M230.168,-101.858C215.955,-93.1562 196.594,-81.3026 180.697,-71.5696"/>
+<polygon fill="#000000" stroke="#000000" points="182.158,-68.3604 171.802,-66.1238 178.503,-74.3304 182.158,-68.3604"/>
 </g>
 <!-- module~mpi_utils -->
-<g id="module~~libfida~~UsesGraph_node7" class="node"><title>module~mpi_utils</title>
-<g id="a_module~~libfida~~UsesGraph_node7"><a xlink:href=".././module/mpi_utils.html" xlink:title="mpi_utils">
-<polygon fill="#337ab7" stroke="#337ab7" points="178.5,-43.9319 123.5,-43.9319 123.5,-19.9319 178.5,-19.9319 178.5,-43.9319"/>
-<text text-anchor="middle" x="151" y="-29.5319" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_utils</text>
+<g id="module~~libfida~~UsesGraph_node8" class="node"><title>module~mpi_utils</title>
+<g id="a_module~~libfida~~UsesGraph_node8"><a xlink:href=".././module/mpi_utils.html" xlink:title="mpi_utils">
+<polygon fill="#337ab7" stroke="#337ab7" points="178.5,-24 123.5,-24 123.5,-0 178.5,-0 178.5,-24"/>
+<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_utils</text>
 </a>
 </g>
 </g>
 <!-- module~libfida&#45;&gt;module~mpi_utils -->
-<g id="module~~libfida~~UsesGraph_edge6" class="edge"><title>module~libfida&#45;&gt;module~mpi_utils</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M239.857,-103.844C228.211,-90.4137 208.113,-68.5652 188,-52.9319 186.625,-51.8634 185.191,-50.8103 183.72,-49.779"/>
-<polygon fill="#000000" stroke="#000000" points="185.357,-46.6685 175.064,-44.1576 181.545,-52.5392 185.357,-46.6685"/>
+<g id="module~~libfida~~UsesGraph_edge7" class="edge"><title>module~libfida&#45;&gt;module~mpi_utils</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M242.824,-101.831C232.381,-84.8664 211.641,-53.8512 188,-33 186.732,-31.8812 185.395,-30.7917 184.012,-29.7353"/>
+<polygon fill="#000000" stroke="#000000" points="185.986,-26.8449 175.759,-24.0764 182.027,-32.6181 185.986,-26.8449"/>
 </g>
-<!-- iso_c_binding -->
-<g id="module~~libfida~~UsesGraph_node8" class="node"><title>iso_c_binding</title>
-<g id="a_module~~libfida~~UsesGraph_node8"><a xlink:href="http://fortranwiki.org/fortran/show/ISO_C_BINDING" xlink:title="iso_c_binding">
-<polygon fill="#337ab7" stroke="#337ab7" points="78,-44.9319 0,-44.9319 0,-20.9319 78,-20.9319 78,-44.9319"/>
-<text text-anchor="middle" x="39" y="-30.5319" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_c_binding</text>
-</a>
+<!-- module~hdf5_utils&#45;&gt;H5LT -->
+<g id="module~~libfida~~UsesGraph_edge8" class="edge"><title>module~hdf5_utils&#45;&gt;H5LT</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M121.958,-141.903C107.994,-145.838 90.95,-150.641 76.029,-154.846"/>
+<polygon fill="#000000" stroke="#000000" points="74.7779,-151.563 66.1022,-157.644 76.6767,-158.3 74.7779,-151.563"/>
 </g>
-</g>
-<!-- module~libfida&#45;&gt;iso_c_binding -->
-<g id="module~~libfida~~UsesGraph_edge7" class="edge"><title>module~libfida&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M247.03,-103.665C240.704,-80.5808 223.484,-31.1874 188,-10.9319 152.324,9.43363 104.248,-3.75709 72.7059,-16.8177"/>
-<polygon fill="#000000" stroke="#000000" points="71.2547,-13.6321 63.4799,-20.8295 74.0461,-20.0514 71.2547,-13.6321"/>
+<!-- module~hdf5_utils&#45;&gt;HDF5 -->
+<g id="module~~libfida~~UsesGraph_edge9" class="edge"><title>module~hdf5_utils&#45;&gt;HDF5</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M121.958,-126.607C107.994,-122.926 90.95,-118.432 76.029,-114.499"/>
+<polygon fill="#000000" stroke="#000000" points="76.6641,-111.046 66.1022,-111.881 74.8796,-117.815 76.6641,-111.046"/>
 </g>
 <!-- module~utilities&#45;&gt;iso_c_binding -->
-<g id="module~~libfida~~UsesGraph_edge9" class="edge"><title>module~utilities&#45;&gt;iso_c_binding</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M127.927,-103.851C123.236,-101.065 118.38,-98.0112 114,-94.9319 95.2026,-81.7174 75.316,-64.8756 60.8976,-52.0812"/>
-<polygon fill="#000000" stroke="#000000" points="62.8698,-49.1483 53.0897,-45.0738 58.1942,-54.3579 62.8698,-49.1483"/>
+<g id="module~~libfida~~UsesGraph_edge11" class="edge"><title>module~utilities&#45;&gt;iso_c_binding</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M123.932,-56.1329C113.31,-57.0019 100.675,-58.0356 88.4755,-59.0338"/>
+<polygon fill="#000000" stroke="#000000" points="88.0646,-55.5557 78.3834,-59.8595 88.6355,-62.5323 88.0646,-55.5557"/>
 </g>
 <!-- omp_lib -->
 <g id="module~~libfida~~UsesGraph_node9" class="node"><title>omp_lib</title>
 <g id="a_module~~libfida~~UsesGraph_node9"><a xlink:href="https://gcc.gnu.org/onlinedocs/gcc-4.4.3/libgomp/Runtime-Library-Routines.html" xlink:title="omp_lib">
-<polygon fill="#337ab7" stroke="#337ab7" points="66,-127.932 12,-127.932 12,-103.932 66,-103.932 66,-127.932"/>
-<text text-anchor="middle" x="39" y="-113.532" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="66,-33 12,-33 12,-9 66,-9 66,-33"/>
+<text text-anchor="middle" x="39" y="-18.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
 </a>
 </g>
 </g>
 <!-- module~utilities&#45;&gt;omp_lib -->
-<g id="module~~libfida~~UsesGraph_edge8" class="edge"><title>module~utilities&#45;&gt;omp_lib</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M123.932,-115.932C109.788,-115.932 92.0753,-115.932 76.5718,-115.932"/>
-<polygon fill="#000000" stroke="#000000" points="76.2626,-112.432 66.2626,-115.932 76.2625,-119.432 76.2626,-112.432"/>
-</g>
-<!-- module~hdf5_utils&#45;&gt;HDF5 -->
-<g id="module~~libfida~~UsesGraph_edge11" class="edge"><title>module~hdf5_utils&#45;&gt;HDF5</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M121.958,-203.835C107.994,-207.77 90.95,-212.573 76.029,-216.778"/>
-<polygon fill="#000000" stroke="#000000" points="74.7779,-213.494 66.1022,-219.576 76.6767,-220.232 74.7779,-213.494"/>
-</g>
-<!-- module~hdf5_utils&#45;&gt;H5LT -->
-<g id="module~~libfida~~UsesGraph_edge10" class="edge"><title>module~hdf5_utils&#45;&gt;H5LT</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M121.958,-190.833C107.994,-188.294 90.95,-185.196 76.029,-182.483"/>
-<polygon fill="#000000" stroke="#000000" points="76.5671,-179.023 66.1022,-180.678 75.3148,-185.91 76.5671,-179.023"/>
+<g id="module~~libfida~~UsesGraph_edge10" class="edge"><title>module~utilities&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M123.932,-46.1795C109.652,-41.8955 91.7344,-36.5203 76.1252,-31.8376"/>
+<polygon fill="#000000" stroke="#000000" points="76.8466,-28.3999 66.2626,-28.8788 74.8351,-35.1047 76.8466,-28.3999"/>
 </g>
 </g>
 </svg>
@@ -1265,9 +1290,13 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-neutron">neutron</a>
       
+      <a class="list-group-item" href="../module/libfida.html#variable-cfpd">cfpd</a>
+      
       <a class="list-group-item" href="../module/libfida.html#variable-fweight">fweight</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nweight">nweight</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-ctable">ctable</a>
       
     </div>
   </div>
@@ -1368,6 +1397,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-neutronrate">NeutronRate</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-cfpdrate">CFPDRate</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-neutralparticle">NeutralParticle</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-neutralparticlereservoir">NeutralParticleReservoir</a>
@@ -1385,6 +1416,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-particletrack">ParticleTrack</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-gyrosurface">GyroSurface</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-cfpdtable">CFPDTable</a>
       
     </div>
   </div>
@@ -1496,6 +1529,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-lflf_assign">lflf_assign</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-oo_assign">oo_assign</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-read_inputs">read_inputs</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-identify_transition">identify_transition</a>
@@ -1511,6 +1546,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-read_chords">read_chords</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_npa">read_npa</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_cfpd">read_cfpd</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_plasma">read_plasma</a>
       
@@ -1547,6 +1584,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-write_spectra">write_spectra</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_neutrons">write_neutrons</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-write_cfpd_weights">write_cfpd_weights</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_fida_weights">write_fida_weights</a>
       
@@ -1594,6 +1633,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-uvw_to_cyl">uvw_to_cyl</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-convert_sightline_to_xyz">convert_sightline_to_xyz</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-grid_intersect">grid_intersect</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-circle_grid_intersect">circle_grid_intersect</a>
@@ -1601,6 +1642,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-get_indices">get_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_passive_grid_indices">get_passive_grid_indices</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_interpolation_grid_indices">get_interpolation_grid_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_plasma_extrema">get_plasma_extrema</a>
       
@@ -1648,7 +1691,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-bt_cx_rates">bt_cx_rates</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-get_dd_rate">get_dd_rate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_ddpt_anisotropy">get_ddpt_anisotropy</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_pgyro">get_pgyro</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-neutral_cx_rate">neutral_cx_rate</a>
       
@@ -1733,6 +1780,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-pnpa_mc">pnpa_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-neutron_f">neutron_f</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-cfpd_f">cfpd_f</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-neutron_mc">neutron_mc</a>
       
@@ -2690,6 +2739,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-cfpd"></span>type(<a href='../type/cfpdrate.html'>CFPDRate</a>),</td>
+  
+  <td>public,</td>
+  <td>save</td><td>::</td>
+  <td><strong>cfpd</strong></td><td></td><td></td><td><p>Variable for storing the Charged Fusion Product rate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-fweight"></span>type(<a href='../type/fidaweights.html'>FIDAWeights</a>),</td>
   
   <td>public,</td>
@@ -2709,6 +2772,20 @@
   <td>public,</td>
   <td>save</td><td>::</td>
   <td><strong>nweight</strong></td><td></td><td></td><td><p>Variable for storing the calculated NPA weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ctable"></span>type(<a href='../type/cfpdtable.html'>CFPDTable</a>),</td>
+  
+  <td>public,</td>
+  <td>save</td><td>::</td>
+  <td><strong>ctable</strong></td><td></td><td></td><td><p>Variable for storing the calculated Charged Fusion Product orbits</p></td>
   
 </tr>
 
@@ -3723,6 +3800,77 @@ public subroutine <a href='../proc/np_assign.html'>np_assign</a>(n1, n2)
   
   <td></td><td>::</td>
   <td><strong>n2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public pure subroutine <a href='../proc/oo_assign.html'>oo_assign</a>(p1, p2)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Defines how to assign <a href="../type/cfpdtable.html">CFPDTable</a> types to eachother</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/cfpdtable.html'>CFPDTable</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/cfpdtable.html'>CFPDTable</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p2</strong></td><td></td>
   
 </tr>
 
@@ -10949,6 +11097,95 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
      
      
 <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-cfpdrate"></span><h3>type, public :: <a href='../type/cfpdrate.html'>CFPDRate</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Charged Fusion Product (CFPD) storage structure</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-weight%7E5"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>weight</strong></td><td></td><td></td><td><p>CFPD rate weight: weight(Ep,Ch,E,p)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-flux%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>flux</strong></td><td></td><td></td><td><p>CFPD flux: flux(E3,chan) [kHz]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-prob"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>prob</strong></td><td></td><td></td><td><p>CFPD flux: probability_gyro(E3,chan) [unity]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gam"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>gam</strong></td><td></td><td></td><td><p>CFPD flux: gyro(E3,chan) [rad]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+     
+<div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-neutralparticle"></span><h3>type, public :: <a href='../type/neutralparticle.html'>NeutralParticle</a>
     
   </h3></div>
@@ -11311,7 +11548,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E5"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E6"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:), allocatable</td><td>::</td>
@@ -11400,7 +11637,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E6"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E7"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
@@ -11414,7 +11651,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-flux%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-flux%7E3"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:), allocatable</td><td>::</td>
@@ -12008,6 +12245,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-calc_cfpd"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_cfpd</strong></td><td></td><td></td><td><p>Calculate Charged Fusion Product flux: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-flr"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -12279,7 +12530,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-flux%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-flux%7E4"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -12436,6 +12687,180 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public,</td>
   <td>dimension(3,3)</td><td>::</td>
   <td><strong>basis</strong></td><td> =</td><td>0.d0</td><td><p>Basis of coordinate system of gyrosurface</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+     
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-cfpdtable"></span><h3>type, public :: <a href='../type/cfpdtable.html'>CFPDTable</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Defines Charged Fusion Product orbit trajectories</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nenergy%7E7"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td> =</td><td>0</td><td><p>Number of cfpd energies</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nrays"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nrays</strong></td><td> =</td><td>0</td><td><p>Number of "rays"</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nsteps"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nsteps</strong></td><td> =</td><td>0</td><td><p>Number of total steps</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nchan%7E5"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nchan</strong></td><td> =</td><td>0</td><td><p>Number of channels</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dl"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dl</strong></td><td></td><td></td><td><p>Step length [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-de%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dE</strong></td><td></td><td></td><td><p>CFPD energy bin width [keV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-earray"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>earray</strong></td><td></td><td></td><td><p>Energies of cfpd orbits [keV]: earray(E3)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nactual"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>nactual</strong></td><td></td><td></td><td><p>Number of spatial steps: nactual(E3,ray,channel)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-daomega"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>daomega</strong></td><td></td><td></td><td><p>Differntial area times solid angle [cm^2]: daomega(E3,ray,channel)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sightline"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>sightline</strong></td><td></td><td></td><td><p>Velocity [cm/s] and position [cm] in cylindrical (R,Phi,Z) coordinates:
+ sightline(E3,:,step,ray,channel)</p></td>
   
 </tr>
 
@@ -15986,6 +16411,80 @@ public pure subroutine <a href='../proc/lflf_assign.html'>lflf_assign</a>(p1, p2
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-oo_assign"></span><h3>
+public pure subroutine <a href='../proc/oo_assign.html'>oo_assign</a>(p1, p2)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Defines how to assign <a href="../type/cfpdtable.html">CFPDTable</a> types to eachother</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/cfpdtable.html'>CFPDTable</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/cfpdtable.html'>CFPDTable</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-read_inputs"></span><h3>
 public subroutine <a href='../proc/read_inputs.html'>read_inputs</a>()
     
@@ -16312,6 +16811,36 @@ public subroutine <a href='../proc/read_npa.html'>read_npa</a>()
 
 
 <p>Reads the NPA geometry and stores the quantities in <a href="../module/libfida.html#variable-npa_chords">npa_chords</a></p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_cfpd"></span><h3>
+public subroutine <a href='../proc/read_cfpd.html'>read_cfpd</a>()
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Reads the CFPD geometry and stores the quantities in <a href="../module/libfida.html#variable-ctable">ctable</a></p>
     
     <h4>Arguments</h4>
     
@@ -17284,6 +17813,36 @@ public subroutine <a href='../proc/write_neutrons.html'>write_neutrons</a>()
 
 
 <p>Writes <a href="../module/libfida.html#variable-neutron">neutron</a> to a HDF5 file</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-write_cfpd_weights"></span><h3>
+public subroutine <a href='../proc/write_cfpd_weights.html'>write_cfpd_weights</a>()
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Writes <a href="../module/libfida.html#variable-cfpd">cfpd</a> to a HDF5 file</p>
     
     <h4>Arguments</h4>
     
@@ -19347,6 +19906,140 @@ public subroutine <a href='../proc/uvw_to_cyl.html'>uvw_to_cyl</a>(uvw, cyl)
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-convert_sightline_to_xyz"></span><h3>
+public subroutine <a href='../proc/convert_sightline_to_xyz.html'>convert_sightline_to_xyz</a>(ie3, ist, iray, ich, xyz, v3_xyz)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert sightline position and velocity from cylindrical coordinate <code>rpz</code> to beam coordinate <code>xyz</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ie3</strong></td><td><p>CFPD energy index</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ist</strong></td><td><p>Step index</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iray</strong></td><td><p>"Ray" index</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ich</strong></td><td><p>Detector channel</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>xyz</strong></td><td><p>Sightline position in beam coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v3_xyz</strong></td><td><p>Sightline velocity in beam coordinates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-grid_intersect"></span><h3>
 public subroutine <a href='../proc/grid_intersect.html'>grid_intersect</a>(r0, v0, length, r_enter, r_exit, center_in, lwh_in, passive)
     
@@ -19736,6 +20429,95 @@ public subroutine <a href='../proc/get_passive_grid_indices.html'>get_passive_gr
 
 
 <p>Find closest <a href="../module/libfida.html#variable-pass_grid">pass_grid</a> indices <code>ind</code> to position <code>pos</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>pos</strong></td><td><p>Position [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=Int32),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ind</strong></td><td><p>Closest indices to position</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>input_coords</strong></td><td><p>Indicates coordinate system of <code>pos</code>. Beam grid (0), machine (1) and cylindrical (2)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_interpolation_grid_indices"></span><h3>
+public subroutine <a href='../proc/get_interpolation_grid_indices.html'>get_interpolation_grid_indices</a>(pos, ind, input_coords)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Find closest <a href="../module/libfida.html#variable-inter_grid">inter_grid</a> indices <code>ind</code> to position <code>pos</code></p>
     
     <h4>Arguments</h4>
     
@@ -22120,8 +22902,8 @@ public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, den
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-get_neutron_rate"></span><h3>
-public subroutine <a href='../proc/get_neutron_rate.html'>get_neutron_rate</a>(plasma, eb, rate)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_dd_rate"></span><h3>
+public subroutine <a href='../proc/get_dd_rate.html'>get_dd_rate</a>(plasma, eb, rate, branch)
     
     
    
@@ -22136,7 +22918,7 @@ public subroutine <a href='../proc/get_neutron_rate.html'>get_neutron_rate</a>(p
 
 
 
-<p>Gets neutron rate for a beam with energy <code>eb</code> interacting with a target plasma</p>
+<p>Gets d(d,p)T rate for a beam with energy <code>eb</code> interacting with a target plasma</p>
     
     <h4>Arguments</h4>
     
@@ -22193,6 +22975,291 @@ public subroutine <a href='../proc/get_neutron_rate.html'>get_neutron_rate</a>(p
   
   <td></td><td>::</td>
   <td><strong>rate</strong></td><td><p>Neutron reaction rate [1/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>branch</strong></td><td><p>Indicates 1 for cfpd rate and 2 for neutron rate</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_ddpt_anisotropy"></span><h3>
+public subroutine <a href='../proc/get_ddpt_anisotropy.html'>get_ddpt_anisotropy</a>(plasma, v1, v3, kappa)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Gets d(d,p)T anisotropy defecit/enhancement factor for a beam interacting with a target plasma</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td><p>Plasma Paramters</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v1</strong></td><td><p>Beam velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v3</strong></td><td><p>Charged Fusion Product velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>kappa</strong></td><td><p>Anisotropy factor
+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_pgyro"></span><h3>
+public subroutine <a href='../proc/get_pgyro.html'>get_pgyro</a>(fields, E3, E1, pitch, plasma, v3_xyz, pgyro, gam0)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Returns fraction of gyroangles that can produce a reaction with
+ given inputs</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fields</strong></td><td><p>Electromagneticfields in beam coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>E3</strong></td><td><p>E3 charged fusion product energy [keV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>E1</strong></td><td><p>E1 fast-ion energy [keV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td><p>pitch  fast ion pitch relative to the field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td><p>Plasma Paramters in beam coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v3_xyz</strong></td><td><p>Charged fusion product velocity in beam coorindates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>pgyro</strong></td><td><p>pgyro   DeltaE_3*\partial\gam/\partial E_3/pi</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gam0</strong></td><td><p>Gyro angle of fast ion [rad]</p></td>
   
 </tr>
 
@@ -25655,6 +26722,36 @@ public subroutine <a href='../proc/neutron_f.html'>neutron_f</a>()
 
 
 <p>Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-cfpd_f"></span><h3>
+public subroutine <a href='../proc/cfpd_f.html'>cfpd_f</a>()
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)</p>
     
     <h4>Arguments</h4>
     

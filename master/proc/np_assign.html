@@ -299,7 +299,7 @@ public subroutine np_assign(n1, n2)
 </g>
 </g>
 <!-- proc~np_assign&#45;&gt;proc~ind2sub -->
-<g id="proc~~np_assign~~CallsGraph_edge2" class="edge"><title>proc~np_assign&#45;&gt;proc~ind2sub</title>
+<g id="proc~~np_assign~~CallsGraph_edge1" class="edge"><title>proc~np_assign&#45;&gt;proc~ind2sub</title>
 <path fill="none" stroke="#000000" d="M61.6692,-39.3577C71.8299,-41.535 83.3112,-43.9953 93.922,-46.269"/>
 <polygon fill="#000000" stroke="#000000" points="93.2455,-49.7034 103.757,-48.3765 94.7123,-42.8588 93.2455,-49.7034"/>
 </g>
@@ -312,7 +312,7 @@ public subroutine np_assign(n1, n2)
 </g>
 </g>
 <!-- proc~np_assign&#45;&gt;proc~npr_assign -->
-<g id="proc~~np_assign~~CallsGraph_edge1" class="edge"><title>proc~np_assign&#45;&gt;proc~npr_assign</title>
+<g id="proc~~np_assign~~CallsGraph_edge2" class="edge"><title>proc~np_assign&#45;&gt;proc~npr_assign</title>
 <path fill="none" stroke="#000000" d="M61.6692,-26.6423C70.1011,-24.8355 79.4425,-22.8338 88.441,-20.9055"/>
 <polygon fill="#000000" stroke="#000000" points="89.3437,-24.2916 98.3883,-18.7739 87.8769,-17.447 89.3437,-24.2916"/>
 </g>
@@ -564,15 +564,15 @@ public subroutine np_assign(n1, n2)
         <span class="k">allocate</span><span class="p">(</span><span class="n">n1</span><span class="p">%</span><span class="n">dens</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="n">ny</span><span class="p">,</span><span class="n">nz</span><span class="p">),</span> <span class="n">source</span><span class="o">=</span><span class="n">n2</span><span class="p">%</span><span class="n">dens</span><span class="p">)</span>
     <span class="k">else</span>
 <span class="k">        </span><span class="n">n1</span><span class="p">%</span><span class="n">dens</span> <span class="o">=</span> <span class="n">n2</span><span class="p">%</span><span class="n">dens</span>
-    <span class="n">endif</span>
+    <span class="k">endif</span>
 
-    <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>
+<span class="k">    do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>
         <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">n2</span><span class="p">%</span><span class="n">res</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)%</span><span class="n">n</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            call </span><span class="n">npr_assign</span><span class="p">(</span><span class="n">n1</span><span class="p">%</span><span class="n">res</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span> <span class="n">n2</span><span class="p">%</span><span class="n">res</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
-        <span class="n">endif</span>
-    <span class="n">enddo</span>
+        <span class="k">endif</span>
+<span class="k">    enddo</span>
 
 <span class="k">end subroutine </span><span class="n">np_assign</span>
 </pre></div>

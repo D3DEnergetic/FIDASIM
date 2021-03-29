@@ -201,8 +201,9 @@
 <h2 id="keyword-arguments">Keyword Arguments</h2>
 <p><strong>spec</strong>: Optional, Spectral geometry structure</p>
 <p><strong>npa</strong>: Optional, NPA geometry structure</p>
+<p><strong>cfpd</strong>: Optional, CFPD geometry structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> write_geometry, filename, nbi, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> write_geometry, filename, nbi, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa, cfpd<span class="o">=</span>cfpd
 </code></pre></div>
       <br>
     
@@ -248,7 +249,7 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> write_geometry, filename, nbi, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> write_geometry, filename, nbi, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa, cfpd<span class="o">=</span>cfpd
 <a name="ln-2"></a><span class="c1">    ;+#write_geometry</span>
 <a name="ln-3"></a><span class="c1">    ;+Write geometry values to a HDF5 file</span>
 <a name="ln-4"></a><span class="c1">    ;+***</span>
@@ -262,334 +263,478 @@
 <a name="ln-12"></a><span class="c1">    ;+</span>
 <a name="ln-13"></a><span class="c1">    ;+     **npa**: Optional, NPA geometry structure</span>
 <a name="ln-14"></a><span class="c1">    ;+</span>
-<a name="ln-15"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-16"></a><span class="c1">    ;+```idl</span>
-<a name="ln-17"></a><span class="c1">    ;+IDL&gt; write_geometry, filename, nbi, spec=spec, npa=npa</span>
-<a name="ln-18"></a><span class="c1">    ;+```</span>
-<a name="ln-19"></a>    info,<span class="s1">&#39;Writing geometry file...&#39;</span>
-<a name="ln-20"></a>
-<a name="ln-21"></a><span class="c1">    ;; Create attributes</span>
-<a name="ln-22"></a>    root_atts <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
-<a name="ln-23"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
-<a name="ln-24"></a>                data<span class="o">:</span><span class="s1">&#39;Geometric quantities for FIDASIM&#39;</span>}
-<a name="ln-25"></a>
-<a name="ln-26"></a><span class="c1">    ;; NBI attributes</span>
-<a name="ln-27"></a>    nbi_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi&#39;</span>, $
-<a name="ln-28"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
-<a name="ln-29"></a>                data<span class="o">:</span><span class="s1">&#39;Neutral Beam Geometry&#39;</span>}
-<a name="ln-30"></a>
-<a name="ln-31"></a>    nbi_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi&#39;</span>, $
-<a name="ln-32"></a>              name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>,$
-<a name="ln-33"></a>              data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
-<a name="ln-34"></a>
-<a name="ln-35"></a>    nbi_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/data_source&#39;</span>, $
-<a name="ln-36"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-37"></a>                   data<span class="o">:</span><span class="s1">&#39;Source of the NBI geometry&#39;</span>}
-<a name="ln-38"></a>
-<a name="ln-39"></a>    nbi_name_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/name&#39;</span>, $
-<a name="ln-40"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-41"></a>                     data<span class="o">:</span><span class="s1">&#39;Beam name&#39;</span>}
-<a name="ln-42"></a>
-<a name="ln-43"></a>    nbi_src_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/src&#39;</span>, $
-<a name="ln-44"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-45"></a>                    data<span class="o">:</span><span class="s1">&#39;Position of the center of the beam source grid&#39;</span>}
-<a name="ln-46"></a>    nbi_src_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/src&#39;</span>, $
-<a name="ln-47"></a>                    name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-48"></a>                    data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-49"></a>
-<a name="ln-50"></a>    nbi_axis_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/axis&#39;</span>, $
-<a name="ln-51"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-52"></a>                     data<span class="o">:</span><span class="s1">&#39;Axis of the beam centerline: Centerline(t) = src + axis*t &#39;</span>}
-<a name="ln-53"></a>    nbi_axis_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/axis&#39;</span>, $
-<a name="ln-54"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-55"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-56"></a>
-<a name="ln-57"></a>    nbi_focy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focy&#39;</span>, $
-<a name="ln-58"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-59"></a>                     data<span class="o">:</span><span class="s1">&#39;Horizonal focal length of the beam&#39;</span>}
-<a name="ln-60"></a>    nbi_focy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focy&#39;</span>, $
-<a name="ln-61"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-62"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-63"></a>
-<a name="ln-64"></a>    nbi_focz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focz&#39;</span>, $
-<a name="ln-65"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-66"></a>                     data<span class="o">:</span><span class="s1">&#39;Vertical focal length of the beam&#39;</span>}
-<a name="ln-67"></a>    nbi_focz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focz&#39;</span>, $
-<a name="ln-68"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-69"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-70"></a>     
-<a name="ln-71"></a>    nbi_divy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divy&#39;</span>, $
-<a name="ln-72"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-73"></a>                     data<span class="o">:</span><span class="s1">&#39;Horizonal divergences of the beam. One for each energy component&#39;</span>}
-<a name="ln-74"></a>    nbi_divy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divy&#39;</span>, $
-<a name="ln-75"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-76"></a>                     data<span class="o">:</span><span class="s1">&#39;radians&#39;</span>}
-<a name="ln-77"></a>
-<a name="ln-78"></a>    nbi_divz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divz&#39;</span>, $
-<a name="ln-79"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-80"></a>                     data<span class="o">:</span><span class="s1">&#39;Vertical divergences of the beam. One for each energy component&#39;</span>}
-<a name="ln-81"></a>    nbi_divz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divz&#39;</span>, $
-<a name="ln-82"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-83"></a>                     data<span class="o">:</span><span class="s1">&#39;radians&#39;</span>}
-<a name="ln-84"></a>
-<a name="ln-85"></a>    nbi_widy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widy&#39;</span>, $
-<a name="ln-86"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-87"></a>                     data<span class="o">:</span><span class="s1">&#39;Half width of the beam source grid&#39;</span>}
-<a name="ln-88"></a>    nbi_widy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widy&#39;</span>, $
-<a name="ln-89"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-90"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-91"></a>
-<a name="ln-92"></a>    nbi_widz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widz&#39;</span>, $
-<a name="ln-93"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-94"></a>                     data<span class="o">:</span><span class="s1">&#39;Half height of the beam source grid&#39;</span>}
-<a name="ln-95"></a>    nbi_widz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widz&#39;</span>, $
-<a name="ln-96"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-97"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-98"></a>
-<a name="ln-99"></a>    nbi_shape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/shape&#39;</span>, $
-<a name="ln-100"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-101"></a>                      data<span class="o">:</span><span class="s1">&#39;Shape of the beam source grid: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
-<a name="ln-102"></a>
-<a name="ln-103"></a>    nbi_naperture_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/naperture&#39;</span>, $
-<a name="ln-104"></a>                          name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-105"></a>                          data<span class="o">:</span><span class="s1">&#39;Number of apertures&#39;</span>}
-<a name="ln-106"></a>    
-<a name="ln-107"></a>    nbi_ashape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/ashape&#39;</span>, $
-<a name="ln-108"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-109"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the aperture(s): 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
-<a name="ln-110"></a>
-<a name="ln-111"></a>    nbi_awidy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidy&#39;</span>, $
-<a name="ln-112"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-113"></a>                      data<span class="o">:</span><span class="s1">&#39;Half width of the aperture(s)&#39;</span>}
-<a name="ln-114"></a>    nbi_awidy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidy&#39;</span>, $
-<a name="ln-115"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-116"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-117"></a>
-<a name="ln-118"></a>    nbi_awidz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidz&#39;</span>, $
-<a name="ln-119"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-120"></a>                      data<span class="o">:</span><span class="s1">&#39;Half height of the aperture(s)&#39;</span>}
-<a name="ln-121"></a>    nbi_awidz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidz&#39;</span>, $
-<a name="ln-122"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-123"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-124"></a> 
-<a name="ln-125"></a>    nbi_aoffy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffy&#39;</span>, $
-<a name="ln-126"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-127"></a>                      data<span class="o">:</span><span class="s1">&#39;Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline&#39;</span>}
-<a name="ln-128"></a>    nbi_aoffy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffy&#39;</span>, $
-<a name="ln-129"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-130"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-131"></a>
-<a name="ln-132"></a>    nbi_aoffz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffz&#39;</span>, $
-<a name="ln-133"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-134"></a>                      data<span class="o">:</span><span class="s1">&#39;Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline&#39;</span>}
-<a name="ln-135"></a>    nbi_aoffz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffz&#39;</span>, $
-<a name="ln-136"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-137"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-138"></a>
-<a name="ln-139"></a>    nbi_adist_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/adist&#39;</span>, $
-<a name="ln-140"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-141"></a>                      data<span class="o">:</span><span class="s1">&#39;Distance from the center of the beam source grid to the aperture(s) plane&#39;</span>}
-<a name="ln-142"></a>    nbi_adist_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/adist&#39;</span>, $
-<a name="ln-143"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-144"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-145"></a>
-<a name="ln-146"></a>    nbi_atts <span class="o">=</span> [nbi_desc, nbi_cs, nbi_ds_desc,nbi_name_desc, $
-<a name="ln-147"></a>                nbi_shape_desc, nbi_src_desc, nbi_src_unit,  $
-<a name="ln-148"></a>                nbi_axis_desc, nbi_axis_unit, $
-<a name="ln-149"></a>                nbi_focy_desc, nbi_focy_unit, $
-<a name="ln-150"></a>                nbi_focz_desc, nbi_focz_unit, $
-<a name="ln-151"></a>                nbi_divy_desc, nbi_divy_unit, $
-<a name="ln-152"></a>                nbi_divz_desc, nbi_divz_unit, $
-<a name="ln-153"></a>                nbi_widy_desc, nbi_widy_unit, $
-<a name="ln-154"></a>                nbi_widz_desc, nbi_widz_unit, $
-<a name="ln-155"></a>                nbi_naperture_desc, nbi_ashape_desc, $
-<a name="ln-156"></a>                nbi_awidy_desc, nbi_awidy_unit, $
-<a name="ln-157"></a>                nbi_awidz_desc, nbi_awidz_unit, $
-<a name="ln-158"></a>                nbi_aoffy_desc, nbi_aoffy_unit, $
-<a name="ln-159"></a>                nbi_aoffz_desc, nbi_aoffz_unit, $
-<a name="ln-160"></a>                nbi_adist_desc, nbi_adist_unit ]
-<a name="ln-161"></a>
-<a name="ln-162"></a><span class="c1">    ;; Spectroscopic attributes</span>
-<a name="ln-163"></a>    spec_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec&#39;</span>, $
-<a name="ln-164"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-165"></a>                 data<span class="o">:</span><span class="s1">&#39;FIDA/BES Chord Geometry&#39;</span>}
-<a name="ln-166"></a>    spec_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec&#39;</span>, $
-<a name="ln-167"></a>               name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
-<a name="ln-168"></a>               data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
-<a name="ln-169"></a>
-<a name="ln-170"></a>    spec_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/data_source&#39;</span>, $
-<a name="ln-171"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-172"></a>                    data<span class="o">:</span><span class="s1">&#39;Source of the chord geometry&#39;</span>}
-<a name="ln-173"></a>
-<a name="ln-174"></a>    spec_nchan_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/nchan&#39;</span>, $
-<a name="ln-175"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-176"></a>                       data<span class="o">:</span><span class="s1">&#39;Number of channels&#39;</span>}
-<a name="ln-177"></a>
-<a name="ln-178"></a>    spec_system_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/system&#39;</span>, $
-<a name="ln-179"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-180"></a>                        data<span class="o">:</span><span class="s1">&#39;Names of the different spectrocopic systems&#39;</span>}
-<a name="ln-181"></a>
-<a name="ln-182"></a>    spec_id_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/id&#39;</span>, $
-<a name="ln-183"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-184"></a>                    data<span class="o">:</span><span class="s1">&#39;Line of sight ID&#39;</span>}
-<a name="ln-185"></a>
-<a name="ln-186"></a>    spec_lens_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/lens&#39;</span>, $
-<a name="ln-187"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-188"></a>                      data<span class="o">:</span><span class="s1">&#39;Positions of the lenses&#39;</span>}
-<a name="ln-189"></a>    spec_lens_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/lens&#39;</span>, $
-<a name="ln-190"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-191"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-192"></a>
-<a name="ln-193"></a>    spec_axis_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/axis&#39;</span>, $
-<a name="ln-194"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-195"></a>                      data<span class="o">:</span><span class="s1">&#39;Optical axis of the lines of sight: LOS(t) = lens + axis*t &#39;</span>}
-<a name="ln-196"></a>    spec_axis_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/axis&#39;</span>, $
-<a name="ln-197"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-198"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-199"></a>
-<a name="ln-200"></a>    spec_radius_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/radius&#39;</span>, $
-<a name="ln-201"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-202"></a>                        data<span class="o">:</span><span class="s1">&#39;Line of sight radius at midplane or tangency point&#39;</span> }
-<a name="ln-203"></a>    spec_radius_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/radius&#39;</span>, $
-<a name="ln-204"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-205"></a>                        data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-206"></a>
-<a name="ln-207"></a>    spec_sigma_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/sigma_pi&#39;</span>, $
-<a name="ln-208"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-209"></a>                       data<span class="o">:</span><span class="s1">&#39;Ratio of the intensities of the sigma and pi stark lines. Measured quantity&#39;</span>}
-<a name="ln-210"></a>
-<a name="ln-211"></a>    spec_spot_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/spot_size&#39;</span>, $
-<a name="ln-212"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-213"></a>                      data<span class="o">:</span><span class="s1">&#39;Radius of spot size&#39;</span>}
-<a name="ln-214"></a>    spec_spot_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/spot_size&#39;</span>, $
-<a name="ln-215"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-216"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-217"></a> 
-<a name="ln-218"></a>    spec_atts <span class="o">=</span> [spec_desc,spec_cs, spec_ds_desc, $
-<a name="ln-219"></a>                 spec_nchan_desc, spec_system_desc, $
-<a name="ln-220"></a>                 spec_id_desc, $
-<a name="ln-221"></a>                 spec_lens_desc,spec_lens_unit, $
-<a name="ln-222"></a>                 spec_axis_desc,spec_axis_unit, $
-<a name="ln-223"></a>                 spec_radius_desc, spec_radius_unit, $
-<a name="ln-224"></a>                 spec_sigma_desc, $
-<a name="ln-225"></a>                 spec_spot_desc, spec_spot_unit]
-<a name="ln-226"></a>
-<a name="ln-227"></a><span class="c1">    ;;NPA attributes</span>
-<a name="ln-228"></a>    npa_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa&#39;</span>, $
-<a name="ln-229"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-230"></a>                data<span class="o">:</span><span class="s1">&#39;NPA Geometry&#39;</span>}
-<a name="ln-231"></a>
-<a name="ln-232"></a>    npa_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa&#39;</span>, $
-<a name="ln-233"></a>              name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
-<a name="ln-234"></a>              data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
-<a name="ln-235"></a>
-<a name="ln-236"></a>    npa_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/data_source&#39;</span>, $
-<a name="ln-237"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-238"></a>                   data<span class="o">:</span><span class="s1">&#39;Source of the NPA geometry&#39;</span>}
-<a name="ln-239"></a>    
-<a name="ln-240"></a>    npa_nchan_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/nchan&#39;</span>, $
-<a name="ln-241"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-242"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of channels&#39;</span>}
-<a name="ln-243"></a>
-<a name="ln-244"></a>    npa_system_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/system&#39;</span>, $
-<a name="ln-245"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-246"></a>                       data<span class="o">:</span><span class="s1">&#39;Names of the different NPA systems&#39;</span>}
-<a name="ln-247"></a>
-<a name="ln-248"></a>    npa_id_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/id&#39;</span>, $
-<a name="ln-249"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-250"></a>                   data<span class="o">:</span><span class="s1">&#39;Line of sight ID&#39;</span>}
-<a name="ln-251"></a>
-<a name="ln-252"></a>    npa_dshape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_shape&#39;</span>, $
-<a name="ln-253"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-254"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the detector: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
-<a name="ln-255"></a>
-<a name="ln-256"></a>    npa_dcent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_cent&#39;</span>, $
-<a name="ln-257"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-258"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the detector&#39;</span>}
-<a name="ln-259"></a>    npa_dcent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_cent&#39;</span>, $
-<a name="ln-260"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-261"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-262"></a>
-<a name="ln-263"></a>    npa_dtedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_tedge&#39;</span>, $
-<a name="ln-264"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-265"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors top edge&#39;</span>}
-<a name="ln-266"></a>    npa_dtedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_tedge&#39;</span>, $
-<a name="ln-267"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-268"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-269"></a>
-<a name="ln-270"></a>    npa_dredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_redge&#39;</span>, $
-<a name="ln-271"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-272"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors right edge&#39;</span>}
-<a name="ln-273"></a>    npa_dredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_redge&#39;</span>, $
-<a name="ln-274"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-275"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-276"></a>
-<a name="ln-277"></a>    npa_ashape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_shape&#39;</span>, $
-<a name="ln-278"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-279"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the aperture: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
-<a name="ln-280"></a>
-<a name="ln-281"></a>    npa_acent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_cent&#39;</span>, $
-<a name="ln-282"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-283"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the aperture&#39;</span>}
-<a name="ln-284"></a>    npa_acent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_cent&#39;</span>, $
-<a name="ln-285"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-286"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-287"></a>
-<a name="ln-288"></a>    npa_atedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_tedge&#39;</span>, $
-<a name="ln-289"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-290"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures top edge&#39;</span>}
-<a name="ln-291"></a>    npa_atedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_tedge&#39;</span>, $
-<a name="ln-292"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-293"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-294"></a>
-<a name="ln-295"></a>    npa_aredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_redge&#39;</span>, $
-<a name="ln-296"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-297"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures right edge&#39;</span>}
-<a name="ln-298"></a>    npa_aredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_redge&#39;</span>, $
-<a name="ln-299"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-300"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-301"></a>
-<a name="ln-302"></a>    npa_radius_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/radius&#39;</span>, $
-<a name="ln-303"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-304"></a>                       data<span class="o">:</span><span class="s1">&#39;Line of sight radius at midplane or tangency point&#39;</span> }
-<a name="ln-305"></a>    npa_radius_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/radius&#39;</span>, $
-<a name="ln-306"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-307"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-308"></a>
-<a name="ln-309"></a>    npa_atts <span class="o">=</span> [npa_desc, npa_cs, npa_ds_desc, $ 
-<a name="ln-310"></a>                npa_nchan_desc, npa_system_desc, $
-<a name="ln-311"></a>                npa_id_desc, $
-<a name="ln-312"></a>                npa_dshape_desc, npa_ashape_desc, $
-<a name="ln-313"></a>                npa_dcent_desc, npa_dcent_unit, $
-<a name="ln-314"></a>                npa_acent_desc, npa_acent_unit, $
-<a name="ln-315"></a>                npa_dtedge_desc, npa_dtedge_unit, $
-<a name="ln-316"></a>                npa_atedge_desc, npa_atedge_unit, $
-<a name="ln-317"></a>                npa_dredge_desc, npa_dredge_unit, $
-<a name="ln-318"></a>                npa_aredge_desc, npa_aredge_unit, $
-<a name="ln-319"></a>                npa_radius_desc, npa_radius_unit ]
-<a name="ln-320"></a>
-<a name="ln-321"></a>    atts <span class="o">=</span> [root_atts, nbi_atts]
-<a name="ln-322"></a>    geom <span class="o">=</span> {nbi<span class="o">:</span>nbi}
-<a name="ln-323"></a>
-<a name="ln-324"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(spec) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-325"></a>        geom <span class="o">=</span> <span class="nb">create_struct</span>(geom, <span class="s2">&quot;spec&quot;</span>, spec)
-<a name="ln-326"></a>        atts <span class="o">=</span> [atts, spec_atts]
-<a name="ln-327"></a>    <span class="k">endif</span>
-<a name="ln-328"></a>
-<a name="ln-329"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(npa) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-330"></a>        geom <span class="o">=</span> <span class="nb">create_struct</span>(geom, <span class="s2">&quot;npa&quot;</span>, npa)
-<a name="ln-331"></a>        atts <span class="o">=</span> [atts,npa_atts]
-<a name="ln-332"></a>    <span class="k">endif</span>
-<a name="ln-333"></a>
-<a name="ln-334"></a>    write_hdf5, geom, filename<span class="o">=</span>filename, atts<span class="o">=</span>atts, <span class="o">/</span>clobber
+<a name="ln-15"></a><span class="c1">    ;+     **cfpd**: Optional, CFPD geometry structure</span>
+<a name="ln-16"></a><span class="c1">    ;+</span>
+<a name="ln-17"></a><span class="c1">    ;+##Example Usage</span>
+<a name="ln-18"></a><span class="c1">    ;+```idl</span>
+<a name="ln-19"></a><span class="c1">    ;+IDL&gt; write_geometry, filename, nbi, spec=spec, npa=npa, cfpd=cfpd</span>
+<a name="ln-20"></a><span class="c1">    ;+```</span>
+<a name="ln-21"></a>    info,<span class="s1">&#39;Writing geometry file...&#39;</span>
+<a name="ln-22"></a>
+<a name="ln-23"></a><span class="c1">    ;; Create attributes</span>
+<a name="ln-24"></a>    root_atts <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
+<a name="ln-25"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
+<a name="ln-26"></a>                data<span class="o">:</span><span class="s1">&#39;Geometric quantities for FIDASIM&#39;</span>}
+<a name="ln-27"></a>
+<a name="ln-28"></a><span class="c1">    ;; NBI attributes</span>
+<a name="ln-29"></a>    nbi_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi&#39;</span>, $
+<a name="ln-30"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>,$
+<a name="ln-31"></a>                data<span class="o">:</span><span class="s1">&#39;Neutral Beam Geometry&#39;</span>}
+<a name="ln-32"></a>
+<a name="ln-33"></a>    nbi_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi&#39;</span>, $
+<a name="ln-34"></a>              name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>,$
+<a name="ln-35"></a>              data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
+<a name="ln-36"></a>
+<a name="ln-37"></a>    nbi_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/data_source&#39;</span>, $
+<a name="ln-38"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-39"></a>                   data<span class="o">:</span><span class="s1">&#39;Source of the NBI geometry&#39;</span>}
+<a name="ln-40"></a>
+<a name="ln-41"></a>    nbi_name_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/name&#39;</span>, $
+<a name="ln-42"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-43"></a>                     data<span class="o">:</span><span class="s1">&#39;Beam name&#39;</span>}
+<a name="ln-44"></a>
+<a name="ln-45"></a>    nbi_src_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/src&#39;</span>, $
+<a name="ln-46"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-47"></a>                    data<span class="o">:</span><span class="s1">&#39;Position of the center of the beam source grid&#39;</span>}
+<a name="ln-48"></a>    nbi_src_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/src&#39;</span>, $
+<a name="ln-49"></a>                    name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-50"></a>                    data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-51"></a>
+<a name="ln-52"></a>    nbi_axis_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/axis&#39;</span>, $
+<a name="ln-53"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-54"></a>                     data<span class="o">:</span><span class="s1">&#39;Axis of the beam centerline: Centerline(t) = src + axis*t &#39;</span>}
+<a name="ln-55"></a>    nbi_axis_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/axis&#39;</span>, $
+<a name="ln-56"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-57"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-58"></a>
+<a name="ln-59"></a>    nbi_focy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focy&#39;</span>, $
+<a name="ln-60"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-61"></a>                     data<span class="o">:</span><span class="s1">&#39;Horizonal focal length of the beam&#39;</span>}
+<a name="ln-62"></a>    nbi_focy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focy&#39;</span>, $
+<a name="ln-63"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-64"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-65"></a>
+<a name="ln-66"></a>    nbi_focz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focz&#39;</span>, $
+<a name="ln-67"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-68"></a>                     data<span class="o">:</span><span class="s1">&#39;Vertical focal length of the beam&#39;</span>}
+<a name="ln-69"></a>    nbi_focz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/focz&#39;</span>, $
+<a name="ln-70"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-71"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-72"></a>
+<a name="ln-73"></a>    nbi_divy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divy&#39;</span>, $
+<a name="ln-74"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-75"></a>                     data<span class="o">:</span><span class="s1">&#39;Horizonal divergences of the beam. One for each energy component&#39;</span>}
+<a name="ln-76"></a>    nbi_divy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divy&#39;</span>, $
+<a name="ln-77"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-78"></a>                     data<span class="o">:</span><span class="s1">&#39;radians&#39;</span>}
+<a name="ln-79"></a>
+<a name="ln-80"></a>    nbi_divz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divz&#39;</span>, $
+<a name="ln-81"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-82"></a>                     data<span class="o">:</span><span class="s1">&#39;Vertical divergences of the beam. One for each energy component&#39;</span>}
+<a name="ln-83"></a>    nbi_divz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/divz&#39;</span>, $
+<a name="ln-84"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-85"></a>                     data<span class="o">:</span><span class="s1">&#39;radians&#39;</span>}
+<a name="ln-86"></a>
+<a name="ln-87"></a>    nbi_widy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widy&#39;</span>, $
+<a name="ln-88"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-89"></a>                     data<span class="o">:</span><span class="s1">&#39;Half width of the beam source grid&#39;</span>}
+<a name="ln-90"></a>    nbi_widy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widy&#39;</span>, $
+<a name="ln-91"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-92"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-93"></a>
+<a name="ln-94"></a>    nbi_widz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widz&#39;</span>, $
+<a name="ln-95"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-96"></a>                     data<span class="o">:</span><span class="s1">&#39;Half height of the beam source grid&#39;</span>}
+<a name="ln-97"></a>    nbi_widz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/widz&#39;</span>, $
+<a name="ln-98"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-99"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-100"></a>
+<a name="ln-101"></a>    nbi_shape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/shape&#39;</span>, $
+<a name="ln-102"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-103"></a>                      data<span class="o">:</span><span class="s1">&#39;Shape of the beam source grid: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-104"></a>
+<a name="ln-105"></a>    nbi_naperture_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/naperture&#39;</span>, $
+<a name="ln-106"></a>                          name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-107"></a>                          data<span class="o">:</span><span class="s1">&#39;Number of apertures&#39;</span>}
+<a name="ln-108"></a>
+<a name="ln-109"></a>    nbi_ashape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/ashape&#39;</span>, $
+<a name="ln-110"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-111"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the aperture(s): 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-112"></a>
+<a name="ln-113"></a>    nbi_awidy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidy&#39;</span>, $
+<a name="ln-114"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-115"></a>                      data<span class="o">:</span><span class="s1">&#39;Half width of the aperture(s)&#39;</span>}
+<a name="ln-116"></a>    nbi_awidy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidy&#39;</span>, $
+<a name="ln-117"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-118"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-119"></a>
+<a name="ln-120"></a>    nbi_awidz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidz&#39;</span>, $
+<a name="ln-121"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-122"></a>                      data<span class="o">:</span><span class="s1">&#39;Half height of the aperture(s)&#39;</span>}
+<a name="ln-123"></a>    nbi_awidz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/awidz&#39;</span>, $
+<a name="ln-124"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-125"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-126"></a>
+<a name="ln-127"></a>    nbi_aoffy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffy&#39;</span>, $
+<a name="ln-128"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-129"></a>                      data<span class="o">:</span><span class="s1">&#39;Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline&#39;</span>}
+<a name="ln-130"></a>    nbi_aoffy_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffy&#39;</span>, $
+<a name="ln-131"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-132"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-133"></a>
+<a name="ln-134"></a>    nbi_aoffz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffz&#39;</span>, $
+<a name="ln-135"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-136"></a>                      data<span class="o">:</span><span class="s1">&#39;Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline&#39;</span>}
+<a name="ln-137"></a>    nbi_aoffz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/aoffz&#39;</span>, $
+<a name="ln-138"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-139"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-140"></a>
+<a name="ln-141"></a>    nbi_adist_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/adist&#39;</span>, $
+<a name="ln-142"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-143"></a>                      data<span class="o">:</span><span class="s1">&#39;Distance from the center of the beam source grid to the aperture(s) plane&#39;</span>}
+<a name="ln-144"></a>    nbi_adist_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/nbi/adist&#39;</span>, $
+<a name="ln-145"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-146"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-147"></a>
+<a name="ln-148"></a>    nbi_atts <span class="o">=</span> [nbi_desc, nbi_cs, nbi_ds_desc,nbi_name_desc, $
+<a name="ln-149"></a>                nbi_shape_desc, nbi_src_desc, nbi_src_unit,  $
+<a name="ln-150"></a>                nbi_axis_desc, nbi_axis_unit, $
+<a name="ln-151"></a>                nbi_focy_desc, nbi_focy_unit, $
+<a name="ln-152"></a>                nbi_focz_desc, nbi_focz_unit, $
+<a name="ln-153"></a>                nbi_divy_desc, nbi_divy_unit, $
+<a name="ln-154"></a>                nbi_divz_desc, nbi_divz_unit, $
+<a name="ln-155"></a>                nbi_widy_desc, nbi_widy_unit, $
+<a name="ln-156"></a>                nbi_widz_desc, nbi_widz_unit, $
+<a name="ln-157"></a>                nbi_naperture_desc, nbi_ashape_desc, $
+<a name="ln-158"></a>                nbi_awidy_desc, nbi_awidy_unit, $
+<a name="ln-159"></a>                nbi_awidz_desc, nbi_awidz_unit, $
+<a name="ln-160"></a>                nbi_aoffy_desc, nbi_aoffy_unit, $
+<a name="ln-161"></a>                nbi_aoffz_desc, nbi_aoffz_unit, $
+<a name="ln-162"></a>                nbi_adist_desc, nbi_adist_unit ]
+<a name="ln-163"></a>
+<a name="ln-164"></a><span class="c1">    ;; Spectroscopic attributes</span>
+<a name="ln-165"></a>    spec_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec&#39;</span>, $
+<a name="ln-166"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-167"></a>                 data<span class="o">:</span><span class="s1">&#39;FIDA/BES Chord Geometry&#39;</span>}
+<a name="ln-168"></a>    spec_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec&#39;</span>, $
+<a name="ln-169"></a>               name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a name="ln-170"></a>               data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
+<a name="ln-171"></a>
+<a name="ln-172"></a>    spec_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/data_source&#39;</span>, $
+<a name="ln-173"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-174"></a>                    data<span class="o">:</span><span class="s1">&#39;Source of the chord geometry&#39;</span>}
+<a name="ln-175"></a>
+<a name="ln-176"></a>    spec_nchan_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/nchan&#39;</span>, $
+<a name="ln-177"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-178"></a>                       data<span class="o">:</span><span class="s1">&#39;Number of channels&#39;</span>}
+<a name="ln-179"></a>
+<a name="ln-180"></a>    spec_system_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/system&#39;</span>, $
+<a name="ln-181"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-182"></a>                        data<span class="o">:</span><span class="s1">&#39;Names of the different spectrocopic systems&#39;</span>}
+<a name="ln-183"></a>
+<a name="ln-184"></a>    spec_id_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/id&#39;</span>, $
+<a name="ln-185"></a>                    name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-186"></a>                    data<span class="o">:</span><span class="s1">&#39;Line of sight ID&#39;</span>}
+<a name="ln-187"></a>
+<a name="ln-188"></a>    spec_lens_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/lens&#39;</span>, $
+<a name="ln-189"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-190"></a>                      data<span class="o">:</span><span class="s1">&#39;Positions of the lenses&#39;</span>}
+<a name="ln-191"></a>    spec_lens_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/lens&#39;</span>, $
+<a name="ln-192"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-193"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-194"></a>
+<a name="ln-195"></a>    spec_axis_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/axis&#39;</span>, $
+<a name="ln-196"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-197"></a>                      data<span class="o">:</span><span class="s1">&#39;Optical axis of the lines of sight: LOS(t) = lens + axis*t &#39;</span>}
+<a name="ln-198"></a>    spec_axis_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/axis&#39;</span>, $
+<a name="ln-199"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-200"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-201"></a>
+<a name="ln-202"></a>    spec_radius_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/radius&#39;</span>, $
+<a name="ln-203"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-204"></a>                        data<span class="o">:</span><span class="s1">&#39;Line of sight radius at midplane or tangency point&#39;</span> }
+<a name="ln-205"></a>    spec_radius_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/radius&#39;</span>, $
+<a name="ln-206"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-207"></a>                        data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-208"></a>
+<a name="ln-209"></a>    spec_sigma_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/sigma_pi&#39;</span>, $
+<a name="ln-210"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-211"></a>                       data<span class="o">:</span><span class="s1">&#39;Ratio of the intensities of the sigma and pi stark lines. Measured quantity&#39;</span>}
+<a name="ln-212"></a>
+<a name="ln-213"></a>    spec_spot_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/spot_size&#39;</span>, $
+<a name="ln-214"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-215"></a>                      data<span class="o">:</span><span class="s1">&#39;Radius of spot size&#39;</span>}
+<a name="ln-216"></a>    spec_spot_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/spec/spot_size&#39;</span>, $
+<a name="ln-217"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-218"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-219"></a>
+<a name="ln-220"></a>    spec_atts <span class="o">=</span> [spec_desc,spec_cs, spec_ds_desc, $
+<a name="ln-221"></a>                 spec_nchan_desc, spec_system_desc, $
+<a name="ln-222"></a>                 spec_id_desc, $
+<a name="ln-223"></a>                 spec_lens_desc,spec_lens_unit, $
+<a name="ln-224"></a>                 spec_axis_desc,spec_axis_unit, $
+<a name="ln-225"></a>                 spec_radius_desc, spec_radius_unit, $
+<a name="ln-226"></a>                 spec_sigma_desc, $
+<a name="ln-227"></a>                 spec_spot_desc, spec_spot_unit]
+<a name="ln-228"></a>
+<a name="ln-229"></a><span class="c1">    ;;NPA attributes</span>
+<a name="ln-230"></a>    npa_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa&#39;</span>, $
+<a name="ln-231"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-232"></a>                data<span class="o">:</span><span class="s1">&#39;NPA Geometry&#39;</span>}
+<a name="ln-233"></a>
+<a name="ln-234"></a>    npa_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa&#39;</span>, $
+<a name="ln-235"></a>              name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a name="ln-236"></a>              data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
+<a name="ln-237"></a>
+<a name="ln-238"></a>    npa_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/data_source&#39;</span>, $
+<a name="ln-239"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-240"></a>                   data<span class="o">:</span><span class="s1">&#39;Source of the NPA geometry&#39;</span>}
+<a name="ln-241"></a>
+<a name="ln-242"></a>    npa_nchan_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/nchan&#39;</span>, $
+<a name="ln-243"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-244"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of channels&#39;</span>}
+<a name="ln-245"></a>
+<a name="ln-246"></a>    npa_system_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/system&#39;</span>, $
+<a name="ln-247"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-248"></a>                       data<span class="o">:</span><span class="s1">&#39;Names of the different NPA systems&#39;</span>}
+<a name="ln-249"></a>
+<a name="ln-250"></a>    npa_id_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/id&#39;</span>, $
+<a name="ln-251"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-252"></a>                   data<span class="o">:</span><span class="s1">&#39;Line of sight ID&#39;</span>}
+<a name="ln-253"></a>
+<a name="ln-254"></a>    npa_dshape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_shape&#39;</span>, $
+<a name="ln-255"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-256"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the detector: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-257"></a>
+<a name="ln-258"></a>    npa_dcent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_cent&#39;</span>, $
+<a name="ln-259"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-260"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the detector&#39;</span>}
+<a name="ln-261"></a>    npa_dcent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_cent&#39;</span>, $
+<a name="ln-262"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-263"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-264"></a>
+<a name="ln-265"></a>    npa_dtedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_tedge&#39;</span>, $
+<a name="ln-266"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-267"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors top edge&#39;</span>}
+<a name="ln-268"></a>    npa_dtedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_tedge&#39;</span>, $
+<a name="ln-269"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-270"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-271"></a>
+<a name="ln-272"></a>    npa_dredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_redge&#39;</span>, $
+<a name="ln-273"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-274"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors right edge&#39;</span>}
+<a name="ln-275"></a>    npa_dredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/d_redge&#39;</span>, $
+<a name="ln-276"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-277"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-278"></a>
+<a name="ln-279"></a>    npa_ashape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_shape&#39;</span>, $
+<a name="ln-280"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-281"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the aperture: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-282"></a>
+<a name="ln-283"></a>    npa_acent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_cent&#39;</span>, $
+<a name="ln-284"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-285"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the aperture&#39;</span>}
+<a name="ln-286"></a>    npa_acent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_cent&#39;</span>, $
+<a name="ln-287"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-288"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-289"></a>
+<a name="ln-290"></a>    npa_atedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_tedge&#39;</span>, $
+<a name="ln-291"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-292"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures top edge&#39;</span>}
+<a name="ln-293"></a>    npa_atedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_tedge&#39;</span>, $
+<a name="ln-294"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-295"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-296"></a>
+<a name="ln-297"></a>    npa_aredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_redge&#39;</span>, $
+<a name="ln-298"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-299"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures right edge&#39;</span>}
+<a name="ln-300"></a>    npa_aredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/a_redge&#39;</span>, $
+<a name="ln-301"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-302"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-303"></a>
+<a name="ln-304"></a>    npa_radius_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/radius&#39;</span>, $
+<a name="ln-305"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-306"></a>                       data<span class="o">:</span><span class="s1">&#39;Line of sight radius at midplane or tangency point&#39;</span> }
+<a name="ln-307"></a>    npa_radius_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/npa/radius&#39;</span>, $
+<a name="ln-308"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-309"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-310"></a>
+<a name="ln-311"></a>    npa_atts <span class="o">=</span> [npa_desc, npa_cs, npa_ds_desc, $
+<a name="ln-312"></a>                npa_nchan_desc, npa_system_desc, $
+<a name="ln-313"></a>                npa_id_desc, $
+<a name="ln-314"></a>                npa_dshape_desc, npa_ashape_desc, $
+<a name="ln-315"></a>                npa_dcent_desc, npa_dcent_unit, $
+<a name="ln-316"></a>                npa_acent_desc, npa_acent_unit, $
+<a name="ln-317"></a>                npa_dtedge_desc, npa_dtedge_unit, $
+<a name="ln-318"></a>                npa_atedge_desc, npa_atedge_unit, $
+<a name="ln-319"></a>                npa_dredge_desc, npa_dredge_unit, $
+<a name="ln-320"></a>                npa_aredge_desc, npa_aredge_unit, $
+<a name="ln-321"></a>                npa_radius_desc, npa_radius_unit ]
+<a name="ln-322"></a>
+<a name="ln-323"></a><span class="c1">    ;;CFPD attributes</span>
+<a name="ln-324"></a>    cfpd_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd&#39;</span>, $
+<a name="ln-325"></a>                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-326"></a>                data<span class="o">:</span><span class="s1">&#39;CFPD Geometry&#39;</span>}
+<a name="ln-327"></a>
+<a name="ln-328"></a>    cfpd_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd&#39;</span>, $
+<a name="ln-329"></a>              name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a name="ln-330"></a>              data<span class="o">:</span><span class="s1">&#39;Right-handed cartesian&#39;</span>}
+<a name="ln-331"></a>
+<a name="ln-332"></a>    cfpd_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/data_source&#39;</span>, $
+<a name="ln-333"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-334"></a>                   data<span class="o">:</span><span class="s1">&#39;Source of the CFPD geometry&#39;</span>}
 <a name="ln-335"></a>
-<a name="ln-336"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-337"></a>        success, <span class="s1">&#39;Geometry file created: &#39;</span><span class="o">+</span>filename
-<a name="ln-338"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-339"></a>        error, <span class="s1">&#39;Geometry file creation failed.&#39;</span>
-<a name="ln-340"></a>    <span class="k">endelse</span>
-<a name="ln-341"></a>
-<a name="ln-342"></a><span class="k">END</span>
+<a name="ln-336"></a>    cfpd_nchan_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/nchan&#39;</span>, $
+<a name="ln-337"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-338"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of channels&#39;</span>}
+<a name="ln-339"></a>
+<a name="ln-340"></a>    cfpd_nrays_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/nrays&#39;</span>, $
+<a name="ln-341"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-342"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of rays&#39;</span>}
+<a name="ln-343"></a>
+<a name="ln-344"></a>    cfpd_nsteps_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/nsteps&#39;</span>, $
+<a name="ln-345"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-346"></a>                      data<span class="o">:</span><span class="s1">&#39;Maximum number of orbit steps&#39;</span>}
+<a name="ln-347"></a>
+<a name="ln-348"></a>    cfpd_nenergy_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/nenergy&#39;</span>, $
+<a name="ln-349"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-350"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of energies&#39;</span>}
+<a name="ln-351"></a>
+<a name="ln-352"></a>    cfpd_nactual_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/nactual&#39;</span>, $
+<a name="ln-353"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-354"></a>                       data<span class="o">:</span><span class="s1">&#39;Number of orbital spatial steps&#39;</span> }
+<a name="ln-355"></a>
+<a name="ln-356"></a>    cfpd_system_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/system&#39;</span>, $
+<a name="ln-357"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-358"></a>                       data<span class="o">:</span><span class="s1">&#39;Names of the different CFPD systems&#39;</span>}
+<a name="ln-359"></a>
+<a name="ln-360"></a>    cfpd_id_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/id&#39;</span>, $
+<a name="ln-361"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-362"></a>                   data<span class="o">:</span><span class="s1">&#39;Line of sight ID&#39;</span>}
+<a name="ln-363"></a>
+<a name="ln-364"></a>    cfpd_dshape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_shape&#39;</span>, $
+<a name="ln-365"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-366"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the detector: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-367"></a>
+<a name="ln-368"></a>    cfpd_dcent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_cent&#39;</span>, $
+<a name="ln-369"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-370"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the detector&#39;</span>}
+<a name="ln-371"></a>    cfpd_dcent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_cent&#39;</span>, $
+<a name="ln-372"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-373"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-374"></a>
+<a name="ln-375"></a>    cfpd_dtedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_tedge&#39;</span>, $
+<a name="ln-376"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-377"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors top edge&#39;</span>}
+<a name="ln-378"></a>    cfpd_dtedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_tedge&#39;</span>, $
+<a name="ln-379"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-380"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-381"></a>
+<a name="ln-382"></a>    cfpd_dredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_redge&#39;</span>, $
+<a name="ln-383"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-384"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the detectors right edge&#39;</span>}
+<a name="ln-385"></a>    cfpd_dredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/d_redge&#39;</span>, $
+<a name="ln-386"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-387"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-388"></a>
+<a name="ln-389"></a>    cfpd_ashape_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_shape&#39;</span>, $
+<a name="ln-390"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-391"></a>                       data<span class="o">:</span><span class="s1">&#39;Shape of the aperture: 1=&quot;rectangular&quot;, 2=&quot;circular&quot;&#39;</span>}
+<a name="ln-392"></a>
+<a name="ln-393"></a>    cfpd_acent_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_cent&#39;</span>, $
+<a name="ln-394"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-395"></a>                      data<span class="o">:</span><span class="s1">&#39;Center of the aperture&#39;</span>}
+<a name="ln-396"></a>    cfpd_acent_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_cent&#39;</span>, $
+<a name="ln-397"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-398"></a>                      data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-399"></a>
+<a name="ln-400"></a>    cfpd_atedge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_tedge&#39;</span>, $
+<a name="ln-401"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-402"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures top edge&#39;</span>}
+<a name="ln-403"></a>    cfpd_atedge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_tedge&#39;</span>, $
+<a name="ln-404"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-405"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-406"></a>
+<a name="ln-407"></a>    cfpd_aredge_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_redge&#39;</span>, $
+<a name="ln-408"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-409"></a>                       data<span class="o">:</span><span class="s1">&#39;Center of the apertures right edge&#39;</span>}
+<a name="ln-410"></a>    cfpd_aredge_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/a_redge&#39;</span>, $
+<a name="ln-411"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-412"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-413"></a>
+<a name="ln-414"></a>    cfpd_radius_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/radius&#39;</span>, $
+<a name="ln-415"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-416"></a>                       data<span class="o">:</span><span class="s1">&#39;Line of sight radius at midplane or tangency point&#39;</span> }
+<a name="ln-417"></a>    cfpd_radius_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/radius&#39;</span>, $
+<a name="ln-418"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-419"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a name="ln-420"></a>
+<a name="ln-421"></a>    cfpd_earray_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/earray&#39;</span>, $
+<a name="ln-422"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-423"></a>                       data<span class="o">:</span><span class="s1">&#39;Energy array&#39;</span> }
+<a name="ln-424"></a>    cfpd_earray_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/earray&#39;</span>, $
+<a name="ln-425"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-426"></a>                       data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
+<a name="ln-427"></a>
+<a name="ln-428"></a>    cfpd_sightline_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/sightline&#39;</span>, $
+<a name="ln-429"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-430"></a>                       data<span class="o">:</span><span class="s1">&#39;Velocity and position in (R,Phi,Z)&#39;</span> }
+<a name="ln-431"></a>    cfpd_sightline_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/sightline&#39;</span>, $
+<a name="ln-432"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-433"></a>                       data<span class="o">:</span><span class="s1">&#39;cm/s and cm&#39;</span>}
+<a name="ln-434"></a>
+<a name="ln-435"></a>    cfpd_daomega_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/daomega&#39;</span>, $
+<a name="ln-436"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a name="ln-437"></a>                       data<span class="o">:</span><span class="s1">&#39;Transmission factor&#39;</span> }
+<a name="ln-438"></a>    cfpd_daomega_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/cfpd/daomega&#39;</span>, $
+<a name="ln-439"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a name="ln-440"></a>                       data<span class="o">:</span><span class="s1">&#39;cm^2&#39;</span>}
+<a name="ln-441"></a>
+<a name="ln-442"></a>    cfpd_atts <span class="o">=</span> [cfpd_desc, cfpd_cs, cfpd_ds_desc, $
+<a name="ln-443"></a>                cfpd_nchan_desc, cfpd_system_desc, $
+<a name="ln-444"></a>                cfpd_nrays_desc, cfpd_nsteps_desc, $
+<a name="ln-445"></a>                cfpd_nenergy_desc, $
+<a name="ln-446"></a>                cfpd_id_desc, $
+<a name="ln-447"></a>                cfpd_dshape_desc, cfpd_ashape_desc, $
+<a name="ln-448"></a>                cfpd_dcent_desc, cfpd_dcent_unit, $
+<a name="ln-449"></a>                cfpd_acent_desc, cfpd_acent_unit, $
+<a name="ln-450"></a>                cfpd_dtedge_desc, cfpd_dtedge_unit, $
+<a name="ln-451"></a>                cfpd_atedge_desc, cfpd_atedge_unit, $
+<a name="ln-452"></a>                cfpd_dredge_desc, cfpd_dredge_unit, $
+<a name="ln-453"></a>                cfpd_aredge_desc, cfpd_aredge_unit, $
+<a name="ln-454"></a>                cfpd_earray_unit, cfpd_sightline_unit, $
+<a name="ln-455"></a>                cfpd_earray_desc, cfpd_sightline_desc, $
+<a name="ln-456"></a>                cfpd_nactual_desc, cfpd_daomega_unit, $
+<a name="ln-457"></a>                cfpd_daomega_desc, $
+<a name="ln-458"></a>                cfpd_radius_desc, cfpd_radius_unit ]
+<a name="ln-459"></a>
+<a name="ln-460"></a>    atts <span class="o">=</span> [root_atts, nbi_atts]
+<a name="ln-461"></a>    geom <span class="o">=</span> {nbi<span class="o">:</span>nbi}
+<a name="ln-462"></a>
+<a name="ln-463"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(spec) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-464"></a>        geom <span class="o">=</span> <span class="nb">create_struct</span>(geom, <span class="s2">&quot;spec&quot;</span>, spec)
+<a name="ln-465"></a>        atts <span class="o">=</span> [atts, spec_atts]
+<a name="ln-466"></a>    <span class="k">endif</span>
+<a name="ln-467"></a>
+<a name="ln-468"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(npa) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-469"></a>        geom <span class="o">=</span> <span class="nb">create_struct</span>(geom, <span class="s2">&quot;npa&quot;</span>, npa)
+<a name="ln-470"></a>        atts <span class="o">=</span> [atts,npa_atts]
+<a name="ln-471"></a>    <span class="k">endif</span>
+<a name="ln-472"></a>
+<a name="ln-473"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(cfpd) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-474"></a>        geom <span class="o">=</span> <span class="nb">create_struct</span>(geom, <span class="s2">&quot;cfpd&quot;</span>, cfpd)
+<a name="ln-475"></a>        atts <span class="o">=</span> [atts,cfpd_atts]
+<a name="ln-476"></a>    <span class="k">endif</span>
+<a name="ln-477"></a>
+<a name="ln-478"></a>    write_hdf5, geom, filename<span class="o">=</span>filename, atts<span class="o">=</span>atts, <span class="o">/</span>clobber
+<a name="ln-479"></a>
+<a name="ln-480"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
+<a name="ln-481"></a>        success, <span class="s1">&#39;Geometry file created: &#39;</span><span class="o">+</span>filename
+<a name="ln-482"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a name="ln-483"></a>        error, <span class="s1">&#39;Geometry file creation failed.&#39;</span>
+<a name="ln-484"></a>    <span class="k">endelse</span>
+<a name="ln-485"></a>
+<a name="ln-486"></a><span class="k">END</span>
 </pre></div>
 
     </section>

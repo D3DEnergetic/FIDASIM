@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 6.7% of total for source files.">1007 statements</a>
+    title=" 6.5% of total for source files.">1007 statements</a>
      </li> 
      
      
@@ -632,8 +632,8 @@ sparse array implementation</p>
 <a name="ln-207"></a>        <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ind1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 <a name="ln-208"></a>        <span class="n">subs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span> <span class="o">-</span> <span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ind2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-209"></a>        <span class="n">ind1</span> <span class="o">=</span> <span class="n">ind2</span>
-<a name="ln-210"></a>    <span class="n">enddo</span>
-<a name="ln-211"></a>    <span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
+<a name="ln-210"></a>    <span class="k">enddo</span>
+<a name="ln-211"></a><span class="k">    </span><span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
 <a name="ln-212"></a>
 <a name="ln-213"></a><span class="k">end subroutine </span><span class="n">ind2sub</span>
 <a name="ln-214"></a>
@@ -654,9 +654,9 @@ sparse array implementation</p>
 <a name="ln-229"></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-230"></a>        <span class="k">do </span><span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span>
 <a name="ln-231"></a>            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">*</span><span class="n">dims</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
-<a name="ln-232"></a>        <span class="n">enddo</span>
-<a name="ln-233"></a>        <span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-234"></a>    <span class="n">enddo</span>
+<a name="ln-232"></a>        <span class="k">enddo</span>
+<a name="ln-233"></a><span class="k">        </span><span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-234"></a>    <span class="k">enddo</span>
 <a name="ln-235"></a>
 <a name="ln-236"></a><span class="k">end function </span><span class="n">sub2ind</span>
 <a name="ln-237"></a>
@@ -682,8 +682,8 @@ sparse array implementation</p>
 <a name="ln-257"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
 <a name="ln-258"></a>        <span class="k">else</span>
 <a name="ln-259"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-260"></a>        <span class="n">endif</span>
-<a name="ln-261"></a>    <span class="n">enddo</span>
+<a name="ln-260"></a>        <span class="k">endif</span>
+<a name="ln-261"></a><span class="k">    enddo</span>
 <a name="ln-262"></a>
 <a name="ln-263"></a><span class="k">end function </span><span class="n">search_sorted_first_integer</span>
 <a name="ln-264"></a>
@@ -706,8 +706,8 @@ sparse array implementation</p>
 <a name="ln-281"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
 <a name="ln-282"></a>        <span class="k">else</span>
 <a name="ln-283"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-284"></a>        <span class="n">endif</span>
-<a name="ln-285"></a>    <span class="n">enddo</span>
+<a name="ln-284"></a>        <span class="k">endif</span>
+<a name="ln-285"></a><span class="k">    enddo</span>
 <a name="ln-286"></a>
 <a name="ln-287"></a><span class="k">end function </span><span class="n">search_sorted_first_float64</span>
 <a name="ln-288"></a>
@@ -748,10 +748,10 @@ sparse array implementation</p>
 <a name="ln-323"></a><span class="cp">#else</span>
 <a name="ln-324"></a>        <span class="n">s</span> <span class="o">=</span> <span class="n">seed</span>
 <a name="ln-325"></a><span class="cp">#endif</span>
-<a name="ln-326"></a>    <span class="n">endif</span>
+<a name="ln-326"></a>    <span class="k">endif</span>
 <a name="ln-327"></a>
 <a name="ln-328"></a>
-<a name="ln-329"></a>    <span class="n">self</span><span class="p">%</span><span class="n">seed</span> <span class="o">=</span> <span class="n">s</span>
+<a name="ln-329"></a><span class="k">    </span><span class="n">self</span><span class="p">%</span><span class="n">seed</span> <span class="o">=</span> <span class="n">s</span>
 <a name="ln-330"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="mi">777755555</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 <a name="ln-331"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ior</span><span class="p">(</span><span class="nb">ieor</span><span class="p">(</span><span class="mi">888889999</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-332"></a>
@@ -839,9 +839,9 @@ sparse array implementation</p>
 <a name="ln-414"></a>        <span class="k">if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">r1</span><span class="p">)</span> <span class="k">exit</span>
 <a name="ln-415"></a><span class="k">        if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">r2</span><span class="p">)</span> <span class="k">cycle</span>
 <a name="ln-416"></a><span class="k">        if</span><span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">).</span><span class="n">lt</span><span class="p">.(</span><span class="o">-</span><span class="mf">4.0</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="k">exit</span>
-<a name="ln-417"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-417"></a><span class="k">    enddo</span>
 <a name="ln-418"></a>
-<a name="ln-419"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">/</span><span class="n">u</span>
+<a name="ln-419"></a><span class="k">    </span><span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">/</span><span class="n">u</span>
 <a name="ln-420"></a>
 <a name="ln-421"></a><span class="k">end function </span><span class="n">rng_normal</span>
 <a name="ln-422"></a>
@@ -857,7 +857,7 @@ sparse array implementation</p>
 <a name="ln-432"></a>    <span class="n">randomu</span> <span class="o">=</span> <span class="mf">0.d0</span>
 <a name="ln-433"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
 <a name="ln-434"></a>        <span class="n">randomu</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<a name="ln-435"></a>    <span class="n">enddo</span>
+<a name="ln-435"></a>    <span class="k">enddo</span>
 <a name="ln-436"></a>
 <a name="ln-437"></a><span class="k">end subroutine </span><span class="n">randu_r_arr</span>
 <a name="ln-438"></a>
@@ -886,7 +886,7 @@ sparse array implementation</p>
 <a name="ln-461"></a>    <span class="n">randomn</span> <span class="o">=</span> <span class="mf">0.d0</span>
 <a name="ln-462"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
 <a name="ln-463"></a>        <span class="n">randomn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_normal</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<a name="ln-464"></a>    <span class="n">enddo</span>
+<a name="ln-464"></a>    <span class="k">enddo</span>
 <a name="ln-465"></a>
 <a name="ln-466"></a><span class="k">end subroutine </span><span class="n">randn_r_arr</span>
 <a name="ln-467"></a>
@@ -919,7 +919,7 @@ sparse array implementation</p>
 <a name="ln-494"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
 <a name="ln-495"></a>        <span class="k">call </span><span class="n">randu_r_arr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">randomu</span><span class="p">)</span>
 <a name="ln-496"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
-<a name="ln-497"></a>    <span class="n">enddo</span>
+<a name="ln-497"></a>    <span class="k">enddo</span>
 <a name="ln-498"></a>
 <a name="ln-499"></a><span class="k">end subroutine </span><span class="n">randind_r_n</span>
 <a name="ln-500"></a>
@@ -958,7 +958,7 @@ sparse array implementation</p>
 <a name="ln-533"></a>        <span class="k">call </span><span class="n">randu_r_arr</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">randomu</span><span class="p">)</span>
 <a name="ln-534"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cdf</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 <a name="ln-535"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">search_sorted_first</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span><span class="n">cdf_val</span><span class="p">),</span><span class="n">n</span><span class="p">)</span>
-<a name="ln-536"></a>    <span class="n">enddo</span>
+<a name="ln-536"></a>    <span class="k">enddo</span>
 <a name="ln-537"></a>
 <a name="ln-538"></a><span class="k">end subroutine </span><span class="n">randind_r_cdf_1</span>
 <a name="ln-539"></a>
@@ -992,7 +992,7 @@ sparse array implementation</p>
 <a name="ln-567"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
 <a name="ln-568"></a>        <span class="n">cs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-569"></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">cs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-570"></a>    <span class="n">enddo</span>
+<a name="ln-570"></a>    <span class="k">enddo</span>
 <a name="ln-571"></a>
 <a name="ln-572"></a><span class="k">end subroutine </span><span class="n">cumsum</span>
 <a name="ln-573"></a>
@@ -1049,7 +1049,7 @@ sparse array implementation</p>
 <a name="ln-624"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-625"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
 <a name="ln-626"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-627"></a>    <span class="n">enddo</span>
+<a name="ln-627"></a>    <span class="k">enddo</span>
 <a name="ln-628"></a>
 <a name="ln-629"></a><span class="k">end subroutine </span><span class="n">randind_r_w_2</span>
 <a name="ln-630"></a>
@@ -1090,7 +1090,7 @@ sparse array implementation</p>
 <a name="ln-665"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-666"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
 <a name="ln-667"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-668"></a>    <span class="n">enddo</span>
+<a name="ln-668"></a>    <span class="k">enddo</span>
 <a name="ln-669"></a>
 <a name="ln-670"></a><span class="k">end subroutine </span><span class="n">randind_r_w_3</span>
 <a name="ln-671"></a>
@@ -1131,7 +1131,7 @@ sparse array implementation</p>
 <a name="ln-706"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-707"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
 <a name="ln-708"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-709"></a>    <span class="n">enddo</span>
+<a name="ln-709"></a>    <span class="k">enddo</span>
 <a name="ln-710"></a>
 <a name="ln-711"></a><span class="k">end subroutine </span><span class="n">randind_r_w_4</span>
 <a name="ln-712"></a>
@@ -1172,7 +1172,7 @@ sparse array implementation</p>
 <a name="ln-747"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <a name="ln-748"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
 <a name="ln-749"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-750"></a>    <span class="n">enddo</span>
+<a name="ln-750"></a>    <span class="k">enddo</span>
 <a name="ln-751"></a>
 <a name="ln-752"></a><span class="k">end subroutine </span><span class="n">randind_r_w_5</span>
 <a name="ln-753"></a>
@@ -1218,9 +1218,9 @@ sparse array implementation</p>
 <a name="ln-793"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-794"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-795"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-796"></a>        <span class="n">endif</span>
-<a name="ln-797"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-798"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-796"></a>        <span class="k">endif</span>
+<a name="ln-797"></a><span class="k">        if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-798"></a><span class="k">    enddo</span>
 <a name="ln-799"></a>
 <a name="ln-800"></a><span class="k">end subroutine </span><span class="n">sparse_1</span>
 <a name="ln-801"></a>
@@ -1250,9 +1250,9 @@ sparse array implementation</p>
 <a name="ln-825"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-826"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 <a name="ln-827"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-828"></a>        <span class="n">endif</span>
-<a name="ln-829"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-830"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-828"></a>        <span class="k">endif</span>
+<a name="ln-829"></a><span class="k">        if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-830"></a><span class="k">    enddo</span>
 <a name="ln-831"></a>
 <a name="ln-832"></a><span class="k">end subroutine </span><span class="n">sparse_2</span>
 <a name="ln-833"></a>
@@ -1282,9 +1282,9 @@ sparse array implementation</p>
 <a name="ln-857"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-858"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 <a name="ln-859"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-860"></a>        <span class="n">endif</span>
-<a name="ln-861"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-862"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-860"></a>        <span class="k">endif</span>
+<a name="ln-861"></a><span class="k">        if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-862"></a><span class="k">    enddo</span>
 <a name="ln-863"></a>
 <a name="ln-864"></a><span class="k">end subroutine </span><span class="n">sparse_3</span>
 <a name="ln-865"></a>
@@ -1314,9 +1314,9 @@ sparse array implementation</p>
 <a name="ln-889"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-890"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 <a name="ln-891"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-892"></a>        <span class="n">endif</span>
-<a name="ln-893"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-894"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-892"></a>        <span class="k">endif</span>
+<a name="ln-893"></a><span class="k">        if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-894"></a><span class="k">    enddo</span>
 <a name="ln-895"></a>
 <a name="ln-896"></a><span class="k">end subroutine </span><span class="n">sparse_4</span>
 <a name="ln-897"></a>
@@ -1338,7 +1338,7 @@ sparse array implementation</p>
 <a name="ln-913"></a>    <span class="n">cind</span> <span class="o">=</span> <span class="n">search_sorted_first</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
 <a name="ln-914"></a>    <span class="k">if</span><span class="p">(</span><span class="n">ind</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">cind</span><span class="p">))</span><span class="k">then</span>
 <a name="ln-915"></a><span class="k">        </span><span class="n">val</span> <span class="o">=</span> <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">cind</span><span class="p">)</span>
-<a name="ln-916"></a>    <span class="n">endif</span>
+<a name="ln-916"></a>    <span class="k">endif</span>
 <a name="ln-917"></a>
 <a name="ln-918"></a><span class="k">end function </span><span class="n">get_value</span>
 <a name="ln-919"></a>
@@ -1368,9 +1368,9 @@ sparse array implementation</p>
 <a name="ln-943"></a>        <span class="n">yp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p3</span><span class="p">)))</span> <span class="o">+</span> <span class="p">&amp;</span>
 <a name="ln-944"></a>                <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">))))</span> <span class="o">-</span>   <span class="p">&amp;</span>
 <a name="ln-945"></a>                <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">p1</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">)))</span>
-<a name="ln-946"></a>    <span class="n">enddo</span>
+<a name="ln-946"></a>    <span class="k">enddo</span>
 <a name="ln-947"></a>
-<a name="ln-948"></a>    <span class="n">yp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span> <span class="o">-</span> <span class="p">&amp;</span>
+<a name="ln-948"></a><span class="k">    </span><span class="n">yp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span> <span class="o">-</span> <span class="p">&amp;</span>
 <a name="ln-949"></a>            <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span> <span class="o">+</span>               <span class="p">&amp;</span>
 <a name="ln-950"></a>            <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span>
 <a name="ln-951"></a>    <span class="n">yp</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span> <span class="o">+</span>   <span class="p">&amp;</span>
@@ -1400,12 +1400,12 @@ sparse array implementation</p>
 <a name="ln-975"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 <a name="ln-976"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
 <a name="ln-977"></a>        <span class="k">call </span><span class="n">deriv_1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">z</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">zxp</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-978"></a>    <span class="n">enddo</span>
+<a name="ln-978"></a>    <span class="k">enddo</span>
 <a name="ln-979"></a>
-<a name="ln-980"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a name="ln-980"></a><span class="k">    </span><span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <a name="ln-981"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
 <a name="ln-982"></a>        <span class="k">call </span><span class="n">deriv_1d</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">,:),</span><span class="n">zyp</span><span class="p">(</span><span class="n">i</span><span class="p">,:))</span>
-<a name="ln-983"></a>    <span class="n">enddo</span>
+<a name="ln-983"></a>    <span class="k">enddo</span>
 <a name="ln-984"></a>
 <a name="ln-985"></a><span class="k">end subroutine </span><span class="n">deriv_2d</span>
 <a name="ln-986"></a>
@@ -1434,22 +1434,22 @@ sparse array implementation</p>
 <a name="ln-1009"></a><span class="k">        </span><span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
 <a name="ln-1010"></a>        <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
 <a name="ln-1011"></a>            <span class="k">call </span><span class="n">deriv_2d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">),</span><span class="n">frp</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">),</span><span class="n">fzp</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">))</span>
-<a name="ln-1012"></a>        <span class="n">enddo</span>
+<a name="ln-1012"></a>        <span class="k">enddo</span>
 <a name="ln-1013"></a>
-<a name="ln-1014"></a>        <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<a name="ln-1014"></a><span class="k">        </span><span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 <a name="ln-1015"></a>        <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
 <a name="ln-1016"></a>            <span class="k">call </span><span class="n">deriv_2d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span><span class="n">f</span><span class="p">(:,</span><span class="n">i</span><span class="p">,:),</span><span class="n">frp</span><span class="p">(:,</span><span class="n">i</span><span class="p">,:),</span><span class="n">fphip</span><span class="p">(:,</span><span class="n">i</span><span class="p">,:))</span>
-<a name="ln-1017"></a>        <span class="n">enddo</span>
+<a name="ln-1017"></a>        <span class="k">enddo</span>
 <a name="ln-1018"></a>
-<a name="ln-1019"></a>        <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<a name="ln-1019"></a><span class="k">        </span><span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <a name="ln-1020"></a>        <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
 <a name="ln-1021"></a>            <span class="k">call </span><span class="n">deriv_2d</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span><span class="n">f</span><span class="p">(</span><span class="n">i</span><span class="p">,:,:),</span><span class="n">fzp</span><span class="p">(</span><span class="n">i</span><span class="p">,:,:),</span><span class="n">fphip</span><span class="p">(</span><span class="n">i</span><span class="p">,:,:))</span>
-<a name="ln-1022"></a>        <span class="n">enddo</span>
-<a name="ln-1023"></a>    <span class="k">else</span>
+<a name="ln-1022"></a>        <span class="k">enddo</span>
+<a name="ln-1023"></a><span class="k">    else</span>
 <a name="ln-1024"></a><span class="k">        </span><span class="n">fphip</span> <span class="o">=</span> <span class="mf">0.0d0</span>
 <a name="ln-1025"></a>        <span class="k">call </span><span class="n">deriv_2d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">f</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">),</span><span class="n">frp</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">),</span><span class="n">fzp</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">))</span>
 <a name="ln-1026"></a>
-<a name="ln-1027"></a>    <span class="n">endif</span>
+<a name="ln-1027"></a>    <span class="k">endif</span>
 <a name="ln-1028"></a>
 <a name="ln-1029"></a><span class="k">end subroutine </span><span class="n">deriv_3d</span>
 <a name="ln-1030"></a>
@@ -1488,9 +1488,9 @@ sparse array implementation</p>
 <a name="ln-1063"></a>        <span class="n">c</span><span class="p">%</span><span class="n">b1</span> <span class="o">=</span> <span class="n">b1</span>
 <a name="ln-1064"></a>        <span class="n">c</span><span class="p">%</span><span class="n">b2</span> <span class="o">=</span> <span class="n">b2</span>
 <a name="ln-1065"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-1066"></a>    <span class="n">endif</span>
+<a name="ln-1066"></a>    <span class="k">endif</span>
 <a name="ln-1067"></a>
-<a name="ln-1068"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1068"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1069"></a>
 <a name="ln-1070"></a><span class="k">end subroutine </span><span class="n">interpol1D_coeff</span>
 <a name="ln-1071"></a>
@@ -1564,9 +1564,9 @@ sparse array implementation</p>
 <a name="ln-1139"></a>        <span class="n">c</span><span class="p">%</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
 <a name="ln-1140"></a>        <span class="n">c</span><span class="p">%</span><span class="n">j</span> <span class="o">=</span> <span class="n">j</span>
 <a name="ln-1141"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-1142"></a>    <span class="n">endif</span>
+<a name="ln-1142"></a>    <span class="k">endif</span>
 <a name="ln-1143"></a>
-<a name="ln-1144"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1144"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1145"></a>
 <a name="ln-1146"></a><span class="k">end subroutine </span><span class="n">interpol2D_coeff</span>
 <a name="ln-1147"></a>
@@ -1662,8 +1662,8 @@ sparse array implementation</p>
 <a name="ln-1237"></a>            <span class="n">c</span><span class="p">%</span><span class="n">j</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">j</span>
 <a name="ln-1238"></a>            <span class="n">c</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-1239"></a>            <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-1240"></a>        <span class="n">endif</span>
-<a name="ln-1241"></a>    <span class="k">else</span>
+<a name="ln-1240"></a>        <span class="k">endif</span>
+<a name="ln-1241"></a><span class="k">    else</span>
 <a name="ln-1242"></a><span class="k">        if</span> <span class="p">((((</span><span class="n">i</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">i</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="n">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">))).</span><span class="nb">and</span><span class="p">.((</span><span class="n">j</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">j</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="n">nz</span><span class="o">-</span><span class="mi">1</span><span class="p">)))).</span><span class="nb">and</span><span class="p">.((</span><span class="n">k</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">k</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="n">nphi</span><span class="o">-</span><span class="mi">1</span><span class="p">))))</span> <span class="k">then</span>
 <a name="ln-1243"></a><span class="k">            </span><span class="n">r1</span> <span class="o">=</span> <span class="n">rmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span>
 <a name="ln-1244"></a>            <span class="n">r2</span> <span class="o">=</span> <span class="n">r1</span> <span class="o">+</span> <span class="n">dr</span>
@@ -1686,10 +1686,10 @@ sparse array implementation</p>
 <a name="ln-1261"></a>            <span class="n">c</span><span class="p">%</span><span class="n">j</span> <span class="o">=</span> <span class="n">j</span>
 <a name="ln-1262"></a>            <span class="n">c</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
 <a name="ln-1263"></a>            <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-1264"></a>        <span class="n">endif</span>
-<a name="ln-1265"></a>    <span class="n">endif</span>
+<a name="ln-1264"></a>        <span class="k">endif</span>
+<a name="ln-1265"></a><span class="k">    endif</span>
 <a name="ln-1266"></a>
-<a name="ln-1267"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1267"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1268"></a>
 <a name="ln-1269"></a><span class="k">end subroutine </span><span class="n">cyl_interpol3D_coeff</span>
 <a name="ln-1270"></a>
@@ -1743,9 +1743,9 @@ sparse array implementation</p>
 <a name="ln-1318"></a><span class="k">        </span><span class="n">phimin</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-1319"></a>        <span class="n">dphi</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">phi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 <a name="ln-1320"></a>        <span class="k">call </span><span class="n">cyl_interpol3D_coeff</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span> <span class="n">dr</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">phimin</span><span class="p">,</span> <span class="n">dphi</span><span class="p">,</span> <span class="n">sphi</span><span class="p">,</span> <span class="n">rout</span><span class="p">,</span> <span class="n">zout</span><span class="p">,</span> <span class="n">phiout</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1321"></a>    <span class="n">endif</span>
+<a name="ln-1321"></a>    <span class="k">endif</span>
 <a name="ln-1322"></a>
-<a name="ln-1323"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1323"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1324"></a>
 <a name="ln-1325"></a><span class="k">end subroutine </span><span class="n">cyl_interpol3D_coeff_arr</span>
 <a name="ln-1326"></a>
@@ -1773,16 +1773,16 @@ sparse array implementation</p>
 <a name="ln-1348"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1349"></a>    <span class="k">else</span>
 <a name="ln-1350"></a><span class="k">        call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">xout</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1351"></a>    <span class="n">endif</span>
+<a name="ln-1351"></a>    <span class="k">endif</span>
 <a name="ln-1352"></a>
-<a name="ln-1353"></a>    <span class="k">if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1353"></a><span class="k">    if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1354"></a><span class="k">        </span><span class="n">i</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">i</span>
 <a name="ln-1355"></a>        <span class="n">yout</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">*</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">*</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-1356"></a>    <span class="k">else</span>
 <a name="ln-1357"></a><span class="k">        </span><span class="n">yout</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-1358"></a>    <span class="n">endif</span>
+<a name="ln-1358"></a>    <span class="k">endif</span>
 <a name="ln-1359"></a>
-<a name="ln-1360"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1360"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1361"></a>
 <a name="ln-1362"></a><span class="k">end subroutine </span><span class="n">interpol1D_arr</span>
 <a name="ln-1363"></a>
@@ -1814,17 +1814,17 @@ sparse array implementation</p>
 <a name="ln-1389"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1390"></a>    <span class="k">else</span>
 <a name="ln-1391"></a><span class="k">        call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xout</span><span class="p">,</span><span class="n">yout</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1392"></a>    <span class="n">endif</span>
+<a name="ln-1392"></a>    <span class="k">endif</span>
 <a name="ln-1393"></a>
-<a name="ln-1394"></a>    <span class="k">if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1394"></a><span class="k">    if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1395"></a><span class="k">        </span><span class="n">i</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">i</span>
 <a name="ln-1396"></a>        <span class="n">j</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">j</span>
 <a name="ln-1397"></a>        <span class="n">zout</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">b11</span><span class="o">*</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b12</span><span class="o">*</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b21</span><span class="o">*</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b22</span><span class="o">*</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-1398"></a>    <span class="k">else</span>
 <a name="ln-1399"></a><span class="k">        </span><span class="n">zout</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-1400"></a>    <span class="n">endif</span>
+<a name="ln-1400"></a>    <span class="k">endif</span>
 <a name="ln-1401"></a>
-<a name="ln-1402"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1402"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1403"></a>
 <a name="ln-1404"></a><span class="k">end subroutine </span><span class="n">interpol2D_arr</span>
 <a name="ln-1405"></a>
@@ -1856,17 +1856,17 @@ sparse array implementation</p>
 <a name="ln-1431"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1432"></a>    <span class="k">else</span>
 <a name="ln-1433"></a><span class="k">        call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">xout</span><span class="p">,</span><span class="n">yout</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1434"></a>    <span class="n">endif</span>
+<a name="ln-1434"></a>    <span class="k">endif</span>
 <a name="ln-1435"></a>
-<a name="ln-1436"></a>    <span class="k">if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1436"></a><span class="k">    if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1437"></a><span class="k">        </span><span class="n">i</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">i</span>
 <a name="ln-1438"></a>        <span class="n">j</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">j</span>
 <a name="ln-1439"></a>        <span class="n">zout</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">b11</span><span class="o">*</span><span class="n">z</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b12</span><span class="o">*</span><span class="n">z</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b21</span><span class="o">*</span><span class="n">z</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">c</span><span class="p">%</span><span class="n">b22</span><span class="o">*</span><span class="n">z</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-1440"></a>    <span class="k">else</span>
 <a name="ln-1441"></a><span class="k">        </span><span class="n">zout</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a name="ln-1442"></a>    <span class="n">endif</span>
+<a name="ln-1442"></a>    <span class="k">endif</span>
 <a name="ln-1443"></a>
-<a name="ln-1444"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1444"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1445"></a>
 <a name="ln-1446"></a><span class="k">end subroutine </span><span class="n">interpol2D_2D_arr</span>
 <a name="ln-1447"></a>
@@ -1909,14 +1909,14 @@ sparse array implementation</p>
 <a name="ln-1484"></a>            <span class="n">b</span><span class="p">%</span><span class="n">b122</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1485"></a>            <span class="n">b</span><span class="p">%</span><span class="n">b112</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1486"></a>            <span class="n">b</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-1487"></a>        <span class="n">endif</span>
-<a name="ln-1488"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-1487"></a>        <span class="k">endif</span>
+<a name="ln-1488"></a><span class="k">        </span><span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1489"></a>    <span class="k">else</span>
 <a name="ln-1490"></a><span class="k">        call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span><span class="n">rout</span><span class="p">,</span><span class="n">zout</span><span class="p">,</span><span class="n">phiout</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1491"></a>    <span class="n">endif</span>
+<a name="ln-1491"></a>    <span class="k">endif</span>
 <a name="ln-1492"></a>
 <a name="ln-1493"></a>
-<a name="ln-1494"></a>    <span class="k">if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1494"></a><span class="k">    if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1495"></a><span class="k">        </span><span class="n">i</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">i</span>
 <a name="ln-1496"></a>        <span class="n">j</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">j</span>
 <a name="ln-1497"></a>        <span class="n">k</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">k</span>
@@ -1924,17 +1924,17 @@ sparse array implementation</p>
 <a name="ln-1499"></a><span class="k">            </span><span class="n">k2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">nphi</span><span class="p">)</span>
 <a name="ln-1500"></a>        <span class="k">else</span>
 <a name="ln-1501"></a><span class="k">            </span><span class="n">k2</span> <span class="o">=</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span>
-<a name="ln-1502"></a>        <span class="n">endif</span>
+<a name="ln-1502"></a>        <span class="k">endif</span>
 <a name="ln-1503"></a>
-<a name="ln-1504"></a>        <span class="n">dout</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">b111</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>    <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b121</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span>   <span class="p">&amp;</span>
+<a name="ln-1504"></a><span class="k">        </span><span class="n">dout</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">b111</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>    <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b121</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span>   <span class="p">&amp;</span>
 <a name="ln-1505"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b112</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span>   <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b122</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span> <span class="o">+</span>  <span class="p">&amp;</span>
 <a name="ln-1506"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b211</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>  <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b221</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
 <a name="ln-1507"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b212</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b222</span><span class="o">*</span><span class="n">d</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span>
 <a name="ln-1508"></a>    <span class="k">else</span>
 <a name="ln-1509"></a><span class="k">        </span><span class="n">dout</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-1510"></a>    <span class="n">endif</span>
+<a name="ln-1510"></a>    <span class="k">endif</span>
 <a name="ln-1511"></a>
-<a name="ln-1512"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1512"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1513"></a>
 <a name="ln-1514"></a><span class="k">end subroutine </span><span class="n">interpol3D_arr</span>
 <a name="ln-1515"></a>
@@ -1978,13 +1978,13 @@ sparse array implementation</p>
 <a name="ln-1553"></a>            <span class="n">b</span><span class="p">%</span><span class="n">b122</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1554"></a>            <span class="n">b</span><span class="p">%</span><span class="n">b112</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1555"></a>            <span class="n">b</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-1556"></a>        <span class="n">endif</span>
-<a name="ln-1557"></a>        <span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-1556"></a>        <span class="k">endif</span>
+<a name="ln-1557"></a><span class="k">        </span><span class="n">err_status</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1558"></a>    <span class="k">else</span>
 <a name="ln-1559"></a><span class="k">        call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">phi</span><span class="p">,</span><span class="n">rout</span><span class="p">,</span><span class="n">zout</span><span class="p">,</span><span class="n">phiout</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">err_status</span><span class="p">)</span>
-<a name="ln-1560"></a>    <span class="n">endif</span>
+<a name="ln-1560"></a>    <span class="k">endif</span>
 <a name="ln-1561"></a>
-<a name="ln-1562"></a>    <span class="k">if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1562"></a><span class="k">    if</span><span class="p">(</span><span class="n">err_status</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1563"></a><span class="k">        </span><span class="n">i</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">i</span>
 <a name="ln-1564"></a>        <span class="n">j</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">j</span>
 <a name="ln-1565"></a>        <span class="n">k</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">k</span>
@@ -1992,16 +1992,16 @@ sparse array implementation</p>
 <a name="ln-1567"></a><span class="k">            </span><span class="n">k2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">nphi</span><span class="p">)</span>
 <a name="ln-1568"></a>        <span class="k">else</span>
 <a name="ln-1569"></a><span class="k">            </span><span class="n">k2</span> <span class="o">=</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span>
-<a name="ln-1570"></a>        <span class="n">endif</span>
-<a name="ln-1571"></a>        <span class="n">fout</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">b111</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>    <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b121</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span>   <span class="p">&amp;</span>
+<a name="ln-1570"></a>        <span class="k">endif</span>
+<a name="ln-1571"></a><span class="k">        </span><span class="n">fout</span> <span class="o">=</span> <span class="n">b</span><span class="p">%</span><span class="n">b111</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>    <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b121</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span>   <span class="p">&amp;</span>
 <a name="ln-1572"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b112</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span>   <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b122</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span> <span class="o">+</span>  <span class="p">&amp;</span>
 <a name="ln-1573"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b211</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>  <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b221</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
 <a name="ln-1574"></a>               <span class="n">b</span><span class="p">%</span><span class="n">b212</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">%</span><span class="n">b222</span><span class="o">*</span><span class="n">f</span><span class="p">(:,:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k2</span><span class="p">)</span>
 <a name="ln-1575"></a>    <span class="k">else</span>
 <a name="ln-1576"></a><span class="k">        </span><span class="n">fout</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a name="ln-1577"></a>    <span class="n">endif</span>
+<a name="ln-1577"></a>    <span class="k">endif</span>
 <a name="ln-1578"></a>
-<a name="ln-1579"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
+<a name="ln-1579"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">err</span><span class="p">))</span> <span class="n">err</span> <span class="o">=</span> <span class="n">err_status</span>
 <a name="ln-1580"></a>
 <a name="ln-1581"></a><span class="k">end subroutine </span><span class="n">interpol3D_2D_arr</span>
 <a name="ln-1582"></a>
@@ -2020,28 +2020,28 @@ sparse array implementation</p>
 <a name="ln-1595"></a>    <span class="n">ts</span> <span class="o">=</span> <span class="mi">0</span>
 <a name="ln-1596"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
 <a name="ln-1597"></a><span class="k">        </span><span class="n">ts</span> <span class="o">=</span> <span class="n">time_start</span>
-<a name="ln-1598"></a>    <span class="n">endif</span>
+<a name="ln-1598"></a>    <span class="k">endif</span>
 <a name="ln-1599"></a>
-<a name="ln-1600"></a>    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ta</span><span class="p">)</span>
+<a name="ln-1600"></a><span class="k">    call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ta</span><span class="p">)</span>
 <a name="ln-1601"></a>    <span class="n">hour</span> <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <a name="ln-1602"></a>    <span class="n">minu</span> <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
 <a name="ln-1603"></a>    <span class="n">sec</span>  <span class="o">=</span> <span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="o">-</span> <span class="n">ts</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
 <a name="ln-1604"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">minu</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1605"></a><span class="k">        </span><span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">+</span> <span class="mi">60</span>
 <a name="ln-1606"></a>        <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">-</span> <span class="mi">1</span>
-<a name="ln-1607"></a>    <span class="n">endif</span>
-<a name="ln-1608"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-1607"></a>    <span class="k">endif</span>
+<a name="ln-1608"></a><span class="k">    if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-1609"></a><span class="k">        </span><span class="n">sec</span>  <span class="o">=</span> <span class="n">sec</span> <span class="o">+</span> <span class="mi">60</span>
 <a name="ln-1610"></a>        <span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">-</span> <span class="mi">1</span>
-<a name="ln-1611"></a>    <span class="n">endif</span>
+<a name="ln-1611"></a>    <span class="k">endif</span>
 <a name="ln-1612"></a>
-<a name="ln-1613"></a>    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
+<a name="ln-1613"></a><span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span> <span class="k">then</span>
 <a name="ln-1614"></a><span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2,&quot; --- elapsed:&quot;,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
 <a name="ln-1615"></a>            <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="n">hour</span><span class="p">,</span><span class="n">minu</span><span class="p">,</span><span class="n">sec</span>
 <a name="ln-1616"></a>    <span class="k">else</span>
 <a name="ln-1617"></a><span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
 <a name="ln-1618"></a>            <span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-<a name="ln-1619"></a>    <span class="n">endif</span>
+<a name="ln-1619"></a>    <span class="k">endif</span>
 <a name="ln-1620"></a>
 <a name="ln-1621"></a><span class="k">end function </span><span class="nb">time</span>
 <a name="ln-1622"></a>

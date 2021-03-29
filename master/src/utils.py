@@ -626,6 +626,91 @@ def beam_grid(nbi, rstart,
 
     return beam_grid
 
+def detector_aperture_geometry(g,wn):
+    #+#detector_aperture_geometry
+    #+ Defines charged fusion product diagnostic geometry
+    #+ Sources: detector_aperture_geometry.dat and MAST_29908_221_g_ensemble.nml
+    #+ NOTE: This file is hardcoded to be useful for developers. General users could modify parameters under
+    #+       wn = 0 or 1, and correspondingly set the wn flag when calling detector_aperture_geometry.pro
+    #+       Alternatively, the user could manually define the geometry, see run_tests.pro and test_cfpd.pro
+    #+***
+    #+##Arguments
+    #+    **g**: GEQDSK file
+    #+
+    #+    **wn**: indicates Werner (1) or Netepneko (0) diagnostic geometry
+    #+
+    #+##Outputs
+    #+    **rdist**: Radial coordinates of detector [m]
+    #+
+    #+    **zdist**: Vertical coordinates of detector [m]
+    #+
+    #+    **v**: Detector orientations [m/s, rad/s, m/s]
+    #+
+    #+    **d**: Collimator length [m]
+    #+
+    #+    **rc**: Outer collimator spacing [m]
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> g = 'g000001.01000'
+    #+>>> geometry = detector_aperture_geometry(g,0)
+    #+```
+
+    if wn == 1: # Source: MAST_29908_221_g_ensemble.nml
+        print('Using MAST geometry 1 (Werner)')
+        ## Detector orientation
+        theta_port = np.radians(np.repeat(40.0, 4))
+
+        #In MAST_29908_221_g_ensemble.nml, phi_port < 0, but it is made positive here for
+        #comparison with detector_aperture_geometry.dat
+        phi_port = np.radians([30.0, 35.0, 40.0, 45.0])
+
+        v = np.zeros((3,4))
+        v[0,:] = - np.sin(theta_port)*np.cos(phi_port)#    radial direction
+        v[1,:] = - np.sin(phi_port)                #    toroidal direction
+        v[2,:] = np.cos(theta_port)*np.cos(phi_port)  #    vertical direction
+
+        ## Detector position
+        ZDist = np.array([0.030014, 0.038311, 0.013981, 0.024414])
+
+        RDist = np.array([1.668328, 1.661375, 1.648754, 1.64])
+
+        PHDangle = np.array([1.38277674641, 1.39294543453, 1.37658569418, 1.3855051501])
+
+        D = 0.0357      #                        detector-collimator spacing (m)
+
+        RC = np.repeat(2.5e-3, 4) # outer collimator radius (m)
+
+        RCD = np.repeat(2.5e-3, 4) # inner collimator radius (m)
+
+    else: # Source: detector_aperture_geometry.dat
+        print('Using MAST geometry 0 (Netepenko)')
+
+        ## Detector orientation
+        theta_port = np.radians([46.6875370324, 47.6648339458, 50.031360382, 51.5837100275])
+
+        phi_port = np.radians([38.8895519328, 44.2509710868, 48.3160975078, 53.6006103875])
+
+        v = np.zeros((3,4))
+        v[0,:] = - np.sin(theta_port)*np.cos(phi_port)#    radial direction
+        v[1,:] = - np.sin(phi_port)                #    toroidal direction
+        v[2,:] = np.cos(theta_port)*np.cos(phi_port)  #    vertical direction
+
+        ## Detector position
+        ZDist = np.array([0.036701870576, 0.0409530530375, 0.0232888146809, 0.0301116448993])
+
+        RDist = np.array([1.66830563971, 1.67508495819, 1.68813419386, 1.69658132076])
+
+        PHDangle = np.radians([79.8774705956, 79.2421358615, 80.3144072462, 79.7395308235])
+
+        D = 0.04      #                        detector-collimator spacing (m)
+
+        RC = np.array([1.288e-3, 1.294e-3, 1.318e-3, 1.343e-3])# outer collimator radius (m)
+
+        RCD = np.array([1.288e-3, 1.294e-3, 1.318e-3, 1.343e-3])# inner collimator radius (detector radius) (m)
+
+    return {'rdist':RDist,'zdist':ZDist,'v':v,'d':D,'rc':RC}
+
 def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     """
     #+#write_data

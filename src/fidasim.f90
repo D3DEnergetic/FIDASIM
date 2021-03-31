@@ -9260,6 +9260,7 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
     !!Calculate anisotropy enhancement/deficit factor
     JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    !!!Need to generalize
     mp = H1_amu*mass_u  ![kg]
     Q = 4.04*JMeV ![J]
 
@@ -9310,9 +9311,9 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
 end subroutine get_ddpt_anisotropy
 
-subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
+subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     !+ Returns fraction of gyroangles that can produce a reaction with
-    !+ given inputs
+    !+ given inputs for 2(1,3)4 reaction
     type(LocalEMFields), intent(in) :: fields
         !+ Electromagneticfields in beam coordinates
     real(Float64), intent(in)       :: E3
@@ -9329,6 +9330,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
         !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
     real(Float64), intent(out) :: gam0
         !+ Gyro angle of fast ion [rad]
+    real(Float64), dimension(4), intent(in), optional :: mass_amu
+        !+ Mass of reactants and products (1,2,3,4) [amu]
 
     real(Float64), dimension(3) :: a_hat, vrot
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,E3max,E3min
@@ -9336,6 +9339,23 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     real(Float64) :: eps,bracket,ccminus,ccplus,bbminus,bbplus,v3minus,v3plus
     real(Float64) :: E3minus,E3plus,v3plusmag,v3minusmag,v3maxmag,v3minmag
     real(Float64) :: DeltaE3
+    real(Float64) :: m1,m2,m3,m4,mu1,mu2,mu3,aa
+
+    ! Derive mass ratios
+    if(present(mass_amu)) then
+        m1 = mass_amu(1)*mass_u  ![kg]
+        m2 = mass_amu(2)*mass_u  ![kg]
+        m3 = mass_amu(3)*mass_u  ![kg]
+        m4 = mass_amu(4)*mass_u  ![kg]
+    else !default is d(d,p)T
+        m1 = beam_mass*mass_u  ![kg]
+        m2 = H2_amu*mass_u  ![kg]
+        m3 = H1_amu*mass_u  ![kg]
+        m4 = H3_amu*mass_u  ![kg]
+    endif
+    mu1 = m1/m4
+    mu2 = m2/m4
+    mu3 = m3/m4
 
     pgyro = 0.d0
     gam0 = 0.d0
@@ -9345,7 +9365,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
     mp = H1_amu*mass_u  ![kg]
     Q = 4.04*JMeV ![J]
-    norm_v3 = sqrt(E3/(H1_amu*v2_to_E_per_amu)) / 100 ![m/s]
+    q = 2*Q/m4 ![J/kg]
+    norm_v3 = sqrt(E3/(m3/mass_u*v2_to_E_per_amu)) / 100 ![m/s]
     norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
     vpar = norm_v1*pitch ![m/s]
     vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
@@ -9369,20 +9390,21 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     endif
 
     ! LHS coefficient teeny (step #0)
-    bracket = vperp*(sin(phip)-2*va/norm_v3)
+    bracket = vperp * ((2*mu1)*sin(phip) - (2*mu1*mu2/mu3)*va/norm_v3)
     if (abs(bracket).lt.1.d-5) then !'Case 0'
         return
     endif
 
     ! Find E3 limits for these parameters (step #1)
-    ccminus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) - vperp*va
-    ccplus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) + vperp*va
-    bbminus = -vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
-    bbplus = vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
-    v3minus = 0.5*(-bbminus + sqrt(bbminus**2+4*ccminus))
-    v3plus = 0.5*(-bbplus + sqrt(bbplus**2+4*ccplus))
-    E3minus = 0.5*mp*v3minus**2 / JkeV
-    E3plus = 0.5*mp*v3plus**2 / JkeV
+    ccminus= 1/mu3 * (q - (mu1**2-mu1)*norm_v1**2 + (mu2**2-mu2)*norm2(vrot) - 2*mu1*mu2*(vpar*vb-vperp*va))
+    ccplus = 1/mu3 * (q - (mu1**2-mu1)*norm_v1**2 + (mu2**2-mu2)*norm2(vrot) - 2*mu1*mu2*(vpar*vb+vperp*va))
+    bbminus = 2*mu1*(-vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) + va*sin(phip))
+    bbplus = 2*mu1*(vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) + va*sin(phip))
+    aa = 1+mu3
+    v3minus = (-bbminus + sqrt(bbminus**2 + 4*aa*ccminus)) / (2*aa)
+    v3plus = (-bbplus + sqrt(bbplus**2 + 4*aa*ccplus)) / (2*aa)
+    E3minus = 0.5*m3*v3minus**2 / JkeV
+    E3plus = 0.5*m3*v3plus**2 / JkeV
     E3min = min(E3plus,E3minus) ![keV]
     E3max = max(E3plus,E3minus) ![keV]
 
@@ -9397,15 +9419,16 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     endif
 
     ! Get gammaplus and gammaminus  (step #3)
-    v3plusmag = sqrt(2*E3plus*JkeV/mp)
-    v3minusmag = sqrt(2*E3minus*JkeV/mp)
-    v3maxmag = sqrt(2*E3plus*JkeV/mp)
-    v3minmag = sqrt(2*E3minus*JkeV/mp)
+    v3plusmag = sqrt(2*E3plus*JkeV/m3)
+    v3minusmag = sqrt(2*E3minus*JkeV/m3)
+    v3maxmag = sqrt(2*E3plus*JkeV/m3)
+    v3minmag = sqrt(2*E3minus*JkeV/m3)
 
     if (E3plus.gt.E3max) then !'Case 3'
         norm_v3 = v3maxmag
-        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
-              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        rhs = (1+mu3)*norm_v3 - q/(mu3*norm_v3) - (2*mu1*vpar+2*mu2*vb)*cos(phip) - 2*mu2*va*sin(phip) &
+              + (mu1**2-mu1)*norm_v1**2/(mu3*norm_v3) + (mu2**2-mu2)*norm2(vrot)/(mu3*norm_v3) + &
+              2*mu1*mu2/(mu3*norm_v3) * (vpar*vb)
         if (abs(rhs).gt.abs(bracket)) then
             if (rhs*bracket.gt.0.) then
                 gammaplus = 0.
@@ -9417,8 +9440,9 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
         endif
     else
         norm_v3 = v3plusmag
-        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
-              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        rhs = (1+mu3)*norm_v3 - q/(mu3*norm_v3) - (2*mu1*vpar+2*mu2*vb)*cos(phip) - 2*mu2*va*sin(phip) &
+              + (mu1**2-mu1)*norm_v1**2/(mu3*norm_v3) + (mu2**2-mu2)*norm2(vrot)/(mu3*norm_v3) + &
+              2*mu1*mu2/(mu3*norm_v3) * (vpar*vb)
         if (abs(rhs).gt.abs(bracket)) then
             if (rhs*bracket.gt.0.) then
                 gammaplus = 0.
@@ -9432,8 +9456,9 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
 
     if (E3minus.lt.E3min) then !'Case 3'
         norm_v3 = v3minmag
-        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
-               - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        rhs = (1+mu3)*norm_v3 - q/(mu3*norm_v3) - (2*mu1*vpar+2*mu2*vb)*cos(phip) - 2*mu2*va*sin(phip) &
+              + (mu1**2-mu1)*norm_v1**2/(mu3*norm_v3) + (mu2**2-mu2)*norm2(vrot)/(mu3*norm_v3) + &
+              2*mu1*mu2/(mu3*norm_v3) * (vpar*vb)
         if (abs(rhs).gt.abs(bracket)) then
             if (rhs*bracket.gt.0.) then
                 gammaminus = 0.
@@ -9445,8 +9470,9 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
         endif
     else
         norm_v3 = v3minusmag
-        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
-              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        rhs = (1+mu3)*norm_v3 - q/(mu3*norm_v3) - (2*mu1*vpar+2*mu2*vb)*cos(phip) - 2*mu2*va*sin(phip) &
+              + (mu1**2-mu1)*norm_v1**2/(mu3*norm_v3) + (mu2**2-mu2)*norm2(vrot)/(mu3*norm_v3) + &
+              2*mu1*mu2/(mu3*norm_v3) * (vpar*vb)
         if (abs(rhs).gt.abs(bracket)) then
             if (rhs*bracket.gt.0.) then
                 gammaminus = 0.

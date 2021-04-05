@@ -39,7 +39,7 @@ function sunflower,n,alpha=alpha,doplot=doplot
 end
 
 
-PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
+PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
     ;+#orb_collimator
     ;+Calculates solid-angle weights of different velocity vectors that exit the collimator
     ;+***
@@ -48,7 +48,7 @@ PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nste
     ;+
     ;+    **ri**: Centered on detector in (R,phi,z) coordinates [m,radians,m]
     ;+
-    ;+    **ivel**: Axis orientation of collimator, i.e. velocity components in (R,phi,z) coordinates
+    ;+    **vi**: Axis orientation of collimator, i.e. velocity components in (R,phi,z) coordinates
     ;+
     ;+    **d**: Collimator length [m]
     ;+
@@ -83,8 +83,8 @@ PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nste
     ;+IDL> g = 'g000001.01000'
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
     ;+IDL> ri = [rdist[0],0,zdist[0]]
-    ;+IDL> ivel = -reform(v[*,0])
-    ;+IDL> orb_collimator,g,ri,ivel,d,rc[0],50,vsave,frac,norm
+    ;+IDL> vi = -reform(v[*,0])
+    ;+IDL> orb_collimator,g,ri,vi,d,rc[0],50,vsave,frac,norm
     ;+```
 
     common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
@@ -118,7 +118,7 @@ PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nste
     ;------
     ; Coordinate system along collimator tube
     ; unit vector along tube
-    vr=ivel[0] & vphi=ivel[1] & vz=ivel[2]
+    vr=vi[0] & vphi=vi[1] & vz=vi[2]
 
     ; transverse unit vector
     if vr eq 0 and vz eq 0 then begin
@@ -154,7 +154,7 @@ PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nste
     frac=replicate(0.,naperture)
 
     ; Orbit initialization
-    ivel0=ivel
+    vi0=vi
 
     first=1
     ;-----------------

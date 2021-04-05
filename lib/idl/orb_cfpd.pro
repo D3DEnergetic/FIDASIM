@@ -39,14 +39,14 @@ function sunflower,n,alpha=alpha,doplot=doplot
 end
 
 
-PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
+PRO orb_collimator,g,ri,ivel,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
     ;+#orb_collimator
     ;+Calculates solid-angle weights of different velocity vectors that exit the collimator
     ;+***
     ;+##Arguments
     ;+    **g**: GEQDSK file
     ;+
-    ;+    **InitialPosition**: Centered on detector in (R,phi,z) coordinates [m,radians,m]
+    ;+    **ri**: Centered on detector in (R,phi,z) coordinates [m,radians,m]
     ;+
     ;+    **ivel**: Axis orientation of collimator, i.e. velocity components in (R,phi,z) coordinates
     ;+
@@ -65,7 +65,7 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,step=ste
     ;+
     ;+    **amu**: Atomic mass unit
     ;+
-    ;+    **z**: Zeff
+    ;+    **z**: Particle charge
     ;+
     ;+    **narea**: Number of positions to launch from
     ;+
@@ -82,175 +82,179 @@ PRO orb_collimator,g,InitialPosition,ivel,d,a,naperture,vsave,frac,norm,step=ste
     ;+```idl
     ;+IDL> g = 'g000001.01000'
     ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
-    ;+IDL> InitialPosition = [rdist[0],0,zdist[0]]
+    ;+IDL> ri = [rdist[0],0,zdist[0]]
     ;+IDL> ivel = -reform(v[*,0])
-    ;+IDL> orb_collimator,g,InitialPosition,ivel,d,rc[0],50,vsave,frac,norm
+    ;+IDL> orb_collimator,g,ri,ivel,d,rc[0],50,vsave,frac,norm
     ;+```
 
-  common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
+    common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
 
-  ; Ion orbit parameters
-  if not keyword_set(step) then step=0.01	; step length in m
-  if not keyword_set(nsteps) then nsteps=110
-  if not keyword_set(e0) then e0=3030.			; keV
-  if not keyword_set(amu) then amu=1. & mp=1.67e-27
-  if not keyword_set(z) then z=1.
-  if not keyword_set(narea) then narea=10000
-  time_reverse=1
+    ; Ion orbit parameters
+    if not keyword_set(step) then step=0.01	; step length in m
+    if not keyword_set(nsteps) then nsteps=110
+    if not keyword_set(e0) then e0=3030.			; keV
+    if not keyword_set(amu) then amu=1. & mp=1.67e-27
+    if not keyword_set(z) then z=1.
+    if not keyword_set(narea) then narea=10000
+    time_reverse=1
 
-  ;-------------
-  ; Same for every calculation
-  ; Use eqdsk to get wall location and magnetic field grid
-  b0=abs(g.bcentr) & r0=g.rmaxis
-  finewall,g,rwall,zwall
-  calculate_bfield,bp,br,bphi,bz,g
-  br=double(br) & bphi=double(bphi) & bz=double(bz)
-  gr0=double(g.r(0)) & gz0=double(g.z(0))
-  dr=double(g.r(1)-g.r(0)) & dz=double(g.z(1)-g.z(0))
-  br=double(br) & bphi=double(bphi) & bz=double(bz)
-  pphisgn=-g.cpasma/abs(g.cpasma)
+    ;-------------
+    ; Same for every calculation
+    ; Use eqdsk to get wall location and magnetic field grid
+    b0=abs(g.bcentr) & r0=g.rmaxis
+    finewall,g,rwall,zwall
+    calculate_bfield,bp,br,bphi,bz,g
+    br=double(br) & bphi=double(bphi) & bz=double(bz)
+    gr0=double(g.r(0)) & gz0=double(g.z(0))
+    dr=double(g.r(1)-g.r(0)) & dz=double(g.z(1)-g.z(0))
+    br=double(br) & bphi=double(bphi) & bz=double(bz)
+    pphisgn=-g.cpasma/abs(g.cpasma)
 
-  ; Normalization constants
-  omega=z*1.6e-19*b0/(amu*mp)
-  v0=sqrt(2*e0*1.e3*1.6e-19/(amu*mp))
-  vconstant=v0/omega
+    ; Normalization constants
+    omega=z*1.6e-19*b0/(amu*mp)
+    v0=sqrt(2*e0*1.e3*1.6e-19/(amu*mp))
+    vconstant=v0/omega
 
-  ;------
-  ; Coordinate system along collimator tube
-  ; unit vector along tube
-  vr=ivel[0] & vphi=ivel[1] & vz=ivel[2]
+    ;------
+    ; Coordinate system along collimator tube
+    ; unit vector along tube
+    vr=ivel[0] & vphi=ivel[1] & vz=ivel[2]
 
-  ; transverse unit vector
-  if vr eq 0 and vz eq 0 then begin
-    ar=1. & az=0.
-  end else begin
-    aphi=0.
-    ar=vz/sqrt(vz^2+vr^2)
-    az=-vr/sqrt(vz^2+vr^2)
-  end
+    ; transverse unit vector
+    if vr eq 0 and vz eq 0 then begin
+      ar=1. & az=0.
+    end else begin
+      aphi=0.
+      ar=vz/sqrt(vz^2+vr^2)
+      az=-vr/sqrt(vz^2+vr^2)
+    end
 
-  ; toroidal unit vector
-  cr=-az*vphi
-  cphi=az*vr-ar*vz
-  cz=ar*vphi
+    ; toroidal unit vector
+    cr=-az*vphi
+    cphi=az*vr-ar*vz
+    cz=ar*vphi
 
-  ;------------
-  ; delta positions on detector area
-  ; use a modified sunflower arrangement based on the golden rule
-  da=a*sunflower(narea)  ; (x,y) displacement array
-  eps=1.02   ; fudge factor on whether ray clears
+    ;------------
+    ; delta positions on detector area
+    ; use a modified sunflower arrangement based on the golden rule
+    da=a*sunflower(narea)  ; (x,y) displacement array
+    eps=1.02   ; fudge factor on whether ray clears
 
-  ;---------
-  ; Velocity angles to use
+    ;---------
+    ; Velocity angles to use
 
-  ; Find the maximum amount the curved orbit can expand the aperture
-  rho=vconstant*sqrt(vr^2 + vz^2)
-  expand=rho - sqrt(rho^2 - d^2)
-  aperture=a + expand
+    ; Find the maximum amount the curved orbit can expand the aperture
+    rho=vconstant*sqrt(vr^2 + vz^2)
+    expand=rho - sqrt(rho^2 - d^2)
+    aperture=a + expand
 
-  ; Points on effective aperture to aim velocities at
-  daperture=aperture*sunflower(naperture) ; (x,y) target array
-  vsave=fltarr(3,naperture)
-  frac=replicate(0.,naperture)
+    ; Points on effective aperture to aim velocities at
+    daperture=aperture*sunflower(naperture) ; (x,y) target array
+    vsave=fltarr(3,naperture)
+    frac=replicate(0.,naperture)
 
-  ; Orbit initialization
-  ivel0=ivel
+    ; Orbit initialization
+    ivel0=ivel
 
-  first=1
-  ;-----------------
-  ; Loop over initial velocities
-  for iaperture=0,naperture-1 do begin
-  ;  ivel=launch_vector(ivel0,tan(daperture[0,iaperture]/d),tan(daperture[1,iaperture]/d))
-    xx=daperture[0,iaperture] & yy=daperture[1,iaperture]
-    ivel=[ar*xx + cr*yy + vr*d, $
-        aphi*xx + cphi*yy + vphi*d, $
-        az*xx + cz*yy + vz*d]
-    ivel/=sqrt(ivel[0]^2 + ivel[1]^2 + ivel[2]^2)
-    vsave[*,iaperture]=ivel
+    first=1
+    ;-----------------
+    ; Loop over initial velocities
+    for iaperture=0,naperture-1 do begin
+    ;  ivel=launch_vector(ivel0,tan(daperture[0,iaperture]/d),tan(daperture[1,iaperture]/d))
+        xx=daperture[0,iaperture] & yy=daperture[1,iaperture]
+        ivel=[ar*xx + cr*yy + vr*d, $
+            aphi*xx + cphi*yy + vphi*d, $
+            az*xx + cz*yy + vz*d]
+        ivel/=sqrt(ivel[0]^2 + ivel[1]^2 + ivel[2]^2)
+        vsave[*,iaperture]=ivel
 
-  ; Preparing normal orb_mast calculation from center of detector
-  Velocity=vconstant*ivel
-  y=dblarr(6) & y(0:2)=Velocity & y(3:5)=InitialPosition
-  h=double(step*omega/v0) & if time_reverse then h=-h
-  yout=dblarr(6,nsteps)
-  if keyword_set(straight) then begin
-    s=sqrt(d^2+a^2)*findgen(nsteps)/(nsteps-1)
-    uu=y[3]*cos(y[4]) + s*ivel[0]
-    vv=y[3]*sin(y[4]) + s*ivel[1]
-    zz=y[5] + s*ivel[2]
-    yout[3,*]=sqrt(uu^2 + vv^2)
-    yout[4,*]=atan(vv,uu)
-    yout[5,*]=zz
-  end else begin
-  dydx=derivs(0.,y)
-  yout(*,0)=y(*)
+        ; Preparing normal orb_mast calculation from center of detector
+        Velocity=vconstant*ivel
+        y=dblarr(6) & y(0:2)=Velocity & y(3:5)=ri
+        h=double(step*omega/v0) & if time_reverse then h=-h
+        yout=dblarr(6,nsteps)
+        if keyword_set(straight) then begin
+          s=sqrt(d^2+a^2)*findgen(nsteps)/(nsteps-1)
+          uu=y[3]*cos(y[4]) + s*ivel[0]
+          vv=y[3]*sin(y[4]) + s*ivel[1]
+          zz=y[5] + s*ivel[2]
+          yout[3,*]=sqrt(uu^2 + vv^2)
+          yout[4,*]=atan(vv,uu)
+          yout[5,*]=zz
+        end else begin
+            yout(*,0)=y(*)
 
-  ; Orbit loop
-  i=0
-  lwall=1		; logical to stop if hits wall
-  while i lt nsteps-1 do begin
-    i=i + 1
-  ;  y=rk4(y,dydx,0.,h,'derivs',/double)
-  ; Van Zeeland's integrator
-    ddeabm,'derivs',0.d,y,h,epsabs=1.e-8
-  ; force energy conservation
-  ;  y(0:2)=y(0:2)*vconstant/sqrt(y(0)^2+y(1)^2+y(2)^2)
-    yout(*,i)=y(*)
-    dydx=derivs(0.,y)
-  end
-  end ; not straight keyword
+            ; Orbit loop
+            i=0
+            lwall=1		; logical to stop if hits wall
+            while i lt nsteps-1 do begin
+                i=i + 1
+              ; Van Zeeland's integrator
+                ddeabm,'derivs',0.d,y,h,epsabs=1.e-8
+              ; force energy conservation
+              ;  y(0:2)=y(0:2)*vconstant/sqrt(y(0)^2+y(1)^2+y(2)^2)
+                yout(*,i)=y(*)
+            end
+        end ; not straight keyword
 
-  ;---------
-  ; Find fraction of detector area that misses walls for this orbit
-  ; Use an (xx,yy,zz) coordinate system with zz axis along collimator
-  ;
-  u=reform(yout[3,*]*cos(yout[4,*])) & u-=u[0]
-  v=reform(yout[3,*]*sin(yout[4,*])) & v-=v[0]
-  w=reform(yout[5,*]) & w-=w[0]
+        ;---------
+        ; Find fraction of detector area that misses walls for this orbit
+        ; Use an (xx,yy,zz) coordinate system with zz axis along collimator
+        ;
+        u=reform(yout[3,*]*cos(yout[4,*])) & u-=u[0]
+        v=reform(yout[3,*]*sin(yout[4,*])) & v-=v[0]
+        w=reform(yout[5,*]) & w-=w[0]
 
-  xx=ar*u + aphi*v + az*w
-  yy=cr*u + cphi*v + cz*w
-  zz=vr*u + vphi*v + vz*w
-  zz*=-1.
+        xx=ar*u + aphi*v + az*w
+        yy=cr*u + cphi*v + cz*w
+        zz=vr*u + vphi*v + vz*w
+        zz*=-1.
 
-  ; Truncate orbit at end of collimator
-  w=where(zz le d)
-  xx=xx[w] & yy=yy[w] & zz=zz[w]
+        ; Truncate orbit at end of collimator
+        w=where(zz le d)
+        xx=xx[w] & yy=yy[w] & zz=zz[w]
 
-  ; Start this trajectory from various positions on detector area
-  ; and store how many don't hit the wall
+        ; Start this trajectory from various positions on detector area
+        ; and store how many don't hit the wall
 
-  plotarea=0 ; Optional plotting of which part of detector area works
-  if plotarea then plot,a*cos(2*!pi*findgen(101)/100),a*sin(2*!pi*findgen(101)/100), $
-    title=string(1e3*daperture[0,iaperture])+' '+string(1e3*daperture[1,iaperture])
-  for j=0,narea-1 do begin
-    w=where((xx + da[0,j])^2 + (yy + da[1,j])^2 gt eps*a^2,nw)
-    if nw lt 1 then frac[iaperture]+=1.
-  if plotarea then begin
-    if nw lt 1 then col=250 else col=100
-    oplot,[da[0,j]],[da[1,j]],color=col,psym=1
-  end
-  end
-  if plotarea then wait,5
+        plotarea=0 ; Optional plotting of which part of detector area works
+        if plotarea then plot,a*cos(2*!pi*findgen(101)/100),a*sin(2*!pi*findgen(101)/100), $
+                              title=string(1e3*daperture[0,iaperture])+' '+string(1e3*daperture[1,iaperture])
+        for j=0,narea-1 do begin
+            w=where((xx + da[0,j])^2 + (yy + da[1,j])^2 gt eps*a^2,nw)
+            if nw lt 1 then frac[iaperture]+=1.
+            if plotarea then begin
+                if nw lt 1 then begin
+                    col=250
+                endif else begin
+                    col=100
+                endelse
+                oplot,[da[0,j]],[da[1,j]],color=col,psym=1
+            end
+        end
 
-  ; Optional plotting of trajectories
-  doplot=0
-  if doplot then begin
-  if first then begin
-  !p.multi=[0,0,1]
-  plot,zz,sqrt(xx^2+yy^2),yrange=1.2*[min(sqrt(xx^2+yy^2)),max(sqrt(xx^2+yy^2))]
-  first=0
-  end else oplot,zz,sqrt(xx^2+yy^2),color=100+fix(frac[iaperture])
-  end ; doplot
+        if plotarea then wait,5
 
-  ; cos(theta) factor
-  frac[iaperture]*=d/sqrt(d^2 + daperture[0,iaperture]^2 + daperture[1,iaperture]^2)
+        ; Optional plotting of trajectories
+        doplot=0
+        if doplot then begin
+            if first then begin
+                !p.multi=[0,0,1]
+                plot,zz,sqrt(xx^2+yy^2),yrange=1.2*[min(sqrt(xx^2+yy^2)),max(sqrt(xx^2+yy^2))]
+                first=0
+            endif else begin
+                oplot,zz,sqrt(xx^2+yy^2),color=100+fix(frac[iaperture])
+            endelse
+        end ; doplot
 
-  end ; iaperture loop
+        ; cos(theta) factor
+        frac[iaperture]*=d/sqrt(d^2 + daperture[0,iaperture]^2 + daperture[1,iaperture]^2)
 
-  frac/=narea
+    end ; iaperture loop
 
-  norm=(!pi*a^2)*(!pi*aperture^2)/(4*!pi*d^2*naperture)
+    frac/=narea
+
+    norm=(!pi*a^2)*(!pi*aperture^2)/(4*!pi*d^2*naperture)
 
   end
 
@@ -343,11 +347,11 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
   ;-----------------
   ; Loop over sightlines
   for ich=0,nch-1 do begin
-    InitialPosition=[rdist[ich],0,zdist[ich]]
+    ri=[rdist[ich],0,zdist[ich]]
     for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
 
   Velocity=vconstant*reform(initial_velocities[*,iray,ich])
-  y=dblarr(6) & y(0:2)=Velocity & y(3:5)=InitialPosition
+  y=dblarr(6) & y(0:2)=Velocity & y(3:5)=ri
   h=double(step*omega/v0) & if time_reverse then h=-h
   yout=dblarr(6,nsteps)
   dydx=derivs(0.,y)

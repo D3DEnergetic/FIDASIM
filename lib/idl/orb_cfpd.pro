@@ -81,7 +81,7 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps
     ;+##Example Usage
     ;+```idl
     ;+IDL> g = 'g000001.01000'
-    ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
+    ;+IDL> detector_aperture_geometry,0,rdist,zdist,v,d,rc
     ;+IDL> ri = [rdist[0],0,zdist[0]]
     ;+IDL> vi = -reform(v[*,0])
     ;+IDL> orb_collimator,g,ri,vi,d,rc[0],50,vsave,frac,norm
@@ -291,7 +291,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
     ;+##Example Usage
     ;+```idl
     ;+IDL> g = 'g000001.01000'
-    ;+IDL> detector_aperture_geometry,g,0,rdist,zdist,v,d,rc
+    ;+IDL> detector_aperture_geometry,0,rdist,zdist,v,d,rc
     ;+IDL> orb = orb_cfpd(g,rdist,zdist,v,d,rc,e0=3030,nrays=50,nsteps=110)
     ;+```
 

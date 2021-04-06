@@ -9359,7 +9359,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
 
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, lambda_shifted
+    real(Float64) :: E, lambda_shifted, B, a0, l0, h, q0, q1
 
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9376,9 +9376,35 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
     efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
     E = norm2(efield)
-
+    B = norm2(bfield)
+    !Stark Splitting
+    h=6.62607004d-34
+        ! planck constant in SI units
+    a0= 5.29177210903d-11
+        ! bohr radius in SI units
+    l0 = lambda0*10**-9
+        ! reference wavelength in [m]
+    q0 = sqrt((e*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
+    q1 = sqrt(4*(e*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
+    wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
+    wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
+    wavel(4) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(2))*l0)
+    wavel(5) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(1))*l0)
+    wavel(6) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(0))*l0)
+    wavel(7) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(1))*l0)
+    wavel(8) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(0))*l0)
+    wavel(9) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-1))*l0)
+    wavel(10) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(0))*l0)
+    wavel(11) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-1))*l0)
+    wavel(12) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-2))*l0)
+    wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
+    wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
+    wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
+    !lambda =  lambda_shifted + E * stark_wavel ![nm] <-old calculation for pure stark effect
+    wavel = (wavel-l0)*10**9
     !! Stark Splitting
-    lambda =  lambda_shifted + E * stark_wavel ![nm]
+    lambda = lambda_shifted + wavel
 end
 
 subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambda, intensity)
@@ -9400,15 +9426,16 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
     real(Float64), dimension(n_stark), intent(out) :: intensity
+    !real(Float64), dimension(n_stark,4), intent(out) :: stokes
         !+ Spectra intensities [Ph/(s cm^2 starkline)]
-
+    !integer(Int32) :: l
+    real(Float64) :: m, h
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, cos_los_Efield, lambda_shifted
+    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1
     integer, dimension(n_stark) :: stark_sign
-
+    real(Float64), dimension(15) :: wavel
     stark_sign = +1*stark_sigma - 1*stark_pi
-
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
 
@@ -9424,10 +9451,34 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
     efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
     E = norm2(efield)
-
+    B = norm2(bfield)
     !Stark Splitting
-    lambda =  lambda_shifted + E * stark_wavel ![nm]
-
+    h=6.62607004d-34
+        ! planck constant in SI units
+    a0= 5.29177210903d-11
+        ! bohr radius in SI units
+    l0 = lambda0*10**-9
+        ! reference wavelength in [m]
+    q0 = sqrt((e*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
+    q1 = sqrt(4*(e*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
+    wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
+    wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
+    wavel(4) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(2))*l0)
+    wavel(5) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(1))*l0)
+    wavel(6) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(0))*l0)
+    wavel(7) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(1))*l0)
+    wavel(8) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(0))*l0)
+    wavel(9) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-1))*l0)
+    wavel(10) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(0))*l0)
+    wavel(11) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-1))*l0)
+    wavel(12) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-2))*l0)
+    wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
+    wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
+    wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
+    !lambda =  lambda_shifted + E * stark_wavel ![nm] <-old calculation for pure stark effect
+    wavel = (wavel-l0)*10**9
+    lambda = lambda_shifted + wavel
     !Intensities of stark components
     if (E .eq. 0.d0) then
         cos_los_Efield = 0.d0
@@ -9435,15 +9486,20 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         cos_los_Efield = dot_product(vp,efield) / E
     endif
 
+    ! do l = 1,n_stark
+        ! stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
+        ! stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
+        ! stokes(l,3) = 0
+        ! stokes(l,4) = 0
+    ! end do
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
         intensity = intensity * sigma_pi
     endwhere
-
+    
     !! normalize and multiply with photon density from colrad
     intensity = intensity/sum(intensity)*photons*dlength
-
 endsubroutine spectrum
 
 subroutine store_photons(pos, vi, lambda0, photons, spectra, passive)

@@ -174,6 +174,7 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
+              'calc_cfpd': zero_int,
               'calc_neutron': zero_int,
               'adaptive': zero_int,
               'split_tol': zero_double,
@@ -1170,6 +1171,116 @@ def check_npa(inp, npa):
     else:
         success('NPA geometry is valid')
 
+def check_cfpd(inp, cfpd):
+    """
+    #+#check_cfpd
+    #+Checks if CFPD geometry dictionary is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: input dictionary
+    #+
+    #+     **cfpd**: CFPD geometry dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> check_cfpd(inputs, cfpd)
+    #+```
+    """
+    err = False
+    info('Checking CFPD geometry...')
+
+    cfpd_keys = cfpd.keys()
+
+    if 'nchan' not in cfpd_keys:
+        error('"nchan" is missing from the CFPD geometry')
+        err = True
+        error('Invalid CFPD geometry. Exiting...', halt=True)
+
+    nchan = cfpd['nchan']
+
+    zero_string = {'dims': 0,
+                   'type': [str]}
+
+    zero_long = {'dims': 0,
+                 'type': [int, np.int32, np.int64]}
+
+    three_float = {'dims': [3, nchan],
+                   'type': [float, np.float64]}
+
+    nchan_int = {'dims': [nchan],
+                 'type': [int, np.int32, np.int64]}
+
+    nchan_float = {'dims': [nchan],
+                    'type': [float, np.float64]}
+
+    nchan_string = {'dims': [nchan],
+                    'type': [np.bytes_]}
+
+    schema = {'data_source': zero_string,
+              'nchan': zero_long,
+              'system': zero_string,
+              'id': nchan_string,
+              'a_shape': nchan_int,
+              'd_shape': nchan_int,
+              'a_tedge': three_float,
+              'a_redge': three_float,
+              'a_cent': three_float,
+              'd_tedge': three_float,
+              'd_redge': three_float,
+              'd_cent': three_float,
+              'radius': nchan_float}
+
+    err = check_dict_schema(schema, cfpd, desc="CFPD geometry")
+    if err:
+        error('Invalid CFPD geometry. Exiting...', halt=True)
+
+    # Check detector/aperture shape
+    w = np.logical_or(cfpd['d_shape'] > 2, cfpd['d_shape'] == 0)
+    nw = len(cfpd['d_shape'][w])
+    if nw != 0:
+        error('Invalid detector shape. Expected 1 (rectagular) or 2 (circular)')
+        print('Invalid indices: {}'.format(np.arange(len(cfpd['d_shape']))[w]))
+        err = True
+
+    w = np.logical_or(cfpd['a_shape'] > 2, cfpd['a_shape'] == 0)
+    nw = len(cfpd['a_shape'][w])
+    if nw != 0:
+        error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
+        print('Invalid indices: {}'.format(np.arange(len(cfpd['a_shape']))[w]))
+        err = True
+
+    err_arr = np.zeros(nchan, dtype=int)
+    for i in range(nchan):
+        uvw_det = cfpd['d_cent'][:, i]
+        d_e1 = cfpd['d_redge'][:, i] - uvw_det
+        d_e2 = cfpd['d_tedge'][:, i] - uvw_det
+
+        uvw_aper = cfpd['a_cent'][:, i]
+        a_e1 = cfpd['a_redge'][:, i] - uvw_aper
+        a_e2 = cfpd['a_tedge'][:, i] - uvw_aper
+
+        uvw_dir = uvw_aper - uvw_det
+
+        # Check that the detector and aperture point in the same direction
+        d_e3 = np.cross(d_e1, d_e2)
+        a_e3 = np.cross(a_e1, a_e2)
+        a_dp = np.sum(uvw_dir*a_e3)
+        d_dp = np.sum(uvw_dir*d_e3)
+        dp = np.sum(d_e3 * a_e3)
+        if (dp <= 0.) or (a_dp <= 0.) or (d_dp <= 0.):
+            error('The detector and/or aperture plane normal vectors are pointing in the wrong direction. The CFPD definition is incorrect.')
+            err_arr[i] = 1
+
+    w = (err_arr == 0)
+    nw = err_arr[w].size
+    if nw == 0:
+        err = True
+
+    if err:
+        error('Invalid CFPD geometry. Exiting...', halt=True)
+    else:
+        success('CFPD geometry is valid')
+
 def write_namelist(filename, inputs):
     """
     #+#write_namelist
@@ -1218,6 +1329,7 @@ def write_namelist(filename, inputs):
         f.write("calc_pfida = {:d}    !! Calculate Passive FIDA Spectra\n".format(inputs['calc_pfida']))
         f.write("calc_pnpa = {:d}   !! Calculate Passive NPA\n".format(inputs['calc_pnpa']))
         f.write("calc_neutron = {:d}   !! Calculate B-T Neutron Rate\n".format(inputs['calc_neutron']))
+        f.write("calc_cfpd = {:d}   !! Calculate B-T CFPD Energy Resolved Count Rate\n".format(inputs['calc_cfpd']))
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
@@ -1292,7 +1404,7 @@ def write_namelist(filename, inputs):
 
     success("Namelist file created: {}\n".format(filename))
 
-def write_geometry(filename, nbi, spec=None, npa=None):
+def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
     """
     #+#write_geometry
     #+Write geometry values to a HDF5 file
@@ -1307,9 +1419,11 @@ def write_geometry(filename, nbi, spec=None, npa=None):
     #+
     #+     **npa**: Optional, NPA geometry structure
     #+
+    #+     **cfpd**: Optional, CFPD geometry structure
+    #+
     #+##Example Usage
     #+```python
-    #+>>> write_geometry(filename, nbi, spec=spec, npa=npa)
+    #+>>> write_geometry(filename, nbi, spec=spec, npa=npa, cfpd=cfpd)
     #+```
     """
     info('Writing geometry file...')
@@ -1419,6 +1533,49 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                          'a_redge': 'cm'}
 
             write_data(g_npa, npa, desc = npa_description, units = npa_units, name='npa')
+
+        if cfpd is not None:
+            # Create cfpd group
+            g_cfpd = hf.create_group('cfpd')
+
+            # Group attributes
+            g_cfpd.attrs['description'] = 'CFPD Geometry'
+            g_cfpd.attrs['coordinate_system'] = 'Right-handed cartesian'
+
+            # Dataset attributes
+            cfpd_description = {'data_source': 'Source of the CFPD geometry',
+                               'nchan': 'Number of channels',
+                               'nrays': 'Number of rays',
+                               'nsteps': 'Maximum number of orbit steps',
+                               'nenergy': 'Number of energies',
+                               'nactual': 'Number of orbital spatial steps',
+                               'system': 'Names of the different CFPD systems',
+                               'id': 'Line of sight ID',
+                               'd_shape': 'Shape of the detector: 1="rectangular", 2="circular"',
+                               'd_cent': 'Center of the detector',
+                               'd_tedge': 'Center of the detectors top edge',
+                               'd_redge': 'Center of the detectors right edge',
+                               'a_shape': 'Shape of the aperture: 1="rectangular", 2="circular"',
+                               'a_cent': 'Center of the aperture',
+                               'a_tedge': 'Center of the apertures top edge',
+                               'a_redge': 'Center of the apertures right edge',
+                               'radius': 'Line of sight radius at midplane or tangency point',
+                               'earray': 'Energy array',
+                               'sightline': 'Velocity and position in (R,Phi,Z)',
+                               'daomega': 'Transmission factor'}
+
+            cfpd_units = {'d_cent': 'cm',
+                         'd_tedge': 'cm',
+                         'd_redge': 'cm',
+                         'a_cent': 'cm',
+                         'a_tedge': 'cm',
+                         'radius': 'cm',
+                         'a_redge': 'cm',
+                         'earray': 'keV',
+                         'sightline': 'cm/s and cm',
+                         'daomega': 'cm^2'}
+
+            write_data(g_cfpd, cfpd, desc = cfpd_description, units = cfpd_units, name='cfpd')
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)
@@ -1621,7 +1778,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, use_abs_path=True):
+def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -1644,9 +1801,11 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, use_abs
     #+
     #+     **npa**: Optional, NPA geometry structure
     #+
+    #+     **cfpd**: Optional, CFPD geometry structure
+    #+
     #+##Example Usage
     #+```python
-    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa)
+    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, cfpd=cfpd)
     #+```
     """
     # CHECK INPUTS
@@ -1679,11 +1838,15 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, use_abs
     if npa is not None:
         check_npa(inputs, npa)
 
+    # CHECK CFPD
+    if cfpd is not None:
+        check_cfpd(inputs, cfpd)
+
     # WRITE FIDASIM INPUT FILES
     write_namelist(inputs['input_file'], inputs)
 
     # WRITE GEOMETRY FILE
-    write_geometry(inputs['geometry_file'], nbi, spec=spec, npa=npa)
+    write_geometry(inputs['geometry_file'], nbi, spec=spec, npa=npa, cfpd=cfpd)
 
     # WRITE EQUILIBRIUM FILE
     write_equilibrium(inputs['equilibrium_file'], plasma, fields)

@@ -851,6 +851,18 @@ type NeutronRate
         !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
+type CFPDRate
+    !+ Charged Fusion Product (CFPD) storage structure
+    real(Float64), dimension(:,:,:,:), allocatable :: weight
+        !+ CFPD rate weight: weight(Ep,Ch,E,p)
+    real(Float64), dimension(:,:), allocatable         :: flux
+        !+ CFPD flux: flux(E3,chan) [kHz]
+    real(Float64), dimension(:,:), allocatable         :: prob
+        !+ CFPD flux: probability_gyro(E3,chan) [unity]
+    real(Float64), dimension(:,:), allocatable         :: gam
+        !+ CFPD flux: gyro(E3,chan) [rad]
+end type CFPDRate
+
 type NeutralParticle
     real(Float64) :: w = 1.d0
         !+ Neutral particle weight
@@ -1011,6 +1023,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_cfpd
+        !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1093,13 +1107,38 @@ type GyroSurface
         !+ Basis of coordinate system of gyrosurface
 end type GyroSurface
 
+type CFPDTable
+    !+ Defines Charged Fusion Product orbit trajectories
+    integer :: nenergy = 0
+        !+ Number of cfpd energies
+    integer :: nrays = 0
+        !+ Number of "rays"
+    integer :: nsteps = 0
+        !+ Number of total steps
+    integer :: nchan = 0
+        !+ Number of channels
+    real(Float64) :: dl
+        !+ Step length [cm]
+    real(Float64) :: dE
+        !+ CFPD energy bin width [keV]
+    real(Float64), dimension(:), allocatable :: earray
+        !+ Energies of cfpd orbits [keV]: earray(E3)
+    real(Float64), dimension(:,:,:), allocatable :: nactual
+        !+ Number of spatial steps: nactual(E3,ray,channel)
+    real(Float64), dimension(:,:,:), allocatable :: daomega
+        !+ Differntial area times solid angle [cm^2]: daomega(E3,ray,channel)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: sightline
+        !+ Velocity [cm/s] and position [cm] in cylindrical (R,Phi,Z) coordinates:
+        !+ sightline(E3,:,step,ray,channel)
+end type CFPDTable
+
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
     !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], [[NPAParticle]], and [[BirthParticle]]
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
                      fast_ion_assign,npa_part_assign,birth_part_assign, &
-                     neutral_part_assign, npr_assign, np_assign
+                     neutral_part_assign, npr_assign, np_assign, oo_assign
 end interface
 
 interface operator(+)
@@ -1162,10 +1201,14 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
+type(CFPDRate), save          :: cfpd
+    !+ Variable for storing the Charged Fusion Product rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
+type(CFPDTable), save       :: ctable
+    !+ Variable for storing the calculated Charged Fusion Product orbits
 
 contains
 
@@ -1868,6 +1911,24 @@ elemental function lfs_divide(p1, real_scalar) result (p3)
 
 end function lfs_divide
 
+pure subroutine oo_assign(p1, p2)
+    !+ Defines how to assign [[CFPDTable]] types to eachother
+    type(CFPDTable), intent(in)  :: p2
+    type(CFPDTable), intent(out) :: p1
+
+    p1%nenergy   = p2%nenergy
+    p1%nrays     = p2%nrays
+    p1%nsteps    = p2%nsteps
+    p1%nchan     = p2%nchan
+    p1%dl        = p2%dl
+    p1%dE        = p2%dE
+    p1%earray    = p2%earray
+    p1%nactual   = p2%nactual
+    p1%daomega   = p2%daomega
+    p1%sightline = p2%sightline
+
+end subroutine oo_assign
+
 !============================================================================
 !-------------------------------I/O Routines---------------------------------
 !============================================================================
@@ -1877,7 +1938,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed
+    integer            :: pathlen, calc_neutron, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
@@ -1900,7 +1961,7 @@ subroutine read_inputs
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
-        calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -1946,6 +2007,7 @@ subroutine read_inputs
     output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
+    calc_cfpd=0
     n_fida=0
     n_pfida=0
     n_npa=0
@@ -2056,6 +2118,7 @@ subroutine read_inputs
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
+    inputs%calc_cfpd=calc_cfpd
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -3095,6 +3158,96 @@ subroutine read_npa
 
 end subroutine read_npa
 
+subroutine read_cfpd
+    !+ Reads the CFPD geometry and stores the quantities in [[libfida:ctable]]
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(3) :: dims3
+    integer(HSIZE_T), dimension(5) :: dims5
+    logical :: path_valid
+    real(Float64),dimension(3) :: uvwi,uvwf,rpzi,rpzf
+
+    character(len=20) :: system = ''
+
+    integer :: error
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
+
+    if(inputs%verbose.ge.1) write(*,'(a)') "---- CFPD settings ----"
+    !!Check if CFPD group exists
+    call h5ltpath_valid_f(fid, "/cfpd", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'CFPD geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without CFPD diagnostics'
+            write(*,*) ''
+        endif
+        inputs%calc_cfpd = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
+        return
+    endif
+
+    !!Open CFPD group
+    call h5gopen_f(fid, "/cfpd", gid, error)
+
+    call h5ltread_dataset_string_f(gid, "/cfpd/system", system, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/cfpd/nchan", ctable%nchan, error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T2,"CFPD System: ", a)') trim(adjustl(system))
+        write(*,'(T2,"Number of channels: ",i3)') ctable%nchan
+    endif
+
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nenergy", ctable%nenergy, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nrays", ctable%nrays, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/cfpd/nsteps", ctable%nsteps, error)
+
+    allocate(ctable%earray(ctable%nenergy))
+    allocate(ctable%nactual(ctable%nenergy, ctable%nrays, ctable%nchan))
+    allocate(ctable%daomega(ctable%nenergy, ctable%nrays, ctable%nchan))
+    allocate(ctable%sightline(ctable%nenergy, 6, ctable%nsteps, ctable%nrays, ctable%nchan))
+
+    dims3 = [ctable%nenergy, ctable%nrays, ctable%nchan]
+    dims5 = [ctable%nenergy, 6, ctable%nsteps, ctable%nrays, ctable%nchan]
+    call h5ltread_dataset_double_f(gid, "/cfpd/earray", ctable%earray, dims3(1:1), error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ctable%nactual, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ctable%daomega, dims3, error)
+    call h5ltread_dataset_double_f(gid, "/cfpd/sightline", ctable%sightline, dims5, error)
+
+    !!Close CFPD group
+    call h5gclose_f(gid, error)
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    rpzi(1) = ctable%sightline(1,4,1,1,1)
+    rpzi(2) = ctable%sightline(1,5,1,1,1)
+    rpzi(3) = ctable%sightline(1,6,1,1,1)
+    rpzf(1) = ctable%sightline(1,4,2,1,1)
+    rpzf(2) = ctable%sightline(1,5,2,1,1)
+    rpzf(3) = ctable%sightline(1,6,2,1,1)
+
+    uvwi(1) = rpzi(1)*cos(rpzi(2))
+    uvwi(2) = rpzi(1)*sin(rpzi(2))
+    uvwi(3) = rpzi(3)
+    uvwf(1) = rpzf(1)*cos(rpzf(2))
+    uvwf(2) = rpzf(1)*sin(rpzf(2))
+    uvwf(3) = rpzf(3)
+    ctable%dl = norm2(uvwf-uvwi)
+
+    ctable%dE = ctable%earray(2)-ctable%earray(1)
+
+    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+
+end subroutine read_cfpd
+
 subroutine read_plasma
     !+ Reads in Plasma composition e.g. the thermal, fast-ion, and impurity species
     integer(HID_T) :: fid, gid
@@ -4061,6 +4214,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
+        inputs%calc_cfpd=0
         return
     endif
 
@@ -4080,7 +4234,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
                  rates%bt_amu(2),' amu got ', thermal_mass(1), ' amu'
         endif
-        err = .True.
+     !!!err = .True.
     endif
 
     if(err) then
@@ -4088,6 +4242,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
+        inputs%calc_cfpd=0
         return
     endif
 
@@ -4173,7 +4328,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.ge.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
     endif
 
@@ -5358,6 +5513,87 @@ subroutine write_neutrons
 
 end subroutine write_neutrons
 
+subroutine write_cfpd_weights
+    !+ Writes [[libfida:cfpd]] to a HDF5 file
+    integer(HID_T) :: fid
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(4) :: dim4
+    integer :: error
+
+    character(charlim) :: filename
+
+    !! write to file
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_cfpd.h5"
+
+    !Open HDF5 interface
+    call h5open_f(error)
+
+    !Create file overwriting any existing file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+    !Write variables
+    if(inputs%dist_type.eq.1) then
+        dim1(1) = 1
+        dim2 = [ctable%nenergy, ctable%nchan]
+        dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
+
+        call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, cfpd%gam, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, cfpd%weight, error)
+
+        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
+        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(3:3), fbm%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(4:4), fbm%pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ctable%earray, error)
+
+        call h5ltset_attribute_string_f(fid,"/flux", "description", &
+             "CFPD flux: flux(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/flux", "units", &
+             "kHz", error)
+
+        call h5ltset_attribute_string_f(fid,"/prob", "description", &
+             "CFPD average nonzero probability: prob(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/gam", "description", &
+             "CFPD average nonzero gyroangle: gam(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/gam", "units", "rad", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "description", &
+             "CFPD Weight Function: weight(Ch,E3,E,p), rate = sum(f*weight)", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "units","products*cm^3*dE*dp/fast-ion*s", error)
+
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of distribution function energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of distribution function pitch values", error)
+
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/earray","description", &
+             "E3 energy array", error)
+        call h5ltset_attribute_string_f(fid,"/earray", "units","keV", error)
+    endif
+
+    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+    call h5ltset_attribute_string_f(fid,"/","description",&
+         "CFPD signals calculated by FIDASIM", error)
+
+    !Close file
+    call h5fclose_f(fid, error)
+
+    !Close HDF5 interface
+    call h5close_f(error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'Charged fusion products written to: ', trim(filename)
+    endif
+
+end subroutine write_cfpd_weights
+
 subroutine write_fida_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
     !! HDF5 variables
@@ -6538,6 +6774,48 @@ subroutine uvw_to_cyl(uvw, cyl)
 
 end subroutine uvw_to_cyl
 
+subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
+    !+ Convert sightline position and velocity from cylindrical coordinate `rpz` to beam coordinate `xyz`
+    integer, intent(in) :: ie3
+        !+ CFPD energy index
+    integer, intent(in) :: ist
+        !+ Step index
+    integer, intent(in) :: iray
+        !+ "Ray" index
+    integer, intent(in) :: ich
+        !+ Detector channel
+    real(Float64), dimension(3), intent(out) :: xyz
+        !+ Sightline position in beam coordinates
+    real(Float64), dimension(3), intent(out) :: v3_xyz
+        !+ Sightline velocity in beam coordinates
+
+    real(Float64), dimension(3) :: rpz, uvw, v3_rpz, v3_uvw
+    real(Float64) :: phi
+
+    !! Position
+    rpz(1) = ctable%sightline(ie3,4,ist,iray,ich)
+    rpz(2) = ctable%sightline(ie3,5,ist,iray,ich)
+    rpz(3) = ctable%sightline(ie3,6,ist,iray,ich)
+
+    phi = rpz(2)
+    uvw(1) = rpz(1)*cos(phi)
+    uvw(2) = rpz(1)*sin(phi)
+    uvw(3) = rpz(3)
+    call uvw_to_xyz(uvw, xyz)
+
+    !! Velocity
+    v3_rpz(1) = ctable%sightline(ie3,1,ist,iray,ich)
+    v3_rpz(2) = ctable%sightline(ie3,2,ist,iray,ich)
+    v3_rpz(3) = ctable%sightline(ie3,3,ist,iray,ich)
+
+    v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
+    v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
+    v3_uvw(3) = v3_rpz(3)
+
+    v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
+
+end subroutine convert_sightline_to_xyz
+
 subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, passive)
     !+ Calculates a particles intersection length with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in)           :: r0
@@ -6880,6 +7158,10 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
         ics = 2
     endif
 
+    if(ics.eq.0) then
+        call xyz_to_cyl(pos, loc)
+    endif
+
     if(ics.eq.1) then
         loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
         loc(2) = pos(3)
@@ -6911,6 +7193,57 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
     enddo
 
 end subroutine get_passive_grid_indices
+
+subroutine get_interpolation_grid_indices(pos, ind, input_coords)
+    !+ Find closest [[libfida:inter_grid]] indices `ind` to position `pos`
+    real(Float64),  dimension(3), intent(in)  :: pos
+        !+ Position [cm]
+    integer(Int32), dimension(3), intent(out) :: ind
+        !+ Closest indices to position
+    integer, intent(in), optional             :: input_coords
+        !+ Indicates coordinate system of `pos`. Beam grid (0), machine (1) and cylindrical (2)
+
+    real(Float64),  dimension(3) :: mini, differentials, loc
+    integer(Int32), dimension(3) :: maxind
+    integer :: i, ics
+
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 2
+    endif
+
+    if(ics.eq.1) then
+        loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        loc(2) = pos(3)
+        loc(3) = atan2(pos(2),pos(1))
+    endif
+
+    if(ics.eq.2) then
+        loc(1) = pos(1)
+        loc(2) = pos(2)
+        loc(3) = pos(3)
+    endif
+
+    maxind(1) = inter_grid%nr
+    maxind(2) = inter_grid%nz
+    maxind(3) = inter_grid%nphi
+
+    mini(1) = minval(inter_grid%r)
+    mini(2) = minval(inter_grid%z)
+    mini(3) = minval(inter_grid%phi)
+
+    differentials(1) = inter_grid%dr
+    differentials(2) = inter_grid%dz
+    differentials(3) = inter_grid%dphi
+
+    do i=1,3
+        ind(i) = floor((loc(i)-mini(i))/differentials(i)) + 1
+        if (ind(i).gt.maxind(i)) ind(i)=maxind(i)
+        if (ind(i).lt.1) ind(i)=1
+    enddo
+
+end subroutine get_interpolation_grid_indices
 
 subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     !+ Returns extrema points where line(s) parametrized by `r0` and `v0` intersect the plasma boudnary
@@ -7691,6 +8024,7 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
         if(ocs.eq.0) then
+            plasma%vrot_uvw = vrot_uvw
             plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
             plasma%pos = xyz
         endif
@@ -8472,20 +8806,28 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
 
 end subroutine bt_cx_rates
 
-subroutine get_neutron_rate(plasma, eb, rate)
-    !+ Gets neutron rate for a beam with energy `eb` interacting with a target plasma
+subroutine get_dd_rate(plasma, eb, rate, branch)
+    !+ Gets d(d,p)T rate for a beam with energy `eb` interacting with a target plasma
     type(LocalProfiles), intent(in) :: plasma
         !+ Plasma Paramters
     real(Float64), intent(in)       :: eb
         !+ Beam energy [keV]
     real(Float64), intent(out)      :: rate
         !+ Neutron reaction rate [1/s]
+    integer, intent(in), optional   :: branch
+        !+ Indicates 1 for cfpd rate and 2 for neutron rate
 
-    integer :: err_status, neb, nt, ebi, tii, is
+    integer :: err_status, neb, nt, ebi, tii, is, ib
     real(Float64) :: dlogE, dlogT, logEmin, logTmin
     real(Float64) :: logeb, logti, lograte
     type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22
+
+    if(present(branch)) then
+        ib = branch
+    else
+        ib = 2
+    endif
 
     logeb = log10(eb)
     logti = log10(plasma%ti)
@@ -8508,18 +8850,16 @@ subroutine get_neutron_rate(plasma, eb, rate)
     b22 = c%b22
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
-            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+            write(*,'(a)') "GET_DD_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
         endif
         rate = 0.d0
         return
     endif
 
-    lograte = (b11*tables%D_D%log_rate(ebi,tii,2)   + &
-               b12*tables%D_D%log_rate(ebi,tii+1,2) + &
-               b21*tables%D_D%log_rate(ebi+1,tii,2) + &
-               b22*tables%D_D%log_rate(ebi+1,tii+1,2))
+    lograte = (b11*tables%D_D%log_rate(ebi,tii,ib)   + &
+               b12*tables%D_D%log_rate(ebi,tii+1,ib) + &
+               b21*tables%D_D%log_rate(ebi+1,tii,ib) + &
+               b22*tables%D_D%log_rate(ebi+1,tii+1,ib))
 
     if (lograte.lt.tables%D_D%minlog_rate) then
         rate = 0.d0
@@ -8532,7 +8872,266 @@ subroutine get_neutron_rate(plasma, eb, rate)
         enddo
     endif
 
-end subroutine get_neutron_rate
+end subroutine get_dd_rate
+
+subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
+    !+ Gets d(d,p)T anisotropy defecit/enhancement factor for a beam interacting with a target plasma
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters
+    real(Float64), dimension(3), intent(in) :: v1
+        !+ Beam velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v3
+        !+ Charged Fusion Product velocity [cm/s]
+    real(Float64), intent(out)              :: kappa
+        !+ Anisotropy factor
+    !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
+
+    real(Float64), dimension(3,12) :: abc
+    real(Float64), dimension(13)   :: bhcor !!! 13?
+    real(Float64), dimension(12)   :: e, a, b, c
+    real(Float64), dimension(3)    :: vcm, v3cm, vrel
+    type(InterpolCoeffs1D) :: c1D
+
+    real(Float64) :: ai, bi, ci, b1, b2, b11, b12, b21, b22, cos_phi, sin_phi
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, Q, mp, k0, JMeV
+    integer :: ei, i, err_status
+
+    !! Calculate effective beam energy
+    vrel = v1-plasma%vrot ![cm/s]
+    vnet_square=dot_product(vrel, vrel) ![(cm/s)**2]
+    eb = v2_to_E_per_amu*fbm%A*vnet_square ![keV]
+
+    !!Calculate anisotropy enhancement/deficit factor
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 4.04*JMeV ![J]
+
+    vcm = 0.5*(v1+plasma%vrot) ![cm/s]
+    KE = 0.5*mp*vnet_square*1.d-4  ! [J] C-O-M kinetic energy
+    k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+    if ((norm2(vcm)*norm2(v3)).gt.0.d0) then
+        cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
+        sin_phi = sin(acos(cos_phi))
+
+        if (abs(k0*sin_phi).le.1) then
+            cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
+        else
+            cos_theta = 0.d0
+        endif
+
+    else
+        cos_theta = 0.d0
+    endif
+
+    !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
+    e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
+    a = [0.0,0.0208,0.0886,0.1882,0.3215,0.4636,0.6055,0.7528,0.8976,1.041,1.166,1.243]
+    b = [0.0,0.0023,0.0184,0.0659,0.076,0.168,0.251,0.250,0.378,0.367,0.521,0.55]
+    c = [0.0,0.0,0.0,0.0,0.048,0.021,0.039,0.162,0.142,0.276,0.203,0.34]
+    e(1) = 10.0
+    a(1) = 0.00903775/(4*pi)
+    abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
+
+    !Correction factor to make it consistent with Bosch & Hale
+    bhcor=[1.0,1.02614,.98497,1.006,1.015,1.012,1.0115,1.021,1.012,1.012,1.016,1.018,1.012]
+    do i=1,12
+        abc(:,i) = abc(:,i)*bhcor(i)
+    enddo
+
+    e1com=0.5d0*eb
+    call interpol_coeff(e, e1com, c1D, err_status)
+
+    ei = c1D%i
+    b1 = c1D%b1
+    b2 = c1D%b2
+
+    ai = b1*abc(1,ei) + b2*abc(1,ei+1)
+    bi = b1*abc(2,ei) + b2*abc(2,ei+1)
+    ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+
+    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
+
+end subroutine get_ddpt_anisotropy
+
+subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
+    !+ Returns fraction of gyroangles that can produce a reaction with
+    !+ given inputs
+    type(LocalEMFields), intent(in) :: fields
+        !+ Electromagneticfields in beam coordinates
+    real(Float64), intent(in)       :: E3
+        !+ E3 charged fusion product energy [keV]
+    real(Float64), intent(in) :: E1
+        !+ E1 fast-ion energy [keV]
+    real(Float64), intent(in) :: pitch
+        !+ pitch  fast ion pitch relative to the field
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters in beam coordinates
+    real(Float64), dimension(3), intent(in) :: v3_xyz
+        !+ Charged fusion product velocity in beam coorindates
+    real(Float64), intent(out) :: pgyro
+        !+ pgyro   DeltaE_3*\partial\gam/\partial E_3/pi
+    real(Float64), intent(out) :: gam0
+        !+ Gyro angle of fast ion [rad]
+
+    real(Float64), dimension(3) :: a_hat, vrot
+    real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,E3max,E3min
+    real(Float64) :: phip,cosphip,cosphib,cosphia,rhs,gammaplus,gammaminus
+    real(Float64) :: eps,bracket,ccminus,ccplus,bbminus,bbplus,v3minus,v3plus
+    real(Float64) :: E3minus,E3plus,v3plusmag,v3minusmag,v3maxmag,v3minmag
+    real(Float64) :: DeltaE3
+
+    pgyro = 0.d0
+    gam0 = 0.d0
+
+    ! Preliminaries [SI units]
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 4.04*JMeV ![J]
+    norm_v3 = sqrt(E3/(H1_amu*v2_to_E_per_amu)) / 100 ![m/s]
+    norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
+    vpar = norm_v1*pitch ![m/s]
+    vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
+    vrot = plasma%vrot/100.d0 ![m/s]
+    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz) !(b,a,c)
+
+    !! First, check E3 limits are valid for the given inputs
+    !! Assumes cos(gamma) = +/- 1 and vrot = 0
+    cosphip = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz)
+    phip = acos(cosphip)
+
+    !! Get plasma rotation components in (b,a,c) coords
+    if (all(vrot.eq.0.d0)) then
+        vb = 0.d0
+        va = 0.d0
+    else
+        cosphib = dot_product(vrot, fields%b_norm) / norm2(vrot)
+        vb = norm2(vrot)*cosphib ![m/s]
+        cosphia = dot_product(vrot, a_hat) / norm2(vrot)
+        va = norm2(vrot)*cosphia ![m/s]
+    endif
+
+    ! LHS coefficient teeny (step #0)
+    bracket = vperp*(sin(phip)-2*va/norm_v3)
+    if (abs(bracket).lt.1.d-5) then !'Case 0'
+        return
+    endif
+
+    ! Find E3 limits for these parameters (step #1)
+    ccminus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) - vperp*va
+    ccplus = 1.5*Q/mp + 0.5*norm_v1**2 - 2*vpar*vb + 0.5*norm2(vrot) + vperp*va
+    bbminus = -vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
+    bbplus = vperp*sin(phip) - (vpar+vb)*cos(phip) - va*sin(phip)
+    v3minus = 0.5*(-bbminus + sqrt(bbminus**2+4*ccminus))
+    v3plus = 0.5*(-bbplus + sqrt(bbplus**2+4*ccplus))
+    E3minus = 0.5*mp*v3minus**2 / JkeV
+    E3plus = 0.5*mp*v3plus**2 / JkeV
+    E3min = min(E3plus,E3minus) ![keV]
+    E3max = max(E3plus,E3minus) ![keV]
+
+    ! Now E3plus and E3minus are charged fusion product energies at edge of bin
+    ! 'Case 1'
+    E3plus = E3 + 0.5*ctable%dE
+    E3minus = E3 - 0.5*ctable%dE
+
+    ! Bin misses gamma curve altogether  (step #2)
+    if ((E3plus.le.E3min) .or. (E3minus.ge.E3max)) then !'Case 2'
+        return
+    endif
+
+    ! Get gammaplus and gammaminus  (step #3)
+    v3plusmag = sqrt(2*E3plus*JkeV/mp)
+    v3minusmag = sqrt(2*E3minus*JkeV/mp)
+    v3maxmag = sqrt(2*E3plus*JkeV/mp)
+    v3minmag = sqrt(2*E3minus*JkeV/mp)
+
+    if (E3plus.gt.E3max) then !'Case 3'
+        norm_v3 = v3maxmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaplus = 0.
+            else
+                gammaplus = pi 
+            endif
+        else
+            gammaplus = acos(rhs/bracket)
+        endif
+    else
+        norm_v3 = v3plusmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaplus = 0.
+            else
+                gammaplus = pi
+            endif
+        else
+            gammaplus = acos(rhs/bracket)
+        endif
+    endif
+
+    if (E3minus.lt.E3min) then !'Case 3'
+        norm_v3 = v3minmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+               - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaminus = 0.
+            else
+                gammaminus = pi
+            endif
+        else
+            gammaminus = acos(rhs/bracket)
+        endif
+    else
+        norm_v3 = v3minusmag
+        rhs = norm_v3 - 1.5*Q/(mp*norm_v3) - (vpar+vb)*cos(phip) - va*sin(phip) &
+              - 0.5*(norm_v1**2 + norm2(vrot))/norm_v3 + 2*vpar*vb/norm_v3
+        if (abs(rhs).gt.abs(bracket)) then
+            if (rhs*bracket.gt.0.) then
+                gammaminus = 0.
+            else
+                gammaminus = pi
+            endif
+        else
+            gammaminus = acos(rhs/bracket)
+        endif
+    endif
+
+    gam0 = (gammaplus + gammaminus) / 2.d0 ! return mean gyroangle
+    !!! should there be modifications in gamma in if statements below
+
+    if ((E3plus.ge.E3max) .and. (E3minus.le.E3min)) then !'Case 4a'
+        pgyro = 1.d0
+        return
+    else if ((E3plus.lt.E3max) .and. (E3minus.gt.E3min)) then !'Case 4b'
+        pgyro = abs(gammaplus-gammaminus)/pi
+        return
+    else if((E3plus.ge.E3max) .and. (E3minus.gt.E3min)) then
+        !'Case 4c'
+        if (gammaplus.gt.gammaminus) then
+            pgyro = (pi-gammaminus)/pi
+            return
+        else
+            pgyro = gammaminus/pi
+            return
+        endif
+    else if ((E3plus.lt.E3max) .and. (E3minus.le.E3min)) then
+        !'Case 4d'
+        if (gammaminus.gt.gammaplus) then
+            pgyro = (pi-gammaplus)/pi
+            return
+        else
+            pgyro = gammaplus/pi
+            return
+        endif
+    endif
+
+
+endsubroutine get_pgyro
 
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
@@ -11610,7 +12209,7 @@ subroutine neutron_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
-                            call get_neutron_rate(plasma, erel, rate)
+                            call get_dd_rate(plasma, erel, rate, branch=2)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
@@ -11654,6 +12253,135 @@ subroutine neutron_f
 
 
 end subroutine neutron_f
+
+subroutine cfpd_f
+    !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
+    real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: pgyro, vnet_square, factor, vabs
+    real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
+    integer :: ie, ip, ich, ie3, iray, ist, cnt
+
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'CFPD_F: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(any(thermal_mass.eq.H3_amu)) then
+        write(*,'(T2,a)') 'CFPD_F: D-T cfpd production is not implemented'
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'CFPD_F: Fast-ion species is not Deuterium'
+        return
+    endif
+
+    allocate(cfpd%flux(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%prob(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%gam(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%weight(ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch))
+    cfpd%flux = 0.d0
+    cfpd%prob = 0.d0
+    cfpd%gam = 0.d0
+    cfpd%weight = 0.d0
+
+    rate = 0.d0
+    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
+    !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt)
+    channel_loop: do ich=1, ctable%nchan
+        E3_loop: do ie3=1, ctable%nenergy
+            cnt = 0
+            ray_loop: do iray=1, ctable%nrays
+                step_loop: do ist=1, ctable%nsteps
+                    if (ist.gt.ctable%nactual(ie3,iray,ich)) cycle ray_loop
+
+                    !! Calculate position and velocity in beam coordinates
+                    call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
+
+                    !! Get fields at sightline position
+                    call get_fields(fields, pos=xyz)
+                    if(.not.fields%in_plasma) cycle step_loop
+
+                    !! Get plasma parameters at sightline position
+                    call get_plasma(plasma, pos=xyz)
+                    if(.not.plasma%in_plasma) cycle step_loop
+
+                    !! Loop over energy/pitch/gamma
+                    pitch_loop: do ip = 1, fbm%npitch
+                        pitch = fbm%pitch(ip)
+                        energy_loop: do ie =1, fbm%nenergy
+                            eb = fbm%energy(ie)
+
+                            !! Get the probability factor
+                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
+                            if (pgyro.le.0.d0) cycle energy_loop
+                            cnt = cnt + 1
+
+                            !! Calculate fast-ion velocity
+                            call pitch_to_vec(pitch, gyro, fields, vi_norm)
+                            vabs = sqrt(eb/(v2_to_E_per_amu*fbm%A))
+                            vi = vi_norm*vabs
+                            !!Correct for gyro orbit
+                            call gyro_step(vi,fields,fbm%A,r_gyro)
+
+                            fbm_denf=0
+                            if (inputs%dist_type.eq.1) then
+                                !get F at guiding center position
+                                call get_ep_denf(eb,pitch,fbm_denf,pos=(xyz+r_gyro))
+                            endif
+                            if (fbm_denf.ne.fbm_denf) cycle energy_loop
+
+                            !! Calculate effective beam energy
+                            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                            erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+
+                            !! Get the cfpd production rate and anisotropy term
+                            call get_dd_rate(plasma, erel, rate, branch=1)
+                            call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
+
+                            !$OMP CRITICAL(cfpd_weight)
+                            cfpd%weight(ie3,ich,ie,ip) = cfpd%weight(ie3,ich,ie,ip) &
+                                                            + rate * kappa * pgyro &
+                                                            * ctable%daomega(ie3,iray,ich) &
+                                                            * factor / (fbm%dE*fbm%dp)
+                            cfpd%prob(ie3,ich) = cfpd%prob(ie3,ich) + pgyro
+                            cfpd%gam(ie3,ich) = cfpd%gam(ie3,ich) + gyro
+                            cfpd%flux(ie3,ich) = cfpd%flux(ie3,ich) + rate * kappa * pgyro &
+                                                                        * ctable%daomega(ie3,iray,ich) &
+                                                                        * fbm_denf * factor
+                            !$OMP END CRITICAL(cfpd_weight)
+
+                        enddo energy_loop
+                    enddo pitch_loop
+                enddo step_loop
+            enddo ray_loop
+            !$OMP CRITICAL(pweight_cnt)
+            cfpd%prob(ie3,ich) = cfpd%prob(ie3,ich) / cnt
+            cfpd%gam(ie3,ich) = cfpd%gam(ie3,ich) / cnt
+            !$OMP END CRITICAL(pweight_cnt)
+        enddo E3_loop
+    enddo channel_loop
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(cfpd%flux)
+    call parallel_sum(cfpd%weight)
+    call parallel_sum(cfpd%prob)
+    call parallel_sum(cfpd%gam)
+#endif
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(30X,a)') ''
+        write(*,*) 'write charged fusion products:    ' , time(time_start)
+    endif
+
+#ifdef _MPI
+    if(my_rank().eq.0) call write_cfpd_weights()
+#else
+    call write_cfpd_weights()
+#endif
+
+end subroutine cfpd_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
@@ -11734,7 +12462,7 @@ subroutine neutron_mc
                 eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
-                call get_neutron_rate(plasma, eb, rate)
+                call get_dd_rate(plasma, eb, rate, branch=2)
                 rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
@@ -11754,7 +12482,7 @@ subroutine neutron_mc
             eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
-            call get_neutron_rate(plasma, eb, rate)
+            call get_dd_rate(plasma, eb, rate, branch=2)
             rate = rate*fast_ion%weight*factor
 
             !! Store neutrons
@@ -12476,6 +13204,10 @@ program fidasim
         call read_npa()
     endif
 
+    if(inputs%calc_cfpd.ge.1) then
+        call read_cfpd()
+    endif
+
     call make_diagnostic_grids()
 
     !! ----------------------------------------------------------
@@ -12751,6 +13483,14 @@ program fidasim
         else
             call neutron_mc()
         endif
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    if(inputs%calc_cfpd.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'charged fusion products:    ', time(time_start)
+        endif
+        call cfpd_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

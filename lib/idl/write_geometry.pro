@@ -1,4 +1,4 @@
-PRO write_geometry, filename, nbi, spec=spec, npa=npa
+PRO write_geometry, filename, nbi, spec=spec, npa=npa, cfpd=cfpd
     ;+#write_geometry
     ;+Write geometry values to a HDF5 file
     ;+***
@@ -12,9 +12,11 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     ;+
     ;+     **npa**: Optional, NPA geometry structure
     ;+
+    ;+     **cfpd**: Optional, CFPD geometry structure
+    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> write_geometry, filename, nbi, spec=spec, npa=npa
+    ;+IDL> write_geometry, filename, nbi, spec=spec, npa=npa, cfpd=cfpd
     ;+```
     info,'Writing geometry file...'
 
@@ -67,7 +69,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     nbi_focz_unit = {attribute,obj:'/nbi/focz', $
                      name:'units', $
                      data:'cm'}
-     
+
     nbi_divy_desc = {attribute,obj:'/nbi/divy', $
                      name:'description', $
                      data:'Horizonal divergences of the beam. One for each energy component'}
@@ -103,7 +105,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     nbi_naperture_desc = {attribute,obj:'/nbi/naperture', $
                           name:'description', $
                           data:'Number of apertures'}
-    
+
     nbi_ashape_desc = {attribute,obj:'/nbi/ashape', $
                        name:'description', $
                        data:'Shape of the aperture(s): 1="rectangular", 2="circular"'}
@@ -121,7 +123,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     nbi_awidz_unit = {attribute,obj:'/nbi/awidz', $
                       name:'units', $
                       data:'cm'}
- 
+
     nbi_aoffy_desc = {attribute,obj:'/nbi/aoffy', $
                       name:'description', $
                       data:'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline'}
@@ -214,7 +216,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     spec_spot_unit = {attribute,obj:'/spec/spot_size', $
                       name:'units', $
                       data:'cm'}
- 
+
     spec_atts = [spec_desc,spec_cs, spec_ds_desc, $
                  spec_nchan_desc, spec_system_desc, $
                  spec_id_desc, $
@@ -236,7 +238,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     npa_ds_desc = {attribute,obj:'/npa/data_source', $
                    name:'description', $
                    data:'Source of the NPA geometry'}
-    
+
     npa_nchan_desc = {attribute,obj:'/npa/nchan', $
                       name:'description', $
                       data:'Number of channels'}
@@ -306,7 +308,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                        name:'units', $
                        data:'cm'}
 
-    npa_atts = [npa_desc, npa_cs, npa_ds_desc, $ 
+    npa_atts = [npa_desc, npa_cs, npa_ds_desc, $
                 npa_nchan_desc, npa_system_desc, $
                 npa_id_desc, $
                 npa_dshape_desc, npa_ashape_desc, $
@@ -317,6 +319,143 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                 npa_dredge_desc, npa_dredge_unit, $
                 npa_aredge_desc, npa_aredge_unit, $
                 npa_radius_desc, npa_radius_unit ]
+
+    ;;CFPD attributes
+    cfpd_desc = {attribute,obj:'/cfpd', $
+                name:'description', $
+                data:'CFPD Geometry'}
+
+    cfpd_cs = {attribute,obj:'/cfpd', $
+              name:'coordinate_system', $
+              data:'Right-handed cartesian'}
+
+    cfpd_ds_desc = {attribute,obj:'/cfpd/data_source', $
+                   name:'description', $
+                   data:'Source of the CFPD geometry'}
+
+    cfpd_nchan_desc = {attribute,obj:'/cfpd/nchan', $
+                      name:'description', $
+                      data:'Number of channels'}
+
+    cfpd_nrays_desc = {attribute,obj:'/cfpd/nrays', $
+                      name:'description', $
+                      data:'Number of rays'}
+
+    cfpd_nsteps_desc = {attribute,obj:'/cfpd/nsteps', $
+                      name:'description', $
+                      data:'Maximum number of orbit steps'}
+
+    cfpd_nenergy_desc = {attribute,obj:'/cfpd/nenergy', $
+                      name:'description', $
+                      data:'Number of energies'}
+
+    cfpd_nactual_desc = {attribute,obj:'/cfpd/nactual', $
+                       name:'description', $
+                       data:'Number of orbital spatial steps' }
+
+    cfpd_system_desc = {attribute,obj:'/cfpd/system', $
+                       name:'description', $
+                       data:'Names of the different CFPD systems'}
+
+    cfpd_id_desc = {attribute,obj:'/cfpd/id', $
+                   name:'description', $
+                   data:'Line of sight ID'}
+
+    cfpd_dshape_desc = {attribute,obj:'/cfpd/d_shape', $
+                       name:'description', $
+                       data:'Shape of the detector: 1="rectangular", 2="circular"'}
+
+    cfpd_dcent_desc = {attribute,obj:'/cfpd/d_cent', $
+                      name:'description', $
+                      data:'Center of the detector'}
+    cfpd_dcent_unit = {attribute,obj:'/cfpd/d_cent', $
+                      name:'units', $
+                      data:'cm'}
+
+    cfpd_dtedge_desc = {attribute,obj:'/cfpd/d_tedge', $
+                       name:'description', $
+                       data:'Center of the detectors top edge'}
+    cfpd_dtedge_unit = {attribute,obj:'/cfpd/d_tedge', $
+                       name:'units', $
+                       data:'cm'}
+
+    cfpd_dredge_desc = {attribute,obj:'/cfpd/d_redge', $
+                       name:'description', $
+                       data:'Center of the detectors right edge'}
+    cfpd_dredge_unit = {attribute,obj:'/cfpd/d_redge', $
+                       name:'units', $
+                       data:'cm'}
+
+    cfpd_ashape_desc = {attribute,obj:'/cfpd/a_shape', $
+                       name:'description', $
+                       data:'Shape of the aperture: 1="rectangular", 2="circular"'}
+
+    cfpd_acent_desc = {attribute,obj:'/cfpd/a_cent', $
+                      name:'description', $
+                      data:'Center of the aperture'}
+    cfpd_acent_unit = {attribute,obj:'/cfpd/a_cent', $
+                      name:'units', $
+                      data:'cm'}
+
+    cfpd_atedge_desc = {attribute,obj:'/cfpd/a_tedge', $
+                       name:'description', $
+                       data:'Center of the apertures top edge'}
+    cfpd_atedge_unit = {attribute,obj:'/cfpd/a_tedge', $
+                       name:'units', $
+                       data:'cm'}
+
+    cfpd_aredge_desc = {attribute,obj:'/cfpd/a_redge', $
+                       name:'description', $
+                       data:'Center of the apertures right edge'}
+    cfpd_aredge_unit = {attribute,obj:'/cfpd/a_redge', $
+                       name:'units', $
+                       data:'cm'}
+
+    cfpd_radius_desc = {attribute,obj:'/cfpd/radius', $
+                       name:'description', $
+                       data:'Line of sight radius at midplane or tangency point' }
+    cfpd_radius_unit = {attribute,obj:'/cfpd/radius', $
+                       name:'units', $
+                       data:'cm'}
+
+    cfpd_earray_desc = {attribute,obj:'/cfpd/earray', $
+                       name:'description', $
+                       data:'Energy array' }
+    cfpd_earray_unit = {attribute,obj:'/cfpd/earray', $
+                       name:'units', $
+                       data:'keV'}
+
+    cfpd_sightline_desc = {attribute,obj:'/cfpd/sightline', $
+                       name:'description', $
+                       data:'Velocity and position in (R,Phi,Z)' }
+    cfpd_sightline_unit = {attribute,obj:'/cfpd/sightline', $
+                       name:'units', $
+                       data:'cm/s and cm'}
+
+    cfpd_daomega_desc = {attribute,obj:'/cfpd/daomega', $
+                       name:'description', $
+                       data:'Transmission factor' }
+    cfpd_daomega_unit = {attribute,obj:'/cfpd/daomega', $
+                       name:'units', $
+                       data:'cm^2'}
+
+    cfpd_atts = [cfpd_desc, cfpd_cs, cfpd_ds_desc, $
+                cfpd_nchan_desc, cfpd_system_desc, $
+                cfpd_nrays_desc, cfpd_nsteps_desc, $
+                cfpd_nenergy_desc, $
+                cfpd_id_desc, $
+                cfpd_dshape_desc, cfpd_ashape_desc, $
+                cfpd_dcent_desc, cfpd_dcent_unit, $
+                cfpd_acent_desc, cfpd_acent_unit, $
+                cfpd_dtedge_desc, cfpd_dtedge_unit, $
+                cfpd_atedge_desc, cfpd_atedge_unit, $
+                cfpd_dredge_desc, cfpd_dredge_unit, $
+                cfpd_aredge_desc, cfpd_aredge_unit, $
+                cfpd_earray_unit, cfpd_sightline_unit, $
+                cfpd_earray_desc, cfpd_sightline_desc, $
+                cfpd_nactual_desc, cfpd_daomega_unit, $
+                cfpd_daomega_desc, $
+                cfpd_radius_desc, cfpd_radius_unit ]
 
     atts = [root_atts, nbi_atts]
     geom = {nbi:nbi}
@@ -329,6 +468,11 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     if keyword_set(npa) then begin
         geom = create_struct(geom, "npa", npa)
         atts = [atts,npa_atts]
+    endif
+
+    if keyword_set(cfpd) then begin
+        geom = create_struct(geom, "cfpd", cfpd)
+        atts = [atts,cfpd_atts]
     endif
 
     write_hdf5, geom, filename=filename, atts=atts, /clobber

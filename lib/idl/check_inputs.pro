@@ -37,7 +37,7 @@ PRO check_inputs, inputs
 	      calc_pnpa:zero_int, calc_pfida:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
-              adaptive:zero_int, p_adaptive:zero_int, split_tol:zero_double, max_cell_splits:zero_int}
+              adaptive:zero_int, split_tol:zero_double, max_cell_splits:zero_int}
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
     if err_status eq 1 then begin
@@ -98,20 +98,14 @@ PRO check_inputs, inputs
       err_status = 1
     endif
 
-    if inputs.p_adaptive lt 0 then begin
-      error,'Invalid passive adaptive switch. Expected value >= 0'
-      print,'p_adaptive = ',inputs.p_adaptive
-      err_status = 1
-    endif
-
     if inputs.split_tol lt 0.0 or inputs.split_tol gt 1.0 then begin
       error,'Invalid split tolerance. Expected value between 0 and 1'
       print,'split_tol = ',inputs.split_tol
       err_status = 1
     endif
 
-    if inputs.max_cell_splits le 0 then begin
-      error,'Invalid max cell splits. Expected positive value'
+    if inputs.max_cell_splits lt 1 then begin
+      error,'Invalid max cell splits. Expected value >= 1'
       print,'max_cell_splits = ',inputs.max_cell_splits
       err_status = 1
     endif

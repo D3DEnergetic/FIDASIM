@@ -311,3 +311,25 @@ Click [here](../02_physics/06_npa.html) for more more information.
 | `d_cent`            | Float64 | 2    | [3,`nchan`]  | cm    | Position of the center of the detector |
 | `d_redge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the detectors right edge |
 | `d_tedge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the detectors top edge |
+
+#Adaptive Time Step Settings
+These variables define the calculations of an adaptive time step in the track and track_cylindrical subroutines.
+The number of splits in a cell is determined by the equation:
+$$ `n_cells` = ceil(\frac{\Delta x}{x_{avg} tol}) $$
+The variable tol is the split tolerance.
+The variable x is a plasma parameter defined by `adaptive` according to the following values:
+
+* 0: Adaptive off
+* 1: `dene`, electron density
+* 2: `denn`, cold neutral density averaged over ground states of thermal species
+* 3: `denf`, fast-ion density
+* 4: `deni`, ion density averaged over thermal species
+* 5: `denimp`, impurity density
+* 6: `te`, electron temperature
+* 7: `ti`, ion temperature
+
+|       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
+|:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
+|`adaptive`           |Int32    |0     |NA            |NA     |Calculate `n_cells` according to plasma parameter|
+|`split_tol`          |Float64  |0     |NA            |NA     |Split tolerance                  |
+|`max_cell_splits`    |Int32    |0     |NA            |NA     |Upper limit for n_cells          |

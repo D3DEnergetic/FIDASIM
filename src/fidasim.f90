@@ -1067,8 +1067,6 @@ type SimulationInputs
     !! Adaptive time step settings
     integer(Int32) :: adaptive
         !+ Simulation switch for adaptive time step, 0:split off, 1:dene, 2:avg(denn(1,:)), 3:denf, 4:avg(deni), 5:denimp, 6:te, 7:ti
-    integer(Int32) :: p_adaptive
-        !+ Adaptive switch for passive grid
     integer(Int32) :: max_cell_splits
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
@@ -1949,7 +1947,7 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, p_adaptive, max_cell_splits
+    integer(Int32)     :: adaptive, max_cell_splits
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
@@ -1971,7 +1969,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, p_adaptive, max_cell_splits, split_tol
+        adaptive, max_cell_splits, split_tol
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2047,7 +2045,6 @@ subroutine read_inputs
     lambdamin_wght=0
     lambdamax_wght=0
     adaptive=0
-    p_adaptive=0
     max_cell_splits=1
     split_tol=0
 
@@ -2166,7 +2163,6 @@ subroutine read_inputs
 
     !!Adaptive Time Step Settings
     inputs%adaptive=adaptive
-    inputs%p_adaptive=p_adaptive
     inputs%max_cell_splits=max_cell_splits
     inputs%split_tol=split_tol
 
@@ -7631,7 +7627,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64) :: dT, dt1, inv_50, dt2
     real(Float64) :: s, c, phi
     real(Float64) :: n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
-    integer :: cc, i, j, ii, mind, ncross, id, k, p_adaptive, max_cell_splits
+    integer :: cc, i, j, ii, mind, ncross, id, k, adaptive, max_cell_splits
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma1, plasma2
     type(LOSInters) :: inter
@@ -7640,7 +7636,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer :: ir, iz, iphi
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
-    p_adaptive = 0; max_cell_splits = 1; split_tol = 0.0
+    adaptive = 0; max_cell_splits = 1; split_tol = 0.0
 
     los_inter=.False.
     if(.not.present(los_intersect)) then
@@ -7722,13 +7718,13 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     call cyl_to_uvw(tedge_cyl,tedge)
     call plane_basis(v_plane, redge, tedge, basis)
 
-    !! Check passive adaptive switch, p_adaptive > 0 activates splitting
-    p_adaptive = inputs%p_adaptive
+    !! Check passive adaptive switch, adaptive > 0 activates splitting
+    adaptive = inputs%adaptive
     max_cell_splits = inputs%max_cell_splits
-    if(p_adaptive.gt.0) then
+    if(adaptive.gt.0) then
         split_tol = inputs%split_tol
         if(split_tol.eq.0.0) then
-            p_adaptive = 0
+            adaptive = 0
         else
             inv_tol = 1.0/split_tol
         endif
@@ -7783,18 +7779,18 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             tracks(cc+1)%ind = ind
             cc = cc + 2
             ncross = ncross + 1
-        elseif(p_adaptive.eq.0) then
+        elseif(adaptive.eq.0) then
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT
             tracks(cc)%ind = ind
             cc = cc + 1
-        elseif(p_adaptive.gt.0) then !! If splitting is activated, calculate n_cells based on gradient between entrance and exit points
+        elseif(adaptive.gt.0) then !! If splitting is activated, calculate n_cells based on gradient between entrance and exit points
             dt2 = 0.0
             call get_plasma(plasma1, ri, input_coords=1)
             call get_plasma(plasma2, ri_tmp, input_coords=1)
 
-            !! Split cell according to gradient of parameter, parameter is selected according to value of p_adaptive
-            select case (p_adaptive)
+            !! Split cell according to gradient of parameter, parameter is selected according to value of adaptive
+            select case (adaptive)
                 case(1)
                     param1 = plasma1%dene
                     param2 = plasma2%dene

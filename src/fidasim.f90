@@ -2267,7 +2267,7 @@ subroutine read_inputs
         write(*,*) ''
     endif
 
-    if(inputs%adaptive.ge.0).or.(inputs%adaptive.le.7) then
+    if(inputs%adaptive.ge.0).and.(inputs%adaptive.le.7) then
         write(*,'(a)') "---- Adaptive time step settings ----"
         write(*,'(T2,"Adaptive: ",i2)') inputs%adaptive
         if(inputs%adaptive.gt.0) then
@@ -2278,7 +2278,7 @@ subroutine read_inputs
                                   inputs%max_cell_splits
                 error=.True.
             endif
-            if(inputs%split_tol.gt.0.0) then
+            if(inputs%split_tol.gt.0.0).and.(inputs%split_tol.lt.1.0) then
                 write(*, 'T2,"Split tolerance: ",f6') inputs%split_tol
             else
                 write(*,'(a,f6)') 'READ_INPUTS: split_tol must be positive if adaptive time stepping is on: ', &

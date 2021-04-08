@@ -332,5 +332,5 @@ The variable x is a plasma parameter defined by `adaptive` according to the foll
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
 |`adaptive`           |Int32    |0     |NA            |NA     |Calculate `n_cells` according to plasma parameter|
-|`split_tol`          |Float64  |0     |NA            |cm^-1  |Split tolerance, %/cm            |
+|`split_tol`          |Float64  |0     |NA            |cm^-1  |Split tolerance, fractional change/cm|
 |`max_cell_splits`    |Int32    |0     |NA            |NA     |Upper limit for n_cells          |

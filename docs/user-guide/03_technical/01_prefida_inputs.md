@@ -317,7 +317,7 @@ These variables define the calculations of an adaptive time step in the track an
 The number of splits in a cell is determined by the equation:
 $$ `n_cells` = ceil(\frac{\Delta x}{x_{avg} dl tol}) $$
 The value of dl is calculated by \(dt \cdot vn\), dt is the time step and vn is the normal component of velocity.
-The tol corresponds to `split_tol`.
+The tol corresponds to `split_tol`, defined as the percent change per cm.
 The variable x is a plasma parameter defined by `adaptive` according to the following values:
 
 * 0: Adaptive off
@@ -332,5 +332,5 @@ The variable x is a plasma parameter defined by `adaptive` according to the foll
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
 |`adaptive`           |Int32    |0     |NA            |NA     |Calculate `n_cells` according to plasma parameter|
-|`split_tol`          |Float64  |0     |NA            |NA     |Split tolerance                  |
+|`split_tol`          |Float64  |0     |NA            |NA     |Split tolerance, %/cm            |
 |`max_cell_splits`    |Int32    |0     |NA            |NA     |Upper limit for n_cells          |

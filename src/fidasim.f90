@@ -2162,8 +2162,13 @@ subroutine read_inputs
 
     !!Adaptive Time Step Settings
     inputs%adaptive=adaptive
-    inputs%max_cell_splits=max_cell_splits
-    inputs%split_tol=split_tol
+    if(inputs%adaptive.eq.0) then
+        inputs%max_cell_splits=1
+        inputs%split_tol=0.0
+    else
+        inputs%max_cell_splits=max_cell_splits
+        inputs%split_tol=split_tol
+    endif
 
     !!Beam Grid Settings
     beam_grid%nx=nx
@@ -2259,6 +2264,33 @@ subroutine read_inputs
 
     if(inputs%verbose.ge.1) then
         write(*,*) ''
+    endif
+
+    if(inputs%adaptive.ge.0).or.(inputs%adaptive.le.7) then
+        write(*,'(a)') "---- Adaptive time step settings ----"
+        write(*,'(T2,"Adaptive: ",i2)') inputs%adaptive
+        if(inputs%adaptive.gt.0) then
+            if(inputs%max_cell_splits.gt.1) then
+                write(*,'(T2,"Max cell splits: ",i4)') inputs%max_cell_splits
+            else
+                write(*,'(a,i4)') 'READ_INPUTS: max_cell_splits must be greater than 1 if adaptive time stepping is on: ', &
+                                  inputs%max_cell_splits
+                error=.True.
+            endif
+            if(inputs%split_tol.gt.0.0) then
+                write(*, 'T2,"Split tolerance: ",f6') inputs%split_tol
+            else
+                write(*,'(a,f6)') 'READ_INPUTS: split_tol must be positive if adaptive time stepping is on: ', &
+                                inputs%split_tol
+                error=.True.
+            endif
+        else
+            write(*,'(a)') 'Adaptive time stepping is off'
+        endif
+    else
+        write(*,'(a,i2)') 'READ_INPUTS: Invalid adaptive switch setting, must be within [0,7]: '&
+                          inputs%adaptive
+        error=.True.
     endif
 
     if(error) then
@@ -7416,7 +7448,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     integer :: cc, i, j, ii, mind, ncross, id, k, adaptive,  max_cell_splits
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
-    real(Float64) :: dT, dt1, inv_50, dt2, n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
+    real(Float64) :: dT, dt1, inv_50, dt2, n_cells, split_tol, inv_param, inv_tol, inv_N, inv_dl, param_sum, param1, param2
     real(Float64), dimension(3) :: dt_arr, dr
     real(Float64), dimension(3) :: vn, inv_vn, vp
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
@@ -7556,7 +7588,8 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             else
                 inv_param = 2.0/param_sum
             endif
-            n_cells = ceiling(abs(param1 - param2)*inv_param*inv_tol)
+            inv_dl = 1/(dT*vn)
+            n_cells = ceiling(abs(param1 - param2)*inv_param*inv_dl*inv_tol)
             if(n_cells.gt.max_cell_splits) then
                 n_cells = max_cell_splits
             elseif(n_cells.lt.1.0) then
@@ -7625,7 +7658,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: ind
     real(Float64) :: dT, dt1, inv_50, dt2
     real(Float64) :: s, c, phi
-    real(Float64) :: n_cells, split_tol, inv_param, inv_tol, inv_N, param_sum, param1, param2
+    real(Float64) :: n_cells, split_tol, inv_param, inv_tol, inv_N, inv_dl, param_sum, param1, param2
     integer :: cc, i, j, ii, mind, ncross, id, k, adaptive, max_cell_splits
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma1, plasma2
@@ -7822,7 +7855,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             else
                 inv_param = 2.0/param_sum
             endif
-            n_cells = ceiling(abs(param1 - param2)*inv_param*inv_tol)
+            inv_dl = 1/(dT*vn)
+            n_cells = ceiling(abs(param1 - param2)*inv_param*inv_dl*inv_tol)
             if(n_cells.gt.max_cell_splits) then
                 n_cells = max_cell_splits
             elseif(n_cells.lt.1.0) then

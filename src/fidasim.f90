@@ -7589,7 +7589,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             else
                 inv_param = 2.0/param_sum
             endif
-            inv_dl = 1/(dT*vn)
+            inv_dl = 1/(dT*norm2(vn))
             n_cells = ceiling(abs(param1 - param2)*inv_param*inv_dl*inv_tol)
             if(n_cells.gt.max_cell_splits) then
                 n_cells = max_cell_splits
@@ -7856,7 +7856,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             else
                 inv_param = 2.0/param_sum
             endif
-            inv_dl = 1/(dT*vn)
+            inv_dl = 1/(dT*norm2(vn))
             n_cells = ceiling(abs(param1 - param2)*inv_param*inv_dl*inv_tol)
             if(n_cells.gt.max_cell_splits) then
                 n_cells = max_cell_splits

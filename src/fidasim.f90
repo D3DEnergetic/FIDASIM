@@ -9356,10 +9356,10 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
         !+ Reference wavelength [nm]
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
-
+    real(Float64), dimension(15) :: wavel
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, lambda_shifted, B, a0, l0, h, q0, q1
+    real(Float64) :: E, lambda_shifted, B, a0, l0, h, q0, q1, m
 
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9380,6 +9380,8 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     !Stark Splitting
     h=6.62607004d-34
         ! planck constant in SI units
+    m = 9.109384*10**-31
+        ! mass of electron
     a0= 5.29177210903d-11
         ! bohr radius in SI units
     l0 = lambda0*10**-9
@@ -9432,7 +9434,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64) :: m, h
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1
+    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1, a0, l0
     integer, dimension(n_stark) :: stark_sign
     real(Float64), dimension(15) :: wavel
     stark_sign = +1*stark_sigma - 1*stark_pi

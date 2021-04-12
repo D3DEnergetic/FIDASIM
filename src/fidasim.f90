@@ -1071,7 +1071,6 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
-
 end type SimulationInputs
 
 type ParticleTrack

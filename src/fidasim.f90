@@ -2278,15 +2278,16 @@ subroutine read_inputs
                 error=.True.
             endif
             if(inputs%split_tol.gt.0.0.and.inputs%split_tol.lt.1.0) then
-                write(*, '(T2,"Split tolerance: ",f2.6)') inputs%split_tol
+                write(*, '(T2,"Split tolerance: ",1f9.6)') inputs%split_tol
             else
                 write(*,'(a,f2.6)') 'READ_INPUTS: split_tol must be positive if adaptive time stepping is on: ', &
                                 inputs%split_tol
                 error=.True.
             endif
         else
-            write(*,'(a)') 'Adaptive time stepping is off'
+            write(*,'(a)') ' Adaptive time stepping is off'
         endif
+        write(*,*) ''
     else
         write(*,'(a,i2)') 'READ_INPUTS: Invalid adaptive switch setting, must be within [0,7]: ', &
                           inputs%adaptive

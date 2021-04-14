@@ -39,7 +39,7 @@ function sunflower,n,alpha=alpha,doplot=doplot
 end
 
 
-PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
+PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,time_reverse=time_reverse,nsteps=nsteps,e0=e0,amu=amu,z=z,narea=narea,straight=straight
     ;+#orb_collimator
     ;+Calculates solid-angle weights of different velocity vectors that exit the collimator
     ;+***
@@ -58,6 +58,8 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps
     ;+
     ;+##Keyword Arguments
     ;+    **step**: Step length [m]
+    ;+
+    ;+    **time_reverse**: Indicates reversed time orbits
     ;+
     ;+    **nsteps**: Number of steps
     ;+
@@ -96,7 +98,7 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps
     if not keyword_set(amu) then amu=1. & mp=1.67e-27
     if not keyword_set(z) then z=1.
     if not keyword_set(narea) then narea=10000
-    time_reverse=1
+    if not keyword_set(time_reverse) then time_reverse=1
 
     ;-------------
     ; Same for every calculation
@@ -122,7 +124,7 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps
 
     ; transverse unit vector
     if vr eq 0 and vz eq 0 then begin
-      ar=1. & az=0.
+      ar=1. & az=0. & aphi=0.
     end else begin
       aphi=0.
       ar=vz/sqrt(vz^2+vr^2)
@@ -260,7 +262,7 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,nsteps=nsteps
 
 
 
-FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show
+FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, step=step, time_reverse=time_reverse, nsteps=nsteps, plot_show=plot_show
     ;+#orb_cfpd
     ;+Returns all of the orbit-related quantities for a given energy
     ;+***
@@ -280,11 +282,17 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
     ;+##Keyword Arguments
     ;+    **e0**: Energy (keV)
     ;+
+    ;+    **amu**: Atomic mass unit
+    ;+
+    ;+    **z**: Particle charge
+    ;+
     ;+    **nrays**: Number of orbits
     ;+
     ;+    **nsteps**: Number of steps
     ;+
     ;+    **step**: Step length [m]
+    ;+
+    ;+    **time_reverse**: Indicates reversed time orbits
     ;+
     ;+    **plot_show**: Plot orbit bundles -- (1) on (0) off
     ;+
@@ -298,9 +306,12 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
   common bcom,b0,r0,br,bphi,bz,gr0,gz0,dr,dz
 
   if ~keyword_set(e0) then e0=3030.; keV
+  if ~keyword_set(amu) then amu=1
+  if ~keyword_set(z) then z=1.
   if ~keyword_set(nrays) then nrays=50
   if ~keyword_set(nsteps) then nsteps=110
   if ~keyword_set(step) then step=0.01
+  if ~keyword_set(time_reverse) then time_reverse=1
   if ~keyword_set(plot_show) then plot_show=0
 
   ; storage arrays
@@ -312,7 +323,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
 
   ;TRANSMISSION FACTORS
   ; collimator
-  for ich=0,3 do begin
+  for ich=0,(nch-1) do begin
     orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d,rc[ich],nrays,vsave,frac,norm, $
       e0=e0
     initial_velocities[*,*,ich]=vsave
@@ -324,8 +335,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
   ; As in orb_collimator, embed it to avoid unnecessary repetition
 
   ; Ion orbit parameters
-  amu=1. & mp=1.67e-27 & z=1.
-  time_reverse=1
+  mp=1.67e-27
 
   ;-------------
   ; Same for every calculation
@@ -387,7 +397,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, nrays=nrays, step=step, nst
       xrange=[xmin,xmax],yrange=[ymin,ymax]
     oplot,g.lim(0,*),g.lim(1,*)
     oplot,g.bdry(0,0:g.nbdry-1),g.bdry(1,0:g.nbdry-1)
-    colors=255 - 50*indgen(4)
+    colors=255 - 50*indgen(nch)
     for ich=0,nch-1 do for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
      nact=nactual[iray,ich]-1
      oplot,sightline[3,0:nact,iray,ich],sightline[5,0:nact,iray,ich],psym=3,color=colors[ich]

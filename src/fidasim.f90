@@ -9380,14 +9380,14 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     !Stark Splitting
     h=6.62607004d-34
         ! planck constant in SI units
-    m = 9.109384*10**-31
+    m = 9.109384d-31
         ! mass of electron
     a0= 5.29177210903d-11
         ! bohr radius in SI units
-    l0 = lambda0*10**-9
+    l0 = lambda0*1d-9
         ! reference wavelength in [m]
-    q0 = sqrt((e*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
-    q1 = sqrt(4*(e*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
+    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
     wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
     wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
     wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
@@ -9457,12 +9457,14 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     !Stark Splitting
     h=6.62607004d-34
         ! planck constant in SI units
+    m = 9.109384d-31
+        ! mass of electron
     a0= 5.29177210903d-11
         ! bohr radius in SI units
-    l0 = lambda0*10**-9
+    l0 = lambda0*1d-9
         ! reference wavelength in [m]
-    q0 = sqrt((e*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
-    q1 = sqrt(4*(e*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
+    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
     wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
     wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
     wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
@@ -9479,7 +9481,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
     wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
     !lambda =  lambda_shifted + E * stark_wavel ![nm] <-old calculation for pure stark effect
-    wavel = (wavel-l0)*10**9
+    wavel = (wavel-l0)*10**9    ! converting to [nm]
     lambda = lambda_shifted + wavel
     !Intensities of stark components
     if (E .eq. 0.d0) then

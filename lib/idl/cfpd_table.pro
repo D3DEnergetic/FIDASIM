@@ -1,4 +1,4 @@
-FUNCTION cfpd_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show, flip_bpol=flip_bpol, geometry=geometry
+FUNCTION cfpd_table, tname, gname, earray=earray, amu=amu, z=z, nrays=nrays, step=step, nsteps=nsteps, plot_show=plot_show, flip_bpol=flip_bpol, geometry=geometry
     ;+#cfpd_table
     ;+Generates charged fusion product table
     ;+***
@@ -9,6 +9,10 @@ FUNCTION cfpd_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps
     ;+
     ;+##Keyword Arguments
     ;+    **earray**: Array of energies (keV) to use
+    ;+
+    ;+    **amu**: Atomic mass unit
+    ;+
+    ;+    **z**: Particle charge
     ;+
     ;+    **nrays**: Number of orbits
     ;+
@@ -31,6 +35,8 @@ FUNCTION cfpd_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps
     ;+```
 
     if ~keyword_set(earray) then earray = 2700. + 40*findgen(19)
+    if ~keyword_set(amu) then amu=1
+    if ~keyword_set(z) then z=1.
     if ~keyword_set(nrays) then nrays=50
     if ~keyword_set(nsteps) then nsteps=110
     if ~keyword_set(step) then step=0.01
@@ -57,12 +63,12 @@ FUNCTION cfpd_table, tname, gname, earray=earray, nrays=nrays, step=step, nsteps
         rc = geometry.rc
     endelse
 
-    orb0 = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[0],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
+    orb0 = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[0],amu=amu,z=z,nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
     orb = replicate(orb0, nenergy)
     orb[0] = orb0
 
     for i=1,nenergy-1 do begin
-        orb[i] = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[i],nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
+        orb[i] = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[i],amu=amu,z=z,nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
     endfor
 
     save,filename=tname,orb,earray

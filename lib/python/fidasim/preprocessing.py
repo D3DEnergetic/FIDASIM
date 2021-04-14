@@ -1382,11 +1382,6 @@ def write_namelist(filename, inputs):
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
 
-        f.write("!! Adaptive time step settings\n")
-        f.write("adaptive = {:d}     !! 0: split off, 1: electron density, 2: fast-ion density\n".format(inputs['adaptive']))
-        f.write("split_tol = {:f}     !! Tolerance for adaptive step size\n".format(inputs['split_tol']))
-        f.write("max_cell_splits = {:d}     !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
-
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))
         f.write("lambdamin = {:f}    !! Minimum Wavelength [nm]\n".format(inputs['lambdamin']))

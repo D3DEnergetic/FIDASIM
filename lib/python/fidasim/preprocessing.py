@@ -175,7 +175,15 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int,
-              'calc_cfpd': zero_int}
+              'calc_cfpd': zero_int,
+              'adaptive': zero_int,
+              'split_tol': zero_double,
+              'max_cell_splits': zero_int}
+
+    # If user doesn't provide adaptive time step parameters, set default to off
+    inputs.setdefault('adaptive', 0)
+    inputs.setdefault('split_tol', 0.0)
+    inputs.setdefault('max_cell_splits', 1)
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -218,6 +226,21 @@ def check_inputs(inputs, use_abs_path=True):
     if np.abs(np.sum(inputs['current_fractions']) - 1.0) > 1e-3:
         error('current_fractions do not sum to 1.0')
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
+        err = True
+
+    if (inputs['adaptive'] < 0):
+        error('Invalid adaptive switch. Expected value >= 0')
+        print('adaptive = {}'.format(inputs['adaptive']))
+        err = True
+
+    if (inputs['split_tol'] < 0.0) or (inputs['split_tol'] > 1.0):
+        error('Invalid split tolerance. Expected value between 0 and 1')
+        print('split_tol = {}'.format(inputs['split_tol']))
+        err = True
+
+    if (inputs['max_cell_splits'] < 1):
+        error('Invalid max cell splits. Expected value >= 1')
+        print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
         err = True
 
     ps = os.path.sep
@@ -1372,6 +1395,11 @@ def write_namelist(filename, inputs):
         f.write("nlambda_wght = {:d}    !! Number of Wavelengths for Weights \n".format(inputs['nlambda_wght']))
         f.write("lambdamin_wght = {:f}    !! Minimum Wavelength for Weights [nm]\n".format(inputs['lambdamin_wght']))
         f.write("lambdamax_wght = {:f}    !! Maximum Wavelength for Weights [nm]\n\n".format(inputs['lambdamax_wght']))
+
+        f.write("!! Adaptive Time Step Settings\n")
+        f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))
+        f.write("split_tol = {:f}    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol\n".format(inputs['split_tol']))
+        f.write("max_cell_splits = {:d}    !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
         f.write("/\n\n")
 
     success("Namelist file created: {}\n".format(filename))

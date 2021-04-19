@@ -1755,8 +1755,8 @@ Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p
 <h1 id="adaptive-time-step-settings">Adaptive Time Step Settings</h1>
 <p>These variables define the calculations of an adaptive time step in the track and track_cylindrical subroutines.
 The number of splits in a cell is determined by the equation:
-<script type="math/tex; mode=display"> <code>n_cells</code> = ceil(\frac{\Delta x}{x_{avg} dl tol}) </script>
-The value of dl is calculated by <script type="math/tex">dt \cdot vn</script>, dt is the time step and vn is the normal component of velocity.
+<script type="math/tex; mode=display"> n_{cells} = ceil(\frac{\Delta x}{x_{avg} \cdot dl \cdot tol}) </script>
+The value of <script type="math/tex">dl</script> is calculated by <script type="math/tex">dt \cdot vn</script>, dt is the time step and vn is the normal component of velocity.
 The tol corresponds to <code>split_tol</code>, defined as the percent change per cm.
 The variable x is a plasma parameter defined by <code>adaptive</code> according to the following values:</p>
 <ul>

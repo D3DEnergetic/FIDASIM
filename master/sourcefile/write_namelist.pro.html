@@ -358,11 +358,16 @@
 <a name="ln-112"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;lambdamax_wght = &quot;,1f9.3,&quot;    !! Maximum Wavelength for Weights [nm]&quot;)&#39;</span><span class="p">,</span><span class="err">$</span>
 <a name="ln-113"></a>              <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax_wght</span>
 <a name="ln-114"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-115"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span>
-<a name="ln-116"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-117"></a>    <span class="s s-Atom">close</span><span class="p">,</span><span class="mi">55</span>
-<a name="ln-118"></a>    <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Namelist file created: &#39;</span><span class="o">+</span><span class="s s-Atom">filename</span>
-<a name="ln-119"></a><span class="nv">END</span>
+<a name="ln-115"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;!! Adaptive Time Step Settings&#39;</span>
+<a name="ln-116"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;adaptive = &quot;,i2,&quot;    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti&quot;)&#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">adaptive</span>
+<a name="ln-117"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;split_tol&quot;,1f9.6,&quot;    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol&quot;)&#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">split_tol</span>
+<a name="ln-118"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;max_cell_splits&quot;,i5,&quot;    !! Maximum number of times a cell can be split&quot;)&#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">max_cell_splits</span>
+<a name="ln-119"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-120"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;/&#39;</span>
+<a name="ln-121"></a>    <span class="s s-Atom">printf</span><span class="p">,</span><span class="mi">55</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-122"></a>    <span class="s s-Atom">close</span><span class="p">,</span><span class="mi">55</span>
+<a name="ln-123"></a>    <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Namelist file created: &#39;</span><span class="o">+</span><span class="s s-Atom">filename</span>
+<a name="ln-124"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

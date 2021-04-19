@@ -165,6 +165,7 @@
 </li>
 <li><a href="#spectral-geometry-structure">Spectral Geometry Structure</a></li>
 <li><a href="#npa-geometry-structure">NPA Geometry Structure</a></li>
+<li><a href="#adaptive-time-step-settings">Adaptive Time Step Settings</a></li>
 </ul>
 </div>
 <h1 id="inputs-structure">Inputs Structure</h1>
@@ -1748,6 +1749,61 @@ Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p
 <td align="center">[3,<code>nchan</code>]</td>
 <td align="center">cm</td>
 <td align="left">Position of the detectors top edge</td>
+</tr>
+</tbody>
+</table>
+<h1 id="adaptive-time-step-settings">Adaptive Time Step Settings</h1>
+<p>These variables define the calculations of an adaptive time step in the track and track_cylindrical subroutines.
+The number of splits in a cell is determined by the equation:
+<script type="math/tex; mode=display"> <code>n_cells</code> = ceil(\frac{\Delta x}{x_{avg} dl tol}) </script>
+The value of dl is calculated by <script type="math/tex">dt \cdot vn</script>, dt is the time step and vn is the normal component of velocity.
+The tol corresponds to <code>split_tol</code>, defined as the percent change per cm.
+The variable x is a plasma parameter defined by <code>adaptive</code> according to the following values:</p>
+<ul>
+<li>0: Adaptive off</li>
+<li>1: <code>dene</code>, electron density</li>
+<li>2: <code>denn</code>, cold neutral density averaged over ground states of thermal species</li>
+<li>3: <code>denf</code>, fast-ion density</li>
+<li>4: <code>deni</code>, ion density averaged over thermal species</li>
+<li>5: <code>denimp</code>, impurity density</li>
+<li>6: <code>te</code>, electron temperature</li>
+<li>7: <code>ti</code>, ion temperature</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>adaptive</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate <code>n_cells</code> according to plasma parameter</td>
+</tr>
+<tr>
+<td align="center"><code>split_tol</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm^-1</td>
+<td align="left">Split tolerance, fractional change/cm</td>
+</tr>
+<tr>
+<td align="center"><code>max_cell_splits</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Upper limit for n_cells</td>
 </tr>
 </tbody>
 </table>

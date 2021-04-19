@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>11.2% of total for derived types.</p>Including implementation: 58 statements, 11.2% of total for derived types.">58 statements</a>
+    title="<p>11.7% of total for derived types.</p>Including implementation: 61 statements, 11.7% of total for derived types.">61 statements</a>
      </li> 
      
      
@@ -288,6 +288,12 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-lambdamin_wght">lambdamin_wght</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-lambdamax_wght">lambdamax_wght</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-adaptive">adaptive</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-max_cell_splits">max_cell_splits</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-split_tol">split_tol</a>
       
     </div>
   </div>
@@ -456,6 +462,12 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-lambdamin_wght">lambdamin_wght</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-lambdamax_wght">lambdamax_wght</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-adaptive">adaptive</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-max_cell_splits">max_cell_splits</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-split_tol">split_tol</a>
       
     </div>
   </div>
@@ -1290,6 +1302,48 @@
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-adaptive"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>adaptive</strong></td><td></td><td></td><td><p>Simulation switch for adaptive time step, 0:split off, 1:dene, 2:avg(denn(1,:)), 3:denf, 4:avg(deni), 5:denimp, 6:te, 7:ti</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-max_cell_splits"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>max_cell_splits</strong></td><td></td><td></td><td><p>Maximum number of times a cell can be split</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-split_tol"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>split_tol</strong></td><td></td><td></td><td><p>Tolerance level for splitting cells</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -1433,6 +1487,14 @@
         <span class="c">!+ Minimum wavelength in weight functions [nm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">lambdamax_wght</span>
         <span class="c">!+ Maximum wavelength in weight functions [nm]</span>
+        
+    <span class="c">!! Adaptive time step settings</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">adaptive</span>
+        <span class="c">!+ Simulation switch for adaptive time step, 0:split off, 1:dene, 2:avg(denn(1,:)), 3:denf, 4:avg(deni), 5:denimp, 6:te, 7:ti</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">max_cell_splits</span>
+        <span class="c">!+ Maximum number of times a cell can be split</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">split_tol</span>
+        <span class="c">!+ Tolerance level for splitting cells</span>
 <span class="k">end type </span><span class="n">SimulationInputs</span>
 </pre></div>
 

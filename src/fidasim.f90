@@ -76,6 +76,8 @@ real(Float64), parameter :: v2_to_E_per_amu = mass_u/(2.*e0*1.d3)*1.d-4
     !+ \(cm^2/s^2\) to keV conversion factor
 real(Float64), parameter :: log_10 = log(10.d0)
     !+ Natural log of 10.0
+real(Float64), parameter :: a_0 = 5.29177210903d-11
+    !+ bohr radius in [m]
 
 real(Float64) :: line_lambda0(3)   = [0.00000d0, 0.00000d0, 0.00000d0]
     !+ H/D/T emission lines [nm]
@@ -9382,12 +9384,10 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
         ! planck constant in SI units
     m = 9.109384d-31
         ! mass of electron
-    a0= 5.29177210903d-11
-        ! bohr radius in SI units
     l0 = lambda0*1d-9
         ! reference wavelength in [m]
-    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
-    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
+    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
     wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
     wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
@@ -9458,13 +9458,11 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     h=6.62607004d-34
         ! planck constant in SI units
     m = 9.109384d-31
-        ! mass of electron
-    a0= 5.29177210903d-11
-        ! bohr radius in SI units
+        ! mass of electron [kg]
     l0 = lambda0*1d-9
         ! reference wavelength in [m]
-    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a0*e0*E)**2)
-    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a0*e0*E)**2)
+    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
+    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
     wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
     wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)

@@ -110,6 +110,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     z2d = vars.z2d
     rsurf = vars.rsurf
     zsurf = vars.zsurf
+    sstr = strupcase(sstr)
     index = where(tag_names(vars) EQ "A_"+sstr)
     pitch = vars.(index[0])
     index = where(tag_names(vars) EQ "E_"+sstr)

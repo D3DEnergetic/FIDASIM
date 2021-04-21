@@ -9361,7 +9361,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     real(Float64), dimension(15) :: wavel
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, lambda_shifted, B, a0, l0, h, q0, q1, m
+    real(Float64) :: E, lambda_shifted, B, l0, h, q0, q1, m
 
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9434,7 +9434,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64) :: m, h
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1, a0, l0
+    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1, l0
     integer, dimension(n_stark) :: stark_sign
     real(Float64), dimension(15) :: wavel
     stark_sign = +1*stark_sigma - 1*stark_pi
@@ -9445,7 +9445,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     vn=vi*0.01d0 ! [m/s]
     lambda_shifted = lambda0*(1.d0 + dot_product(vn,vp)/c0)
 
-    !! Calculate Stark Splitting
+    !! Calculate Stark-Zeeman Splitting
     ! Calculate E-field
     bfield = fields%b_norm*fields%b_abs
     efield = fields%e_norm*fields%e_abs
@@ -9454,15 +9454,19 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
     E = norm2(efield)
     B = norm2(bfield)
-    !Stark Splitting
+    !Stark-Zeeman Splitting
     h=6.62607004d-34
         ! planck constant in SI units
     m = 9.109384d-31
         ! mass of electron [kg]
     l0 = lambda0*1d-9
-        ! reference wavelength in [m]
+        ! reference wavelength [m]
+    ! stark-zeeman corrections to energy of n=2 states are -q0, 0 and q0
     q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
+    ! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
+    ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
+    ! order is small wavelengths to large wavelengths
     wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
     wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
     wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
@@ -9488,6 +9492,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         cos_los_Efield = dot_product(vp,efield) / E
     endif
 
+    !calculate stokes parameters
     ! do l = 1,n_stark
         ! stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         ! stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)

@@ -830,7 +830,14 @@ type Spectra
     real(Float64), dimension(:,:,:), allocatable   :: half
         !+ Half energy beam emission stark components: half(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: third
-        !+ Third energy beam emission stark components: third(n_stark,lambda,chan)
+        !+ Third energy beam emission stark components: thirdstokes(n_stark,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: fullstokes
+        !+ Full energy beam emission stark components: full(n_stark,4,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: halfstokes
+        !+ Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: thirdstokes
+        !+ Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)
+
     real(Float64), dimension(:,:,:,:), allocatable :: dcx
         !+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)
     real(Float64), dimension(:,:,:,:), allocatable :: halo
@@ -5198,11 +5205,11 @@ subroutine write_spectra
 
     if(inputs%calc_bes.ge.1) then
         spec%full = factor*spec%full
-        spec%fullstokes = factor*spec%fullstokes
+        !spec%fullstokes = factor*spec%fullstokes
         spec%half = factor*spec%half
-        spec%halfstokes = factor*spec%halfstokes
+        !spec%halfstokes = factor*spec%halfstokes
         spec%third = factor*spec%third
-        spec%thirdstokes = factor*spec%thirdstokes
+        !spec%thirdstokes = factor*spec%thirdstokes
         if (inputs%stark_components.eq.0) then
             full  = sum(spec%full, dim=1)
             half  = sum(spec%half, dim=1)
@@ -9461,7 +9468,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
     real(Float64), dimension(n_stark), intent(out) :: intensity
-    real(Float64), dimension(n_stark,4), intent(out) :: stokes
+    real(Float64), dimension(n_stark,4), intent(out), optional :: stokes
         !+ Spectra intensities [Ph/(s cm^2 starkline)]
     integer(Int32) :: l
     real(Float64) :: m, h
@@ -9565,7 +9572,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:,:), intent(inout) :: spectra
     !+ Stark split `spectra`
-    real(Float64), dimension(:,:,:,:), intent(inout) :: stokevec
+    real(Float64), dimension(:,:,:,:), intent(inout), optional :: stokevec
     !+ Stark split `stokes vector`
     logical, intent(in), optional                :: passive
         !+ Indicates whether photon is passive FIDA

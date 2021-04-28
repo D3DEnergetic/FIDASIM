@@ -831,11 +831,11 @@ type Spectra
         !+ Half energy beam emission stark components: half(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: third
         !+ Third energy beam emission stark components: thirdstokes(n_stark,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: fullstokes
-        !+ Full energy beam emission stark components: full(n_stark,4,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: halfstokes
+    real(Float64), dimension(:,:,:,:), allocatable   :: fullstokes
+        !+ Full energy beam emission stark components: fullstokes(n_stark,4,lambda,chan)
+    real(Float64), dimension(:,:,:,:), allocatable   :: halfstokes
         !+ Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: thirdstokes
+    real(Float64), dimension(:,:,:,:), allocatable   :: thirdstokes
         !+ Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)
 
     real(Float64), dimension(:,:,:,:), allocatable :: dcx
@@ -5205,19 +5205,20 @@ subroutine write_spectra
 
     if(inputs%calc_bes.ge.1) then
         spec%full = factor*spec%full
-        !spec%fullstokes = factor*spec%fullstokes
+        spec%fullstokes = factor*spec%fullstokes
         spec%half = factor*spec%half
-        !spec%halfstokes = factor*spec%halfstokes
+        spec%halfstokes = factor*spec%halfstokes
         spec%third = factor*spec%third
-        !spec%thirdstokes = factor*spec%thirdstokes
+        spec%thirdstokes = factor*spec%thirdstokes
         if (inputs%stark_components.eq.0) then
             full  = sum(spec%full, dim=1)
             half  = sum(spec%half, dim=1)
             third = sum(spec%third, dim=1)
             do k = 1,4
-                fullstokes(:,k,:) = sum(spec%fullstokes, dim=1)
-                halfstokes(:,k,:) = sum(spec%fullstokes, dim=1)
-                thirdstokes(:,k,:) = sum(spec%fullstokes, dim=1)
+                fullstokes(k,:,:) = sum(spec%fullstokes(:,k,:,:),dim=1)
+                halfstokes(k,:,:) = sum(spec%halfstokes(:,k,:,:), dim=1)
+                thirdstokes(k,:,:) = sum(spec%thirdstokes(:,k,:,:), dim=1)
+            enddo
             !Write variables
             call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(2:3), &
                  full, error)
@@ -9405,7 +9406,34 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
 
     !! Calculate Stark Splitting
     !! Calculate E-field
-    bfield = fields%b_norm*fields%b_abs
+    bfield = fields%b_norm*fields%b_abs        ! planck constant in SI units
+    m = 9.109384d-31
+        ! mass of electron [kg]
+    l0 = lambda0*1d-9
+        ! reference wavelength [m]
+    ! stark-zeeman corrections to energy of n=2 states are -q0, 0 and q0
+    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
+    ! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2
+    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
+    ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
+    ! order is small wavelengths to large wavelengths
+    if(n_stark.eq.15) then
+        wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
+        wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
+        wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
+        wavel(4) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(2))*l0)
+        wavel(5) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(1))*l0)
+        wavel(6) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(0))*l0)
+        wavel(7) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(1))*l0)
+        wavel(8) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(0))*l0)
+        wavel(9) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-1))*l0)
+        wavel(10) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(0))*l0)
+        wavel(11) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-1))*l0)
+        wavel(12) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-2))*l0)
+        wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
+        wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
+        wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
+
     efield = fields%e_norm*fields%e_abs
     efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
@@ -9626,9 +9654,18 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
             !$OMP ATOMIC UPDATE
             spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
-            loop_over_stokes: do k=1,4
-              stokevec(i,k,bin,ichan) = stokevec(i,k,bin,ichan) + stokes(i,k)
-            enddo loop_over_stokes
+            !$OMP END ATOMIC
+            !$OMP ATOMIC UPDATE
+            stokevec(i,1,bin,ichan) = stokevec(i,1,bin,ichan) + stokes(i,1)
+            !$OMP END ATOMIC
+            !$OMP ATOMIC UPDATE
+            stokevec(i,2,bin,ichan) = stokevec(i,2,bin,ichan) + stokes(i,2)
+            !$OMP END ATOMIC
+            !$OMP ATOMIC UPDATE
+            stokevec(i,3,bin,ichan) = stokevec(i,3,bin,ichan) + stokes(i,3)
+            !$OMP END ATOMIC
+            !$OMP ATOMIC UPDATE
+            stokevec(i,4,bin,ichan) = stokevec(i,4,bin,ichan) + stokes(i,4)
             !$OMP END ATOMIC
         enddo loop_over_stark
     enddo loop_over_channels
@@ -10117,7 +10154,7 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
         !+ Pitch of the fast ion
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
-
+spec%full
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg
     real(Float64), dimension(3) :: randomu3

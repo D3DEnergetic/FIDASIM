@@ -840,14 +840,24 @@ type Spectra
 
     real(Float64), dimension(:,:,:,:), allocatable :: dcx
         !+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: dcxstokes
+        !+ Direct CX emission stark components: dcxstokes(n_stark,4,lambda,chan,species)
     real(Float64), dimension(:,:,:,:), allocatable :: halo
         !+ Thermal halo emission stark components: halo(n_stark,lambda,chan,species)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: halostokes
+        !+ Thermal halo emission stark components: halo(n_stark,4,lambda,chan,species)
     real(Float64), dimension(:,:,:,:), allocatable :: cold
         !+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: coldstokes
+        !+ Cold D-alpha emission stark components: coldstokes(n_stark,4,lambda,chan,species)
     real(Float64), dimension(:,:,:,:), allocatable :: fida
         !+ Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: fidastokes
+        !+ Active FIDA emission stark components: fidastokes(n_stark,4,lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:,:), allocatable :: pfida
         !+ Passive FIDA emission stark components: pfida(n_stark,lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: pfidastokes
+        !+ Passive FIDA emission stark components: pfidastokes(n_stark,4,lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate
@@ -5253,7 +5263,7 @@ subroutine write_spectra
                 spec%fullstokes, error)
             call h5ltmake_compressed_dataset_double_f(fid, "/halfstokes", 4, dims_stokes(1:4), &
                 spec%halfstokes, error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/thirdstoke", 4, dims_stokes(1:4),&
+            call h5ltmake_compressed_dataset_double_f(fid, "/thirdstokes", 4, dims_stokes(1:4),&
                 spec%thirdstokes, error)
             call h5ltset_attribute_string_f(fid,"/full","description", &
                  "Full energy component of the beam emmision stark components: full(stark,lambda,chan)", &
@@ -9417,23 +9427,6 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
-    if(n_stark.eq.15) then
-        wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
-        wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
-        wavel(3) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(1))*l0)
-        wavel(4) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(2))*l0)
-        wavel(5) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(1))*l0)
-        wavel(6) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(0))*l0)
-        wavel(7) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(1))*l0)
-        wavel(8) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(0))*l0)
-        wavel(9) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-1))*l0)
-        wavel(10) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(0))*l0)
-        wavel(11) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-1))*l0)
-        wavel(12) = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(-2))*l0)
-        wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
-        wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
-        wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
-
     efield = fields%e_norm*fields%e_abs
     efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
@@ -9465,8 +9458,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
         wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
         wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
         wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
-
-    else if(n_stark.eq.3) then
+    elseif(n_stark.eq.3) then
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
@@ -9496,7 +9488,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
     real(Float64), dimension(n_stark), intent(out) :: intensity
-    real(Float64), dimension(n_stark,4), intent(out), optional :: stokes
+    real(Float64), dimension(n_stark,4), intent(out) :: stokes
         !+ Spectra intensities [Ph/(s cm^2 starkline)]
     integer(Int32) :: l
     real(Float64) :: m, h
@@ -9551,8 +9543,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
         wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
         wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
-
-    else if(n_stark.eq.3) then
+    elseif(n_stark.eq.3) then
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
@@ -9568,12 +9559,14 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     endif
 
     !calculate stokes parameters
+    intensity = stark_intens
     do l = 1,n_stark
-        stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
+        !stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         stokes(l,3) = 0
         stokes(l,4) = 0
     end do
+    stokes(:,1) = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
@@ -9780,6 +9773,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
 
     real(Float64), dimension(n_stark) :: lambda,intensity
+    real(Float64), dimension(n_stark,4) :: stokes
     real(Float64) :: dlambda,intens_fac
     integer :: i,bin
 
@@ -9787,7 +9781,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     intens_fac = (1.d0)/(4.d0*pi*dlambda)
     call spectrum(vp,vi,fields, lambda0, sigma_pi,photons, &
-                  dlength,lambda,intensity)
+                  dlength,lambda,intensity, stokes)
 
     !$OMP CRITICAL(fida_wght)
     loop_over_stark: do i=1,n_stark
@@ -10154,7 +10148,7 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
         !+ Pitch of the fast ion
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
-spec%full
+
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg
     real(Float64), dimension(3) :: randomu3
@@ -10919,15 +10913,15 @@ subroutine nbi_spec
             !! Third Spectra
             call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
             t_tot = t_tot + t_wght
-            call store_photons(ri, vnbi, beam_lambda0, t_wght*nbit_photons, third, halfstokes)
+            call store_photons(ri, vnbi, beam_lambda0, t_wght*nbit_photons, third, thirdstokes)
         enddo
         !$OMP CRITICAL(nbi_spec_1)
         spec%full = spec%full + full/f_tot
         spec%half = spec%half + half/h_tot
         spec%third = spec%third + third/t_tot
         spec%fullstokes = spec%fullstokes + fullstokes/f_tot
-        spec%halfstokes = spec%halfstokes + halfstokes/f_tot
-        spec%thirdstokes = spec%thirdstokes + thirdstokes/f_tot
+        spec%halfstokes = spec%halfstokes + halfstokes/h_tot
+        spec%thirdstokes = spec%thirdstokes + thirdstokes/t_tot
         !$OMP END CRITICAL(nbi_spec_1)
     enddo loop_over_cells
     !$OMP END PARALLEL DO

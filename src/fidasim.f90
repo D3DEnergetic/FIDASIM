@@ -9458,7 +9458,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
         wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
         wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
         wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
-    elseif(n_stark.eq.3) then
+    else if(n_stark.eq.3) then
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
@@ -9491,7 +9491,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(n_stark,4), intent(out) :: stokes
         !+ Spectra intensities [Ph/(s cm^2 starkline)]
     integer(Int32) :: l
-    real(Float64) :: m, h
+    real(Float64) :: m, h, normfactor
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1, l0
@@ -9543,7 +9543,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
         wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
         wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
-    elseif(n_stark.eq.3) then
+    else if(n_stark.eq.3) then
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
@@ -9561,24 +9561,23 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     !calculate stokes parameters
     intensity = stark_intens
     do l = 1,n_stark
-        !stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
+        stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         stokes(l,3) = 0
         stokes(l,4) = 0
     end do
-    stokes(:,1) = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
         intensity = intensity * sigma_pi
     endwhere
-
     !! normalize and multiply with photon density from colrad
+    normfactor = (1/sum(intensity))*photons*dlength
     intensity = intensity/sum(intensity)*photons*dlength
-    stokes(:,1) = stokes(:,1)/sum(intensity)*photons*dlength
-    stokes(:,2) = stokes(:,2)/sum(intensity)*photons*dlength
-    stokes(:,3) = stokes(:,3)/sum(intensity)*photons*dlength
-    stokes(:,4) = stokes(:,4)/sum(intensity)*photons*dlength
+    stokes(:,1) = stokes(:,1)*normfactor
+    stokes(:,2) = stokes(:,2)*normfactor
+    stokes(:,3) = stokes(:,3)*normfactor
+    stokes(:,4) = stokes(:,4)*normfactor
 endsubroutine spectrum
 
 subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
@@ -9593,7 +9592,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:,:), intent(inout) :: spectra
     !+ Stark split `spectra`
-    real(Float64), dimension(:,:,:,:), intent(inout), optional :: stokevec
+    real(Float64), dimension(:,:,:,:), intent(inout) :: stokevec
     !+ Stark split `stokes vector`
     logical, intent(in), optional                :: passive
         !+ Indicates whether photon is passive FIDA
@@ -9639,7 +9638,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
         endif
         vp = pos_xyz - lens_xyz
         call spectrum(vp,vi,fields,lambda0,sigma_pi,photons, &
-                      dlength,lambda,intensity,stokes)
+                      dlength,lambda,intensity, stokes)
 
         loop_over_stark: do i=1,n_stark
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
@@ -9682,7 +9681,7 @@ subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
            case (nbif_type)
                call store_photons(pos,vi,lambda0,photons,spec%full,spec%fullstokes)
            case (nbih_type)
-               call store_photons(pos,vi,lambda0,photons,spec%half,spec%halfstokes)
+               call store_photons(pos,vi,lambda0,photons,spec%half, spec%halfstokes)
            case (nbit_type)
                call store_photons(pos,vi,lambda0,photons,spec%third,spec%thirdstokes)
            case default
@@ -9719,9 +9718,9 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
     if(present(passive)) pas = passive
 
     if(pas) then
-        call store_photons(pos, vi, lambda0, photons, spec%pfida(:,:,:,iclass), passive=.True.)
+        call store_photons(pos, vi, lambda0, photons, spec%pfida(:,:,:,iclass), spec%pfidastokes(:,:,:,:,iclass), passive=.True.)
     else
-        call store_photons(pos, vi, lambda0, photons, spec%fida(:,:,:,iclass))
+        call store_photons(pos, vi, lambda0, photons, spec%fida(:,:,:,iclass),spec%fidastokes(:,:,:,:,iclass))
     endif
 
 end subroutine store_fida_photons
@@ -9781,7 +9780,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     intens_fac = (1.d0)/(4.d0*pi*dlambda)
     call spectrum(vp,vi,fields, lambda0, sigma_pi,photons, &
-                  dlength,lambda,intensity, stokes)
+                  dlength,lambda,intensity, stokes = stokes)
 
     !$OMP CRITICAL(fida_wght)
     loop_over_stark: do i=1,n_stark
@@ -10662,7 +10661,7 @@ subroutine dcx
 
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                         photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),spec%dcx(:,:,:,is))
+                        call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
                     endif
                 enddo loop_along_track
             enddo loop_over_dcx
@@ -10811,7 +10810,7 @@ subroutine halo
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                             photons = fi_correction*photons !! Correct for including fast-ions in states
                             call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), &
-                                               photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
+                                               photons/nlaunch(i,j,k),spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
                         endif
                     enddo loop_along_track
                 enddo loop_over_halos
@@ -10972,7 +10971,7 @@ subroutine dcx_spec
             do it=1, n
                 !! DCX Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), wght*dcx_photons/n, spec%dcx(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*dcx_photons/n, spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -11022,7 +11021,7 @@ subroutine halo_spec
             do it=1, n
                 !! Halo Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), wght*halo_photons/n, spec%halo(:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*halo_photons/n, spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -11063,7 +11062,7 @@ subroutine cold_spec
             do it=1, n
                 !! Cold Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is), passive=.True.)
+                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is), spec%coldstokes(:,:,:,:,is), passive=.True.)
             enddo
         enddo
     enddo loop_over_cells
@@ -13235,22 +13234,32 @@ program fidasim
         if(inputs%calc_dcx.ge.1) then
             allocate(spec%dcx(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%dcx = 0.d0
+            allocate(spec%dcxstokes(n_stark,4,inputs%nlambda,spec_chords%nchan,n_thermal))
+            spec%dcxstokes = 0.d0
         endif
         if(inputs%calc_halo.ge.1) then
             allocate(spec%halo(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%halo = 0.d0
+            allocate(spec%halostokes(n_stark,4,inputs%nlambda,spec_chords%nchan,n_thermal))
+            spec%halostokes = 0.d0
         endif
         if(inputs%calc_cold.ge.1) then
             allocate(spec%cold(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%cold = 0.d0
+            allocate(spec%coldstokes(n_stark,4,inputs%nlambda,spec_chords%nchan,n_thermal))
+            spec%coldstokes = 0.d0
         endif
         if(inputs%calc_fida.ge.1) then
             allocate(spec%fida(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%fida = 0.d0
+            allocate(spec%fidastokes(n_stark,4,inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%fidastokes = 0.d0
         endif
         if(inputs%calc_pfida.ge.1) then
             allocate(spec%pfida(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%pfida = 0.d0
+            allocate(spec%pfidastokes(n_stark,4,inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%pfidastokes = 0.d0
         endif
     endif
 

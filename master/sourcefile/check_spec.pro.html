@@ -245,92 +245,92 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> check_spec, inp, chords
-<a name="ln-2"></a><span class="c1">    ;+#check_spec</span>
-<a name="ln-3"></a><span class="c1">    ;+Check if spectral geometry structure is valid</span>
-<a name="ln-4"></a><span class="c1">    ;+***</span>
-<a name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
-<a name="ln-6"></a><span class="c1">    ;+     **inputs**: input structure</span>
-<a name="ln-7"></a><span class="c1">    ;+</span>
-<a name="ln-8"></a><span class="c1">    ;+     **chords**: spectral geometry structure</span>
-<a name="ln-9"></a><span class="c1">    ;+ </span>
-<a name="ln-10"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-11"></a><span class="c1">    ;+```idl</span>
-<a name="ln-12"></a><span class="c1">    ;+IDL&gt; check_spec, inputs, chords</span>
-<a name="ln-13"></a><span class="c1">    ;+```</span>
-<a name="ln-14"></a>    err_status <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-15"></a>    info,<span class="s1">&#39;Checking FIDA/BES inputs...&#39;</span>
-<a name="ln-16"></a>
-<a name="ln-17"></a>    w <span class="o">=</span> <span class="nb">where</span>(<span class="s2">&quot;nchan&quot;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">TAG_NAMES</span>(chords)),nw)
-<a name="ln-18"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-19"></a>        error,<span class="s1">&#39;&quot;nchan&quot; is missing from the FIDA/BES geometry&#39;</span>
-<a name="ln-20"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-21"></a>        <span class="k">goto</span>, GET_OUT
-<a name="ln-22"></a>    <span class="k">endif</span>
-<a name="ln-23"></a>
-<a name="ln-24"></a>    nchan <span class="o">=</span> chords.nchan
-<a name="ln-25"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
-<a name="ln-26"></a>    zero_long <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;LONG&#39;</span>}
-<a name="ln-27"></a>    nchan_double <span class="o">=</span> {dims<span class="o">:</span>[nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
-<a name="ln-28"></a>    nchan_string <span class="o">=</span> {dims<span class="o">:</span>[nchan], type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
-<a name="ln-29"></a>    schema <span class="o">=</span> {data_source<span class="o">:</span>zero_string, $
-<a name="ln-30"></a>              nchan<span class="o">:</span>zero_long, $
-<a name="ln-31"></a>              system<span class="o">:</span>zero_string, $
-<a name="ln-32"></a>              id<span class="o">:</span>nchan_string, $
-<a name="ln-33"></a>              lens<span class="o">:</span>{dims<span class="o">:</span>[<span class="mi">3</span>,nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}, $
-<a name="ln-34"></a>              <span class="nb">axis</span><span class="o">:</span>{dims<span class="o">:</span>[<span class="mi">3</span>,nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}, $
-<a name="ln-35"></a>              sigma_pi<span class="o">:</span>nchan_double, $
-<a name="ln-36"></a>              spot_size<span class="o">:</span>nchan_double, $
-<a name="ln-37"></a>              radius<span class="o">:</span>nchan_double}
-<a name="ln-38"></a>
-<a name="ln-39"></a>    check_struct_schema,schema,chords,err_status, desc<span class="o">=</span><span class="s2">&quot;FIDA/BES geometry&quot;</span>
-<a name="ln-40"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-41"></a>        <span class="k">goto</span>, GET_OUT
-<a name="ln-42"></a>    <span class="k">endif</span>
-<a name="ln-43"></a>
-<a name="ln-44"></a>    err_arr<span class="o">=</span><span class="nb">intarr</span>(nchan)
-<a name="ln-45"></a>    cross_arr<span class="o">=</span><span class="nb">intarr</span>(nchan)
-<a name="ln-46"></a>    uvw_lens <span class="o">=</span> chords.lens
-<a name="ln-47"></a>    uvw_axis <span class="o">=</span> chords.<span class="nb">axis</span>
-<a name="ln-48"></a>
-<a name="ln-49"></a><span class="c1">    ;;ROTATE CHORDS INTO BEAM GRID COORDINATES</span>
-<a name="ln-50"></a>    xyz_lens <span class="o">=</span> uvw_to_xyz(inp.alpha,inp.<span class="nb">beta</span>,inp.<span class="nb">gamma</span>,uvw_lens,origin<span class="o">=</span>inp.origin)
-<a name="ln-51"></a>    xyz_axis <span class="o">=</span> uvw_to_xyz(inp.alpha,inp.<span class="nb">beta</span>,inp.<span class="nb">gamma</span>,uvw_axis)
-<a name="ln-52"></a>
-<a name="ln-53"></a><span class="c1">    ;; Calculate grid center rc and sides length dr</span>
-<a name="ln-54"></a>    dr <span class="o">=</span> [inp.xmax<span class="o">-</span>inp.xmin,inp.ymax<span class="o">-</span>inp.ymin,inp.zmax<span class="o">-</span>inp.zmin]
-<a name="ln-55"></a>    rc <span class="o">=</span> [inp.xmin,inp.ymin,inp.zmin] <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span>dr
-<a name="ln-56"></a>
-<a name="ln-57"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nchan<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-58"></a>        chan_str <span class="o">=</span> <span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all)
-<a name="ln-59"></a>        <span class="k">if</span> <span class="nb">abs</span>(<span class="nb">total</span>(uvw_axis[<span class="o">*</span>,i]<span class="o">^</span><span class="mf">2.0</span>) <span class="o">-</span> <span class="mf">1.0</span>) <span class="k">gt</span> 1d<span class="o">-</span><span class="mi">5</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-60"></a>            error,<span class="s1">&#39;Invalid optical axis for chord &quot;&#39;</span><span class="o">+</span>chords.id[i]<span class="o">+</span><span class="s1">&#39;&quot;. Expected norm(axis) == 1&#39;</span>
-<a name="ln-61"></a>            <span class="nb">print</span>, <span class="nb">total</span>(uvw_axis[<span class="o">*</span>,i]<span class="o">^</span><span class="mf">2.0</span>) <span class="o">-</span> <span class="mf">1.0</span>
-<a name="ln-62"></a>            err_arr[i] <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-63"></a>        <span class="k">endif</span>
-<a name="ln-64"></a>
-<a name="ln-65"></a><span class="c1">        ;; Check if viewing chord intersects beam grid</span>
-<a name="ln-66"></a>        aabb_intersect,rc,dr,xyz_lens[<span class="o">*</span>,i],xyz_axis[<span class="o">*</span>,i],length,r_enter,r_exit
-<a name="ln-67"></a>        <span class="k">if</span> length <span class="k">le</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-68"></a>            warn,<span class="s1">&#39;Chord &quot;&#39;</span><span class="o">+</span> chords.id[i] <span class="o">+</span><span class="s1">&#39;&quot; does not cross the beam grid&#39;</span>
-<a name="ln-69"></a>            cross_arr[i] <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-70"></a>        <span class="k">endif</span>
-<a name="ln-71"></a>    <span class="k">endfor</span>
-<a name="ln-72"></a>
-<a name="ln-73"></a>    w <span class="o">=</span> <span class="nb">where</span>(cross_arr <span class="k">eq</span> <span class="mf">0.0</span>,nw,complement<span class="o">=</span>ww,ncomplement<span class="o">=</span>nww)
-<a name="ln-74"></a>    <span class="nb">print</span>,f<span class="o">=</span><span class="s1">&#39;(i3,&quot; out of &quot;,i3,&quot; chords crossed the beam grid&quot;)&#39;</span>,nw,nchan
-<a name="ln-75"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-76"></a>        error,<span class="s1">&#39;No channels intersect the beam grid&#39;</span>
-<a name="ln-77"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-78"></a>    <span class="k">endif</span>
-<a name="ln-79"></a>
-<a name="ln-80"></a>    GET_OUT<span class="o">:</span>
-<a name="ln-81"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-82"></a>        error,<span class="s1">&#39;Invalid FIDA/BES geometry. Exiting...&#39;</span>,<span class="o">/</span>halt
-<a name="ln-83"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-84"></a>        success,<span class="s1">&#39;FIDA/BES geometry is valid&#39;</span>
-<a name="ln-85"></a>    <span class="k">endelse</span>
-<a name="ln-86"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">PRO</span> check_spec, inp, chords
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+#check_spec</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Check if spectral geometry structure is valid</span>
+<a id="ln-4" name="ln-4"></a><span class="c1">    ;+***</span>
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+     **inputs**: input structure</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+     **chords**: spectral geometry structure</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+ </span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+```idl</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+IDL&gt; check_spec, inputs, chords</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+```</span>
+<a id="ln-14" name="ln-14"></a>    err_status <span class="o">=</span> <span class="mi">0</span>
+<a id="ln-15" name="ln-15"></a>    info,<span class="s1">&#39;Checking FIDA/BES inputs...&#39;</span>
+<a id="ln-16" name="ln-16"></a>
+<a id="ln-17" name="ln-17"></a>    w <span class="o">=</span> <span class="nb">where</span>(<span class="s2">&quot;nchan&quot;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">TAG_NAMES</span>(chords)),nw)
+<a id="ln-18" name="ln-18"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-19" name="ln-19"></a>        error,<span class="s1">&#39;&quot;nchan&quot; is missing from the FIDA/BES geometry&#39;</span>
+<a id="ln-20" name="ln-20"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-21" name="ln-21"></a>        <span class="k">goto</span>, GET_OUT
+<a id="ln-22" name="ln-22"></a>    <span class="k">endif</span>
+<a id="ln-23" name="ln-23"></a>
+<a id="ln-24" name="ln-24"></a>    nchan <span class="o">=</span> chords.nchan
+<a id="ln-25" name="ln-25"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
+<a id="ln-26" name="ln-26"></a>    zero_long <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;LONG&#39;</span>}
+<a id="ln-27" name="ln-27"></a>    nchan_double <span class="o">=</span> {dims<span class="o">:</span>[nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a id="ln-28" name="ln-28"></a>    nchan_string <span class="o">=</span> {dims<span class="o">:</span>[nchan], type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
+<a id="ln-29" name="ln-29"></a>    schema <span class="o">=</span> {data_source<span class="o">:</span>zero_string, $
+<a id="ln-30" name="ln-30"></a>              nchan<span class="o">:</span>zero_long, $
+<a id="ln-31" name="ln-31"></a>              system<span class="o">:</span>zero_string, $
+<a id="ln-32" name="ln-32"></a>              id<span class="o">:</span>nchan_string, $
+<a id="ln-33" name="ln-33"></a>              lens<span class="o">:</span>{dims<span class="o">:</span>[<span class="mi">3</span>,nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}, $
+<a id="ln-34" name="ln-34"></a>              <span class="nb">axis</span><span class="o">:</span>{dims<span class="o">:</span>[<span class="mi">3</span>,nchan], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}, $
+<a id="ln-35" name="ln-35"></a>              sigma_pi<span class="o">:</span>nchan_double, $
+<a id="ln-36" name="ln-36"></a>              spot_size<span class="o">:</span>nchan_double, $
+<a id="ln-37" name="ln-37"></a>              radius<span class="o">:</span>nchan_double}
+<a id="ln-38" name="ln-38"></a>
+<a id="ln-39" name="ln-39"></a>    check_struct_schema,schema,chords,err_status, desc<span class="o">=</span><span class="s2">&quot;FIDA/BES geometry&quot;</span>
+<a id="ln-40" name="ln-40"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-41" name="ln-41"></a>        <span class="k">goto</span>, GET_OUT
+<a id="ln-42" name="ln-42"></a>    <span class="k">endif</span>
+<a id="ln-43" name="ln-43"></a>
+<a id="ln-44" name="ln-44"></a>    err_arr<span class="o">=</span><span class="nb">intarr</span>(nchan)
+<a id="ln-45" name="ln-45"></a>    cross_arr<span class="o">=</span><span class="nb">intarr</span>(nchan)
+<a id="ln-46" name="ln-46"></a>    uvw_lens <span class="o">=</span> chords.lens
+<a id="ln-47" name="ln-47"></a>    uvw_axis <span class="o">=</span> chords.<span class="nb">axis</span>
+<a id="ln-48" name="ln-48"></a>
+<a id="ln-49" name="ln-49"></a><span class="c1">    ;;ROTATE CHORDS INTO BEAM GRID COORDINATES</span>
+<a id="ln-50" name="ln-50"></a>    xyz_lens <span class="o">=</span> uvw_to_xyz(inp.alpha,inp.<span class="nb">beta</span>,inp.<span class="nb">gamma</span>,uvw_lens,origin<span class="o">=</span>inp.origin)
+<a id="ln-51" name="ln-51"></a>    xyz_axis <span class="o">=</span> uvw_to_xyz(inp.alpha,inp.<span class="nb">beta</span>,inp.<span class="nb">gamma</span>,uvw_axis)
+<a id="ln-52" name="ln-52"></a>
+<a id="ln-53" name="ln-53"></a><span class="c1">    ;; Calculate grid center rc and sides length dr</span>
+<a id="ln-54" name="ln-54"></a>    dr <span class="o">=</span> [inp.xmax<span class="o">-</span>inp.xmin,inp.ymax<span class="o">-</span>inp.ymin,inp.zmax<span class="o">-</span>inp.zmin]
+<a id="ln-55" name="ln-55"></a>    rc <span class="o">=</span> [inp.xmin,inp.ymin,inp.zmin] <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span>dr
+<a id="ln-56" name="ln-56"></a>
+<a id="ln-57" name="ln-57"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nchan<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-58" name="ln-58"></a>        chan_str <span class="o">=</span> <span class="nb">strcompress</span>(<span class="nb">string</span>(i),<span class="o">/</span>remove_all)
+<a id="ln-59" name="ln-59"></a>        <span class="k">if</span> <span class="nb">abs</span>(<span class="nb">total</span>(uvw_axis[<span class="o">*</span>,i]<span class="o">^</span><span class="mf">2.0</span>) <span class="o">-</span> <span class="mf">1.0</span>) <span class="k">gt</span> 1d<span class="o">-</span><span class="mi">5</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-60" name="ln-60"></a>            error,<span class="s1">&#39;Invalid optical axis for chord &quot;&#39;</span><span class="o">+</span>chords.id[i]<span class="o">+</span><span class="s1">&#39;&quot;. Expected norm(axis) == 1&#39;</span>
+<a id="ln-61" name="ln-61"></a>            <span class="nb">print</span>, <span class="nb">total</span>(uvw_axis[<span class="o">*</span>,i]<span class="o">^</span><span class="mf">2.0</span>) <span class="o">-</span> <span class="mf">1.0</span>
+<a id="ln-62" name="ln-62"></a>            err_arr[i] <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-63" name="ln-63"></a>        <span class="k">endif</span>
+<a id="ln-64" name="ln-64"></a>
+<a id="ln-65" name="ln-65"></a><span class="c1">        ;; Check if viewing chord intersects beam grid</span>
+<a id="ln-66" name="ln-66"></a>        aabb_intersect,rc,dr,xyz_lens[<span class="o">*</span>,i],xyz_axis[<span class="o">*</span>,i],length,r_enter,r_exit
+<a id="ln-67" name="ln-67"></a>        <span class="k">if</span> length <span class="k">le</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-68" name="ln-68"></a>            warn,<span class="s1">&#39;Chord &quot;&#39;</span><span class="o">+</span> chords.id[i] <span class="o">+</span><span class="s1">&#39;&quot; does not cross the beam grid&#39;</span>
+<a id="ln-69" name="ln-69"></a>            cross_arr[i] <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-70" name="ln-70"></a>        <span class="k">endif</span>
+<a id="ln-71" name="ln-71"></a>    <span class="k">endfor</span>
+<a id="ln-72" name="ln-72"></a>
+<a id="ln-73" name="ln-73"></a>    w <span class="o">=</span> <span class="nb">where</span>(cross_arr <span class="k">eq</span> <span class="mf">0.0</span>,nw,complement<span class="o">=</span>ww,ncomplement<span class="o">=</span>nww)
+<a id="ln-74" name="ln-74"></a>    <span class="nb">print</span>,f<span class="o">=</span><span class="s1">&#39;(i3,&quot; out of &quot;,i3,&quot; chords crossed the beam grid&quot;)&#39;</span>,nw,nchan
+<a id="ln-75" name="ln-75"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-76" name="ln-76"></a>        error,<span class="s1">&#39;No channels intersect the beam grid&#39;</span>
+<a id="ln-77" name="ln-77"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-78" name="ln-78"></a>    <span class="k">endif</span>
+<a id="ln-79" name="ln-79"></a>
+<a id="ln-80" name="ln-80"></a>    GET_OUT<span class="o">:</span>
+<a id="ln-81" name="ln-81"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-82" name="ln-82"></a>        error,<span class="s1">&#39;Invalid FIDA/BES geometry. Exiting...&#39;</span>,<span class="o">/</span>halt
+<a id="ln-83" name="ln-83"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-84" name="ln-84"></a>        success,<span class="s1">&#39;FIDA/BES geometry is valid&#39;</span>
+<a id="ln-85" name="ln-85"></a>    <span class="k">endelse</span>
+<a id="ln-86" name="ln-86"></a><span class="k">END</span>
 </pre></div>
 
     </section>

@@ -246,73 +246,73 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> check_fields, inp, grid, fields
-<a name="ln-2"></a><span class="c1">    ;+#check_fields</span>
-<a name="ln-3"></a><span class="c1">    ;+Checks if electromagnetic fields structure is valid</span>
-<a name="ln-4"></a><span class="c1">    ;+***</span>
-<a name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
-<a name="ln-6"></a><span class="c1">    ;+     **inputs**: Input structure</span>
-<a name="ln-7"></a><span class="c1">    ;+ </span>
-<a name="ln-8"></a><span class="c1">    ;+     **grid**: Interpolation grid structure</span>
-<a name="ln-9"></a><span class="c1">    ;+ </span>
-<a name="ln-10"></a><span class="c1">    ;+     **fields**: Electromagnetic fields structure</span>
-<a name="ln-11"></a><span class="c1">    ;+ </span>
-<a name="ln-12"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-13"></a><span class="c1">    ;+```idl</span>
-<a name="ln-14"></a><span class="c1">    ;+IDL&gt; check_fields, inputs, grid, fields</span>
-<a name="ln-15"></a><span class="c1">    ;+```</span>
-<a name="ln-16"></a>
-<a name="ln-17"></a>    err_status<span class="o">=</span><span class="mi">0</span>
-<a name="ln-18"></a>    info,<span class="s1">&#39;Checking electromagnetic fields...&#39;</span>
-<a name="ln-19"></a>
-<a name="ln-20"></a>    nr <span class="o">=</span> grid.nr
-<a name="ln-21"></a>    nz <span class="o">=</span> grid.nz
-<a name="ln-22"></a>    w <span class="o">=</span> <span class="nb">where</span>(<span class="s2">&quot;nphi&quot;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">TAG_NAMES</span>(grid)),nw)
-<a name="ln-23"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-24"></a>        info,<span class="s1">&#39;&quot;nphi&quot; is missing from the fields, assuming axisymmetry&#39;</span>
-<a name="ln-25"></a>        nphi <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-26"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-27"></a>        nphi <span class="o">=</span> grid.nphi
-<a name="ln-28"></a>    <span class="k">endelse</span>
-<a name="ln-29"></a>
-<a name="ln-30"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
-<a name="ln-31"></a>    zero_double <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
-<a name="ln-32"></a>    nrnznphi_double <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
-<a name="ln-33"></a>    nrnznphi_int <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;INT&#39;</span>}
-<a name="ln-34"></a>    schema <span class="o">=</span> {time<span class="o">:</span>zero_double, $
-<a name="ln-35"></a>              br<span class="o">:</span>nrnznphi_double, $
-<a name="ln-36"></a>              bt<span class="o">:</span>nrnznphi_double, $
-<a name="ln-37"></a>              bz<span class="o">:</span>nrnznphi_double, $
-<a name="ln-38"></a>              er<span class="o">:</span>nrnznphi_double, $
-<a name="ln-39"></a>              et<span class="o">:</span>nrnznphi_double, $
-<a name="ln-40"></a>              ez<span class="o">:</span>nrnznphi_double, $
-<a name="ln-41"></a>              mask<span class="o">:</span>nrnznphi_int, $
-<a name="ln-42"></a>              data_source<span class="o">:</span>zero_string}
-<a name="ln-43"></a>
-<a name="ln-44"></a>    check_struct_schema,schema,fields,err_status, desc <span class="o">=</span> <span class="s2">&quot;electromagnetic fields&quot;</span>
-<a name="ln-45"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-46"></a>        <span class="k">goto</span>, GET_OUT
-<a name="ln-47"></a>    <span class="k">endif</span>
-<a name="ln-48"></a>
-<a name="ln-49"></a>    <span class="k">if</span> fields.data_source <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-50"></a>        error, <span class="s1">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
-<a name="ln-51"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-52"></a>    <span class="k">endif</span>
-<a name="ln-53"></a> 
-<a name="ln-54"></a>    <span class="k">if</span> <span class="nb">abs</span>(fields.time <span class="o">-</span> inp.time) <span class="k">gt</span> <span class="mf">0.02</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-55"></a>        warn,<span class="s1">&#39;Electromagnetic fields time and input time do not match&#39;</span>
-<a name="ln-56"></a>        <span class="nb">print</span>,<span class="s1">&#39;Input time: &#39;</span>,inp.time
-<a name="ln-57"></a>        <span class="nb">print</span>,<span class="s1">&#39;Electromagnetic fields time: &#39;</span>,fields.time
-<a name="ln-58"></a>    <span class="k">endif</span>
-<a name="ln-59"></a>
-<a name="ln-60"></a>    fields <span class="o">=</span> <span class="nb">create_struct</span>(fields, grid)
-<a name="ln-61"></a>    GET_OUT<span class="o">:</span>
-<a name="ln-62"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-63"></a>        error,<span class="s1">&#39;Invalid electromagnetic fields. Exiting...&#39;</span>,<span class="o">/</span>halt
-<a name="ln-64"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-65"></a>        success,<span class="s1">&#39;Electromagnetic fields are valid&#39;</span>
-<a name="ln-66"></a>    <span class="k">endelse</span>
-<a name="ln-67"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">PRO</span> check_fields, inp, grid, fields
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+#check_fields</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Checks if electromagnetic fields structure is valid</span>
+<a id="ln-4" name="ln-4"></a><span class="c1">    ;+***</span>
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+##Input Arguments</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+     **inputs**: Input structure</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+ </span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+     **grid**: Interpolation grid structure</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+ </span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+     **fields**: Electromagnetic fields structure</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+ </span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+```idl</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+IDL&gt; check_fields, inputs, grid, fields</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+```</span>
+<a id="ln-16" name="ln-16"></a>
+<a id="ln-17" name="ln-17"></a>    err_status<span class="o">=</span><span class="mi">0</span>
+<a id="ln-18" name="ln-18"></a>    info,<span class="s1">&#39;Checking electromagnetic fields...&#39;</span>
+<a id="ln-19" name="ln-19"></a>
+<a id="ln-20" name="ln-20"></a>    nr <span class="o">=</span> grid.nr
+<a id="ln-21" name="ln-21"></a>    nz <span class="o">=</span> grid.nz
+<a id="ln-22" name="ln-22"></a>    w <span class="o">=</span> <span class="nb">where</span>(<span class="s2">&quot;nphi&quot;</span> <span class="k">eq</span> <span class="nb">strlowcase</span>(<span class="nb">TAG_NAMES</span>(grid)),nw)
+<a id="ln-23" name="ln-23"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-24" name="ln-24"></a>        info,<span class="s1">&#39;&quot;nphi&quot; is missing from the fields, assuming axisymmetry&#39;</span>
+<a id="ln-25" name="ln-25"></a>        nphi <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-26" name="ln-26"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-27" name="ln-27"></a>        nphi <span class="o">=</span> grid.nphi
+<a id="ln-28" name="ln-28"></a>    <span class="k">endelse</span>
+<a id="ln-29" name="ln-29"></a>
+<a id="ln-30" name="ln-30"></a>    zero_string <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;STRING&#39;</span>}
+<a id="ln-31" name="ln-31"></a>    zero_double <span class="o">=</span> {dims<span class="o">:</span><span class="mi">0</span>, type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a id="ln-32" name="ln-32"></a>    nrnznphi_double <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;DOUBLE&#39;</span>}
+<a id="ln-33" name="ln-33"></a>    nrnznphi_int <span class="o">=</span> {dims<span class="o">:</span>[nr,nz,nphi], type<span class="o">:</span><span class="s1">&#39;INT&#39;</span>}
+<a id="ln-34" name="ln-34"></a>    schema <span class="o">=</span> {time<span class="o">:</span>zero_double, $
+<a id="ln-35" name="ln-35"></a>              br<span class="o">:</span>nrnznphi_double, $
+<a id="ln-36" name="ln-36"></a>              bt<span class="o">:</span>nrnznphi_double, $
+<a id="ln-37" name="ln-37"></a>              bz<span class="o">:</span>nrnznphi_double, $
+<a id="ln-38" name="ln-38"></a>              er<span class="o">:</span>nrnznphi_double, $
+<a id="ln-39" name="ln-39"></a>              et<span class="o">:</span>nrnznphi_double, $
+<a id="ln-40" name="ln-40"></a>              ez<span class="o">:</span>nrnznphi_double, $
+<a id="ln-41" name="ln-41"></a>              mask<span class="o">:</span>nrnznphi_int, $
+<a id="ln-42" name="ln-42"></a>              data_source<span class="o">:</span>zero_string}
+<a id="ln-43" name="ln-43"></a>
+<a id="ln-44" name="ln-44"></a>    check_struct_schema,schema,fields,err_status, desc <span class="o">=</span> <span class="s2">&quot;electromagnetic fields&quot;</span>
+<a id="ln-45" name="ln-45"></a>    <span class="k">if</span> err_status <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-46" name="ln-46"></a>        <span class="k">goto</span>, GET_OUT
+<a id="ln-47" name="ln-47"></a>    <span class="k">endif</span>
+<a id="ln-48" name="ln-48"></a>
+<a id="ln-49" name="ln-49"></a>    <span class="k">if</span> fields.data_source <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-50" name="ln-50"></a>        error, <span class="s1">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
+<a id="ln-51" name="ln-51"></a>        err_status <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-52" name="ln-52"></a>    <span class="k">endif</span>
+<a id="ln-53" name="ln-53"></a> 
+<a id="ln-54" name="ln-54"></a>    <span class="k">if</span> <span class="nb">abs</span>(fields.time <span class="o">-</span> inp.time) <span class="k">gt</span> <span class="mf">0.02</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-55" name="ln-55"></a>        warn,<span class="s1">&#39;Electromagnetic fields time and input time do not match&#39;</span>
+<a id="ln-56" name="ln-56"></a>        <span class="nb">print</span>,<span class="s1">&#39;Input time: &#39;</span>,inp.time
+<a id="ln-57" name="ln-57"></a>        <span class="nb">print</span>,<span class="s1">&#39;Electromagnetic fields time: &#39;</span>,fields.time
+<a id="ln-58" name="ln-58"></a>    <span class="k">endif</span>
+<a id="ln-59" name="ln-59"></a>
+<a id="ln-60" name="ln-60"></a>    fields <span class="o">=</span> <span class="nb">create_struct</span>(fields, grid)
+<a id="ln-61" name="ln-61"></a>    GET_OUT<span class="o">:</span>
+<a id="ln-62" name="ln-62"></a>    <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-63" name="ln-63"></a>        error,<span class="s1">&#39;Invalid electromagnetic fields. Exiting...&#39;</span>,<span class="o">/</span>halt
+<a id="ln-64" name="ln-64"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-65" name="ln-65"></a>        success,<span class="s1">&#39;Electromagnetic fields are valid&#39;</span>
+<a id="ln-66" name="ln-66"></a>    <span class="k">endelse</span>
+<a id="ln-67" name="ln-67"></a><span class="k">END</span>
 </pre></div>
 
     </section>

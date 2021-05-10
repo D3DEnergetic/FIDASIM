@@ -238,29 +238,29 @@ If name is not given then it returns the source file of caller routine</p>
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> source_file,name
-<a name="ln-2"></a><span class="c1">    ;+ Returns the source file of the routine `name`</span>
-<a name="ln-3"></a><span class="c1">    ;+ If name is not given then it returns the source file of caller routine</span>
-<a name="ln-4"></a>    <span class="k">if</span> <span class="nb">N_PARAMS</span>() <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-5"></a>        s <span class="o">=</span> <span class="nb">scope_traceback</span>(<span class="o">/</span>structure)
-<a name="ln-6"></a>        nlevels <span class="o">=</span> <span class="nb">n_elements</span>(s)
-<a name="ln-7"></a>        sfile <span class="o">=</span> s[nlevels<span class="o">-</span><span class="mi">2</span>].filename
-<a name="ln-8"></a>        <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
-<a name="ln-9"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-10"></a>        <span class="nb">help</span>,<span class="o">/</span>source_files,output<span class="o">=</span>csf ;all compiled source files
-<a name="ln-11"></a>        nc <span class="o">=</span> <span class="nb">n_elements</span>(csf)
-<a name="ln-12"></a>        <span class="k">for</span> i<span class="o">=</span><span class="mi">2</span>,nc<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-13"></a>            has_name <span class="o">=</span> <span class="nb">stregex</span>(csf[i],name,<span class="o">/</span>fold_case) <span class="k">ne</span> <span class="o">-</span><span class="mi">1</span>
-<a name="ln-14"></a>            <span class="k">if</span> has_name <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-15"></a>                sfile <span class="o">=</span> <span class="nb">stregex</span>(csf[i],<span class="s2">&quot;(/[^/ ]*)+/?$&quot;</span>,<span class="o">/</span>extract,<span class="o">/</span>fold_case)
-<a name="ln-16"></a>                <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
-<a name="ln-17"></a>            <span class="k">endif</span>
-<a name="ln-18"></a>        <span class="k">endfor</span>
-<a name="ln-19"></a>    <span class="k">endelse</span>
-<a name="ln-20"></a>
-<a name="ln-21"></a>    <span class="nb">return</span>,<span class="s1">&#39;&#39;</span>
-<a name="ln-22"></a>
-<a name="ln-23"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> source_file,name
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+ Returns the source file of the routine `name`</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+ If name is not given then it returns the source file of caller routine</span>
+<a id="ln-4" name="ln-4"></a>    <span class="k">if</span> <span class="nb">N_PARAMS</span>() <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-5" name="ln-5"></a>        s <span class="o">=</span> <span class="nb">scope_traceback</span>(<span class="o">/</span>structure)
+<a id="ln-6" name="ln-6"></a>        nlevels <span class="o">=</span> <span class="nb">n_elements</span>(s)
+<a id="ln-7" name="ln-7"></a>        sfile <span class="o">=</span> s[nlevels<span class="o">-</span><span class="mi">2</span>].filename
+<a id="ln-8" name="ln-8"></a>        <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
+<a id="ln-9" name="ln-9"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-10" name="ln-10"></a>        <span class="nb">help</span>,<span class="o">/</span>source_files,output<span class="o">=</span>csf ;all compiled source files
+<a id="ln-11" name="ln-11"></a>        nc <span class="o">=</span> <span class="nb">n_elements</span>(csf)
+<a id="ln-12" name="ln-12"></a>        <span class="k">for</span> i<span class="o">=</span><span class="mi">2</span>,nc<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-13" name="ln-13"></a>            has_name <span class="o">=</span> <span class="nb">stregex</span>(csf[i],name,<span class="o">/</span>fold_case) <span class="k">ne</span> <span class="o">-</span><span class="mi">1</span>
+<a id="ln-14" name="ln-14"></a>            <span class="k">if</span> has_name <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-15" name="ln-15"></a>                sfile <span class="o">=</span> <span class="nb">stregex</span>(csf[i],<span class="s2">&quot;(/[^/ ]*)+/?$&quot;</span>,<span class="o">/</span>extract,<span class="o">/</span>fold_case)
+<a id="ln-16" name="ln-16"></a>                <span class="nb">return</span>, <span class="nb">file_expand_path</span>(sfile)
+<a id="ln-17" name="ln-17"></a>            <span class="k">endif</span>
+<a id="ln-18" name="ln-18"></a>        <span class="k">endfor</span>
+<a id="ln-19" name="ln-19"></a>    <span class="k">endelse</span>
+<a id="ln-20" name="ln-20"></a>
+<a id="ln-21" name="ln-21"></a>    <span class="nb">return</span>,<span class="s1">&#39;&#39;</span>
+<a id="ln-22" name="ln-22"></a>
+<a id="ln-23" name="ln-23"></a><span class="k">END</span>
 </pre></div>
 
     </section>

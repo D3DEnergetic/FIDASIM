@@ -248,51 +248,51 @@ IDL<span class="o">&gt;</span> s <span class="o">=</span> vars_to_struct() ; str
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> vars_to_struct,vars<span class="o">=</span>vars,level<span class="o">=</span>level
-<a name="ln-2"></a><span class="c1">    ;+#vars_to_struct</span>
-<a name="ln-3"></a><span class="c1">    ;+Creates a structure containing the variables in the callers scope</span>
-<a name="ln-4"></a><span class="c1">    ;+</span>
-<a name="ln-5"></a><span class="c1">    ;+##Keyword Arguments</span>
-<a name="ln-6"></a><span class="c1">    ;+    **vars**: List of variables to store in the output structure. Defaults to all variables in the callers scope.</span>
-<a name="ln-7"></a><span class="c1">    ;+</span>
-<a name="ln-8"></a><span class="c1">    ;+    **level**: Relative scope. Defaults to the callers scope (-1)</span>
-<a name="ln-9"></a><span class="c1">    ;+</span>
-<a name="ln-10"></a><span class="c1">    ;+##Return Value</span>
-<a name="ln-11"></a><span class="c1">    ;+Structure containing variables from the callers scope</span>
-<a name="ln-12"></a><span class="c1">    ;+</span>
-<a name="ln-13"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-14"></a><span class="c1">    ;+```idl</span>
-<a name="ln-15"></a><span class="c1">    ;+IDL&gt; a = 1</span>
-<a name="ln-16"></a><span class="c1">    ;+IDL&gt; b = &quot;hello&quot;</span>
-<a name="ln-17"></a><span class="c1">    ;+IDL&gt; s = vars_to_struct() ; structure containing `a` &amp; `b`</span>
-<a name="ln-18"></a><span class="c1">    ;+```</span>
-<a name="ln-19"></a>
-<a name="ln-20"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(level) <span class="k">then</span> level<span class="o">=-</span><span class="mi">1</span>
-<a name="ln-21"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(vars) <span class="k">then</span> vars <span class="o">=</span> <span class="nb">scope_varname</span>(level<span class="o">=</span>level)
-<a name="ln-22"></a>
-<a name="ln-23"></a>    nvars <span class="o">=</span> <span class="nb">n_elements</span>(vars)
-<a name="ln-24"></a>
-<a name="ln-25"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nvars<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-26"></a>        <span class="nb">catch</span>, err_status
-<a name="ln-27"></a>        <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-28"></a>            <span class="nb">catch</span>,<span class="o">/</span>cancel
-<a name="ln-29"></a>            <span class="k">continue</span>
-<a name="ln-30"></a>        <span class="k">endif</span>
-<a name="ln-31"></a>        var <span class="o">=</span> <span class="nb">scope_varfetch</span>(vars[i],level<span class="o">=</span>level)
-<a name="ln-32"></a>        <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-33"></a>           <span class="k">if</span> i <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-34"></a>               s <span class="o">=</span> <span class="nb">create_struct</span>(vars[i],var)
-<a name="ln-35"></a>           <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-36"></a>               s <span class="o">=</span> <span class="nb">create_struct</span>(s,vars[i],var)
-<a name="ln-37"></a>           <span class="k">endelse</span>
-<a name="ln-38"></a>        <span class="k">endif</span>
-<a name="ln-39"></a>    <span class="k">endfor</span>
-<a name="ln-40"></a>    
-<a name="ln-41"></a>    <span class="k">if</span> nvars <span class="k">eq</span> <span class="mi">1</span> <span class="k">and</span> <span class="nb">size</span>(s.(<span class="mi">0</span>),<span class="o">/</span>tname) <span class="k">eq</span> <span class="s1">&#39;STRUCT&#39;</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-42"></a>        s <span class="o">=</span> s.(<span class="mi">0</span>)
-<a name="ln-43"></a>    <span class="k">endif</span>
-<a name="ln-44"></a>    <span class="nb">return</span>, s
-<a name="ln-45"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> vars_to_struct,vars<span class="o">=</span>vars,level<span class="o">=</span>level
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+#vars_to_struct</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Creates a structure containing the variables in the callers scope</span>
+<a id="ln-4" name="ln-4"></a><span class="c1">    ;+</span>
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+    **vars**: List of variables to store in the output structure. Defaults to all variables in the callers scope.</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+    **level**: Relative scope. Defaults to the callers scope (-1)</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+</span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+##Return Value</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+Structure containing variables from the callers scope</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+```idl</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+IDL&gt; a = 1</span>
+<a id="ln-16" name="ln-16"></a><span class="c1">    ;+IDL&gt; b = &quot;hello&quot;</span>
+<a id="ln-17" name="ln-17"></a><span class="c1">    ;+IDL&gt; s = vars_to_struct() ; structure containing `a` &amp; `b`</span>
+<a id="ln-18" name="ln-18"></a><span class="c1">    ;+```</span>
+<a id="ln-19" name="ln-19"></a>
+<a id="ln-20" name="ln-20"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(level) <span class="k">then</span> level<span class="o">=-</span><span class="mi">1</span>
+<a id="ln-21" name="ln-21"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(vars) <span class="k">then</span> vars <span class="o">=</span> <span class="nb">scope_varname</span>(level<span class="o">=</span>level)
+<a id="ln-22" name="ln-22"></a>
+<a id="ln-23" name="ln-23"></a>    nvars <span class="o">=</span> <span class="nb">n_elements</span>(vars)
+<a id="ln-24" name="ln-24"></a>
+<a id="ln-25" name="ln-25"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">0</span>,nvars<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-26" name="ln-26"></a>        <span class="nb">catch</span>, err_status
+<a id="ln-27" name="ln-27"></a>        <span class="k">if</span> err_status <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-28" name="ln-28"></a>            <span class="nb">catch</span>,<span class="o">/</span>cancel
+<a id="ln-29" name="ln-29"></a>            <span class="k">continue</span>
+<a id="ln-30" name="ln-30"></a>        <span class="k">endif</span>
+<a id="ln-31" name="ln-31"></a>        var <span class="o">=</span> <span class="nb">scope_varfetch</span>(vars[i],level<span class="o">=</span>level)
+<a id="ln-32" name="ln-32"></a>        <span class="k">if</span> <span class="nb">n_elements</span>(var) <span class="k">ne</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-33" name="ln-33"></a>           <span class="k">if</span> i <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-34" name="ln-34"></a>               s <span class="o">=</span> <span class="nb">create_struct</span>(vars[i],var)
+<a id="ln-35" name="ln-35"></a>           <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-36" name="ln-36"></a>               s <span class="o">=</span> <span class="nb">create_struct</span>(s,vars[i],var)
+<a id="ln-37" name="ln-37"></a>           <span class="k">endelse</span>
+<a id="ln-38" name="ln-38"></a>        <span class="k">endif</span>
+<a id="ln-39" name="ln-39"></a>    <span class="k">endfor</span>
+<a id="ln-40" name="ln-40"></a>    
+<a id="ln-41" name="ln-41"></a>    <span class="k">if</span> nvars <span class="k">eq</span> <span class="mi">1</span> <span class="k">and</span> <span class="nb">size</span>(s.(<span class="mi">0</span>),<span class="o">/</span>tname) <span class="k">eq</span> <span class="s1">&#39;STRUCT&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-42" name="ln-42"></a>        s <span class="o">=</span> s.(<span class="mi">0</span>)
+<a id="ln-43" name="ln-43"></a>    <span class="k">endif</span>
+<a id="ln-44" name="ln-44"></a>    <span class="nb">return</span>, s
+<a id="ln-45" name="ln-45"></a><span class="k">END</span>
 </pre></div>
 
     </section>

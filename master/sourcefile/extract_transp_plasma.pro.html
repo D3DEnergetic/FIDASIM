@@ -254,230 +254,230 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> extract_transp_plasma,filename, intime, grid, rhogrid, $
-<a name="ln-2"></a>            doplot<span class="o">=</span>doplot, <span class="nb">profiles</span><span class="o">=</span><span class="nb">profiles</span>, dn0out<span class="o">=</span>dn0out, $
-<a name="ln-3"></a>            scrapeoff<span class="o">=</span>scrapeoff, rho_scrapeoff<span class="o">=</span>rho_scrapeoff,$
-<a name="ln-4"></a>            sne<span class="o">=</span>sne, ste<span class="o">=</span>ste, sti<span class="o">=</span>sti, simp<span class="o">=</span>simp, srot<span class="o">=</span>srot, snn<span class="o">=</span>snn
-<a name="ln-5"></a><span class="c1">    ;+#extract_transp_plasma</span>
-<a name="ln-6"></a><span class="c1">    ;+Extracts `plasma` structure from a TRANSP run</span>
-<a name="ln-7"></a><span class="c1">    ;+***</span>
-<a name="ln-8"></a><span class="c1">    ;+##Arguments</span>
-<a name="ln-9"></a><span class="c1">    ;+    **filename**: TRANSP output file e.g. [TRANSP_RUNID].CDF</span>
-<a name="ln-10"></a><span class="c1">    ;+</span>
-<a name="ln-11"></a><span class="c1">    ;+    **intime**: Time of interest [s]</span>
-<a name="ln-12"></a><span class="c1">    ;+</span>
-<a name="ln-13"></a><span class="c1">    ;+    **grid**: Interpolation grid</span>
-<a name="ln-14"></a><span class="c1">    ;+</span>
-<a name="ln-15"></a><span class="c1">    ;+    **rhogrid**: sqrt(normalized torodial flux) mapped onto the interpolation grid</span>
-<a name="ln-16"></a><span class="c1">    ;+</span>
-<a name="ln-17"></a><span class="c1">    ;+##Keyword Arguments</span>
-<a name="ln-18"></a><span class="c1">    ;+    **doplot**: Plot profiles</span>
-<a name="ln-19"></a><span class="c1">    ;+</span>
-<a name="ln-20"></a><span class="c1">    ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho</span>
-<a name="ln-21"></a><span class="c1">    ;+</span>
-<a name="ln-22"></a><span class="c1">    ;+    **s(ne|ni|te|ti|imp|rot|nn)**: Smooth profiles</span>
-<a name="ln-23"></a><span class="c1">    ;+</span>
-<a name="ln-24"></a><span class="c1">    ;+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist</span>
-<a name="ln-25"></a><span class="c1">    ;+</span>
-<a name="ln-26"></a><span class="c1">    ;+    **scrapeoff**: scrapeoff decay length</span>
-<a name="ln-27"></a><span class="c1">    ;+</span>
-<a name="ln-28"></a><span class="c1">    ;+    **rho_scrapeoff**: scrapeoff length, default = 0.1</span>
-<a name="ln-29"></a><span class="c1">    ;+</span>
-<a name="ln-30"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-31"></a><span class="c1">    ;+```idl</span>
-<a name="ln-32"></a><span class="c1">    ;+IDL&gt; plasma = extract_transp_plasma(&quot;./142332H01.CDF&quot;, 1.2, grid, rho)</span>
-<a name="ln-33"></a><span class="c1">    ;+```</span>
-<a name="ln-34"></a>
-<a name="ln-35"></a>    var_list <span class="o">=</span> [<span class="s2">&quot;X&quot;</span>,<span class="s2">&quot;TRFLX&quot;</span>,<span class="s2">&quot;TFLUX&quot;</span>,<span class="s2">&quot;TIME&quot;</span>,<span class="s2">&quot;NE&quot;</span>,<span class="s2">&quot;NH&quot;</span>,<span class="s2">&quot;ND&quot;</span>,<span class="s2">&quot;NT&quot;</span>,<span class="s2">&quot;NIMP&quot;</span>,<span class="s2">&quot;TE&quot;</span>,<span class="s2">&quot;TI&quot;</span>,<span class="s2">&quot;ZEFFI&quot;</span>,<span class="s2">&quot;OMEGA&quot;</span>,<span class="s2">&quot;DN0WD&quot;</span>,<span class="s2">&quot;XZIMP&quot;</span>]
-<a name="ln-36"></a>
-<a name="ln-37"></a>    zz <span class="o">=</span> read_ncdf(filename,vars <span class="o">=</span> var_list)
-<a name="ln-38"></a>    tn <span class="o">=</span> <span class="nb">tag_names</span>(zz)
-<a name="ln-39"></a>
-<a name="ln-40"></a>    t <span class="o">=</span> zz.time
-<a name="ln-41"></a>    dummy<span class="o">=</span><span class="nb">min</span>( <span class="nb">abs</span>(t<span class="o">-</span>intime), idx)
-<a name="ln-42"></a>    time <span class="o">=</span> <span class="nb">double</span>(t[idx])
-<a name="ln-43"></a>
-<a name="ln-44"></a>    <span class="nb">print</span>, <span class="s1">&#39; * Selecting profiles at :&#39;</span>, time, <span class="s1">&#39; s&#39;</span> ;pick the closest timeslice to TOI
-<a name="ln-45"></a>
-<a name="ln-46"></a>    impurity_charge <span class="o">=</span> <span class="nb">fix</span>(<span class="nb">ceil</span>(<span class="nb">max</span>(zz.xzimp)))
-<a name="ln-47"></a><span class="c1">    ; Densities</span>
-<a name="ln-48"></a>    transp_ne <span class="o">=</span> zz.ne_[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
-<a name="ln-49"></a>    transp_nimp <span class="o">=</span> zz.nimp[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
-<a name="ln-50"></a>    transp_nn <span class="o">=</span> zz.dn0wd[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
-<a name="ln-51"></a>    w_thermal <span class="o">=</span> []
-<a name="ln-52"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;NH&quot;</span>, nmatch)
-<a name="ln-53"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-54"></a>        transp_nh <span class="o">=</span> zz.nh[<span class="o">*</span>,idx]
-<a name="ln-55"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">0</span>]
-<a name="ln-56"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-57"></a>        transp_nh <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
-<a name="ln-58"></a>    <span class="k">endelse</span>
-<a name="ln-59"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;ND&quot;</span>, nmatch)
-<a name="ln-60"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-61"></a>        transp_nd <span class="o">=</span> zz.nd[<span class="o">*</span>,idx]
-<a name="ln-62"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">1</span>]
-<a name="ln-63"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-64"></a>        transp_nd <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
-<a name="ln-65"></a>    <span class="k">endelse</span>
-<a name="ln-66"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;NT&quot;</span>, nmatch)
-<a name="ln-67"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-68"></a>        transp_nt <span class="o">=</span> zz.nt[<span class="o">*</span>,idx]
-<a name="ln-69"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">2</span>]
-<a name="ln-70"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-71"></a>        transp_nt <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
-<a name="ln-72"></a>    <span class="k">endelse</span>
-<a name="ln-73"></a>
-<a name="ln-74"></a>    transp_te <span class="o">=</span> zz.te[<span class="o">*</span>,idx]<span class="o">*</span><span class="mf">1.d-3</span>  ; kev
-<a name="ln-75"></a>    transp_ti <span class="o">=</span> zz.ti[<span class="o">*</span>,idx]<span class="o">*</span><span class="mf">1.d-3</span>   ; kev
-<a name="ln-76"></a>    transp_zeff <span class="o">=</span> zz.zeffi[<span class="o">*</span>,idx]
-<a name="ln-77"></a>
-<a name="ln-78"></a>    rho_cb <span class="o">=</span> <span class="nb">sqrt</span>(zz.trflx[<span class="o">*</span>,idx]<span class="o">/</span>zz.tflux[idx])
-<a name="ln-79"></a><span class="c1">    ; center each rho b/c toroidal flux is at cell boundary</span>
-<a name="ln-80"></a>    rho <span class="o">=</span> <span class="mf">0.d0</span><span class="o">*</span>rho_cb
-<a name="ln-81"></a>    rho[<span class="mi">0</span>] <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span>rho_cb[<span class="mi">0</span>]
-<a name="ln-82"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">1</span>,<span class="nb">n_elements</span>(rho_cb)<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-83"></a>        rho[i] <span class="o">=</span> rho_cb[i] <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span>(rho_cb[i] <span class="o">-</span> rho_cb[i<span class="o">-</span><span class="mi">1</span>])
-<a name="ln-84"></a>    <span class="k">endfor</span>
-<a name="ln-85"></a>
-<a name="ln-86"></a>    <span class="k">if</span> <span class="nb">total</span>(<span class="nb">strmatch</span>(<span class="nb">tag_names</span>(zz),<span class="s1">&#39;OMEGA&#39;</span>,<span class="o">/</span>fold_case)) <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-87"></a>      warn,<span class="s1">&#39;OMEGA not found in TRANSP file. Assuming no plasma rotation&#39;</span>
-<a name="ln-88"></a>      transp_omega<span class="o">=</span><span class="mf">0.0</span><span class="o">*</span>transp_te
-<a name="ln-89"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-90"></a>      transp_omega <span class="o">=</span> zz.omega[<span class="o">*</span>,idx]  ; rad<span class="o">/</span>s
-<a name="ln-91"></a>    <span class="k">endelse</span>
-<a name="ln-92"></a>
-<a name="ln-93"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(dn0out) <span class="k">then</span> dn0out <span class="o">=</span> transp_nn[<span class="o">-</span><span class="mi">1</span>]
-<a name="ln-94"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(scrapeoff) <span class="k">then</span> scrapeoff <span class="o">=</span> <span class="mf">0.0</span>
-<a name="ln-95"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(rho_scrapeoff) <span class="k">then</span> rho_scrapeoff <span class="o">=</span> <span class="mf">0.1</span>
-<a name="ln-96"></a>
-<a name="ln-97"></a>    <span class="k">if</span> scrapeoff <span class="k">gt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-98"></a>        drho <span class="o">=</span> <span class="nb">abs</span>(rho[<span class="o">-</span><span class="mi">1</span>] <span class="o">-</span> rho[<span class="o">-</span><span class="mi">2</span>])
-<a name="ln-99"></a>        rho_sc <span class="o">=</span> rho[<span class="o">-</span><span class="mi">1</span>] <span class="o">+</span> drho<span class="o">*</span>(<span class="nb">dindgen</span>(<span class="nb">ceil</span>(rho_scrapeoff<span class="o">/</span>drho)) <span class="o">+</span> <span class="mi">1</span>)
-<a name="ln-100"></a>        sc <span class="o">=</span> <span class="nb">exp</span>(<span class="o">-</span>(rho_sc <span class="o">-</span> rho[<span class="o">-</span><span class="mi">1</span>])<span class="o">/</span>scrapeoff)
-<a name="ln-101"></a>        transp_ne   <span class="o">=</span> [transp_ne,transp_ne[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-102"></a>        transp_nimp <span class="o">=</span> [transp_nimp,transp_nimp[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-103"></a>        transp_nh   <span class="o">=</span> [transp_nh,transp_nh[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-104"></a>        transp_nd   <span class="o">=</span> [transp_nd,transp_nd[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-105"></a>        transp_nt   <span class="o">=</span> [transp_nt,transp_nt[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-106"></a>        transp_te   <span class="o">=</span> [transp_te,transp_te[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-107"></a>        transp_ti   <span class="o">=</span> [transp_ti,transp_ti[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-108"></a>        transp_nn   <span class="o">=</span> [transp_nn,<span class="mi">0</span><span class="o">*</span>sc <span class="o">+</span> dn0out]
-<a name="ln-109"></a>        transp_zeff <span class="o">=</span> [transp_zeff, (transp_zeff[<span class="o">-</span><span class="mi">1</span>]<span class="o">-</span><span class="mi">1</span>)<span class="o">*</span>sc <span class="o">+</span> <span class="mi">1</span>]
-<a name="ln-110"></a>        transp_omega <span class="o">=</span> [transp_omega,transp_omega[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
-<a name="ln-111"></a>        rho <span class="o">=</span> [rho, rho_sc]
-<a name="ln-112"></a>    <span class="k">endif</span>
-<a name="ln-113"></a>
-<a name="ln-114"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(doplot) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-115"></a>        !p.charsize<span class="o">=</span><span class="mi">2</span> &amp; !x.minor<span class="o">=-</span><span class="mi">1</span> &amp; !y.minor<span class="o">=-</span><span class="mi">1</span>
-<a name="ln-116"></a>       	<span class="nb">loadct</span>, <span class="mi">13</span>  &amp; !p.color<span class="o">=</span><span class="mi">100</span>  &amp; !p.<span class="nb">multi</span><span class="o">=</span>[<span class="mi">0</span>,<span class="mi">2</span>,<span class="mi">3</span>]  &amp;  !p.psym<span class="o">=</span><span class="mi">1</span>  &amp; !p.thick<span class="o">=</span><span class="mi">1</span>
-<a name="ln-117"></a>    	<span class="nb">device</span>, decompose<span class="o">=</span><span class="mi">0</span>
-<a name="ln-118"></a>    	<span class="nb">window</span>, <span class="mi">0</span>, retain<span class="o">=</span><span class="mi">2</span>, xs<span class="o">=</span><span class="mi">600</span>, ys<span class="o">=</span><span class="mi">800</span>
-<a name="ln-119"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(sne) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-120"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_ne, sne)
-<a name="ln-121"></a>           <span class="nb">plot</span>,  x, transp_ne, title<span class="o">=</span><span class="s1">&#39;Ne&#39;</span>
-<a name="ln-122"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-123"></a>           transp_ne <span class="o">=</span> z
-<a name="ln-124"></a>        <span class="k">end</span>
-<a name="ln-125"></a>
-<a name="ln-126"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(simp) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-127"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_nimp, simp)
-<a name="ln-128"></a>           <span class="nb">plot</span>,  x, transp_nimp, title<span class="o">=</span><span class="s1">&#39;Nimp&#39;</span>
-<a name="ln-129"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-130"></a>           transp_nimp <span class="o">=</span> z
-<a name="ln-131"></a>        <span class="k">end</span>
-<a name="ln-132"></a>
-<a name="ln-133"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(ste) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-134"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_te, ste)
-<a name="ln-135"></a>           <span class="nb">plot</span>,  x, transp_te, title<span class="o">=</span><span class="s1">&#39;Te&#39;</span>
-<a name="ln-136"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-137"></a>           transp_te <span class="o">=</span> z
-<a name="ln-138"></a>        <span class="k">end</span>
-<a name="ln-139"></a>
-<a name="ln-140"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(sti) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-141"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_ti, sti)
-<a name="ln-142"></a>           <span class="nb">plot</span>,  x, transp_ti, title<span class="o">=</span><span class="s1">&#39;Ti&#39;</span>
-<a name="ln-143"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-144"></a>           transp_ti <span class="o">=</span> z
-<a name="ln-145"></a>        <span class="k">end</span>
-<a name="ln-146"></a>
-<a name="ln-147"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(srot) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-148"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_omega, srot)
-<a name="ln-149"></a>           <span class="nb">plot</span>,  x, transp_omega, title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
-<a name="ln-150"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-151"></a>           transp_omega <span class="o">=</span> z
-<a name="ln-152"></a>        <span class="k">end</span>
-<a name="ln-153"></a>
-<a name="ln-154"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(snn) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-155"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_nn, snn)
-<a name="ln-156"></a>           <span class="nb">plot</span>,  x, transp_nn, title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
-<a name="ln-157"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
-<a name="ln-158"></a>           transp_nn <span class="o">=</span> z
-<a name="ln-159"></a>        <span class="k">end</span>
-<a name="ln-160"></a>    	!p.color<span class="o">=</span><span class="mi">220</span>  &amp; !p.<span class="nb">multi</span><span class="o">=</span>[<span class="mi">0</span>,<span class="mi">2</span>,<span class="mi">3</span>]  &amp;  !p.psym<span class="o">=</span><span class="mi">0</span>  &amp; !p.thick<span class="o">=</span><span class="mi">2</span>
-<a name="ln-161"></a>    	<span class="nb">window</span>, <span class="mi">1</span>, retain<span class="o">=</span><span class="mi">2</span>, xs<span class="o">=</span><span class="mi">600</span>, ys<span class="o">=</span><span class="mi">800</span>
-<a name="ln-162"></a>
-<a name="ln-163"></a>    	<span class="nb">plot</span>, x, transp_ne,                  ytitle<span class="o">=</span><span class="s1">&#39; x E13 cm-3&#39;</span>, title<span class="o">=</span><span class="s1">&#39;Ne  &#39;</span>
-<a name="ln-164"></a>    	<span class="nb">plot</span>, x, transp_nimp,                ytitle<span class="o">=</span> <span class="s1">&#39;x E13 cm-3&#39;</span>, title<span class="o">=</span><span class="s1">&#39;Nimp&#39;</span>
-<a name="ln-165"></a>    	<span class="nb">plot</span>, x, transp_te,                  ytitle<span class="o">=</span><span class="s1">&#39; keV&#39;</span>,        title<span class="o">=</span><span class="s1">&#39;Te&#39;</span>
-<a name="ln-166"></a>    	<span class="nb">plot</span>, x, transp_ti,    xtitle<span class="o">=</span><span class="s1">&#39;rho&#39;</span>, ytitle<span class="o">=</span><span class="s1">&#39; keV&#39;</span>,        title<span class="o">=</span><span class="s1">&#39;Ti&#39;</span>
-<a name="ln-167"></a>    	<span class="nb">plot</span>, x, transp_omega, xtitle<span class="o">=</span><span class="s1">&#39;rho&#39;</span>, ytitle<span class="o">=</span><span class="s1">&#39;rad/s&#39;</span>,       title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
-<a name="ln-168"></a>        <span class="nb">plot</span>, x, transp_nn,                  ytitle<span class="o">=</span><span class="s1">&#39;cm-3&#39;</span>,	   title<span class="o">=</span><span class="s1">&#39;Nn&#39;</span>
-<a name="ln-169"></a>    <span class="k">endif</span>
-<a name="ln-170"></a>
-<a name="ln-171"></a>    <span class="nb">profiles</span> <span class="o">=</span> {rho<span class="o">:</span>rho, $
-<a name="ln-172"></a>                impurity_charge<span class="o">:</span>impurity_charge,$
-<a name="ln-173"></a>                dene<span class="o">:</span>transp_ne <span class="o">&gt;</span> <span class="mf">0.0</span>, $
-<a name="ln-174"></a>                denimp<span class="o">:</span>transp_nimp <span class="o">&gt;</span> <span class="mf">0.0</span>, $
-<a name="ln-175"></a>		denn<span class="o">:</span>transp_nn <span class="o">&gt;</span> <span class="mf">0.0</span>, $
-<a name="ln-176"></a>                te<span class="o">:</span>transp_te <span class="o">&gt;</span> <span class="mf">0.0</span>, $
-<a name="ln-177"></a>                ti<span class="o">:</span>transp_ti <span class="o">&gt;</span> <span class="mf">0.0</span>, $
-<a name="ln-178"></a>                zeff<span class="o">:</span>transp_zeff <span class="o">&gt;</span> <span class="mf">1.0</span>, $
-<a name="ln-179"></a>                omega<span class="o">:</span>transp_omega}
-<a name="ln-180"></a>
-<a name="ln-181"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">0</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-182"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;denh&quot;</span>,transp_nh<span class="o">&gt;</span><span class="mf">0.0</span>)
-<a name="ln-183"></a>    <span class="k">endif</span>
-<a name="ln-184"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">1</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-185"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;dend&quot;</span>,transp_nd<span class="o">&gt;</span><span class="mf">0.0</span>)
-<a name="ln-186"></a>    <span class="k">endif</span>
-<a name="ln-187"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">2</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-188"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;dent&quot;</span>,transp_nt<span class="o">&gt;</span><span class="mf">0.0</span>)
-<a name="ln-189"></a>    <span class="k">endif</span>
-<a name="ln-190"></a>
-<a name="ln-191"></a><span class="c1">    ;; Interpolate onto r-z grid</span>
-<a name="ln-192"></a>    dene<span class="o">=</span><span class="nb">interpol</span>(transp_ne,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-193"></a>    denimp<span class="o">=</span><span class="nb">interpol</span>(transp_nimp,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-194"></a>    denh<span class="o">=</span><span class="nb">interpol</span>(transp_nh,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-195"></a>    dend<span class="o">=</span><span class="nb">interpol</span>(transp_nd,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-196"></a>    dent<span class="o">=</span><span class="nb">interpol</span>(transp_nt,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-197"></a>    denn<span class="o">=</span>(<span class="mf">10.d0</span><span class="o">^</span><span class="nb">interpol</span>(<span class="nb">alog10</span>(transp_nn),rho,rhogrid)) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-198"></a>    te<span class="o">=</span><span class="nb">interpol</span>(transp_te,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-199"></a>    ti<span class="o">=</span><span class="nb">interpol</span>(transp_ti,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
-<a name="ln-200"></a>    zeff<span class="o">=</span> <span class="nb">interpol</span>(transp_zeff,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">1.0</span>
-<a name="ln-201"></a>    vt <span class="o">=</span> <span class="nb">double</span>(grid.r2d<span class="o">*</span><span class="nb">interpol</span>(transp_omega,rho,rhogrid))
-<a name="ln-202"></a>    vr <span class="o">=</span> <span class="nb">double</span>(<span class="nb">replicate</span>(<span class="mf">0.0</span>,grid.nr,grid.nz))
-<a name="ln-203"></a>    vz <span class="o">=</span> <span class="nb">double</span>(<span class="nb">replicate</span>(<span class="mf">0.0</span>,grid.nr,grid.nz))
-<a name="ln-204"></a>    max_rho <span class="o">=</span> <span class="nb">max</span>(<span class="nb">abs</span>(rho))
-<a name="ln-205"></a>
-<a name="ln-206"></a>    s <span class="o">=</span> <span class="nb">size</span>(rhogrid,<span class="o">/</span>dim)
-<a name="ln-207"></a>    mask <span class="o">=</span> <span class="nb">intarr</span>(s[<span class="mi">0</span>],s[<span class="mi">1</span>])
-<a name="ln-208"></a>    w<span class="o">=</span><span class="nb">where</span>(rhogrid <span class="k">le</span> max_rho) ;<span class="nb">where</span> we have <span class="nb">profiles</span>
-<a name="ln-209"></a>    mask[w] <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-210"></a>
-<a name="ln-211"></a>    deni <span class="o">=</span> <span class="nb">dblarr</span>(<span class="mi">3</span>,s[<span class="mi">0</span>],s[<span class="mi">1</span>])
-<a name="ln-212"></a>    deni[<span class="mi">0</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> denh
-<a name="ln-213"></a>    deni[<span class="mi">1</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> dend
-<a name="ln-214"></a>    deni[<span class="mi">2</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> dent
-<a name="ln-215"></a>    ai <span class="o">=</span> [<span class="mf">1.007276466879d0</span>, <span class="mf">2.013553212745d0</span>,<span class="mf">3.01550071632d0</span>]
-<a name="ln-216"></a>
-<a name="ln-217"></a><span class="c1">    ;;SAVE IN PROFILES STRUCTURE</span>
-<a name="ln-218"></a>    plasma<span class="o">=</span>{data_source<span class="o">:</span><span class="nb">file_expand_path</span>(filename),time<span class="o">:</span>time, mask<span class="o">:</span>mask, impurity_charge<span class="o">:</span>impurity_charge, $
-<a name="ln-219"></a>            nthermal<span class="o">:</span><span class="nb">fix</span>(<span class="nb">n_elements</span>(w_thermal)), species_mass<span class="o">:</span>ai[w_thermal], dene<span class="o">:</span>dene,deni<span class="o">:</span>deni[w_thermal,<span class="o">*</span>,<span class="o">*</span>], $
-<a name="ln-220"></a>            denimp<span class="o">:</span>denimp,denn<span class="o">:</span>denn,te<span class="o">:</span>te,ti<span class="o">:</span>ti,vr<span class="o">:</span>vr,vt<span class="o">:</span>vt,vz<span class="o">:</span>vz,zeff<span class="o">:</span>zeff}
-<a name="ln-221"></a>
-<a name="ln-222"></a>    <span class="nb">return</span>,plasma
-<a name="ln-223"></a>
-<a name="ln-224"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> extract_transp_plasma,filename, intime, grid, rhogrid, $
+<a id="ln-2" name="ln-2"></a>            doplot<span class="o">=</span>doplot, <span class="nb">profiles</span><span class="o">=</span><span class="nb">profiles</span>, dn0out<span class="o">=</span>dn0out, $
+<a id="ln-3" name="ln-3"></a>            scrapeoff<span class="o">=</span>scrapeoff, rho_scrapeoff<span class="o">=</span>rho_scrapeoff,$
+<a id="ln-4" name="ln-4"></a>            sne<span class="o">=</span>sne, ste<span class="o">=</span>ste, sti<span class="o">=</span>sti, simp<span class="o">=</span>simp, srot<span class="o">=</span>srot, snn<span class="o">=</span>snn
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+#extract_transp_plasma</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+Extracts `plasma` structure from a TRANSP run</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+***</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+##Arguments</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+    **filename**: TRANSP output file e.g. [TRANSP_RUNID].CDF</span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+    **intime**: Time of interest [s]</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+    **grid**: Interpolation grid</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+    **rhogrid**: sqrt(normalized torodial flux) mapped onto the interpolation grid</span>
+<a id="ln-16" name="ln-16"></a><span class="c1">    ;+</span>
+<a id="ln-17" name="ln-17"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a id="ln-18" name="ln-18"></a><span class="c1">    ;+    **doplot**: Plot profiles</span>
+<a id="ln-19" name="ln-19"></a><span class="c1">    ;+</span>
+<a id="ln-20" name="ln-20"></a><span class="c1">    ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho</span>
+<a id="ln-21" name="ln-21"></a><span class="c1">    ;+</span>
+<a id="ln-22" name="ln-22"></a><span class="c1">    ;+    **s(ne|ni|te|ti|imp|rot|nn)**: Smooth profiles</span>
+<a id="ln-23" name="ln-23"></a><span class="c1">    ;+</span>
+<a id="ln-24" name="ln-24"></a><span class="c1">    ;+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist</span>
+<a id="ln-25" name="ln-25"></a><span class="c1">    ;+</span>
+<a id="ln-26" name="ln-26"></a><span class="c1">    ;+    **scrapeoff**: scrapeoff decay length</span>
+<a id="ln-27" name="ln-27"></a><span class="c1">    ;+</span>
+<a id="ln-28" name="ln-28"></a><span class="c1">    ;+    **rho_scrapeoff**: scrapeoff length, default = 0.1</span>
+<a id="ln-29" name="ln-29"></a><span class="c1">    ;+</span>
+<a id="ln-30" name="ln-30"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-31" name="ln-31"></a><span class="c1">    ;+```idl</span>
+<a id="ln-32" name="ln-32"></a><span class="c1">    ;+IDL&gt; plasma = extract_transp_plasma(&quot;./142332H01.CDF&quot;, 1.2, grid, rho)</span>
+<a id="ln-33" name="ln-33"></a><span class="c1">    ;+```</span>
+<a id="ln-34" name="ln-34"></a>
+<a id="ln-35" name="ln-35"></a>    var_list <span class="o">=</span> [<span class="s2">&quot;X&quot;</span>,<span class="s2">&quot;TRFLX&quot;</span>,<span class="s2">&quot;TFLUX&quot;</span>,<span class="s2">&quot;TIME&quot;</span>,<span class="s2">&quot;NE&quot;</span>,<span class="s2">&quot;NH&quot;</span>,<span class="s2">&quot;ND&quot;</span>,<span class="s2">&quot;NT&quot;</span>,<span class="s2">&quot;NIMP&quot;</span>,<span class="s2">&quot;TE&quot;</span>,<span class="s2">&quot;TI&quot;</span>,<span class="s2">&quot;ZEFFI&quot;</span>,<span class="s2">&quot;OMEGA&quot;</span>,<span class="s2">&quot;DN0WD&quot;</span>,<span class="s2">&quot;XZIMP&quot;</span>]
+<a id="ln-36" name="ln-36"></a>
+<a id="ln-37" name="ln-37"></a>    zz <span class="o">=</span> read_ncdf(filename,vars <span class="o">=</span> var_list)
+<a id="ln-38" name="ln-38"></a>    tn <span class="o">=</span> <span class="nb">tag_names</span>(zz)
+<a id="ln-39" name="ln-39"></a>
+<a id="ln-40" name="ln-40"></a>    t <span class="o">=</span> zz.time
+<a id="ln-41" name="ln-41"></a>    dummy<span class="o">=</span><span class="nb">min</span>( <span class="nb">abs</span>(t<span class="o">-</span>intime), idx)
+<a id="ln-42" name="ln-42"></a>    time <span class="o">=</span> <span class="nb">double</span>(t[idx])
+<a id="ln-43" name="ln-43"></a>
+<a id="ln-44" name="ln-44"></a>    <span class="nb">print</span>, <span class="s1">&#39; * Selecting profiles at :&#39;</span>, time, <span class="s1">&#39; s&#39;</span> ;pick the closest timeslice to TOI
+<a id="ln-45" name="ln-45"></a>
+<a id="ln-46" name="ln-46"></a>    impurity_charge <span class="o">=</span> <span class="nb">fix</span>(<span class="nb">ceil</span>(<span class="nb">max</span>(zz.xzimp)))
+<a id="ln-47" name="ln-47"></a><span class="c1">    ; Densities</span>
+<a id="ln-48" name="ln-48"></a>    transp_ne <span class="o">=</span> zz.ne_[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
+<a id="ln-49" name="ln-49"></a>    transp_nimp <span class="o">=</span> zz.nimp[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
+<a id="ln-50" name="ln-50"></a>    transp_nn <span class="o">=</span> zz.dn0wd[<span class="o">*</span>,idx] ;cm<span class="o">^-</span><span class="mi">3</span>
+<a id="ln-51" name="ln-51"></a>    w_thermal <span class="o">=</span> []
+<a id="ln-52" name="ln-52"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;NH&quot;</span>, nmatch)
+<a id="ln-53" name="ln-53"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-54" name="ln-54"></a>        transp_nh <span class="o">=</span> zz.nh[<span class="o">*</span>,idx]
+<a id="ln-55" name="ln-55"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">0</span>]
+<a id="ln-56" name="ln-56"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-57" name="ln-57"></a>        transp_nh <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
+<a id="ln-58" name="ln-58"></a>    <span class="k">endelse</span>
+<a id="ln-59" name="ln-59"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;ND&quot;</span>, nmatch)
+<a id="ln-60" name="ln-60"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-61" name="ln-61"></a>        transp_nd <span class="o">=</span> zz.nd[<span class="o">*</span>,idx]
+<a id="ln-62" name="ln-62"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">1</span>]
+<a id="ln-63" name="ln-63"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-64" name="ln-64"></a>        transp_nd <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
+<a id="ln-65" name="ln-65"></a>    <span class="k">endelse</span>
+<a id="ln-66" name="ln-66"></a>    _ <span class="o">=</span> <span class="nb">where</span>(tn <span class="k">eq</span> <span class="s2">&quot;NT&quot;</span>, nmatch)
+<a id="ln-67" name="ln-67"></a>    <span class="k">if</span> nmatch <span class="k">eq</span> <span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-68" name="ln-68"></a>        transp_nt <span class="o">=</span> zz.nt[<span class="o">*</span>,idx]
+<a id="ln-69" name="ln-69"></a>        w_thermal <span class="o">=</span> [w_thermal, <span class="mi">2</span>]
+<a id="ln-70" name="ln-70"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-71" name="ln-71"></a>        transp_nt <span class="o">=</span> transp_ne<span class="o">*</span><span class="mi">0</span>
+<a id="ln-72" name="ln-72"></a>    <span class="k">endelse</span>
+<a id="ln-73" name="ln-73"></a>
+<a id="ln-74" name="ln-74"></a>    transp_te <span class="o">=</span> zz.te[<span class="o">*</span>,idx]<span class="o">*</span><span class="mf">1.d-3</span>  ; kev
+<a id="ln-75" name="ln-75"></a>    transp_ti <span class="o">=</span> zz.ti[<span class="o">*</span>,idx]<span class="o">*</span><span class="mf">1.d-3</span>   ; kev
+<a id="ln-76" name="ln-76"></a>    transp_zeff <span class="o">=</span> zz.zeffi[<span class="o">*</span>,idx]
+<a id="ln-77" name="ln-77"></a>
+<a id="ln-78" name="ln-78"></a>    rho_cb <span class="o">=</span> <span class="nb">sqrt</span>(zz.trflx[<span class="o">*</span>,idx]<span class="o">/</span>zz.tflux[idx])
+<a id="ln-79" name="ln-79"></a><span class="c1">    ; center each rho b/c toroidal flux is at cell boundary</span>
+<a id="ln-80" name="ln-80"></a>    rho <span class="o">=</span> <span class="mf">0.d0</span><span class="o">*</span>rho_cb
+<a id="ln-81" name="ln-81"></a>    rho[<span class="mi">0</span>] <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span>rho_cb[<span class="mi">0</span>]
+<a id="ln-82" name="ln-82"></a>    <span class="k">for</span> i<span class="o">=</span><span class="mi">1</span>,<span class="nb">n_elements</span>(rho_cb)<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-83" name="ln-83"></a>        rho[i] <span class="o">=</span> rho_cb[i] <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span>(rho_cb[i] <span class="o">-</span> rho_cb[i<span class="o">-</span><span class="mi">1</span>])
+<a id="ln-84" name="ln-84"></a>    <span class="k">endfor</span>
+<a id="ln-85" name="ln-85"></a>
+<a id="ln-86" name="ln-86"></a>    <span class="k">if</span> <span class="nb">total</span>(<span class="nb">strmatch</span>(<span class="nb">tag_names</span>(zz),<span class="s1">&#39;OMEGA&#39;</span>,<span class="o">/</span>fold_case)) <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-87" name="ln-87"></a>      warn,<span class="s1">&#39;OMEGA not found in TRANSP file. Assuming no plasma rotation&#39;</span>
+<a id="ln-88" name="ln-88"></a>      transp_omega<span class="o">=</span><span class="mf">0.0</span><span class="o">*</span>transp_te
+<a id="ln-89" name="ln-89"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-90" name="ln-90"></a>      transp_omega <span class="o">=</span> zz.omega[<span class="o">*</span>,idx]  ; rad<span class="o">/</span>s
+<a id="ln-91" name="ln-91"></a>    <span class="k">endelse</span>
+<a id="ln-92" name="ln-92"></a>
+<a id="ln-93" name="ln-93"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(dn0out) <span class="k">then</span> dn0out <span class="o">=</span> transp_nn[<span class="o">-</span><span class="mi">1</span>]
+<a id="ln-94" name="ln-94"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(scrapeoff) <span class="k">then</span> scrapeoff <span class="o">=</span> <span class="mf">0.0</span>
+<a id="ln-95" name="ln-95"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(rho_scrapeoff) <span class="k">then</span> rho_scrapeoff <span class="o">=</span> <span class="mf">0.1</span>
+<a id="ln-96" name="ln-96"></a>
+<a id="ln-97" name="ln-97"></a>    <span class="k">if</span> scrapeoff <span class="k">gt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-98" name="ln-98"></a>        drho <span class="o">=</span> <span class="nb">abs</span>(rho[<span class="o">-</span><span class="mi">1</span>] <span class="o">-</span> rho[<span class="o">-</span><span class="mi">2</span>])
+<a id="ln-99" name="ln-99"></a>        rho_sc <span class="o">=</span> rho[<span class="o">-</span><span class="mi">1</span>] <span class="o">+</span> drho<span class="o">*</span>(<span class="nb">dindgen</span>(<span class="nb">ceil</span>(rho_scrapeoff<span class="o">/</span>drho)) <span class="o">+</span> <span class="mi">1</span>)
+<a id="ln-100" name="ln-100"></a>        sc <span class="o">=</span> <span class="nb">exp</span>(<span class="o">-</span>(rho_sc <span class="o">-</span> rho[<span class="o">-</span><span class="mi">1</span>])<span class="o">/</span>scrapeoff)
+<a id="ln-101" name="ln-101"></a>        transp_ne   <span class="o">=</span> [transp_ne,transp_ne[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-102" name="ln-102"></a>        transp_nimp <span class="o">=</span> [transp_nimp,transp_nimp[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-103" name="ln-103"></a>        transp_nh   <span class="o">=</span> [transp_nh,transp_nh[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-104" name="ln-104"></a>        transp_nd   <span class="o">=</span> [transp_nd,transp_nd[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-105" name="ln-105"></a>        transp_nt   <span class="o">=</span> [transp_nt,transp_nt[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-106" name="ln-106"></a>        transp_te   <span class="o">=</span> [transp_te,transp_te[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-107" name="ln-107"></a>        transp_ti   <span class="o">=</span> [transp_ti,transp_ti[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-108" name="ln-108"></a>        transp_nn   <span class="o">=</span> [transp_nn,<span class="mi">0</span><span class="o">*</span>sc <span class="o">+</span> dn0out]
+<a id="ln-109" name="ln-109"></a>        transp_zeff <span class="o">=</span> [transp_zeff, (transp_zeff[<span class="o">-</span><span class="mi">1</span>]<span class="o">-</span><span class="mi">1</span>)<span class="o">*</span>sc <span class="o">+</span> <span class="mi">1</span>]
+<a id="ln-110" name="ln-110"></a>        transp_omega <span class="o">=</span> [transp_omega,transp_omega[<span class="o">-</span><span class="mi">1</span>]<span class="o">*</span>sc]
+<a id="ln-111" name="ln-111"></a>        rho <span class="o">=</span> [rho, rho_sc]
+<a id="ln-112" name="ln-112"></a>    <span class="k">endif</span>
+<a id="ln-113" name="ln-113"></a>
+<a id="ln-114" name="ln-114"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(doplot) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-115" name="ln-115"></a>        !p.charsize<span class="o">=</span><span class="mi">2</span> &amp; !x.minor<span class="o">=-</span><span class="mi">1</span> &amp; !y.minor<span class="o">=-</span><span class="mi">1</span>
+<a id="ln-116" name="ln-116"></a>       	<span class="nb">loadct</span>, <span class="mi">13</span>  &amp; !p.color<span class="o">=</span><span class="mi">100</span>  &amp; !p.<span class="nb">multi</span><span class="o">=</span>[<span class="mi">0</span>,<span class="mi">2</span>,<span class="mi">3</span>]  &amp;  !p.psym<span class="o">=</span><span class="mi">1</span>  &amp; !p.thick<span class="o">=</span><span class="mi">1</span>
+<a id="ln-117" name="ln-117"></a>    	<span class="nb">device</span>, decompose<span class="o">=</span><span class="mi">0</span>
+<a id="ln-118" name="ln-118"></a>    	<span class="nb">window</span>, <span class="mi">0</span>, retain<span class="o">=</span><span class="mi">2</span>, xs<span class="o">=</span><span class="mi">600</span>, ys<span class="o">=</span><span class="mi">800</span>
+<a id="ln-119" name="ln-119"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(sne) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-120" name="ln-120"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_ne, sne)
+<a id="ln-121" name="ln-121"></a>           <span class="nb">plot</span>,  x, transp_ne, title<span class="o">=</span><span class="s1">&#39;Ne&#39;</span>
+<a id="ln-122" name="ln-122"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-123" name="ln-123"></a>           transp_ne <span class="o">=</span> z
+<a id="ln-124" name="ln-124"></a>        <span class="k">end</span>
+<a id="ln-125" name="ln-125"></a>
+<a id="ln-126" name="ln-126"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(simp) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-127" name="ln-127"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_nimp, simp)
+<a id="ln-128" name="ln-128"></a>           <span class="nb">plot</span>,  x, transp_nimp, title<span class="o">=</span><span class="s1">&#39;Nimp&#39;</span>
+<a id="ln-129" name="ln-129"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-130" name="ln-130"></a>           transp_nimp <span class="o">=</span> z
+<a id="ln-131" name="ln-131"></a>        <span class="k">end</span>
+<a id="ln-132" name="ln-132"></a>
+<a id="ln-133" name="ln-133"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(ste) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-134" name="ln-134"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_te, ste)
+<a id="ln-135" name="ln-135"></a>           <span class="nb">plot</span>,  x, transp_te, title<span class="o">=</span><span class="s1">&#39;Te&#39;</span>
+<a id="ln-136" name="ln-136"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-137" name="ln-137"></a>           transp_te <span class="o">=</span> z
+<a id="ln-138" name="ln-138"></a>        <span class="k">end</span>
+<a id="ln-139" name="ln-139"></a>
+<a id="ln-140" name="ln-140"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(sti) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-141" name="ln-141"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_ti, sti)
+<a id="ln-142" name="ln-142"></a>           <span class="nb">plot</span>,  x, transp_ti, title<span class="o">=</span><span class="s1">&#39;Ti&#39;</span>
+<a id="ln-143" name="ln-143"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-144" name="ln-144"></a>           transp_ti <span class="o">=</span> z
+<a id="ln-145" name="ln-145"></a>        <span class="k">end</span>
+<a id="ln-146" name="ln-146"></a>
+<a id="ln-147" name="ln-147"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(srot) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-148" name="ln-148"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_omega, srot)
+<a id="ln-149" name="ln-149"></a>           <span class="nb">plot</span>,  x, transp_omega, title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
+<a id="ln-150" name="ln-150"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-151" name="ln-151"></a>           transp_omega <span class="o">=</span> z
+<a id="ln-152" name="ln-152"></a>        <span class="k">end</span>
+<a id="ln-153" name="ln-153"></a>
+<a id="ln-154" name="ln-154"></a>        <span class="k">if</span> <span class="nb">keyword_set</span>(snn) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-155" name="ln-155"></a>           z <span class="o">=</span> <span class="nb">smooth</span>(transp_nn, snn)
+<a id="ln-156" name="ln-156"></a>           <span class="nb">plot</span>,  x, transp_nn, title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
+<a id="ln-157" name="ln-157"></a>           <span class="nb">oplot</span>, x, z, psym<span class="o">=</span><span class="mi">0</span>, color<span class="o">=</span><span class="mi">100</span>
+<a id="ln-158" name="ln-158"></a>           transp_nn <span class="o">=</span> z
+<a id="ln-159" name="ln-159"></a>        <span class="k">end</span>
+<a id="ln-160" name="ln-160"></a>    	!p.color<span class="o">=</span><span class="mi">220</span>  &amp; !p.<span class="nb">multi</span><span class="o">=</span>[<span class="mi">0</span>,<span class="mi">2</span>,<span class="mi">3</span>]  &amp;  !p.psym<span class="o">=</span><span class="mi">0</span>  &amp; !p.thick<span class="o">=</span><span class="mi">2</span>
+<a id="ln-161" name="ln-161"></a>    	<span class="nb">window</span>, <span class="mi">1</span>, retain<span class="o">=</span><span class="mi">2</span>, xs<span class="o">=</span><span class="mi">600</span>, ys<span class="o">=</span><span class="mi">800</span>
+<a id="ln-162" name="ln-162"></a>
+<a id="ln-163" name="ln-163"></a>    	<span class="nb">plot</span>, x, transp_ne,                  ytitle<span class="o">=</span><span class="s1">&#39; x E13 cm-3&#39;</span>, title<span class="o">=</span><span class="s1">&#39;Ne  &#39;</span>
+<a id="ln-164" name="ln-164"></a>    	<span class="nb">plot</span>, x, transp_nimp,                ytitle<span class="o">=</span> <span class="s1">&#39;x E13 cm-3&#39;</span>, title<span class="o">=</span><span class="s1">&#39;Nimp&#39;</span>
+<a id="ln-165" name="ln-165"></a>    	<span class="nb">plot</span>, x, transp_te,                  ytitle<span class="o">=</span><span class="s1">&#39; keV&#39;</span>,        title<span class="o">=</span><span class="s1">&#39;Te&#39;</span>
+<a id="ln-166" name="ln-166"></a>    	<span class="nb">plot</span>, x, transp_ti,    xtitle<span class="o">=</span><span class="s1">&#39;rho&#39;</span>, ytitle<span class="o">=</span><span class="s1">&#39; keV&#39;</span>,        title<span class="o">=</span><span class="s1">&#39;Ti&#39;</span>
+<a id="ln-167" name="ln-167"></a>    	<span class="nb">plot</span>, x, transp_omega, xtitle<span class="o">=</span><span class="s1">&#39;rho&#39;</span>, ytitle<span class="o">=</span><span class="s1">&#39;rad/s&#39;</span>,       title<span class="o">=</span><span class="s1">&#39;Omega&#39;</span>
+<a id="ln-168" name="ln-168"></a>        <span class="nb">plot</span>, x, transp_nn,                  ytitle<span class="o">=</span><span class="s1">&#39;cm-3&#39;</span>,	   title<span class="o">=</span><span class="s1">&#39;Nn&#39;</span>
+<a id="ln-169" name="ln-169"></a>    <span class="k">endif</span>
+<a id="ln-170" name="ln-170"></a>
+<a id="ln-171" name="ln-171"></a>    <span class="nb">profiles</span> <span class="o">=</span> {rho<span class="o">:</span>rho, $
+<a id="ln-172" name="ln-172"></a>                impurity_charge<span class="o">:</span>impurity_charge,$
+<a id="ln-173" name="ln-173"></a>                dene<span class="o">:</span>transp_ne <span class="o">&gt;</span> <span class="mf">0.0</span>, $
+<a id="ln-174" name="ln-174"></a>                denimp<span class="o">:</span>transp_nimp <span class="o">&gt;</span> <span class="mf">0.0</span>, $
+<a id="ln-175" name="ln-175"></a>		denn<span class="o">:</span>transp_nn <span class="o">&gt;</span> <span class="mf">0.0</span>, $
+<a id="ln-176" name="ln-176"></a>                te<span class="o">:</span>transp_te <span class="o">&gt;</span> <span class="mf">0.0</span>, $
+<a id="ln-177" name="ln-177"></a>                ti<span class="o">:</span>transp_ti <span class="o">&gt;</span> <span class="mf">0.0</span>, $
+<a id="ln-178" name="ln-178"></a>                zeff<span class="o">:</span>transp_zeff <span class="o">&gt;</span> <span class="mf">1.0</span>, $
+<a id="ln-179" name="ln-179"></a>                omega<span class="o">:</span>transp_omega}
+<a id="ln-180" name="ln-180"></a>
+<a id="ln-181" name="ln-181"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">0</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-182" name="ln-182"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;denh&quot;</span>,transp_nh<span class="o">&gt;</span><span class="mf">0.0</span>)
+<a id="ln-183" name="ln-183"></a>    <span class="k">endif</span>
+<a id="ln-184" name="ln-184"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">1</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-185" name="ln-185"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;dend&quot;</span>,transp_nd<span class="o">&gt;</span><span class="mf">0.0</span>)
+<a id="ln-186" name="ln-186"></a>    <span class="k">endif</span>
+<a id="ln-187" name="ln-187"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="mi">2</span> <span class="k">eq</span> w_thermal) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-188" name="ln-188"></a>        <span class="nb">profiles</span> <span class="o">=</span> <span class="nb">create_struct</span>(<span class="nb">profiles</span>,<span class="s2">&quot;dent&quot;</span>,transp_nt<span class="o">&gt;</span><span class="mf">0.0</span>)
+<a id="ln-189" name="ln-189"></a>    <span class="k">endif</span>
+<a id="ln-190" name="ln-190"></a>
+<a id="ln-191" name="ln-191"></a><span class="c1">    ;; Interpolate onto r-z grid</span>
+<a id="ln-192" name="ln-192"></a>    dene<span class="o">=</span><span class="nb">interpol</span>(transp_ne,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-193" name="ln-193"></a>    denimp<span class="o">=</span><span class="nb">interpol</span>(transp_nimp,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-194" name="ln-194"></a>    denh<span class="o">=</span><span class="nb">interpol</span>(transp_nh,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-195" name="ln-195"></a>    dend<span class="o">=</span><span class="nb">interpol</span>(transp_nd,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-196" name="ln-196"></a>    dent<span class="o">=</span><span class="nb">interpol</span>(transp_nt,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-197" name="ln-197"></a>    denn<span class="o">=</span>(<span class="mf">10.d0</span><span class="o">^</span><span class="nb">interpol</span>(<span class="nb">alog10</span>(transp_nn),rho,rhogrid)) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-198" name="ln-198"></a>    te<span class="o">=</span><span class="nb">interpol</span>(transp_te,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-199" name="ln-199"></a>    ti<span class="o">=</span><span class="nb">interpol</span>(transp_ti,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">0.0</span>
+<a id="ln-200" name="ln-200"></a>    zeff<span class="o">=</span> <span class="nb">interpol</span>(transp_zeff,rho,rhogrid) <span class="o">&gt;</span> <span class="mf">1.0</span>
+<a id="ln-201" name="ln-201"></a>    vt <span class="o">=</span> <span class="nb">double</span>(grid.r2d<span class="o">*</span><span class="nb">interpol</span>(transp_omega,rho,rhogrid))
+<a id="ln-202" name="ln-202"></a>    vr <span class="o">=</span> <span class="nb">double</span>(<span class="nb">replicate</span>(<span class="mf">0.0</span>,grid.nr,grid.nz))
+<a id="ln-203" name="ln-203"></a>    vz <span class="o">=</span> <span class="nb">double</span>(<span class="nb">replicate</span>(<span class="mf">0.0</span>,grid.nr,grid.nz))
+<a id="ln-204" name="ln-204"></a>    max_rho <span class="o">=</span> <span class="nb">max</span>(<span class="nb">abs</span>(rho))
+<a id="ln-205" name="ln-205"></a>
+<a id="ln-206" name="ln-206"></a>    s <span class="o">=</span> <span class="nb">size</span>(rhogrid,<span class="o">/</span>dim)
+<a id="ln-207" name="ln-207"></a>    mask <span class="o">=</span> <span class="nb">intarr</span>(s[<span class="mi">0</span>],s[<span class="mi">1</span>])
+<a id="ln-208" name="ln-208"></a>    w<span class="o">=</span><span class="nb">where</span>(rhogrid <span class="k">le</span> max_rho) ;<span class="nb">where</span> we have <span class="nb">profiles</span>
+<a id="ln-209" name="ln-209"></a>    mask[w] <span class="o">=</span> <span class="mi">1</span>
+<a id="ln-210" name="ln-210"></a>
+<a id="ln-211" name="ln-211"></a>    deni <span class="o">=</span> <span class="nb">dblarr</span>(<span class="mi">3</span>,s[<span class="mi">0</span>],s[<span class="mi">1</span>])
+<a id="ln-212" name="ln-212"></a>    deni[<span class="mi">0</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> denh
+<a id="ln-213" name="ln-213"></a>    deni[<span class="mi">1</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> dend
+<a id="ln-214" name="ln-214"></a>    deni[<span class="mi">2</span>,<span class="o">*</span>,<span class="o">*</span>] <span class="o">=</span> dent
+<a id="ln-215" name="ln-215"></a>    ai <span class="o">=</span> [<span class="mf">1.007276466879d0</span>, <span class="mf">2.013553212745d0</span>,<span class="mf">3.01550071632d0</span>]
+<a id="ln-216" name="ln-216"></a>
+<a id="ln-217" name="ln-217"></a><span class="c1">    ;;SAVE IN PROFILES STRUCTURE</span>
+<a id="ln-218" name="ln-218"></a>    plasma<span class="o">=</span>{data_source<span class="o">:</span><span class="nb">file_expand_path</span>(filename),time<span class="o">:</span>time, mask<span class="o">:</span>mask, impurity_charge<span class="o">:</span>impurity_charge, $
+<a id="ln-219" name="ln-219"></a>            nthermal<span class="o">:</span><span class="nb">fix</span>(<span class="nb">n_elements</span>(w_thermal)), species_mass<span class="o">:</span>ai[w_thermal], dene<span class="o">:</span>dene,deni<span class="o">:</span>deni[w_thermal,<span class="o">*</span>,<span class="o">*</span>], $
+<a id="ln-220" name="ln-220"></a>            denimp<span class="o">:</span>denimp,denn<span class="o">:</span>denn,te<span class="o">:</span>te,ti<span class="o">:</span>ti,vr<span class="o">:</span>vr,vt<span class="o">:</span>vt,vz<span class="o">:</span>vz,zeff<span class="o">:</span>zeff}
+<a id="ln-221" name="ln-221"></a>
+<a id="ln-222" name="ln-222"></a>    <span class="nb">return</span>,plasma
+<a id="ln-223" name="ln-223"></a>
+<a id="ln-224" name="ln-224"></a><span class="k">END</span>
 </pre></div>
 
     </section>

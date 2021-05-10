@@ -245,321 +245,321 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">PRO</span> write_equilibrium, filename, plasma, fields
-<a name="ln-2"></a><span class="c1">    ;+##`write_equilibrium, filename, plasma, fields`</span>
-<a name="ln-3"></a><span class="c1">    ;+Write MHD equilibrium values to a HDF5 file</span>
-<a name="ln-4"></a><span class="c1">    ;+</span>
-<a name="ln-5"></a><span class="c1">    ;+###Input Arguments</span>
-<a name="ln-6"></a><span class="c1">    ;+     **filename**: Name of the equilibrium file</span>
-<a name="ln-7"></a><span class="c1">    ;+</span>
-<a name="ln-8"></a><span class="c1">    ;+     **plasma**: Plasma structure</span>
-<a name="ln-9"></a><span class="c1">    ;+</span>
-<a name="ln-10"></a><span class="c1">    ;+     **fields**: Electromagnetic fields structure</span>
-<a name="ln-11"></a><span class="c1">    ;+</span>
-<a name="ln-12"></a><span class="c1">    ;+###Example Usage</span>
-<a name="ln-13"></a><span class="c1">    ;+```idl</span>
-<a name="ln-14"></a><span class="c1">    ;+IDL&gt; write_equilibrium, filename, plasma, fields</span>
-<a name="ln-15"></a><span class="c1">    ;+```</span>
-<a name="ln-16"></a>
-<a name="ln-17"></a>    info, <span class="s1">&#39;Writing equilibrium file...&#39;</span>
-<a name="ln-18"></a>
-<a name="ln-19"></a>    root_atts <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
-<a name="ln-20"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-21"></a>                 data<span class="o">:</span><span class="s1">&#39;Plasma Parameters and Electromagnetic Fields for FIDASIM&#39;</span>}
-<a name="ln-22"></a>
-<a name="ln-23"></a><span class="c1">    ;; Plasma Attributes</span>
-<a name="ln-24"></a>    plasma_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma&#39;</span>, $
-<a name="ln-25"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-26"></a>                   data<span class="o">:</span><span class="s1">&#39;Plasma Parameters&#39;</span>}
-<a name="ln-27"></a>
-<a name="ln-28"></a>    plasma_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma&#39;</span>, $
-<a name="ln-29"></a>                 name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
-<a name="ln-30"></a>                 data<span class="o">:</span><span class="s1">&#39;Cylindrical&#39;</span>}
-<a name="ln-31"></a>
-<a name="ln-32"></a>    plasma_ds_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/data_source&#39;</span>, $
-<a name="ln-33"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-34"></a>                      data<span class="o">:</span><span class="s1">&#39;Source of the plasma parameters&#39;</span>}
-<a name="ln-35"></a>
-<a name="ln-36"></a>    plasma_time_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/time&#39;</span>, $
-<a name="ln-37"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-38"></a>                        data<span class="o">:</span><span class="s1">&#39;Time&#39;</span>}
-<a name="ln-39"></a>    plasma_time_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/time&#39;</span>, $
-<a name="ln-40"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-41"></a>                        data<span class="o">:</span><span class="s1">&#39;s&#39;</span>}
-<a name="ln-42"></a>
-<a name="ln-43"></a>    plasma_dene_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/dene&#39;</span>, $
-<a name="ln-44"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-45"></a>                        data<span class="o">:</span><span class="s1">&#39;Electron Number Density: Dene(r,z,[phi])&#39;</span>}
-<a name="ln-46"></a>    plasma_dene_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/dene&#39;</span>, $
-<a name="ln-47"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-48"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
-<a name="ln-49"></a>
-<a name="ln-50"></a>    plasma_denimp_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/denimp&#39;</span>, $
-<a name="ln-51"></a>                          name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-52"></a>                          data<span class="o">:</span><span class="s1">&#39;Impurity Number Density: Denimp(r,z,[phi])&#39;</span>}
-<a name="ln-53"></a>    plasma_denimp_unit <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/denimp&#39;</span>, $
-<a name="ln-54"></a>                          name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-55"></a>                          data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
-<a name="ln-56"></a>
-<a name="ln-57"></a>    plasma_species_mass_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/species_mass&#39;</span>, $
-<a name="ln-58"></a>                                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-59"></a>                                data<span class="o">:</span><span class="s1">&#39;Mass of ion species: species_mass(species)&#39;</span>}
-<a name="ln-60"></a>    plasma_species_mass_unit <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/species_mass&#39;</span>, $
-<a name="ln-61"></a>                                name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-62"></a>                                data<span class="o">:</span><span class="s1">&#39;amu&#39;</span>}
-<a name="ln-63"></a>
-<a name="ln-64"></a>    plasma_impurity_charge_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/impurity_charge&#39;</span>, $
-<a name="ln-65"></a>                                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-66"></a>                                   data<span class="o">:</span><span class="s1">&#39;Charge number of main impurity species&#39;</span>}
-<a name="ln-67"></a>
-<a name="ln-68"></a>    plasma_nthermal_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/nthermal&#39;</span>, $
-<a name="ln-69"></a>                            name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-70"></a>                            data<span class="o">:</span><span class="s1">&#39;Number of hydrogenic, thermal ion species&#39;</span>}
-<a name="ln-71"></a>
-<a name="ln-72"></a>    plasma_deni_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/deni&#39;</span>, $
-<a name="ln-73"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-74"></a>                        data<span class="o">:</span><span class="s1">&#39;Ion Number Density: Deni(species,r,z,[phi])&#39;</span>}
-<a name="ln-75"></a>    plasma_deni_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/deni&#39;</span>, $
-<a name="ln-76"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-77"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
-<a name="ln-78"></a>
-<a name="ln-79"></a>    plasma_denn_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/denn&#39;</span>, $
-<a name="ln-80"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-81"></a>                        data<span class="o">:</span><span class="s1">&#39;Cold Neutral Number Density: Denn(r,z,[phi])&#39;</span>}
-<a name="ln-82"></a>    plasma_denn_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/denn&#39;</span>, $
-<a name="ln-83"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-84"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
-<a name="ln-85"></a>
-<a name="ln-86"></a>    plasma_te_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/te&#39;</span>, $
-<a name="ln-87"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-88"></a>                      data<span class="o">:</span><span class="s1">&#39;Electron Temperature: Te(r,z,[phi])&#39;</span>}
-<a name="ln-89"></a>    plasma_te_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/te&#39;</span>, $
-<a name="ln-90"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-91"></a>                      data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
-<a name="ln-92"></a>
-<a name="ln-93"></a>    plasma_ti_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/ti&#39;</span>, $
-<a name="ln-94"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-95"></a>                      data<span class="o">:</span><span class="s1">&#39;Ion Temperature: Ti(r,z,[phi])&#39;</span>}
-<a name="ln-96"></a>    plasma_ti_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/ti&#39;</span>, $
-<a name="ln-97"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-98"></a>                      data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
-<a name="ln-99"></a>
-<a name="ln-100"></a>    plasma_zeff_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/zeff&#39;</span>, $
-<a name="ln-101"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-102"></a>                        data<span class="o">:</span><span class="s1">&#39;Effective Nuclear Charge: Zeff(r,z,[phi])&#39;</span>}
-<a name="ln-103"></a>
-<a name="ln-104"></a>    plasma_vr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vr&#39;</span>, $
-<a name="ln-105"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-106"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the r-direction: Vr(r,z,[phi])&#39;</span>}
-<a name="ln-107"></a>    plasma_vr_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vr&#39;</span>, $
-<a name="ln-108"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-109"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
-<a name="ln-110"></a>
-<a name="ln-111"></a>    plasma_vt_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vt&#39;</span>, $
-<a name="ln-112"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-113"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the theta/torodial-direction: Vt(r,z,[phi])&#39;</span>}
-<a name="ln-114"></a>    plasma_vt_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vt&#39;</span>, $
-<a name="ln-115"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-116"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
-<a name="ln-117"></a>
-<a name="ln-118"></a>    plasma_vz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vz&#39;</span>, $
-<a name="ln-119"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-120"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the z-direction: Vz(r,z,[phi])&#39;</span>}
-<a name="ln-121"></a>    plasma_vz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vz&#39;</span>, $
-<a name="ln-122"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-123"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
-<a name="ln-124"></a>
-<a name="ln-125"></a>    plasma_nr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/nr&#39;</span>, $
-<a name="ln-126"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-127"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of R values&#39;</span>}
-<a name="ln-128"></a>
-<a name="ln-129"></a>    plasma_nz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/nz&#39;</span>, $
-<a name="ln-130"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-131"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of Z values&#39;</span>}
-<a name="ln-132"></a>
-<a name="ln-133"></a>    plasma_r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r&#39;</span>, $
-<a name="ln-134"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-135"></a>                     data<span class="o">:</span><span class="s1">&#39;Radius&#39;</span>}
-<a name="ln-136"></a>    plasma_r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r&#39;</span>, $
-<a name="ln-137"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-138"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-139"></a>
-<a name="ln-140"></a>    plasma_z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z&#39;</span>, $
-<a name="ln-141"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-142"></a>                     data<span class="o">:</span><span class="s1">&#39;Z&#39;</span>}
-<a name="ln-143"></a>    plasma_z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z&#39;</span>, $
-<a name="ln-144"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-145"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-146"></a>
-<a name="ln-147"></a>    plasma_r2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r2d&#39;</span>, $
-<a name="ln-148"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-149"></a>                       data<span class="o">:</span><span class="s1">&#39;Radius grid: R(r,z)&#39;</span>}
-<a name="ln-150"></a>    plasma_r2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r2d&#39;</span>, $
-<a name="ln-151"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-152"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-153"></a>
-<a name="ln-154"></a>    plasma_z2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z2d&#39;</span>, $
-<a name="ln-155"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-156"></a>                       data<span class="o">:</span><span class="s1">&#39;Z grid: Z(r,z)&#39;</span>}
-<a name="ln-157"></a>    plasma_z2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z2d&#39;</span>, $
-<a name="ln-158"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-159"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-160"></a>
-<a name="ln-161"></a>    plasma_mask_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/mask&#39;</span>,$
-<a name="ln-162"></a>                         name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-163"></a>                         data<span class="o">:</span><span class="s1">&#39;Boolean mask that indicates where&#39;</span> <span class="o">+</span>$
-<a name="ln-164"></a>                         <span class="s1">&#39; the plasma parameters are well defined&#39;</span>}
-<a name="ln-165"></a>
-<a name="ln-166"></a>    plasma_atts <span class="o">=</span> [plasma_desc, plasma_cs, plasma_ds_desc, $
-<a name="ln-167"></a>                   plasma_time_desc, plasma_time_unit, $
-<a name="ln-168"></a>                   plasma_mask_desc, $
-<a name="ln-169"></a>                   plasma_dene_desc, plasma_dene_unit, $
-<a name="ln-170"></a>                   plasma_denimp_desc, plasma_denimp_unit, $
-<a name="ln-171"></a>                   plasma_impurity_charge_desc, $
-<a name="ln-172"></a>                   plasma_nthermal_desc, $
-<a name="ln-173"></a>                   plasma_species_mass_desc, plasma_species_mass_unit, $
-<a name="ln-174"></a>                   plasma_deni_desc, plasma_deni_unit, $
-<a name="ln-175"></a>                   plasma_denn_desc, plasma_denn_unit, $
-<a name="ln-176"></a>                   plasma_te_desc, plasma_te_unit, $
-<a name="ln-177"></a>                   plasma_ti_desc, plasma_ti_unit, $
-<a name="ln-178"></a>                   plasma_zeff_desc, $
-<a name="ln-179"></a>                   plasma_vr_desc, plasma_vr_unit, $
-<a name="ln-180"></a>                   plasma_vt_desc, plasma_vt_unit, $
-<a name="ln-181"></a>                   plasma_vz_desc, plasma_vz_unit, $
-<a name="ln-182"></a>                   plasma_nr_desc, plasma_nz_desc, $
-<a name="ln-183"></a>                   plasma_r_desc, plasma_r_unit, $
-<a name="ln-184"></a>                   plasma_z_desc, plasma_z_unit, $
-<a name="ln-185"></a>                   plasma_r2d_desc, plasma_r2d_unit, $
-<a name="ln-186"></a>                   plasma_z2d_desc, plasma_z2d_unit ]
-<a name="ln-187"></a>
-<a name="ln-188"></a><span class="c1">    ;; Electromagnetic fields attributes</span>
-<a name="ln-189"></a>    fields_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields&#39;</span>, $
-<a name="ln-190"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-191"></a>                   data<span class="o">:</span><span class="s1">&#39;Electromagnetic Fields&#39;</span>}
-<a name="ln-192"></a>
-<a name="ln-193"></a>    fields_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields&#39;</span>, $
-<a name="ln-194"></a>                 name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
-<a name="ln-195"></a>                 data<span class="o">:</span><span class="s1">&#39;Cylindrical&#39;</span>}
-<a name="ln-196"></a>
-<a name="ln-197"></a>    fields_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/data_source&#39;</span>, $
-<a name="ln-198"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-199"></a>                      data<span class="o">:</span><span class="s1">&#39;Source of the EM equilibrium&#39;</span>}
-<a name="ln-200"></a>
-<a name="ln-201"></a>    fields_mask_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/mask&#39;</span>,$
-<a name="ln-202"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-203"></a>                        data<span class="o">:</span><span class="s1">&#39;Boolean mask that indicates where&#39;</span> <span class="o">+</span>$
-<a name="ln-204"></a>                        <span class="s1">&#39; the fields are well defined&#39;</span>}
-<a name="ln-205"></a>
-<a name="ln-206"></a>    fields_time_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/time&#39;</span>, $
-<a name="ln-207"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-208"></a>                        data<span class="o">:</span><span class="s1">&#39;Time&#39;</span>}
-<a name="ln-209"></a>    fields_time_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/time&#39;</span>, $
-<a name="ln-210"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-211"></a>                        data<span class="o">:</span><span class="s1">&#39;s&#39;</span>}
-<a name="ln-212"></a>
-<a name="ln-213"></a>    fields_br_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/br&#39;</span>, $
-<a name="ln-214"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-215"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the r-direction: Br(r,z)&#39;</span>}
-<a name="ln-216"></a>    fields_br_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/br&#39;</span>, $
-<a name="ln-217"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-218"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
-<a name="ln-219"></a>
-<a name="ln-220"></a>    fields_bt_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bt&#39;</span>, $
-<a name="ln-221"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-222"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the theta/torodial-direction: Bt(r,z)&#39;</span>}
-<a name="ln-223"></a>    fields_bt_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bt&#39;</span>, $
-<a name="ln-224"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-225"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
-<a name="ln-226"></a>
-<a name="ln-227"></a>    fields_bz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bz&#39;</span>, $
-<a name="ln-228"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-229"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the z-direction: Bz(r,z)&#39;</span>}
-<a name="ln-230"></a>    fields_bz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bz&#39;</span>, $
-<a name="ln-231"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-232"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
-<a name="ln-233"></a>
-<a name="ln-234"></a>    fields_er_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/er&#39;</span>, $
-<a name="ln-235"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-236"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the r-direction: Er(r,z)&#39;</span>}
-<a name="ln-237"></a>    fields_er_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/er&#39;</span>, $
-<a name="ln-238"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-239"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
-<a name="ln-240"></a>
-<a name="ln-241"></a>    fields_et_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/et&#39;</span>, $
-<a name="ln-242"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-243"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the theta/torodial-direction: Et(r,z)&#39;</span>}
-<a name="ln-244"></a>    fields_et_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/et&#39;</span>, $
-<a name="ln-245"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-246"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
-<a name="ln-247"></a>
-<a name="ln-248"></a>    fields_ez_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/ez&#39;</span>, $
-<a name="ln-249"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-250"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the z-direction: Ez(r,z)&#39;</span>}
-<a name="ln-251"></a>    fields_ez_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/ez&#39;</span>, $
-<a name="ln-252"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-253"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
-<a name="ln-254"></a>
-<a name="ln-255"></a>    fields_nr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/nr&#39;</span>, $
-<a name="ln-256"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-257"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of R values&#39;</span>}
-<a name="ln-258"></a>
-<a name="ln-259"></a>    fields_nz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/nz&#39;</span>, $
-<a name="ln-260"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-261"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of Z values&#39;</span>}
-<a name="ln-262"></a>
-<a name="ln-263"></a>    fields_r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r&#39;</span>, $
-<a name="ln-264"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-265"></a>                     data<span class="o">:</span><span class="s1">&#39;Radius&#39;</span>}
-<a name="ln-266"></a>    fields_r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r&#39;</span>, $
-<a name="ln-267"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-268"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-269"></a>
-<a name="ln-270"></a>    fields_z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z&#39;</span>, $
-<a name="ln-271"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-272"></a>                     data<span class="o">:</span><span class="s1">&#39;Z&#39;</span>}
-<a name="ln-273"></a>    fields_z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z&#39;</span>, $
-<a name="ln-274"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-275"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-276"></a>
-<a name="ln-277"></a>    fields_r2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r2d&#39;</span>, $
-<a name="ln-278"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-279"></a>                       data<span class="o">:</span><span class="s1">&#39;Radius grid: R(r,z)&#39;</span>}
-<a name="ln-280"></a>    fields_r2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r2d&#39;</span>, $
-<a name="ln-281"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-282"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-283"></a>
-<a name="ln-284"></a>    fields_z2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z2d&#39;</span>, $
-<a name="ln-285"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
-<a name="ln-286"></a>                       data<span class="o">:</span><span class="s1">&#39;Z grid: Z(r,z)&#39;</span>}
-<a name="ln-287"></a>    fields_z2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z2d&#39;</span>, $
-<a name="ln-288"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
-<a name="ln-289"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
-<a name="ln-290"></a>
-<a name="ln-291"></a>    fields_atts <span class="o">=</span> [fields_desc, fields_cs, fields_ds_desc, $
-<a name="ln-292"></a>                   fields_mask_desc, $
-<a name="ln-293"></a>                   fields_time_desc, fields_time_unit, $
-<a name="ln-294"></a>                   fields_br_desc, fields_br_unit, $
-<a name="ln-295"></a>                   fields_bt_desc, fields_bt_unit, $
-<a name="ln-296"></a>                   fields_bz_desc, fields_bz_unit, $
-<a name="ln-297"></a>                   fields_er_desc, fields_er_unit, $
-<a name="ln-298"></a>                   fields_et_desc, fields_et_unit, $
-<a name="ln-299"></a>                   fields_ez_desc, fields_ez_unit, $
-<a name="ln-300"></a>                   fields_nr_desc, fields_nz_desc, $
-<a name="ln-301"></a>                   fields_r_desc, fields_r_unit, $
-<a name="ln-302"></a>                   fields_z_desc, fields_z_unit, $
-<a name="ln-303"></a>                   fields_r2d_desc, fields_r2d_unit, $
-<a name="ln-304"></a>                   fields_z2d_desc, fields_z2d_unit ]
-<a name="ln-305"></a>
-<a name="ln-306"></a>    atts <span class="o">=</span> [root_atts, plasma_atts, fields_atts]
-<a name="ln-307"></a>
-<a name="ln-308"></a>    write_hdf5,[<span class="s2">&quot;plasma&quot;</span>,<span class="s2">&quot;fields&quot;</span>],filename<span class="o">=</span>filename, atts<span class="o">=</span>atts, <span class="o">/</span>clobber
-<a name="ln-309"></a>
-<a name="ln-310"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-311"></a>        success, <span class="s1">&#39;Equilibrium file created: &#39;</span><span class="o">+</span>filename
-<a name="ln-312"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-313"></a>        error, <span class="s1">&#39;Equilibrium file creation failed.&#39;</span>
-<a name="ln-314"></a>    <span class="k">endelse</span>
-<a name="ln-315"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">PRO</span> write_equilibrium, filename, plasma, fields
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+##`write_equilibrium, filename, plasma, fields`</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Write MHD equilibrium values to a HDF5 file</span>
+<a id="ln-4" name="ln-4"></a><span class="c1">    ;+</span>
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+###Input Arguments</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+     **filename**: Name of the equilibrium file</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+     **plasma**: Plasma structure</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+</span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+     **fields**: Electromagnetic fields structure</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+###Example Usage</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+```idl</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+IDL&gt; write_equilibrium, filename, plasma, fields</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+```</span>
+<a id="ln-16" name="ln-16"></a>
+<a id="ln-17" name="ln-17"></a>    info, <span class="s1">&#39;Writing equilibrium file...&#39;</span>
+<a id="ln-18" name="ln-18"></a>
+<a id="ln-19" name="ln-19"></a>    root_atts <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/&#39;</span>, $
+<a id="ln-20" name="ln-20"></a>                 name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-21" name="ln-21"></a>                 data<span class="o">:</span><span class="s1">&#39;Plasma Parameters and Electromagnetic Fields for FIDASIM&#39;</span>}
+<a id="ln-22" name="ln-22"></a>
+<a id="ln-23" name="ln-23"></a><span class="c1">    ;; Plasma Attributes</span>
+<a id="ln-24" name="ln-24"></a>    plasma_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma&#39;</span>, $
+<a id="ln-25" name="ln-25"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-26" name="ln-26"></a>                   data<span class="o">:</span><span class="s1">&#39;Plasma Parameters&#39;</span>}
+<a id="ln-27" name="ln-27"></a>
+<a id="ln-28" name="ln-28"></a>    plasma_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma&#39;</span>, $
+<a id="ln-29" name="ln-29"></a>                 name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a id="ln-30" name="ln-30"></a>                 data<span class="o">:</span><span class="s1">&#39;Cylindrical&#39;</span>}
+<a id="ln-31" name="ln-31"></a>
+<a id="ln-32" name="ln-32"></a>    plasma_ds_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/data_source&#39;</span>, $
+<a id="ln-33" name="ln-33"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-34" name="ln-34"></a>                      data<span class="o">:</span><span class="s1">&#39;Source of the plasma parameters&#39;</span>}
+<a id="ln-35" name="ln-35"></a>
+<a id="ln-36" name="ln-36"></a>    plasma_time_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/time&#39;</span>, $
+<a id="ln-37" name="ln-37"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-38" name="ln-38"></a>                        data<span class="o">:</span><span class="s1">&#39;Time&#39;</span>}
+<a id="ln-39" name="ln-39"></a>    plasma_time_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/time&#39;</span>, $
+<a id="ln-40" name="ln-40"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-41" name="ln-41"></a>                        data<span class="o">:</span><span class="s1">&#39;s&#39;</span>}
+<a id="ln-42" name="ln-42"></a>
+<a id="ln-43" name="ln-43"></a>    plasma_dene_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/dene&#39;</span>, $
+<a id="ln-44" name="ln-44"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-45" name="ln-45"></a>                        data<span class="o">:</span><span class="s1">&#39;Electron Number Density: Dene(r,z,[phi])&#39;</span>}
+<a id="ln-46" name="ln-46"></a>    plasma_dene_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/dene&#39;</span>, $
+<a id="ln-47" name="ln-47"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-48" name="ln-48"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
+<a id="ln-49" name="ln-49"></a>
+<a id="ln-50" name="ln-50"></a>    plasma_denimp_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/denimp&#39;</span>, $
+<a id="ln-51" name="ln-51"></a>                          name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-52" name="ln-52"></a>                          data<span class="o">:</span><span class="s1">&#39;Impurity Number Density: Denimp(r,z,[phi])&#39;</span>}
+<a id="ln-53" name="ln-53"></a>    plasma_denimp_unit <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/denimp&#39;</span>, $
+<a id="ln-54" name="ln-54"></a>                          name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-55" name="ln-55"></a>                          data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
+<a id="ln-56" name="ln-56"></a>
+<a id="ln-57" name="ln-57"></a>    plasma_species_mass_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/species_mass&#39;</span>, $
+<a id="ln-58" name="ln-58"></a>                                name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-59" name="ln-59"></a>                                data<span class="o">:</span><span class="s1">&#39;Mass of ion species: species_mass(species)&#39;</span>}
+<a id="ln-60" name="ln-60"></a>    plasma_species_mass_unit <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/species_mass&#39;</span>, $
+<a id="ln-61" name="ln-61"></a>                                name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-62" name="ln-62"></a>                                data<span class="o">:</span><span class="s1">&#39;amu&#39;</span>}
+<a id="ln-63" name="ln-63"></a>
+<a id="ln-64" name="ln-64"></a>    plasma_impurity_charge_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/impurity_charge&#39;</span>, $
+<a id="ln-65" name="ln-65"></a>                                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-66" name="ln-66"></a>                                   data<span class="o">:</span><span class="s1">&#39;Charge number of main impurity species&#39;</span>}
+<a id="ln-67" name="ln-67"></a>
+<a id="ln-68" name="ln-68"></a>    plasma_nthermal_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/nthermal&#39;</span>, $
+<a id="ln-69" name="ln-69"></a>                            name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-70" name="ln-70"></a>                            data<span class="o">:</span><span class="s1">&#39;Number of hydrogenic, thermal ion species&#39;</span>}
+<a id="ln-71" name="ln-71"></a>
+<a id="ln-72" name="ln-72"></a>    plasma_deni_desc <span class="o">=</span> {attribute, obj<span class="o">:</span><span class="s1">&#39;/plasma/deni&#39;</span>, $
+<a id="ln-73" name="ln-73"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-74" name="ln-74"></a>                        data<span class="o">:</span><span class="s1">&#39;Ion Number Density: Deni(species,r,z,[phi])&#39;</span>}
+<a id="ln-75" name="ln-75"></a>    plasma_deni_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/deni&#39;</span>, $
+<a id="ln-76" name="ln-76"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-77" name="ln-77"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
+<a id="ln-78" name="ln-78"></a>
+<a id="ln-79" name="ln-79"></a>    plasma_denn_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/denn&#39;</span>, $
+<a id="ln-80" name="ln-80"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-81" name="ln-81"></a>                        data<span class="o">:</span><span class="s1">&#39;Cold Neutral Number Density: Denn(r,z,[phi])&#39;</span>}
+<a id="ln-82" name="ln-82"></a>    plasma_denn_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/denn&#39;</span>, $
+<a id="ln-83" name="ln-83"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-84" name="ln-84"></a>                        data<span class="o">:</span><span class="s1">&#39;cm^-3&#39;</span>}
+<a id="ln-85" name="ln-85"></a>
+<a id="ln-86" name="ln-86"></a>    plasma_te_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/te&#39;</span>, $
+<a id="ln-87" name="ln-87"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-88" name="ln-88"></a>                      data<span class="o">:</span><span class="s1">&#39;Electron Temperature: Te(r,z,[phi])&#39;</span>}
+<a id="ln-89" name="ln-89"></a>    plasma_te_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/te&#39;</span>, $
+<a id="ln-90" name="ln-90"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-91" name="ln-91"></a>                      data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
+<a id="ln-92" name="ln-92"></a>
+<a id="ln-93" name="ln-93"></a>    plasma_ti_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/ti&#39;</span>, $
+<a id="ln-94" name="ln-94"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-95" name="ln-95"></a>                      data<span class="o">:</span><span class="s1">&#39;Ion Temperature: Ti(r,z,[phi])&#39;</span>}
+<a id="ln-96" name="ln-96"></a>    plasma_ti_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/ti&#39;</span>, $
+<a id="ln-97" name="ln-97"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-98" name="ln-98"></a>                      data<span class="o">:</span><span class="s1">&#39;keV&#39;</span>}
+<a id="ln-99" name="ln-99"></a>
+<a id="ln-100" name="ln-100"></a>    plasma_zeff_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/zeff&#39;</span>, $
+<a id="ln-101" name="ln-101"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-102" name="ln-102"></a>                        data<span class="o">:</span><span class="s1">&#39;Effective Nuclear Charge: Zeff(r,z,[phi])&#39;</span>}
+<a id="ln-103" name="ln-103"></a>
+<a id="ln-104" name="ln-104"></a>    plasma_vr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vr&#39;</span>, $
+<a id="ln-105" name="ln-105"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-106" name="ln-106"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the r-direction: Vr(r,z,[phi])&#39;</span>}
+<a id="ln-107" name="ln-107"></a>    plasma_vr_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vr&#39;</span>, $
+<a id="ln-108" name="ln-108"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-109" name="ln-109"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a id="ln-110" name="ln-110"></a>
+<a id="ln-111" name="ln-111"></a>    plasma_vt_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vt&#39;</span>, $
+<a id="ln-112" name="ln-112"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-113" name="ln-113"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the theta/torodial-direction: Vt(r,z,[phi])&#39;</span>}
+<a id="ln-114" name="ln-114"></a>    plasma_vt_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vt&#39;</span>, $
+<a id="ln-115" name="ln-115"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-116" name="ln-116"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a id="ln-117" name="ln-117"></a>
+<a id="ln-118" name="ln-118"></a>    plasma_vz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vz&#39;</span>, $
+<a id="ln-119" name="ln-119"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-120" name="ln-120"></a>                      data<span class="o">:</span><span class="s1">&#39;Bulk plasma flow in the z-direction: Vz(r,z,[phi])&#39;</span>}
+<a id="ln-121" name="ln-121"></a>    plasma_vz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/vz&#39;</span>, $
+<a id="ln-122" name="ln-122"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-123" name="ln-123"></a>                      data<span class="o">:</span><span class="s1">&#39;cm/s&#39;</span>}
+<a id="ln-124" name="ln-124"></a>
+<a id="ln-125" name="ln-125"></a>    plasma_nr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/nr&#39;</span>, $
+<a id="ln-126" name="ln-126"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-127" name="ln-127"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of R values&#39;</span>}
+<a id="ln-128" name="ln-128"></a>
+<a id="ln-129" name="ln-129"></a>    plasma_nz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/nz&#39;</span>, $
+<a id="ln-130" name="ln-130"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-131" name="ln-131"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of Z values&#39;</span>}
+<a id="ln-132" name="ln-132"></a>
+<a id="ln-133" name="ln-133"></a>    plasma_r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r&#39;</span>, $
+<a id="ln-134" name="ln-134"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-135" name="ln-135"></a>                     data<span class="o">:</span><span class="s1">&#39;Radius&#39;</span>}
+<a id="ln-136" name="ln-136"></a>    plasma_r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r&#39;</span>, $
+<a id="ln-137" name="ln-137"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-138" name="ln-138"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-139" name="ln-139"></a>
+<a id="ln-140" name="ln-140"></a>    plasma_z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z&#39;</span>, $
+<a id="ln-141" name="ln-141"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-142" name="ln-142"></a>                     data<span class="o">:</span><span class="s1">&#39;Z&#39;</span>}
+<a id="ln-143" name="ln-143"></a>    plasma_z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z&#39;</span>, $
+<a id="ln-144" name="ln-144"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-145" name="ln-145"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-146" name="ln-146"></a>
+<a id="ln-147" name="ln-147"></a>    plasma_r2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r2d&#39;</span>, $
+<a id="ln-148" name="ln-148"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-149" name="ln-149"></a>                       data<span class="o">:</span><span class="s1">&#39;Radius grid: R(r,z)&#39;</span>}
+<a id="ln-150" name="ln-150"></a>    plasma_r2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/r2d&#39;</span>, $
+<a id="ln-151" name="ln-151"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-152" name="ln-152"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-153" name="ln-153"></a>
+<a id="ln-154" name="ln-154"></a>    plasma_z2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z2d&#39;</span>, $
+<a id="ln-155" name="ln-155"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-156" name="ln-156"></a>                       data<span class="o">:</span><span class="s1">&#39;Z grid: Z(r,z)&#39;</span>}
+<a id="ln-157" name="ln-157"></a>    plasma_z2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/z2d&#39;</span>, $
+<a id="ln-158" name="ln-158"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-159" name="ln-159"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-160" name="ln-160"></a>
+<a id="ln-161" name="ln-161"></a>    plasma_mask_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/plasma/mask&#39;</span>,$
+<a id="ln-162" name="ln-162"></a>                         name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-163" name="ln-163"></a>                         data<span class="o">:</span><span class="s1">&#39;Boolean mask that indicates where&#39;</span> <span class="o">+</span>$
+<a id="ln-164" name="ln-164"></a>                         <span class="s1">&#39; the plasma parameters are well defined&#39;</span>}
+<a id="ln-165" name="ln-165"></a>
+<a id="ln-166" name="ln-166"></a>    plasma_atts <span class="o">=</span> [plasma_desc, plasma_cs, plasma_ds_desc, $
+<a id="ln-167" name="ln-167"></a>                   plasma_time_desc, plasma_time_unit, $
+<a id="ln-168" name="ln-168"></a>                   plasma_mask_desc, $
+<a id="ln-169" name="ln-169"></a>                   plasma_dene_desc, plasma_dene_unit, $
+<a id="ln-170" name="ln-170"></a>                   plasma_denimp_desc, plasma_denimp_unit, $
+<a id="ln-171" name="ln-171"></a>                   plasma_impurity_charge_desc, $
+<a id="ln-172" name="ln-172"></a>                   plasma_nthermal_desc, $
+<a id="ln-173" name="ln-173"></a>                   plasma_species_mass_desc, plasma_species_mass_unit, $
+<a id="ln-174" name="ln-174"></a>                   plasma_deni_desc, plasma_deni_unit, $
+<a id="ln-175" name="ln-175"></a>                   plasma_denn_desc, plasma_denn_unit, $
+<a id="ln-176" name="ln-176"></a>                   plasma_te_desc, plasma_te_unit, $
+<a id="ln-177" name="ln-177"></a>                   plasma_ti_desc, plasma_ti_unit, $
+<a id="ln-178" name="ln-178"></a>                   plasma_zeff_desc, $
+<a id="ln-179" name="ln-179"></a>                   plasma_vr_desc, plasma_vr_unit, $
+<a id="ln-180" name="ln-180"></a>                   plasma_vt_desc, plasma_vt_unit, $
+<a id="ln-181" name="ln-181"></a>                   plasma_vz_desc, plasma_vz_unit, $
+<a id="ln-182" name="ln-182"></a>                   plasma_nr_desc, plasma_nz_desc, $
+<a id="ln-183" name="ln-183"></a>                   plasma_r_desc, plasma_r_unit, $
+<a id="ln-184" name="ln-184"></a>                   plasma_z_desc, plasma_z_unit, $
+<a id="ln-185" name="ln-185"></a>                   plasma_r2d_desc, plasma_r2d_unit, $
+<a id="ln-186" name="ln-186"></a>                   plasma_z2d_desc, plasma_z2d_unit ]
+<a id="ln-187" name="ln-187"></a>
+<a id="ln-188" name="ln-188"></a><span class="c1">    ;; Electromagnetic fields attributes</span>
+<a id="ln-189" name="ln-189"></a>    fields_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields&#39;</span>, $
+<a id="ln-190" name="ln-190"></a>                   name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-191" name="ln-191"></a>                   data<span class="o">:</span><span class="s1">&#39;Electromagnetic Fields&#39;</span>}
+<a id="ln-192" name="ln-192"></a>
+<a id="ln-193" name="ln-193"></a>    fields_cs <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields&#39;</span>, $
+<a id="ln-194" name="ln-194"></a>                 name<span class="o">:</span><span class="s1">&#39;coordinate_system&#39;</span>, $
+<a id="ln-195" name="ln-195"></a>                 data<span class="o">:</span><span class="s1">&#39;Cylindrical&#39;</span>}
+<a id="ln-196" name="ln-196"></a>
+<a id="ln-197" name="ln-197"></a>    fields_ds_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/data_source&#39;</span>, $
+<a id="ln-198" name="ln-198"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-199" name="ln-199"></a>                      data<span class="o">:</span><span class="s1">&#39;Source of the EM equilibrium&#39;</span>}
+<a id="ln-200" name="ln-200"></a>
+<a id="ln-201" name="ln-201"></a>    fields_mask_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/mask&#39;</span>,$
+<a id="ln-202" name="ln-202"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-203" name="ln-203"></a>                        data<span class="o">:</span><span class="s1">&#39;Boolean mask that indicates where&#39;</span> <span class="o">+</span>$
+<a id="ln-204" name="ln-204"></a>                        <span class="s1">&#39; the fields are well defined&#39;</span>}
+<a id="ln-205" name="ln-205"></a>
+<a id="ln-206" name="ln-206"></a>    fields_time_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/time&#39;</span>, $
+<a id="ln-207" name="ln-207"></a>                        name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-208" name="ln-208"></a>                        data<span class="o">:</span><span class="s1">&#39;Time&#39;</span>}
+<a id="ln-209" name="ln-209"></a>    fields_time_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/time&#39;</span>, $
+<a id="ln-210" name="ln-210"></a>                        name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-211" name="ln-211"></a>                        data<span class="o">:</span><span class="s1">&#39;s&#39;</span>}
+<a id="ln-212" name="ln-212"></a>
+<a id="ln-213" name="ln-213"></a>    fields_br_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/br&#39;</span>, $
+<a id="ln-214" name="ln-214"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-215" name="ln-215"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the r-direction: Br(r,z)&#39;</span>}
+<a id="ln-216" name="ln-216"></a>    fields_br_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/br&#39;</span>, $
+<a id="ln-217" name="ln-217"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-218" name="ln-218"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
+<a id="ln-219" name="ln-219"></a>
+<a id="ln-220" name="ln-220"></a>    fields_bt_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bt&#39;</span>, $
+<a id="ln-221" name="ln-221"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-222" name="ln-222"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the theta/torodial-direction: Bt(r,z)&#39;</span>}
+<a id="ln-223" name="ln-223"></a>    fields_bt_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bt&#39;</span>, $
+<a id="ln-224" name="ln-224"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-225" name="ln-225"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
+<a id="ln-226" name="ln-226"></a>
+<a id="ln-227" name="ln-227"></a>    fields_bz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bz&#39;</span>, $
+<a id="ln-228" name="ln-228"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-229" name="ln-229"></a>                      data<span class="o">:</span><span class="s1">&#39;Magnetic field in the z-direction: Bz(r,z)&#39;</span>}
+<a id="ln-230" name="ln-230"></a>    fields_bz_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/bz&#39;</span>, $
+<a id="ln-231" name="ln-231"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-232" name="ln-232"></a>                      data<span class="o">:</span><span class="s1">&#39;T&#39;</span>}
+<a id="ln-233" name="ln-233"></a>
+<a id="ln-234" name="ln-234"></a>    fields_er_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/er&#39;</span>, $
+<a id="ln-235" name="ln-235"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-236" name="ln-236"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the r-direction: Er(r,z)&#39;</span>}
+<a id="ln-237" name="ln-237"></a>    fields_er_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/er&#39;</span>, $
+<a id="ln-238" name="ln-238"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-239" name="ln-239"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
+<a id="ln-240" name="ln-240"></a>
+<a id="ln-241" name="ln-241"></a>    fields_et_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/et&#39;</span>, $
+<a id="ln-242" name="ln-242"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-243" name="ln-243"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the theta/torodial-direction: Et(r,z)&#39;</span>}
+<a id="ln-244" name="ln-244"></a>    fields_et_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/et&#39;</span>, $
+<a id="ln-245" name="ln-245"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-246" name="ln-246"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
+<a id="ln-247" name="ln-247"></a>
+<a id="ln-248" name="ln-248"></a>    fields_ez_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/ez&#39;</span>, $
+<a id="ln-249" name="ln-249"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-250" name="ln-250"></a>                      data<span class="o">:</span><span class="s1">&#39;Electric field in the z-direction: Ez(r,z)&#39;</span>}
+<a id="ln-251" name="ln-251"></a>    fields_ez_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/ez&#39;</span>, $
+<a id="ln-252" name="ln-252"></a>                      name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-253" name="ln-253"></a>                      data<span class="o">:</span><span class="s1">&#39;V/m&#39;</span>}
+<a id="ln-254" name="ln-254"></a>
+<a id="ln-255" name="ln-255"></a>    fields_nr_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/nr&#39;</span>, $
+<a id="ln-256" name="ln-256"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-257" name="ln-257"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of R values&#39;</span>}
+<a id="ln-258" name="ln-258"></a>
+<a id="ln-259" name="ln-259"></a>    fields_nz_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/nz&#39;</span>, $
+<a id="ln-260" name="ln-260"></a>                      name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-261" name="ln-261"></a>                      data<span class="o">:</span><span class="s1">&#39;Number of Z values&#39;</span>}
+<a id="ln-262" name="ln-262"></a>
+<a id="ln-263" name="ln-263"></a>    fields_r_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r&#39;</span>, $
+<a id="ln-264" name="ln-264"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-265" name="ln-265"></a>                     data<span class="o">:</span><span class="s1">&#39;Radius&#39;</span>}
+<a id="ln-266" name="ln-266"></a>    fields_r_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r&#39;</span>, $
+<a id="ln-267" name="ln-267"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-268" name="ln-268"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-269" name="ln-269"></a>
+<a id="ln-270" name="ln-270"></a>    fields_z_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z&#39;</span>, $
+<a id="ln-271" name="ln-271"></a>                     name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-272" name="ln-272"></a>                     data<span class="o">:</span><span class="s1">&#39;Z&#39;</span>}
+<a id="ln-273" name="ln-273"></a>    fields_z_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z&#39;</span>, $
+<a id="ln-274" name="ln-274"></a>                     name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-275" name="ln-275"></a>                     data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-276" name="ln-276"></a>
+<a id="ln-277" name="ln-277"></a>    fields_r2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r2d&#39;</span>, $
+<a id="ln-278" name="ln-278"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-279" name="ln-279"></a>                       data<span class="o">:</span><span class="s1">&#39;Radius grid: R(r,z)&#39;</span>}
+<a id="ln-280" name="ln-280"></a>    fields_r2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/r2d&#39;</span>, $
+<a id="ln-281" name="ln-281"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-282" name="ln-282"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-283" name="ln-283"></a>
+<a id="ln-284" name="ln-284"></a>    fields_z2d_desc <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z2d&#39;</span>, $
+<a id="ln-285" name="ln-285"></a>                       name<span class="o">:</span><span class="s1">&#39;description&#39;</span>, $
+<a id="ln-286" name="ln-286"></a>                       data<span class="o">:</span><span class="s1">&#39;Z grid: Z(r,z)&#39;</span>}
+<a id="ln-287" name="ln-287"></a>    fields_z2d_unit <span class="o">=</span> {attribute,obj<span class="o">:</span><span class="s1">&#39;/fields/z2d&#39;</span>, $
+<a id="ln-288" name="ln-288"></a>                       name<span class="o">:</span><span class="s1">&#39;units&#39;</span>, $
+<a id="ln-289" name="ln-289"></a>                       data<span class="o">:</span><span class="s1">&#39;cm&#39;</span>}
+<a id="ln-290" name="ln-290"></a>
+<a id="ln-291" name="ln-291"></a>    fields_atts <span class="o">=</span> [fields_desc, fields_cs, fields_ds_desc, $
+<a id="ln-292" name="ln-292"></a>                   fields_mask_desc, $
+<a id="ln-293" name="ln-293"></a>                   fields_time_desc, fields_time_unit, $
+<a id="ln-294" name="ln-294"></a>                   fields_br_desc, fields_br_unit, $
+<a id="ln-295" name="ln-295"></a>                   fields_bt_desc, fields_bt_unit, $
+<a id="ln-296" name="ln-296"></a>                   fields_bz_desc, fields_bz_unit, $
+<a id="ln-297" name="ln-297"></a>                   fields_er_desc, fields_er_unit, $
+<a id="ln-298" name="ln-298"></a>                   fields_et_desc, fields_et_unit, $
+<a id="ln-299" name="ln-299"></a>                   fields_ez_desc, fields_ez_unit, $
+<a id="ln-300" name="ln-300"></a>                   fields_nr_desc, fields_nz_desc, $
+<a id="ln-301" name="ln-301"></a>                   fields_r_desc, fields_r_unit, $
+<a id="ln-302" name="ln-302"></a>                   fields_z_desc, fields_z_unit, $
+<a id="ln-303" name="ln-303"></a>                   fields_r2d_desc, fields_r2d_unit, $
+<a id="ln-304" name="ln-304"></a>                   fields_z2d_desc, fields_z2d_unit ]
+<a id="ln-305" name="ln-305"></a>
+<a id="ln-306" name="ln-306"></a>    atts <span class="o">=</span> [root_atts, plasma_atts, fields_atts]
+<a id="ln-307" name="ln-307"></a>
+<a id="ln-308" name="ln-308"></a>    write_hdf5,[<span class="s2">&quot;plasma&quot;</span>,<span class="s2">&quot;fields&quot;</span>],filename<span class="o">=</span>filename, atts<span class="o">=</span>atts, <span class="o">/</span>clobber
+<a id="ln-309" name="ln-309"></a>
+<a id="ln-310" name="ln-310"></a>    <span class="k">if</span> <span class="nb">file_test</span>(filename) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-311" name="ln-311"></a>        success, <span class="s1">&#39;Equilibrium file created: &#39;</span><span class="o">+</span>filename
+<a id="ln-312" name="ln-312"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-313" name="ln-313"></a>        error, <span class="s1">&#39;Equilibrium file creation failed.&#39;</span>
+<a id="ln-314" name="ln-314"></a>    <span class="k">endelse</span>
+<a id="ln-315" name="ln-315"></a><span class="k">END</span>
 </pre></div>
 
     </section>

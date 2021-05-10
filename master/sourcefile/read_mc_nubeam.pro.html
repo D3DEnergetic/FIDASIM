@@ -252,142 +252,142 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> read_mc_nubeam,infile,ntotal<span class="o">=</span>ntotal,e_range<span class="o">=</span>e_range,p_range<span class="o">=</span>p_range,particle_weight <span class="o">=</span> particle_weight,btipsign<span class="o">=</span>btipsign
-<a name="ln-2"></a><span class="c1">    ;+#read_mc_nubeam</span>
-<a name="ln-3"></a><span class="c1">    ;+Reads guiding center Monte Carlo NUBEAM fast-ion distribution file</span>
-<a name="ln-4"></a><span class="c1">    ;+***</span>
-<a name="ln-5"></a><span class="c1">    ;+##Arguments</span>
-<a name="ln-6"></a><span class="c1">    ;+    **infile**: NUBEAM Monte Carlo distribution file</span>
-<a name="ln-7"></a><span class="c1">    ;+</span>
-<a name="ln-8"></a><span class="c1">    ;+##Keyword Arguments</span>
-<a name="ln-9"></a><span class="c1">    ;+    **ntotal**: Total number of fast-ions</span>
-<a name="ln-10"></a><span class="c1">    ;+</span>
-<a name="ln-11"></a><span class="c1">    ;+    **e_range**: Energy range of particles to consider</span>
-<a name="ln-12"></a><span class="c1">    ;+</span>
-<a name="ln-13"></a><span class="c1">    ;+    **p_range**: Pitch range of particles to consider</span>
-<a name="ln-14"></a><span class="c1">    ;+</span>
-<a name="ln-15"></a><span class="c1">    ;+    **particle_weight**: Set particle/marker weight such that sum(particle_weights) = ntotal: Defaults to `ntotal`/nparticles</span>
-<a name="ln-16"></a><span class="c1">    ;+</span>
-<a name="ln-17"></a><span class="c1">    ;+    **btipsign**: Sign of the dot product between the current and magnetic field (Required)</span>
-<a name="ln-18"></a><span class="c1">    ;+</span>
-<a name="ln-19"></a><span class="c1">    ;+##Return Value</span>
-<a name="ln-20"></a><span class="c1">    ;+Distribution structure</span>
-<a name="ln-21"></a><span class="c1">    ;+</span>
-<a name="ln-22"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-23"></a><span class="c1">    ;+```idl</span>
-<a name="ln-24"></a><span class="c1">    ;+IDL&gt; dist = read_spiral(&quot;./spiral_file.TXT&quot;,time=1.0, ntotal=1e19)</span>
-<a name="ln-25"></a><span class="c1">    ;+```</span>
-<a name="ln-26"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(btipsign) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-27"></a>        error,<span class="s1">&#39;btipsign is not set.&#39;</span>,<span class="o">/</span>halt
-<a name="ln-28"></a>    <span class="k">endif</span>
-<a name="ln-29"></a>
-<a name="ln-30"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(ntotal) <span class="k">and</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-31"></a>        warn,<span class="s1">&#39;Ntotal not set. Setting arbitrarily to 1e19&#39;</span>
-<a name="ln-32"></a>        ntotal <span class="o">=</span> <span class="mf">1.d19</span>
-<a name="ln-33"></a>    <span class="k">endif</span>
-<a name="ln-34"></a>
-<a name="ln-35"></a>    zzz<span class="o">=</span>FINDFILE(infile)
-<a name="ln-36"></a>    <span class="k">if</span> zzz <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-37"></a>        error, <span class="s1">&#39;Nonexistent file: &#39;</span><span class="o">+</span>infile,<span class="o">/</span>halt
-<a name="ln-38"></a>    <span class="k">endif</span>
-<a name="ln-39"></a>    
-<a name="ln-40"></a>    openr,unit,infile, <span class="o">/</span><span class="nb">get_lun</span>
-<a name="ln-41"></a>    line<span class="o">=</span><span class="s1">&#39; &#39;</span>
-<a name="ln-42"></a>    readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
-<a name="ln-43"></a>    readf,unit,line
-<a name="ln-44"></a>    pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;N=&#39;</span>)
-<a name="ln-45"></a>    <span class="k">if</span> pos <span class="k">eq</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-46"></a>        error,<span class="s1">&#39;Second line is missing the number of points&#39;</span>,<span class="o">/</span>halt
-<a name="ln-47"></a>    <span class="k">endif</span>
-<a name="ln-48"></a>
-<a name="ln-49"></a>    w <span class="o">=</span> <span class="nb">stregex</span>(line,<span class="s1">&#39;N *= *([0-9]*)&#39;</span>,<span class="o">/</span>sub,<span class="o">/</span>extract)
-<a name="ln-50"></a>    npts <span class="o">=</span> <span class="nb">long</span>(w[<span class="mi">1</span>])
-<a name="ln-51"></a>    <span class="k">if</span> npts <span class="k">lt</span> <span class="mi">5</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-52"></a>        error,<span class="s1">&#39;Too few points &#39;</span><span class="o">+</span><span class="nb">strtrim</span>(npts,<span class="mi">2</span>),<span class="o">/</span>halt
-<a name="ln-53"></a>    <span class="k">endif</span>
-<a name="ln-54"></a><span class="c1">    </span>
-<a name="ln-55"></a><span class="c1">    ; Get time</span>
-<a name="ln-56"></a>    readf,unit,line
-<a name="ln-57"></a>    parts<span class="o">=</span>str_sep(line, <span class="s1">&#39; &#39;</span>)
-<a name="ln-58"></a>    w<span class="o">=</span><span class="nb">where</span>(parts <span class="k">eq</span> <span class="s1">&#39;TIME&#39;</span>,nw)
-<a name="ln-59"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-60"></a>        error,<span class="s1">&#39;Time not found on 3rd line&#39;</span>,<span class="o">/</span>halt
-<a name="ln-61"></a>    <span class="k">endif</span>
-<a name="ln-62"></a>    i<span class="o">=</span><span class="mi">1</span>
-<a name="ln-63"></a>    <span class="k">while</span> <span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-64"></a>        s <span class="o">=</span> parts[w[<span class="mi">0</span>]<span class="o">+</span>i]
-<a name="ln-65"></a>        <span class="k">if</span> s <span class="k">ne</span> <span class="s1">&#39;&#39;</span> <span class="k">and</span> s <span class="k">ne</span> <span class="s1">&#39;=&#39;</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-66"></a>            time <span class="o">=</span> <span class="nb">float</span>(s)
-<a name="ln-67"></a>            <span class="k">break</span>
-<a name="ln-68"></a>        <span class="k">endif</span>
-<a name="ln-69"></a>        i <span class="o">=</span> i<span class="o">+</span><span class="mi">1</span>
-<a name="ln-70"></a>    <span class="k">endwhile</span>
-<a name="ln-71"></a>    data<span class="o">=</span><span class="nb">fltarr</span>(<span class="mi">4</span>,npts)
-<a name="ln-72"></a>    
-<a name="ln-73"></a>    ready<span class="o">=</span><span class="mi">0</span>
-<a name="ln-74"></a>    <span class="k">while</span> <span class="k">not</span> ready <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-75"></a>        readf,unit,line  ; Description line
-<a name="ln-76"></a>        pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;R(cm)&#39;</span>)
-<a name="ln-77"></a>        <span class="k">if</span> pos <span class="k">gt</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> ready<span class="o">=</span><span class="mi">1</span>
-<a name="ln-78"></a>    <span class="k">endwhile</span>
-<a name="ln-79"></a> 
-<a name="ln-80"></a>    <span class="k">for</span> i<span class="o">=</span><span class="il">0L</span>,npts<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-81"></a>        readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
-<a name="ln-82"></a>        line<span class="o">=</span><span class="nb">strcompress</span>(line)
-<a name="ln-83"></a>        parts <span class="o">=</span> str_sep(line, <span class="s1">&#39; &#39;</span>) &amp; np<span class="o">=</span><span class="nb">n_elements</span>(parts)
-<a name="ln-84"></a>        <span class="k">if</span> parts(<span class="mi">0</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> parts<span class="o">=</span><span class="nb">shift</span>(parts,<span class="o">-</span><span class="mi">1</span>) ; accommodate blank before 1st
-<a name="ln-85"></a>
-<a name="ln-86"></a>        <span class="k">while</span> parts(np<span class="o">-</span><span class="mi">1</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">do</span> np<span class="o">=</span>np<span class="o">-</span><span class="mi">1</span>
-<a name="ln-87"></a>
-<a name="ln-88"></a>        <span class="k">if</span> np <span class="k">ne</span> <span class="mi">4</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-89"></a>            error,<span class="s1">&#39;Wrong number of entries on line: &#39;</span><span class="o">+</span>line
-<a name="ln-90"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-91"></a>            data[<span class="o">*</span>,i]<span class="o">=</span>parts[<span class="mi">0</span><span class="o">:</span>np<span class="o">-</span><span class="mi">1</span>]
-<a name="ln-92"></a>        <span class="k">endelse</span>
-<a name="ln-93"></a>        <span class="nb">print</span>,format<span class="o">=</span><span class="s1">&#39;(f7.2,&quot;%&quot;,A,$)&#39;</span>,<span class="mf">100.0</span><span class="o">*</span>(i<span class="o">+</span><span class="mi">1</span>)<span class="o">/</span><span class="nb">float</span>(npts),<span class="nb">string</span>(<span class="m">13b</span>)
-<a name="ln-94"></a>    <span class="k">endfor</span>   
-<a name="ln-95"></a>    <span class="nb">free_lun</span>, unit
-<a name="ln-96"></a>
-<a name="ln-97"></a>    r<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">0</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
-<a name="ln-98"></a>    w<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">1</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
-<a name="ln-99"></a>    pitch<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">2</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))<span class="o">*</span>btipsign
-<a name="ln-100"></a>    energy<span class="o">=</span><span class="nb">reform</span>(data[<span class="mi">3</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>])<span class="o">*</span><span class="mf">1.d-3</span> ;keV
-<a name="ln-101"></a>    orbit_class <span class="o">=</span> <span class="nb">replicate</span>(<span class="mi">1</span>,npts)
-<a name="ln-102"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-103"></a>        particle_weight <span class="o">=</span> ntotal<span class="o">/</span><span class="nb">float</span>(npts)
-<a name="ln-104"></a>    <span class="k">endif</span>
-<a name="ln-105"></a>    weight <span class="o">=</span> <span class="nb">replicate</span>(particle_weight,npts)
-<a name="ln-106"></a>
-<a name="ln-107"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(e_range) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-108"></a>        e_range <span class="o">=</span> [<span class="nb">min</span>(energy),<span class="nb">max</span>(energy)]
-<a name="ln-109"></a>    <span class="k">endif</span>
-<a name="ln-110"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(p_range) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-111"></a>        p_range <span class="o">=</span> [<span class="nb">min</span>(pitch),<span class="nb">max</span>(pitch)]
-<a name="ln-112"></a>    <span class="k">endif</span>
-<a name="ln-113"></a>
-<a name="ln-114"></a>    ww <span class="o">=</span> <span class="nb">where</span>(energy <span class="k">ge</span> e_range[<span class="mi">0</span>] <span class="k">and</span> energy <span class="k">le</span> e_range[<span class="mi">1</span>],nw)
-<a name="ln-115"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-116"></a>        error,<span class="s1">&#39;No particles fall in requested energy range&#39;</span>,<span class="o">/</span>halt
-<a name="ln-117"></a>    <span class="k">endif</span>
-<a name="ln-118"></a>    wwp <span class="o">=</span> <span class="nb">where</span>(pitch[ww] <span class="k">ge</span> p_range[<span class="mi">0</span>] <span class="k">and</span> pitch[ww] <span class="k">le</span> p_range[<span class="mi">1</span>],nwp)
-<a name="ln-119"></a>    <span class="k">if</span> nwp <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-120"></a>        error,<span class="s1">&#39;No particles fall in the requested pitch range&#39;</span>,<span class="o">/</span>halt
-<a name="ln-121"></a>    <span class="k">endif</span>
-<a name="ln-122"></a>    ww <span class="o">=</span> ww[wwp]
-<a name="ln-123"></a>    nw <span class="o">=</span> <span class="nb">n_elements</span>(ww)
-<a name="ln-124"></a>
-<a name="ln-125"></a>    <span class="nb">print</span>, <span class="s1">&#39;Time: &#39;</span>,time  
-<a name="ln-126"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers: &#39;</span>,npts
-<a name="ln-127"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers in phase space: &#39;</span>,nw
-<a name="ln-128"></a>    <span class="nb">print</span>, <span class="s1">&#39;Total Number of Fast-ions in phase space: &#39;</span>,particle_weight<span class="o">*</span>nw
-<a name="ln-129"></a>
-<a name="ln-130"></a>    fbm_struct <span class="o">=</span> {type<span class="o">:</span><span class="mi">2</span>,time<span class="o">:</span><span class="nb">double</span>(time),data_source<span class="o">:</span><span class="nb">file_expand_path</span>(infile), $
-<a name="ln-131"></a>                  nparticle<span class="o">:</span><span class="nb">long</span>(nw),nclass<span class="o">:</span><span class="mi">1</span>,r<span class="o">:</span>r[ww],z<span class="o">:</span>w[ww],$
-<a name="ln-132"></a>                  energy<span class="o">:</span>energy[ww],pitch<span class="o">:</span>pitch[ww],class<span class="o">:</span>orbit_class[ww],$
-<a name="ln-133"></a>                  weight<span class="o">:</span>weight[ww]}
-<a name="ln-134"></a>
-<a name="ln-135"></a>    <span class="nb">return</span>, fbm_struct
-<a name="ln-136"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> read_mc_nubeam,infile,ntotal<span class="o">=</span>ntotal,e_range<span class="o">=</span>e_range,p_range<span class="o">=</span>p_range,particle_weight <span class="o">=</span> particle_weight,btipsign<span class="o">=</span>btipsign
+<a id="ln-2" name="ln-2"></a><span class="c1">    ;+#read_mc_nubeam</span>
+<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Reads guiding center Monte Carlo NUBEAM fast-ion distribution file</span>
+<a id="ln-4" name="ln-4"></a><span class="c1">    ;+***</span>
+<a id="ln-5" name="ln-5"></a><span class="c1">    ;+##Arguments</span>
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+    **infile**: NUBEAM Monte Carlo distribution file</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+##Keyword Arguments</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+    **ntotal**: Total number of fast-ions</span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+    **e_range**: Energy range of particles to consider</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+    **p_range**: Pitch range of particles to consider</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+    **particle_weight**: Set particle/marker weight such that sum(particle_weights) = ntotal: Defaults to `ntotal`/nparticles</span>
+<a id="ln-16" name="ln-16"></a><span class="c1">    ;+</span>
+<a id="ln-17" name="ln-17"></a><span class="c1">    ;+    **btipsign**: Sign of the dot product between the current and magnetic field (Required)</span>
+<a id="ln-18" name="ln-18"></a><span class="c1">    ;+</span>
+<a id="ln-19" name="ln-19"></a><span class="c1">    ;+##Return Value</span>
+<a id="ln-20" name="ln-20"></a><span class="c1">    ;+Distribution structure</span>
+<a id="ln-21" name="ln-21"></a><span class="c1">    ;+</span>
+<a id="ln-22" name="ln-22"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-23" name="ln-23"></a><span class="c1">    ;+```idl</span>
+<a id="ln-24" name="ln-24"></a><span class="c1">    ;+IDL&gt; dist = read_spiral(&quot;./spiral_file.TXT&quot;,time=1.0, ntotal=1e19)</span>
+<a id="ln-25" name="ln-25"></a><span class="c1">    ;+```</span>
+<a id="ln-26" name="ln-26"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(btipsign) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-27" name="ln-27"></a>        error,<span class="s1">&#39;btipsign is not set.&#39;</span>,<span class="o">/</span>halt
+<a id="ln-28" name="ln-28"></a>    <span class="k">endif</span>
+<a id="ln-29" name="ln-29"></a>
+<a id="ln-30" name="ln-30"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(ntotal) <span class="k">and</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-31" name="ln-31"></a>        warn,<span class="s1">&#39;Ntotal not set. Setting arbitrarily to 1e19&#39;</span>
+<a id="ln-32" name="ln-32"></a>        ntotal <span class="o">=</span> <span class="mf">1.d19</span>
+<a id="ln-33" name="ln-33"></a>    <span class="k">endif</span>
+<a id="ln-34" name="ln-34"></a>
+<a id="ln-35" name="ln-35"></a>    zzz<span class="o">=</span>FINDFILE(infile)
+<a id="ln-36" name="ln-36"></a>    <span class="k">if</span> zzz <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-37" name="ln-37"></a>        error, <span class="s1">&#39;Nonexistent file: &#39;</span><span class="o">+</span>infile,<span class="o">/</span>halt
+<a id="ln-38" name="ln-38"></a>    <span class="k">endif</span>
+<a id="ln-39" name="ln-39"></a>    
+<a id="ln-40" name="ln-40"></a>    openr,unit,infile, <span class="o">/</span><span class="nb">get_lun</span>
+<a id="ln-41" name="ln-41"></a>    line<span class="o">=</span><span class="s1">&#39; &#39;</span>
+<a id="ln-42" name="ln-42"></a>    readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
+<a id="ln-43" name="ln-43"></a>    readf,unit,line
+<a id="ln-44" name="ln-44"></a>    pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;N=&#39;</span>)
+<a id="ln-45" name="ln-45"></a>    <span class="k">if</span> pos <span class="k">eq</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-46" name="ln-46"></a>        error,<span class="s1">&#39;Second line is missing the number of points&#39;</span>,<span class="o">/</span>halt
+<a id="ln-47" name="ln-47"></a>    <span class="k">endif</span>
+<a id="ln-48" name="ln-48"></a>
+<a id="ln-49" name="ln-49"></a>    w <span class="o">=</span> <span class="nb">stregex</span>(line,<span class="s1">&#39;N *= *([0-9]*)&#39;</span>,<span class="o">/</span>sub,<span class="o">/</span>extract)
+<a id="ln-50" name="ln-50"></a>    npts <span class="o">=</span> <span class="nb">long</span>(w[<span class="mi">1</span>])
+<a id="ln-51" name="ln-51"></a>    <span class="k">if</span> npts <span class="k">lt</span> <span class="mi">5</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-52" name="ln-52"></a>        error,<span class="s1">&#39;Too few points &#39;</span><span class="o">+</span><span class="nb">strtrim</span>(npts,<span class="mi">2</span>),<span class="o">/</span>halt
+<a id="ln-53" name="ln-53"></a>    <span class="k">endif</span>
+<a id="ln-54" name="ln-54"></a><span class="c1">    </span>
+<a id="ln-55" name="ln-55"></a><span class="c1">    ; Get time</span>
+<a id="ln-56" name="ln-56"></a>    readf,unit,line
+<a id="ln-57" name="ln-57"></a>    parts<span class="o">=</span>str_sep(line, <span class="s1">&#39; &#39;</span>)
+<a id="ln-58" name="ln-58"></a>    w<span class="o">=</span><span class="nb">where</span>(parts <span class="k">eq</span> <span class="s1">&#39;TIME&#39;</span>,nw)
+<a id="ln-59" name="ln-59"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-60" name="ln-60"></a>        error,<span class="s1">&#39;Time not found on 3rd line&#39;</span>,<span class="o">/</span>halt
+<a id="ln-61" name="ln-61"></a>    <span class="k">endif</span>
+<a id="ln-62" name="ln-62"></a>    i<span class="o">=</span><span class="mi">1</span>
+<a id="ln-63" name="ln-63"></a>    <span class="k">while</span> <span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-64" name="ln-64"></a>        s <span class="o">=</span> parts[w[<span class="mi">0</span>]<span class="o">+</span>i]
+<a id="ln-65" name="ln-65"></a>        <span class="k">if</span> s <span class="k">ne</span> <span class="s1">&#39;&#39;</span> <span class="k">and</span> s <span class="k">ne</span> <span class="s1">&#39;=&#39;</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-66" name="ln-66"></a>            time <span class="o">=</span> <span class="nb">float</span>(s)
+<a id="ln-67" name="ln-67"></a>            <span class="k">break</span>
+<a id="ln-68" name="ln-68"></a>        <span class="k">endif</span>
+<a id="ln-69" name="ln-69"></a>        i <span class="o">=</span> i<span class="o">+</span><span class="mi">1</span>
+<a id="ln-70" name="ln-70"></a>    <span class="k">endwhile</span>
+<a id="ln-71" name="ln-71"></a>    data<span class="o">=</span><span class="nb">fltarr</span>(<span class="mi">4</span>,npts)
+<a id="ln-72" name="ln-72"></a>    
+<a id="ln-73" name="ln-73"></a>    ready<span class="o">=</span><span class="mi">0</span>
+<a id="ln-74" name="ln-74"></a>    <span class="k">while</span> <span class="k">not</span> ready <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-75" name="ln-75"></a>        readf,unit,line  ; Description line
+<a id="ln-76" name="ln-76"></a>        pos<span class="o">=</span><span class="nb">strpos</span>(line,<span class="s1">&#39;R(cm)&#39;</span>)
+<a id="ln-77" name="ln-77"></a>        <span class="k">if</span> pos <span class="k">gt</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span> ready<span class="o">=</span><span class="mi">1</span>
+<a id="ln-78" name="ln-78"></a>    <span class="k">endwhile</span>
+<a id="ln-79" name="ln-79"></a> 
+<a id="ln-80" name="ln-80"></a>    <span class="k">for</span> i<span class="o">=</span><span class="il">0L</span>,npts<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-81" name="ln-81"></a>        readf,unit,line           ; <span class="nb">read</span> <span class="nb">string</span>
+<a id="ln-82" name="ln-82"></a>        line<span class="o">=</span><span class="nb">strcompress</span>(line)
+<a id="ln-83" name="ln-83"></a>        parts <span class="o">=</span> str_sep(line, <span class="s1">&#39; &#39;</span>) &amp; np<span class="o">=</span><span class="nb">n_elements</span>(parts)
+<a id="ln-84" name="ln-84"></a>        <span class="k">if</span> parts(<span class="mi">0</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">then</span> parts<span class="o">=</span><span class="nb">shift</span>(parts,<span class="o">-</span><span class="mi">1</span>) ; accommodate blank before 1st
+<a id="ln-85" name="ln-85"></a>
+<a id="ln-86" name="ln-86"></a>        <span class="k">while</span> parts(np<span class="o">-</span><span class="mi">1</span>) <span class="k">eq</span> <span class="s1">&#39;&#39;</span> <span class="k">do</span> np<span class="o">=</span>np<span class="o">-</span><span class="mi">1</span>
+<a id="ln-87" name="ln-87"></a>
+<a id="ln-88" name="ln-88"></a>        <span class="k">if</span> np <span class="k">ne</span> <span class="mi">4</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-89" name="ln-89"></a>            error,<span class="s1">&#39;Wrong number of entries on line: &#39;</span><span class="o">+</span>line
+<a id="ln-90" name="ln-90"></a>        <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-91" name="ln-91"></a>            data[<span class="o">*</span>,i]<span class="o">=</span>parts[<span class="mi">0</span><span class="o">:</span>np<span class="o">-</span><span class="mi">1</span>]
+<a id="ln-92" name="ln-92"></a>        <span class="k">endelse</span>
+<a id="ln-93" name="ln-93"></a>        <span class="nb">print</span>,format<span class="o">=</span><span class="s1">&#39;(f7.2,&quot;%&quot;,A,$)&#39;</span>,<span class="mf">100.0</span><span class="o">*</span>(i<span class="o">+</span><span class="mi">1</span>)<span class="o">/</span><span class="nb">float</span>(npts),<span class="nb">string</span>(<span class="m">13b</span>)
+<a id="ln-94" name="ln-94"></a>    <span class="k">endfor</span>   
+<a id="ln-95" name="ln-95"></a>    <span class="nb">free_lun</span>, unit
+<a id="ln-96" name="ln-96"></a>
+<a id="ln-97" name="ln-97"></a>    r<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">0</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
+<a id="ln-98" name="ln-98"></a>    w<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">1</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))
+<a id="ln-99" name="ln-99"></a>    pitch<span class="o">=</span><span class="nb">double</span>(<span class="nb">reform</span>(data[<span class="mi">2</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>]))<span class="o">*</span>btipsign
+<a id="ln-100" name="ln-100"></a>    energy<span class="o">=</span><span class="nb">reform</span>(data[<span class="mi">3</span>,<span class="mi">0</span><span class="o">:</span>npts<span class="o">-</span><span class="mi">1</span>])<span class="o">*</span><span class="mf">1.d-3</span> ;keV
+<a id="ln-101" name="ln-101"></a>    orbit_class <span class="o">=</span> <span class="nb">replicate</span>(<span class="mi">1</span>,npts)
+<a id="ln-102" name="ln-102"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(particle_weight) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-103" name="ln-103"></a>        particle_weight <span class="o">=</span> ntotal<span class="o">/</span><span class="nb">float</span>(npts)
+<a id="ln-104" name="ln-104"></a>    <span class="k">endif</span>
+<a id="ln-105" name="ln-105"></a>    weight <span class="o">=</span> <span class="nb">replicate</span>(particle_weight,npts)
+<a id="ln-106" name="ln-106"></a>
+<a id="ln-107" name="ln-107"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(e_range) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-108" name="ln-108"></a>        e_range <span class="o">=</span> [<span class="nb">min</span>(energy),<span class="nb">max</span>(energy)]
+<a id="ln-109" name="ln-109"></a>    <span class="k">endif</span>
+<a id="ln-110" name="ln-110"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(p_range) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-111" name="ln-111"></a>        p_range <span class="o">=</span> [<span class="nb">min</span>(pitch),<span class="nb">max</span>(pitch)]
+<a id="ln-112" name="ln-112"></a>    <span class="k">endif</span>
+<a id="ln-113" name="ln-113"></a>
+<a id="ln-114" name="ln-114"></a>    ww <span class="o">=</span> <span class="nb">where</span>(energy <span class="k">ge</span> e_range[<span class="mi">0</span>] <span class="k">and</span> energy <span class="k">le</span> e_range[<span class="mi">1</span>],nw)
+<a id="ln-115" name="ln-115"></a>    <span class="k">if</span> nw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-116" name="ln-116"></a>        error,<span class="s1">&#39;No particles fall in requested energy range&#39;</span>,<span class="o">/</span>halt
+<a id="ln-117" name="ln-117"></a>    <span class="k">endif</span>
+<a id="ln-118" name="ln-118"></a>    wwp <span class="o">=</span> <span class="nb">where</span>(pitch[ww] <span class="k">ge</span> p_range[<span class="mi">0</span>] <span class="k">and</span> pitch[ww] <span class="k">le</span> p_range[<span class="mi">1</span>],nwp)
+<a id="ln-119" name="ln-119"></a>    <span class="k">if</span> nwp <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-120" name="ln-120"></a>        error,<span class="s1">&#39;No particles fall in the requested pitch range&#39;</span>,<span class="o">/</span>halt
+<a id="ln-121" name="ln-121"></a>    <span class="k">endif</span>
+<a id="ln-122" name="ln-122"></a>    ww <span class="o">=</span> ww[wwp]
+<a id="ln-123" name="ln-123"></a>    nw <span class="o">=</span> <span class="nb">n_elements</span>(ww)
+<a id="ln-124" name="ln-124"></a>
+<a id="ln-125" name="ln-125"></a>    <span class="nb">print</span>, <span class="s1">&#39;Time: &#39;</span>,time  
+<a id="ln-126" name="ln-126"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers: &#39;</span>,npts
+<a id="ln-127" name="ln-127"></a>    <span class="nb">print</span>,<span class="s1">&#39;Number of markers in phase space: &#39;</span>,nw
+<a id="ln-128" name="ln-128"></a>    <span class="nb">print</span>, <span class="s1">&#39;Total Number of Fast-ions in phase space: &#39;</span>,particle_weight<span class="o">*</span>nw
+<a id="ln-129" name="ln-129"></a>
+<a id="ln-130" name="ln-130"></a>    fbm_struct <span class="o">=</span> {type<span class="o">:</span><span class="mi">2</span>,time<span class="o">:</span><span class="nb">double</span>(time),data_source<span class="o">:</span><span class="nb">file_expand_path</span>(infile), $
+<a id="ln-131" name="ln-131"></a>                  nparticle<span class="o">:</span><span class="nb">long</span>(nw),nclass<span class="o">:</span><span class="mi">1</span>,r<span class="o">:</span>r[ww],z<span class="o">:</span>w[ww],$
+<a id="ln-132" name="ln-132"></a>                  energy<span class="o">:</span>energy[ww],pitch<span class="o">:</span>pitch[ww],class<span class="o">:</span>orbit_class[ww],$
+<a id="ln-133" name="ln-133"></a>                  weight<span class="o">:</span>weight[ww]}
+<a id="ln-134" name="ln-134"></a>
+<a id="ln-135" name="ln-135"></a>    <span class="nb">return</span>, fbm_struct
+<a id="ln-136" name="ln-136"></a><span class="k">END</span>
 </pre></div>
 
     </section>

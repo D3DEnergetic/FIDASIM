@@ -249,74 +249,74 @@
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">FUNCTION</span> is_left, p0, p1, p2
-<a name="ln-2"></a>    <span class="nb">return</span>, ((p1[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p2[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]) <span class="o">-</span> (p2[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p1[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]))
-<a name="ln-3"></a><span class="k">END</span>
-<a name="ln-4"></a>
-<a name="ln-5"></a><span class="k">FUNCTION</span> in_vessel, rwall, zwall, r, z
-<a name="ln-6"></a><span class="c1">    ;+#in_vessel</span>
-<a name="ln-7"></a><span class="c1">    ;+Calculates whether a given r,z is within the vessel</span>
-<a name="ln-8"></a><span class="c1">    ;+***</span>
-<a name="ln-9"></a><span class="c1">    ;+##Arguments</span>
-<a name="ln-10"></a><span class="c1">    ;+    **rwall**: r values of the wall</span>
-<a name="ln-11"></a><span class="c1">    ;+</span>
-<a name="ln-12"></a><span class="c1">    ;+    **zwall**: z values of the wall</span>
-<a name="ln-13"></a><span class="c1">    ;+</span>
-<a name="ln-14"></a><span class="c1">    ;+    **r**: r values</span>
-<a name="ln-15"></a><span class="c1">    ;+</span>
-<a name="ln-16"></a><span class="c1">    ;+    **z**: z values</span>
-<a name="ln-17"></a><span class="c1">    ;+</span>
-<a name="ln-18"></a><span class="c1">    ;+##Return Value</span>
-<a name="ln-19"></a><span class="c1">    ;+    0 for false, 1 for true</span>
-<a name="ln-20"></a><span class="c1">    ;+</span>
-<a name="ln-21"></a><span class="c1">    ;+##Example Usage</span>
-<a name="ln-22"></a><span class="c1">    ;+```idl</span>
-<a name="ln-23"></a><span class="c1">    ;+IDL&gt; inv = in_vessel(rwall,zwall,r,z)</span>
-<a name="ln-24"></a><span class="c1">    ;+```</span>
-<a name="ln-25"></a>
-<a name="ln-26"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(rwall) <span class="k">ne</span> <span class="nb">n_elements</span>(zwall) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-27"></a>        error, <span class="s2">&quot;rwall and zwall must have the same number of elements&quot;</span>
-<a name="ln-28"></a>        <span class="nb">stop</span>
-<a name="ln-29"></a>    <span class="k">endif</span>
-<a name="ln-30"></a>    nv <span class="o">=</span> <span class="nb">n_elements</span>(rwall)
-<a name="ln-31"></a>    v <span class="o">=</span> [[<span class="nb">reform</span>(rwall,nv)],[<span class="nb">reform</span>(zwall,nv)]]
-<a name="ln-32"></a>
-<a name="ln-33"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(r) <span class="k">ne</span> <span class="nb">n_elements</span>(z) <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-34"></a>        error, <span class="s2">&quot;r and z must have the same number of elements&quot;</span>
-<a name="ln-35"></a>        <span class="nb">stop</span>
-<a name="ln-36"></a>    <span class="k">endif</span>
-<a name="ln-37"></a>    np <span class="o">=</span> <span class="nb">n_elements</span>(r)
-<a name="ln-38"></a>    dims <span class="o">=</span> <span class="nb">size</span>(r,<span class="o">/</span>d)
-<a name="ln-39"></a>    rr <span class="o">=</span> <span class="nb">reform</span>(r,np)
-<a name="ln-40"></a>    zz <span class="o">=</span> <span class="nb">reform</span>(z,np)
-<a name="ln-41"></a>
-<a name="ln-42"></a>    inv <span class="o">=</span> <span class="nb">intarr</span>(np)
-<a name="ln-43"></a>    <span class="k">for</span> ip<span class="o">=</span><span class="mi">0</span>, np<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-44"></a>        p <span class="o">=</span> [rr[ip], zz[ip]]
-<a name="ln-45"></a>
-<a name="ln-46"></a>        wn <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-47"></a>        <span class="k">for</span> i <span class="o">=</span> <span class="mi">0</span>, nv<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
-<a name="ln-48"></a>            i1 <span class="o">=</span> (i <span class="o">+</span> <span class="mi">1</span>) <span class="k">mod</span> nv
-<a name="ln-49"></a>            <span class="k">if</span> v[i,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-50"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">gt</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-51"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">gt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-52"></a>                        wn <span class="o">=</span> wn <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-53"></a>                    <span class="k">endif</span>
-<a name="ln-54"></a>                <span class="k">endif</span>
-<a name="ln-55"></a>            <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a name="ln-56"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-57"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">lt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
-<a name="ln-58"></a>                        wn <span class="o">=</span> wn <span class="o">-</span> <span class="mi">1</span>
-<a name="ln-59"></a>                    <span class="k">endif</span>
-<a name="ln-60"></a>                <span class="k">endif</span>
-<a name="ln-61"></a>            <span class="k">endelse</span>
-<a name="ln-62"></a>        <span class="k">endfor</span>
-<a name="ln-63"></a>
-<a name="ln-64"></a>        inv[ip] <span class="o">=</span> wn <span class="k">ne</span> <span class="mi">0</span>
-<a name="ln-65"></a>    <span class="k">endfor</span>
-<a name="ln-66"></a>
-<a name="ln-67"></a>    <span class="nb">return</span>, <span class="nb">reform</span>(inv,dims)
-<a name="ln-68"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> is_left, p0, p1, p2
+<a id="ln-2" name="ln-2"></a>    <span class="nb">return</span>, ((p1[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p2[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]) <span class="o">-</span> (p2[<span class="mi">0</span>] <span class="o">-</span> p0[<span class="mi">0</span>])<span class="o">*</span>(p1[<span class="mi">1</span>] <span class="o">-</span> p0[<span class="mi">1</span>]))
+<a id="ln-3" name="ln-3"></a><span class="k">END</span>
+<a id="ln-4" name="ln-4"></a>
+<a id="ln-5" name="ln-5"></a><span class="k">FUNCTION</span> in_vessel, rwall, zwall, r, z
+<a id="ln-6" name="ln-6"></a><span class="c1">    ;+#in_vessel</span>
+<a id="ln-7" name="ln-7"></a><span class="c1">    ;+Calculates whether a given r,z is within the vessel</span>
+<a id="ln-8" name="ln-8"></a><span class="c1">    ;+***</span>
+<a id="ln-9" name="ln-9"></a><span class="c1">    ;+##Arguments</span>
+<a id="ln-10" name="ln-10"></a><span class="c1">    ;+    **rwall**: r values of the wall</span>
+<a id="ln-11" name="ln-11"></a><span class="c1">    ;+</span>
+<a id="ln-12" name="ln-12"></a><span class="c1">    ;+    **zwall**: z values of the wall</span>
+<a id="ln-13" name="ln-13"></a><span class="c1">    ;+</span>
+<a id="ln-14" name="ln-14"></a><span class="c1">    ;+    **r**: r values</span>
+<a id="ln-15" name="ln-15"></a><span class="c1">    ;+</span>
+<a id="ln-16" name="ln-16"></a><span class="c1">    ;+    **z**: z values</span>
+<a id="ln-17" name="ln-17"></a><span class="c1">    ;+</span>
+<a id="ln-18" name="ln-18"></a><span class="c1">    ;+##Return Value</span>
+<a id="ln-19" name="ln-19"></a><span class="c1">    ;+    0 for false, 1 for true</span>
+<a id="ln-20" name="ln-20"></a><span class="c1">    ;+</span>
+<a id="ln-21" name="ln-21"></a><span class="c1">    ;+##Example Usage</span>
+<a id="ln-22" name="ln-22"></a><span class="c1">    ;+```idl</span>
+<a id="ln-23" name="ln-23"></a><span class="c1">    ;+IDL&gt; inv = in_vessel(rwall,zwall,r,z)</span>
+<a id="ln-24" name="ln-24"></a><span class="c1">    ;+```</span>
+<a id="ln-25" name="ln-25"></a>
+<a id="ln-26" name="ln-26"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(rwall) <span class="k">ne</span> <span class="nb">n_elements</span>(zwall) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-27" name="ln-27"></a>        error, <span class="s2">&quot;rwall and zwall must have the same number of elements&quot;</span>
+<a id="ln-28" name="ln-28"></a>        <span class="nb">stop</span>
+<a id="ln-29" name="ln-29"></a>    <span class="k">endif</span>
+<a id="ln-30" name="ln-30"></a>    nv <span class="o">=</span> <span class="nb">n_elements</span>(rwall)
+<a id="ln-31" name="ln-31"></a>    v <span class="o">=</span> [[<span class="nb">reform</span>(rwall,nv)],[<span class="nb">reform</span>(zwall,nv)]]
+<a id="ln-32" name="ln-32"></a>
+<a id="ln-33" name="ln-33"></a>    <span class="k">if</span> <span class="nb">n_elements</span>(r) <span class="k">ne</span> <span class="nb">n_elements</span>(z) <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-34" name="ln-34"></a>        error, <span class="s2">&quot;r and z must have the same number of elements&quot;</span>
+<a id="ln-35" name="ln-35"></a>        <span class="nb">stop</span>
+<a id="ln-36" name="ln-36"></a>    <span class="k">endif</span>
+<a id="ln-37" name="ln-37"></a>    np <span class="o">=</span> <span class="nb">n_elements</span>(r)
+<a id="ln-38" name="ln-38"></a>    dims <span class="o">=</span> <span class="nb">size</span>(r,<span class="o">/</span>d)
+<a id="ln-39" name="ln-39"></a>    rr <span class="o">=</span> <span class="nb">reform</span>(r,np)
+<a id="ln-40" name="ln-40"></a>    zz <span class="o">=</span> <span class="nb">reform</span>(z,np)
+<a id="ln-41" name="ln-41"></a>
+<a id="ln-42" name="ln-42"></a>    inv <span class="o">=</span> <span class="nb">intarr</span>(np)
+<a id="ln-43" name="ln-43"></a>    <span class="k">for</span> ip<span class="o">=</span><span class="mi">0</span>, np<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-44" name="ln-44"></a>        p <span class="o">=</span> [rr[ip], zz[ip]]
+<a id="ln-45" name="ln-45"></a>
+<a id="ln-46" name="ln-46"></a>        wn <span class="o">=</span> <span class="mi">0</span>
+<a id="ln-47" name="ln-47"></a>        <span class="k">for</span> i <span class="o">=</span> <span class="mi">0</span>, nv<span class="o">-</span><span class="mi">1</span> <span class="k">do</span> <span class="k">begin</span>
+<a id="ln-48" name="ln-48"></a>            i1 <span class="o">=</span> (i <span class="o">+</span> <span class="mi">1</span>) <span class="k">mod</span> nv
+<a id="ln-49" name="ln-49"></a>            <span class="k">if</span> v[i,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-50" name="ln-50"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">gt</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-51" name="ln-51"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">gt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-52" name="ln-52"></a>                        wn <span class="o">=</span> wn <span class="o">+</span> <span class="mi">1</span>
+<a id="ln-53" name="ln-53"></a>                    <span class="k">endif</span>
+<a id="ln-54" name="ln-54"></a>                <span class="k">endif</span>
+<a id="ln-55" name="ln-55"></a>            <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
+<a id="ln-56" name="ln-56"></a>                <span class="k">if</span> v[i1,<span class="mi">1</span>] <span class="k">le</span> p[<span class="mi">1</span>] <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-57" name="ln-57"></a>                    <span class="k">if</span> is_left(v[i,<span class="o">*</span>],v[i1,<span class="o">*</span>],p) <span class="k">lt</span> <span class="mf">0.0</span> <span class="k">then</span> <span class="k">begin</span>
+<a id="ln-58" name="ln-58"></a>                        wn <span class="o">=</span> wn <span class="o">-</span> <span class="mi">1</span>
+<a id="ln-59" name="ln-59"></a>                    <span class="k">endif</span>
+<a id="ln-60" name="ln-60"></a>                <span class="k">endif</span>
+<a id="ln-61" name="ln-61"></a>            <span class="k">endelse</span>
+<a id="ln-62" name="ln-62"></a>        <span class="k">endfor</span>
+<a id="ln-63" name="ln-63"></a>
+<a id="ln-64" name="ln-64"></a>        inv[ip] <span class="o">=</span> wn <span class="k">ne</span> <span class="mi">0</span>
+<a id="ln-65" name="ln-65"></a>    <span class="k">endfor</span>
+<a id="ln-66" name="ln-66"></a>
+<a id="ln-67" name="ln-67"></a>    <span class="nb">return</span>, <span class="nb">reform</span>(inv,dims)
+<a id="ln-68" name="ln-68"></a><span class="k">END</span>
 </pre></div>
 
     </section>

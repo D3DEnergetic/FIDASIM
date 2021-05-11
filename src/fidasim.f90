@@ -9644,24 +9644,13 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP ATOMIC UPDATE
             spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
-            !$OMP END ATOMIC
-            !$OMP ATOMIC UPDATE
             stokevec(i,1,bin,ichan) = stokevec(i,1,bin,ichan) + stokes(i,1)
-            !$OMP END ATOMIC
-            !$OMP ATOMIC UPDATE
             stokevec(i,2,bin,ichan) = stokevec(i,2,bin,ichan) + stokes(i,2)
-            !$OMP END ATOMIC
-            !$OMP ATOMIC UPDATE
             stokevec(i,3,bin,ichan) = stokevec(i,3,bin,ichan) + stokes(i,3)
-            !$OMP END ATOMIC
-            !$OMP ATOMIC UPDATE
             stokevec(i,4,bin,ichan) = stokevec(i,4,bin,ichan) + stokes(i,4)
-            !$OMP END ATOMIC
         enddo loop_over_stark
     enddo loop_over_channels
-
 end subroutine store_photons
 
 subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
@@ -10873,7 +10862,8 @@ subroutine nbi_spec
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
     !$OMP& nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&
     !$OMP& random3,f_tot,h_tot,t_tot,f_wght,h_wght,t_wght,&
-    !$OMP& full,half,third)
+    !$OMP& full,half,third, &
+    !$OMP& fullstokes, halfstokes, thirdstokes)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)

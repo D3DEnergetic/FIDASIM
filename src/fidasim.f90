@@ -9644,11 +9644,13 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
+            !$OMP CRITICAL(spec_stokes)
             spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
             stokevec(i,1,bin,ichan) = stokevec(i,1,bin,ichan) + stokes(i,1)
             stokevec(i,2,bin,ichan) = stokevec(i,2,bin,ichan) + stokes(i,2)
             stokevec(i,3,bin,ichan) = stokevec(i,3,bin,ichan) + stokes(i,3)
             stokevec(i,4,bin,ichan) = stokevec(i,4,bin,ichan) + stokes(i,4)
+            !$OMP END CRITICAL(spec_stokes)
         enddo loop_over_stark
     enddo loop_over_channels
 end subroutine store_photons
@@ -10855,7 +10857,7 @@ subroutine nbi_spec
     real(Float64) :: f_wght, h_wght, t_wght
     real(Float64) :: f_tot, h_tot, t_tot
     real(Float64), dimension(n_stark,inputs%nlambda,spec_chords%nchan) :: full, half, third
-    real(Float64), dimension(n_stark,4,inputs%nlambda,spec_chords%nchan) :: fullstokes, halfstokes, thirdstokes
+    real(Float64), dimension(:,:,:,:), allocatable :: fullstokes, halfstokes, thirdstokes
     logical :: inp
     integer :: n = 10000
 
@@ -10885,9 +10887,12 @@ subroutine nbi_spec
             ri = rc + beam_grid%dr*(random3 - 0.5)
             call in_plasma(ri,inp)
         enddo
-
+        allocate(fullstokes(n_stark,4,inputs%nlambda,spec_chords%nchan))
+        allocate(halfstokes(n_stark,4,inputs%nlambda,spec_chords%nchan))
+        allocate(thirdstokes(n_stark,4,inputs%nlambda,spec_chords%nchan))
         f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
         full  = 0.0 ; half  = 0.0 ; third = 0.0
+        fullstokes  = 0.0 ; halfstokes  = 0.0 ; thirdstokes = 0.0
         do it=1, n
             !! Full Spectra
             call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
@@ -10912,6 +10917,9 @@ subroutine nbi_spec
         spec%halfstokes = spec%halfstokes + halfstokes/h_tot
         spec%thirdstokes = spec%thirdstokes + thirdstokes/t_tot
         !$OMP END CRITICAL(nbi_spec_1)
+        deallocate(fullstokes)
+        deallocate(halfstokes)
+        deallocate(thirdstokes)
     enddo loop_over_cells
     !$OMP END PARALLEL DO
 
@@ -10921,7 +10929,6 @@ subroutine nbi_spec
     call parallel_sum(spec%half)
     call parallel_sum(spec%third)
 #endif
-
 end subroutine nbi_spec
 
 subroutine dcx_spec

@@ -5149,7 +5149,9 @@ subroutine write_spectra
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan) :: fullstokes, halfstokes, thirdstokes
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,n_thermal) :: dcx, halo, cold
+    real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,n_thermal) :: dcxstokes, halostokes, coldstokes
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
+    real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,particles%nclass) :: fidastokes, pfidastokes
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -5282,16 +5284,24 @@ subroutine write_spectra
 
     if(inputs%calc_dcx.ge.1) then
         spec%dcx = factor*spec%dcx
+        spec%dcxstokes = factor*spec%dcxstokes
         if (inputs%stark_components.eq.0) then
             dcx = sum(spec%dcx, dim=1)
+            do k = 1,4
+                dcxstokes(k,:,:,:) = sum(spec%dcxstokes(:,k,:,:,:), dim=1)
+            enddo
             call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 3, dims(2:4), &
                  dcx, error)
             call h5ltset_attribute_string_f(fid,"/dcx","description", &
                  "Direct Charge Exchange (DCX) emission: dcx(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltmake_compressed_dataset_double_f(fid,"/dcxstokes", 4, dims_stokes(2:5),&
+                 dcxstokes, error)
         else
             call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 4, dims, &
                  spec%dcx, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/dcxstokes", 5, dims_stokes, &
+                 spec%dcxstokes, error)
             call h5ltset_attribute_string_f(fid,"/dcx","description", &
                  "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
@@ -5300,19 +5310,27 @@ subroutine write_spectra
 
     if(inputs%calc_halo.ge.1) then
         spec%halo = factor*spec%halo
+        spec%halostokes = factor*spec%halostokes
         if (inputs%stark_components.eq.0) then
             halo = sum(spec%halo, dim=1)
+            do k = 1,4
+                halostokes(k,:,:,:) = sum(spec%halostokes(:,k,:,:,:), dim=1)
+            enddo
             call h5ltmake_compressed_dataset_double_f(fid, "/halo", 3, dims(2:4), &
                  halo, error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
                  "Halo component of the beam emmision: halo(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltmake_compressed_dataset_double_f(fid, "/halostokes", 4, dims_stokes(2:5), &
+                 halostokes, error)
         else
             call h5ltmake_compressed_dataset_double_f(fid, "/halo", 4, dims, &
                  spec%halo, error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
                  "Halo component of the beam emmision stark components: halo(stark,lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltmake_compressed_dataset_double_f(fid, "/halostokes", 5, dims_stokes(1:5), &
+                 spec%halostokes, error)
         endif
     endif
 
@@ -5331,13 +5349,19 @@ subroutine write_spectra
 
     if(inputs%calc_cold.ge.1) then
         spec%cold = factor*spec%cold
+        spec%coldstokes = factor*spec%coldstokes
         if (inputs%stark_components.eq.0) then
             cold = sum(spec%cold, dim=1)
+            do k=1,4
+                coldstokes(k,:,:,:) = sum(spec%coldstokes(:,k,:,:,:), dim=1)
+            enddo
             call h5ltmake_compressed_dataset_double_f(fid, "/cold", 3, dims(2:4), &
                  cold, error)
             call h5ltset_attribute_string_f(fid,"/cold","description", &
                  "Cold D-alpha emission: cold(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltmake_compressed_dataset_double_f(fid, "/coldstokes", 4, dims_stokes(2:5), &
+                 coldstokes, error)
         else
             call h5ltmake_compressed_dataset_double_f(fid, "/cold", 4, dims, &
                  spec%cold, error)
@@ -5345,24 +5369,36 @@ subroutine write_spectra
                  "Cold D-alpha emission stark components: cold(stark,lambda,chan,species)", &
                  error)
             call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltmake_compressed_dataset_double_f(fid, "/coldstokes", 5, dims_stokes, &
+                 spec%coldstokes, error)
         endif
     endif
 
     dims(4) = particles%nclass
     if(inputs%calc_fida.ge.1) then
         spec%fida = factor*spec%fida
-        if (inputs%stark_components.eq.0) fida = sum(spec%fida, dim=1)
+        spec%fidastokes = factor*spec%fidastokes
+        if(inputs%stark_components.eq.0) then
+            fida = sum(spec%fida, dim=1)
+            do k = 1,4
+                fidastokes(k,:,:,:) = sum(spec%fidastokes(:,k,:,:,:), dim=1)
+            enddo
+        endif
         !Write variables
         if(particles%nclass.le.1) then
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
                      dims(2:3), fida(:,:,1), error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 3, &
+                     dims_stokes(2:4), fidastokes(:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                      dims(1:3), spec%fida(:,:,:,1), error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
+                     dims_stokes(1:4), spec%fidastokes(:,:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan)", &
@@ -5373,12 +5409,16 @@ subroutine write_spectra
                 call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                      dims(2:4), fida, error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 4, &
+                     dims_stokes(2:5), fidastokes, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
                      dims, spec%fida, error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 5, &
+                     dims_stokes, spec%fidastokes, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
@@ -5390,18 +5430,28 @@ subroutine write_spectra
 
     if(inputs%calc_pfida.ge.1) then
         spec%pfida = factor*spec%pfida
-        if (inputs%stark_components.eq.0) pfida = sum(spec%pfida, dim=1)
+        spec%pfidastokes = factor*spec%pfidastokes
+        if (inputs%stark_components.eq.0) then
+            pfida = sum(spec%pfida, dim=1)
+            do k = 1,4
+                pfidastokes(k,:,:,:) = sum(spec%pfidastokes(:,k,:,:,:), dim=1)
+            enddo
+        endif
         !Write variables
         if(particles%nclass.le.1) then
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
                      dims(2:3), pfida(:,:,1), error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidastokes", 3, &
+                     dims_stokes(2:4), pfidastokes(:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
                      dims(1:3), spec%pfida(:,:,:,1), error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidastokes", 4, &
+                     dims_stokes(1:4), spec%pfidastokes(:,:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan)", &
@@ -5414,12 +5464,16 @@ subroutine write_spectra
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
                      dims(2:4), pfida, error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidastokes", 4, &
+                     dims_stokes(2:5), pfidastokes, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan,class)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 4, &
                      dims, spec%pfida, error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidastokes", 5, &
+                     dims_stokes, spec%pfidastokes, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan,class)", &

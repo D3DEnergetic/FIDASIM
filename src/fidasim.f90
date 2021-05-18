@@ -4718,9 +4718,9 @@ subroutine write_neutral_population(id, pop, error)
        call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
        call h5ltset_attribute_string_f(gid,"v","description", &
             "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
+       !Close reservoir group
+       call h5gclose_f(gid, error)
     endif
-    !Close grid group
-    call h5gclose_f(gid, error)
 
     deallocate(v,w,n)
 

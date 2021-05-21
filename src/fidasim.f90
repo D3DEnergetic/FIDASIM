@@ -9607,9 +9607,10 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64) :: m, h, normfactor
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
-    real(Float64) :: E, B, cos_los_Efield, lambda_shifted, q0, q1, l0
+    real(Float64) :: E, B, cos_los_Efield, cos_los_Bfield, lambda_shifted, q0, q1, l0, szratio
     integer, dimension(n_stark) :: stark_sign
-    real(Float64), dimension(15) :: wavel
+    real(Float64), dimension(n_stark) :: wavel
+    real(Float64), dimension(n_stark) :: circularity
     stark_sign = +1*stark_sigma - 1*stark_pi
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9638,6 +9639,9 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
     ! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
+    ! szratio is gamma/epsilon factor. can be thought of as roughly stark energy shift/ zeeman energy shift.
+    szratio = (e0*h*B/(4*pi*m))/(3*a_0*e0*E)
+
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
     if(n_stark.eq.15) then
@@ -9656,10 +9660,13 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         wavel(13) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-1))*l0)
         wavel(14) = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(-2))*l0)
         wavel(15) = 2*c0*h*l0/(2*c0*h+(-2*q0*(1)+q1*(-2))*l0)
+        circularity = [1.0/3,4.0/3,5.0/3,-97.0/123,-1.0/2,-17.0/81,-1.0/3,0.0,1.0/3,17.0/81,1.0/2,97.0/123,-5.0/3,-4.0/3,-1.0/3]
+        circularity = circularity*szratio
     else if(n_stark.eq.3) then
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
+        circularity = 0.d0
     endif
     !lambda =  lambda_shifted + E * stark_wavel ![nm] <-old calculation for pure stark effect
     wavel = (wavel-l0)*10**9    ! converting to [nm]
@@ -9670,14 +9677,18 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     else
         cos_los_Efield = dot_product(vp,efield) / E
     endif
-
+    if (B .eq. 0.d0) then
+        cos_los_Bfield = 0.d0
+    else
+        cos_los_Bfield = dot_product(vp,bfield) / B
+    endif
     !calculate stokes parameters
     intensity = stark_intens
     do l = 1,n_stark
         stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
         stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
-        stokes(l,3) = 0
-        stokes(l,4) = 0
+        stokes(l,3) = 0.d0
+        stokes(l,4) = 2*intensity(l)*cos_los_Bfield*circularity(l)
     end do
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio

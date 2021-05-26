@@ -5142,7 +5142,7 @@ subroutine write_spectra
     integer :: error
 
     character(charlim) :: filename
-    integer :: i, k
+    integer :: i
     real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
 
@@ -5226,11 +5226,9 @@ subroutine write_spectra
             full  = sum(spec%full, dim=1)
             half  = sum(spec%half, dim=1)
             third = sum(spec%third, dim=1)
-            do k = 1,4
-                fullstokes(k,:,:) = sum(spec%fullstokes(:,k,:,:),dim=1)
-                halfstokes(k,:,:) = sum(spec%halfstokes(:,k,:,:), dim=1)
-                thirdstokes(k,:,:) = sum(spec%thirdstokes(:,k,:,:), dim=1)
-            enddo
+            fullstokes = sum(spec%fullstokes,dim=1)
+            halfstokes = sum(spec%halfstokes, dim=1)
+            thirdstokes = sum(spec%thirdstokes, dim=1)
             !Write variables
             call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(2:3), &
                  full, error)
@@ -5308,9 +5306,7 @@ subroutine write_spectra
         spec%dcxstokes = factor*spec%dcxstokes
         if (inputs%stark_components.eq.0) then
             dcx = sum(spec%dcx, dim=1)
-            do k = 1,4
-                dcxstokes(k,:,:,:) = sum(spec%dcxstokes(:,k,:,:,:), dim=1)
-            enddo
+            dcxstokes = sum(spec%dcxstokes, dim=1)
             call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 3, dims(2:4), &
                  dcx, error)
             call h5ltset_attribute_string_f(fid,"/dcx","description", &
@@ -5340,9 +5336,7 @@ subroutine write_spectra
         spec%halostokes = factor*spec%halostokes
         if (inputs%stark_components.eq.0) then
             halo = sum(spec%halo, dim=1)
-            do k = 1,4
-                halostokes(k,:,:,:) = sum(spec%halostokes(:,k,:,:,:), dim=1)
-            enddo
+            halostokes = sum(spec%halostokes, dim=1)
             call h5ltmake_compressed_dataset_double_f(fid, "/halo", 3, dims(2:4), &
                  halo, error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
@@ -5385,9 +5379,7 @@ subroutine write_spectra
         spec%coldstokes = factor*spec%coldstokes
         if (inputs%stark_components.eq.0) then
             cold = sum(spec%cold, dim=1)
-            do k=1,4
-                coldstokes(k,:,:,:) = sum(spec%coldstokes(:,k,:,:,:), dim=1)
-            enddo
+            coldstokes = sum(spec%coldstokes, dim=1)
             call h5ltmake_compressed_dataset_double_f(fid, "/cold", 3, dims(2:4), &
                  cold, error)
             call h5ltset_attribute_string_f(fid,"/cold","description", &
@@ -5419,9 +5411,7 @@ subroutine write_spectra
         spec%fidastokes = factor*spec%fidastokes
         if(inputs%stark_components.eq.0) then
             fida = sum(spec%fida, dim=1)
-            do k = 1,4
-                fidastokes(k,:,:,:) = sum(spec%fidastokes(:,k,:,:,:), dim=1)
-            enddo
+            fidastokes = sum(spec%fidastokes, dim=1)
         endif
         !Write variables
         if(particles%nclass.le.1) then
@@ -5483,9 +5473,7 @@ subroutine write_spectra
         spec%pfidastokes = factor*spec%pfidastokes
         if (inputs%stark_components.eq.0) then
             pfida = sum(spec%pfida, dim=1)
-            do k = 1,4
-                pfidastokes(k,:,:,:) = sum(spec%pfidastokes(:,k,:,:,:), dim=1)
-            enddo
+            pfidastokes = sum(spec%pfidastokes, dim=1)
         endif
         !Write variables
         if(particles%nclass.le.1) then
@@ -9603,14 +9591,13 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(n_stark), intent(out) :: intensity
     real(Float64), dimension(n_stark,4), intent(out) :: stokes
         !+ Spectra intensities [Ph/(s cm^2 starkline)]
-    integer(Int32) :: l
     real(Float64) :: m, h, normfactor
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, B, cos_los_Efield, cos_los_Bfield, lambda_shifted, q0, q1, l0, szratio
     integer, dimension(n_stark) :: stark_sign
     real(Float64), dimension(n_stark) :: wavel
-    real(Float64), dimension(n_stark) :: circularity
+    real(Float64), dimension(:), allocatable :: circularity
     stark_sign = +1*stark_sigma - 1*stark_pi
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9640,8 +9627,12 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     ! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     ! szratio is gamma/epsilon factor. can be thought of as roughly stark energy shift/ zeeman energy shift.
-    szratio = (e0*h*B/(4*pi*m))/(3*a_0*e0*E)
-
+    if(E.eq.0.d0)then
+    	szratio = 0.d0
+    else
+    	szratio = (e0*h*B/(4*pi*m))/(3*a_0*e0*E)
+    endif
+    allocate(circularity(n_stark))
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
     if(n_stark.eq.15) then
@@ -9666,7 +9657,8 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
         wavel(1) = c0*h*l0/(c0*h+q0*(-1)*l0)
         wavel(2) = c0*h*l0/(c0*h+q0*(0)*l0)
         wavel(3) = c0*h*l0/(c0*h+q0*(1)*l0)
-        circularity = 0.d0
+        circularity = [1.0,0.0,-1.0]
+        circularity = circularity*szratio
     endif
     !lambda =  lambda_shifted + E * stark_wavel ![nm] <-old calculation for pure stark effect
     wavel = (wavel-l0)*10**9    ! converting to [nm]
@@ -9684,12 +9676,10 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     endif
     !calculate stokes parameters
     intensity = stark_intens
-    do l = 1,n_stark
-        stokes(l,1) = intensity(l)*(1.d0+ cos_los_Efield**2)*stark_sigma(l)*sigma_pi +  intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
-        stokes(l,2) = intensity(l)*(1.d0- cos_los_Efield**2)*stark_sigma(l)*sigma_pi - intensity(l)*(1.d0- cos_los_Efield**2)*stark_pi(l)
-        stokes(l,3) = 0.d0
-        stokes(l,4) = 2*intensity(l)*cos_los_Bfield*circularity(l)
-    end do
+    stokes(:,1) = intensity*(1.d0+ cos_los_Efield**2)*stark_sigma*sigma_pi +  intensity*(1.d0- cos_los_Efield**2)*stark_pi
+    stokes(:,2) = intensity*(1.d0- cos_los_Efield**2)*stark_sigma*sigma_pi - intensity*(1.d0- cos_los_Efield**2)*stark_pi
+    stokes(:,3) = 0.d0
+    stokes(:,4) = 2*intensity*cos_los_Bfield*circularity
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
@@ -9698,10 +9688,8 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     !! normalize and multiply with photon density from colrad
     normfactor = (1/sum(intensity))*photons*dlength
     intensity = intensity/sum(intensity)*photons*dlength
-    stokes(:,1) = stokes(:,1)*normfactor
-    stokes(:,2) = stokes(:,2)*normfactor
-    stokes(:,3) = stokes(:,3)*normfactor
-    stokes(:,4) = stokes(:,4)*normfactor
+    stokes = stokes*normfactor
+    deallocate(circularity)
 endsubroutine spectrum
 
 subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
@@ -9770,10 +9758,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
             !$OMP CRITICAL(spec_stokes)
             spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
-            stokevec(i,1,bin,ichan) = stokevec(i,1,bin,ichan) + stokes(i,1)
-            stokevec(i,2,bin,ichan) = stokevec(i,2,bin,ichan) + stokes(i,2)
-            stokevec(i,3,bin,ichan) = stokevec(i,3,bin,ichan) + stokes(i,3)
-            stokevec(i,4,bin,ichan) = stokevec(i,4,bin,ichan) + stokes(i,4)
+            stokevec(i,:,bin,ichan) = stokevec(i,:,bin,ichan) + stokes(i,:)
             !$OMP END CRITICAL(spec_stokes)
         enddo loop_over_stark
     enddo loop_over_channels

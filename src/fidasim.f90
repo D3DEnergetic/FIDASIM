@@ -9626,7 +9626,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
     ! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
-    ! szratio is gamma/epsilon factor. can be thought of as roughly stark energy shift/ zeeman energy shift.
+    ! szratio is gamma/epsilon factor. can be thought of as roughly zeeman energy shift/ stark energy shift.
     if(E.eq.0.d0)then
     	szratio = 0.d0
     else

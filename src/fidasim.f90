@@ -9597,7 +9597,7 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64) :: E, B, cos_los_Efield, cos_los_Bfield, lambda_shifted, q0, q1, l0, szratio
     integer, dimension(n_stark) :: stark_sign
     real(Float64), dimension(n_stark) :: wavel
-    real(Float64), dimension(:), allocatable :: circularity
+    real(Float64), dimension(n_stark) :: circularity
     stark_sign = +1*stark_sigma - 1*stark_pi
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
@@ -9632,7 +9632,6 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     else
     	szratio = (e0*h*B/(4*pi*m))/(3*a_0*e0*E)
     endif
-    allocate(circularity(n_stark))
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
     if(n_stark.eq.15) then
@@ -9689,7 +9688,6 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     normfactor = (1/sum(intensity))*photons*dlength
     intensity = intensity/sum(intensity)*photons*dlength
     stokes = stokes*normfactor
-    deallocate(circularity)
 endsubroutine spectrum
 
 subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)

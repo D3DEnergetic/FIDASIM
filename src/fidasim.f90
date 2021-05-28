@@ -9503,11 +9503,11 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
         !+ Reference wavelength [nm]
     real(Float64), dimension(n_stark), intent(out) :: lambda
         !+ Wavelengths [nm]
-    real(Float64), dimension(15) :: wavel
+    real(Float64), dimension(:), allocatable :: wavel
     real(Float64), dimension(3) :: vp, vn
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, lambda_shifted, B, l0, h, q0, q1, m
-
+    allocate(wavel(n_stark))
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
 
@@ -9568,6 +9568,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     wavel = (wavel-l0)*10**9
     !! Stark Splitting
     lambda = lambda_shifted + wavel
+    deallocate(wavel)
 end
 
 subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambda, intensity, stokes)
@@ -9596,12 +9597,13 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, B, cos_los_Efield, cos_los_Bfield, lambda_shifted, q0, q1, l0, szratio
     integer, dimension(n_stark) :: stark_sign
-    real(Float64), dimension(n_stark) :: wavel
-    real(Float64), dimension(n_stark) :: circularity
+    real(Float64), dimension(:), allocatable :: wavel
+    real(Float64), dimension(:), allocatable :: circularity
     stark_sign = +1*stark_sigma - 1*stark_pi
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
-
+    allocate(wavel(n_stark))
+    allocate(circularity(n_stark))
     ! Calculate Doppler shift
     vn=vi*0.01d0 ! [m/s]
     lambda_shifted = lambda0*(1.d0 + dot_product(vn,vp)/c0)
@@ -9688,6 +9690,8 @@ subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambd
     normfactor = (1/sum(intensity))*photons*dlength
     intensity = intensity/sum(intensity)*photons*dlength
     stokes = stokes*normfactor
+    deallocate(wavel)
+    deallocate(circularity)
 endsubroutine spectrum
 
 subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)

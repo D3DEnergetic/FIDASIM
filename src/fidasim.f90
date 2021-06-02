@@ -10773,7 +10773,8 @@ subroutine dcx
 
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                         photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
+                        call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),&
+                            &spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
                     endif
                 enddo loop_along_track
             enddo loop_over_dcx
@@ -11089,7 +11090,8 @@ subroutine dcx_spec
             do it=1, n
                 !! DCX Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), wght*dcx_photons/n, spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*dcx_photons/n, &
+                    &spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -11139,7 +11141,8 @@ subroutine halo_spec
             do it=1, n
                 !! Halo Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), wght*halo_photons/n, spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
+                call store_photons(ri, vhalo, thermal_lambda0(is), wght*halo_photons/n, &
+                    &spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
             enddo
         enddo
     enddo loop_over_cells
@@ -11180,7 +11183,8 @@ subroutine cold_spec
             do it=1, n
                 !! Cold Spectra
                 call mc_halo(plasma, thermal_mass(is), vhalo)
-                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, spec%cold(:,:,:,is), spec%coldstokes(:,:,:,:,is), passive=.True.)
+                call store_photons(ri, vhalo, thermal_lambda0(is), cold_photons/n, &
+                    &spec%cold(:,:,:,is), spec%coldstokes(:,:,:,:,is), passive=.True.)
             enddo
         enddo
     enddo loop_over_cells

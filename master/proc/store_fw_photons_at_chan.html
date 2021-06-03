@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">28 statements</a>
+    title=" 0.2% of total for procedures.">29 statements</a>
      </li> 
      
      
@@ -700,6 +700,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
         <span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stokes</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlambda</span><span class="p">,</span><span class="n">intens_fac</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">bin</span>
 
@@ -707,7 +708,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
     <span class="n">dlambda</span><span class="o">=</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span>
     <span class="n">intens_fac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span>
     <span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span> <span class="p">&amp;</span>
-                  <span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">)</span>
+                  <span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">,</span> <span class="n">stokes</span> <span class="o">=</span> <span class="n">stokes</span><span class="p">)</span>
 
     <span class="c">!$OMP CRITICAL(fida_wght)</span>
     <span class="n">loop_over_stark</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_stark</span>

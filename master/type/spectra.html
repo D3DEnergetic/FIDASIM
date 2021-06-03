@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 2.1% of total for derived types.</p>Including implementation: 11 statements,  2.1% of total for derived types.">11 statements</a>
+    title="<p> 3.6% of total for derived types.</p>Including implementation: 19 statements,  3.6% of total for derived types.">19 statements</a>
      </li> 
      
      
@@ -185,15 +185,31 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-third">third</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-fullstokes">fullstokes</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-halfstokes">halfstokes</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-thirdstokes">thirdstokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-dcx">dcx</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-dcxstokes">dcxstokes</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-halostokes">halostokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-cold">cold</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-coldstokes">coldstokes</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-fidastokes">fidastokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-pfida">pfida</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-pfidastokes">pfidastokes</a>
       
     </div>
   </div>
@@ -259,15 +275,31 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-third">third</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-fullstokes">fullstokes</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-halfstokes">halfstokes</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-thirdstokes">thirdstokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-dcx">dcx</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-dcxstokes">dcxstokes</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-halostokes">halostokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-cold">cold</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-coldstokes">coldstokes</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-fidastokes">fidastokes</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-pfida">pfida</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-pfidastokes">pfidastokes</a>
       
     </div>
   </div>
@@ -369,7 +401,49 @@
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy beam emission stark components: third(n_stark,lambda,chan)</p></td>
+  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy beam emission stark components: thirdstokes(n_stark,lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fullstokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>fullstokes</strong></td><td></td><td></td><td><p>Full energy beam emission stark components: fullstokes(n_stark,4,lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-halfstokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>halfstokes</strong></td><td></td><td></td><td><p>Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-thirdstokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>thirdstokes</strong></td><td></td><td></td><td><p>Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)</p></td>
   
 </tr>
 
@@ -393,11 +467,39 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-dcxstokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>dcxstokes</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcxstokes(n_stark,4,lambda,chan,species)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-halo"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:), allocatable</td><td>::</td>
   <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan,species)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-halostokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>halostokes</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,4,lambda,chan,species)</p></td>
   
 </tr>
 
@@ -421,6 +523,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-coldstokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>coldstokes</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: coldstokes(n_stark,4,lambda,chan,species)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-fida"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -435,11 +551,39 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-fidastokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>fidastokes</strong></td><td></td><td></td><td><p>Active FIDA emission stark components: fidastokes(n_stark,4,lambda,chan,orbit_type)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-pfida"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:), allocatable</td><td>::</td>
   <td><strong>pfida</strong></td><td></td><td></td><td><p>Passive FIDA emission stark components: pfida(n_stark,lambda,chan,orbit_type)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pfidastokes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>pfidastokes</strong></td><td></td><td></td><td><p>Passive FIDA emission stark components: pfidastokes(n_stark,4,lambda,chan,orbit_type)</p></td>
   
 </tr>
 
@@ -468,17 +612,34 @@
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">half</span>
         <span class="c">!+ Half energy beam emission stark components: half(n_stark,lambda,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">third</span>
-        <span class="c">!+ Third energy beam emission stark components: third(n_stark,lambda,chan)</span>
+        <span class="c">!+ Third energy beam emission stark components: thirdstokes(n_stark,lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">fullstokes</span>
+        <span class="c">!+ Full energy beam emission stark components: fullstokes(n_stark,4,lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">halfstokes</span>
+        <span class="c">!+ Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">thirdstokes</span>
+        <span class="c">!+ Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)</span>
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dcx</span>
         <span class="c">!+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dcxstokes</span>
+        <span class="c">!+ Direct CX emission stark components: dcxstokes(n_stark,4,lambda,chan,species)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">halo</span>
         <span class="c">!+ Thermal halo emission stark components: halo(n_stark,lambda,chan,species)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">halostokes</span>
+        <span class="c">!+ Thermal halo emission stark components: halo(n_stark,4,lambda,chan,species)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">cold</span>
         <span class="c">!+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">coldstokes</span>
+        <span class="c">!+ Cold D-alpha emission stark components: coldstokes(n_stark,4,lambda,chan,species)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fida</span>
         <span class="c">!+ Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fidastokes</span>
+        <span class="c">!+ Active FIDA emission stark components: fidastokes(n_stark,4,lambda,chan,orbit_type)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">pfida</span>
         <span class="c">!+ Passive FIDA emission stark components: pfida(n_stark,lambda,chan,orbit_type)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">pfidastokes</span>
+        <span class="c">!+ Passive FIDA emission stark components: pfidastokes(n_stark,4,lambda,chan,orbit_type)</span>
 <span class="k">end type </span><span class="n">Spectra</span>
 </pre></div>
 

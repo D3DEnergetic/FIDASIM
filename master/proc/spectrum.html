@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">36 statements</a>
+    title=" 0.6% of total for procedures.">89 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambda, intensity)
+public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength, lambda, intensity, stokes)
     
     
    
@@ -361,7 +361,22 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
   <td></td>
   
   <td>dimension(n_stark)</td><td>::</td>
-  <td><strong>intensity</strong></td><td><p>Spectra intensities [Ph/(s cm^2 starkline)]</p></td>
+  <td><strong>intensity</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stokes"></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(n_stark,4)</td><td>::</td>
+  <td><strong>stokes</strong></td><td><p>Spectra intensities [Ph/(s cm^2 starkline)]</p></td>
   
 </tr>
 
@@ -422,48 +437,35 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
 <path fill="none" stroke="#000000" d="M340.399,-87.0355C358.67,-92.7622 380.434,-99.5839 398.578,-105.271"/>
 <polygon fill="#000000" stroke="#000000" points="397.651,-108.648 408.24,-108.299 399.745,-101.968 397.651,-108.648"/>
 </g>
-<!-- proc~store_fida_photons -->
-<g id="proc~~spectrum~~CalledByGraph_node4" class="node"><title>proc~store_fida_photons</title>
-<g id="a_proc~~spectrum~~CalledByGraph_node4"><a xlink:href=".././proc/store_fida_photons.html" xlink:title="store_fida_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="194,-66 90,-66 90,-42 194,-42 194,-66"/>
-<text text-anchor="middle" x="142" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
-</a>
-</g>
-</g>
-<!-- proc~store_fida_photons&#45;&gt;proc~store_photons -->
-<g id="proc~~spectrum~~CalledByGraph_edge7" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~store_photons</title>
-<path fill="none" stroke="#000000" d="M194.408,-60.8762C212.349,-63.276 232.443,-65.9638 250.248,-68.3453"/>
-<polygon fill="#000000" stroke="#000000" points="250.057,-71.8508 260.433,-69.7076 250.985,-64.9126 250.057,-71.8508"/>
-</g>
 <!-- proc~nbi_spec -->
-<g id="proc~~spectrum~~CalledByGraph_node5" class="node"><title>proc~nbi_spec</title>
-<g id="a_proc~~spectrum~~CalledByGraph_node5"><a xlink:href=".././proc/nbi_spec.html" xlink:title="nbi_spec">
+<g id="proc~~spectrum~~CalledByGraph_node4" class="node"><title>proc~nbi_spec</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node4"><a xlink:href=".././proc/nbi_spec.html" xlink:title="nbi_spec">
 <polygon fill="#d9534f" stroke="#d9534f" points="169.5,-108 114.5,-108 114.5,-84 169.5,-84 169.5,-108"/>
 <text text-anchor="middle" x="142" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">nbi_spec</text>
 </a>
 </g>
 </g>
 <!-- proc~nbi_spec&#45;&gt;proc~store_photons -->
-<g id="proc~~spectrum~~CalledByGraph_edge6" class="edge"><title>proc~nbi_spec&#45;&gt;proc~store_photons</title>
+<g id="proc~~spectrum~~CalledByGraph_edge5" class="edge"><title>proc~nbi_spec&#45;&gt;proc~store_photons</title>
 <path fill="none" stroke="#000000" d="M169.633,-92.4376C191.664,-89.4908 223.562,-85.2243 250.29,-81.6491"/>
 <polygon fill="#000000" stroke="#000000" points="250.801,-85.112 260.249,-80.317 249.873,-78.1738 250.801,-85.112"/>
 </g>
 <!-- proc~store_nbi_photons -->
-<g id="proc~~spectrum~~CalledByGraph_node6" class="node"><title>proc~store_nbi_photons</title>
-<g id="a_proc~~spectrum~~CalledByGraph_node6"><a xlink:href=".././proc/store_nbi_photons.html" xlink:title="store_nbi_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="192.5,-24 91.5,-24 91.5,-0 192.5,-0 192.5,-24"/>
-<text text-anchor="middle" x="142" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_nbi_photons</text>
+<g id="proc~~spectrum~~CalledByGraph_node5" class="node"><title>proc~store_nbi_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node5"><a xlink:href=".././proc/store_nbi_photons.html" xlink:title="store_nbi_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="192.5,-66 91.5,-66 91.5,-42 192.5,-42 192.5,-66"/>
+<text text-anchor="middle" x="142" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_nbi_photons</text>
 </a>
 </g>
 </g>
 <!-- proc~store_nbi_photons&#45;&gt;proc~store_photons -->
-<g id="proc~~spectrum~~CalledByGraph_edge5" class="edge"><title>proc~store_nbi_photons&#45;&gt;proc~store_photons</title>
-<path fill="none" stroke="#000000" d="M173.271,-24.147C198.111,-34.1146 233.47,-48.3031 260.529,-59.1615"/>
-<polygon fill="#000000" stroke="#000000" points="259.504,-62.5213 270.088,-62.9972 262.111,-56.0248 259.504,-62.5213"/>
+<g id="proc~~spectrum~~CalledByGraph_edge6" class="edge"><title>proc~store_nbi_photons&#45;&gt;proc~store_photons</title>
+<path fill="none" stroke="#000000" d="M192.676,-60.6445C211.095,-63.1082 231.973,-65.9008 250.387,-68.3638"/>
+<polygon fill="#000000" stroke="#000000" points="249.956,-71.8373 260.332,-69.694 250.884,-64.8991 249.956,-71.8373"/>
 </g>
 <!-- proc~store_fw_photons -->
-<g id="proc~~spectrum~~CalledByGraph_node7" class="node"><title>proc~store_fw_photons</title>
-<g id="a_proc~~spectrum~~CalledByGraph_node7"><a xlink:href=".././proc/store_fw_photons.html" xlink:title="store_fw_photons">
+<g id="proc~~spectrum~~CalledByGraph_node6" class="node"><title>proc~store_fw_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node6"><a xlink:href=".././proc/store_fw_photons.html" xlink:title="store_fw_photons">
 <polygon fill="#d9534f" stroke="#d9534f" points="190.5,-192 93.5,-192 93.5,-168 190.5,-168 190.5,-192"/>
 <text text-anchor="middle" x="142" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons</text>
 </a>
@@ -475,8 +477,8 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
 <polygon fill="#000000" stroke="#000000" points="246.248,-156.003 255.004,-150.037 244.439,-149.241 246.248,-156.003"/>
 </g>
 <!-- proc~fida_weights_los -->
-<g id="proc~~spectrum~~CalledByGraph_node8" class="node"><title>proc~fida_weights_los</title>
-<g id="a_proc~~spectrum~~CalledByGraph_node8"><a xlink:href=".././proc/fida_weights_los.html" xlink:title="fida_weights_los">
+<g id="proc~~spectrum~~CalledByGraph_node7" class="node"><title>proc~fida_weights_los</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node7"><a xlink:href=".././proc/fida_weights_los.html" xlink:title="fida_weights_los">
 <polygon fill="#d9534f" stroke="#d9534f" points="187.5,-150 96.5,-150 96.5,-126 187.5,-126 187.5,-150"/>
 <text text-anchor="middle" x="142" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
 </a>
@@ -486,6 +488,19 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
 <g id="proc~~spectrum~~CalledByGraph_edge3" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan</title>
 <path fill="none" stroke="#000000" d="M187.57,-138C197.634,-138 208.62,-138 219.654,-138"/>
 <polygon fill="#000000" stroke="#000000" points="219.776,-141.5 229.776,-138 219.776,-134.5 219.776,-141.5"/>
+</g>
+<!-- proc~store_fida_photons -->
+<g id="proc~~spectrum~~CalledByGraph_node8" class="node"><title>proc~store_fida_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node8"><a xlink:href=".././proc/store_fida_photons.html" xlink:title="store_fida_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="194,-24 90,-24 90,-0 194,-0 194,-24"/>
+<text text-anchor="middle" x="142" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
+</a>
+</g>
+</g>
+<!-- proc~store_fida_photons&#45;&gt;proc~store_photons -->
+<g id="proc~~spectrum~~CalledByGraph_edge7" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~store_photons</title>
+<path fill="none" stroke="#000000" d="M173.271,-24.147C198.111,-34.1146 233.47,-48.3031 260.529,-59.1615"/>
+<polygon fill="#000000" stroke="#000000" points="259.504,-62.5213 270.088,-62.9972 262.111,-56.0248 259.504,-62.5213"/>
 </g>
 <!-- program~fidasim -->
 <g id="proc~~spectrum~~CalledByGraph_node9" class="node"><title>program~fidasim</title>
@@ -622,7 +637,7 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vecp</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">dlength</span><span class="p">,</span> <span class="n">lambda</span><span class="p">,</span> <span class="n">intensity</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vecp</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">dlength</span><span class="p">,</span> <span class="n">lambda</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">stokes</span><span class="p">)</span>
     <span class="c">!+ Calculates doppler shift, stark splitting, and intensities</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">vecp</span>
         <span class="c">!+ Vector directing towards optical head</span>
@@ -641,15 +656,16 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lambda</span>
         <span class="c">!+ Wavelengths [nm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">intensity</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stokes</span>
         <span class="c">!+ Spectra intensities [Ph/(s cm^2 starkline)]</span>
-
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">m</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">normfactor</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span><span class="p">,</span> <span class="n">vn</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bfield</span><span class="p">,</span> <span class="n">efield</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">E</span><span class="p">,</span> <span class="n">cos_los_Efield</span><span class="p">,</span> <span class="n">lambda_shifted</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">E</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">cos_los_Efield</span><span class="p">,</span> <span class="n">cos_los_Bfield</span><span class="p">,</span> <span class="n">lambda_shifted</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">szratio</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stark_sign</span>
-
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">wavel</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">circularity</span>
     <span class="n">stark_sign</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">stark_sigma</span> <span class="o">-</span> <span class="mi">1</span><span class="o">*</span><span class="n">stark_pi</span>
-
     <span class="c">!! vector directing towards the optical head</span>
     <span class="n">vp</span><span class="o">=</span><span class="n">vecp</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vecp</span><span class="p">)</span>
 
@@ -657,7 +673,7 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
     <span class="n">vn</span><span class="o">=</span><span class="n">vi</span><span class="o">*</span><span class="mf">0.01d0</span> <span class="c">! [m/s]</span>
     <span class="n">lambda_shifted</span> <span class="o">=</span> <span class="n">lambda0</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span> <span class="o">+</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span><span class="n">vp</span><span class="p">)</span><span class="o">/</span><span class="n">c0</span><span class="p">)</span>
 
-    <span class="c">!! Calculate Stark Splitting</span>
+    <span class="c">!! Calculate Stark-Zeeman Splitting</span>
     <span class="c">! Calculate E-field</span>
     <span class="n">bfield</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
     <span class="n">efield</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">e_norm</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">e_abs</span>
@@ -665,26 +681,80 @@ public subroutine spectrum(vecp, vi, fields, lambda0, sigma_pi, photons, dlength
     <span class="n">efield</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">efield</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">vn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">bfield</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">vn</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">bfield</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">efield</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">efield</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span>  <span class="n">vn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">bfield</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">vn</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">bfield</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">E</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">efield</span><span class="p">)</span>
-
-    <span class="c">!Stark Splitting</span>
-    <span class="n">lambda</span> <span class="o">=</span>  <span class="n">lambda_shifted</span> <span class="o">+</span> <span class="n">E</span> <span class="o">*</span> <span class="n">stark_wavel</span> <span class="c">![nm]</span>
-
+    <span class="n">B</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">bfield</span><span class="p">)</span>
+    <span class="c">!Stark-Zeeman Splitting</span>
+    <span class="n">h</span><span class="o">=</span><span class="mf">6.62607004d-34</span>
+        <span class="c">! planck constant in SI units</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mf">9.109384d-31</span>
+        <span class="c">! mass of electron [kg]</span>
+    <span class="n">l0</span> <span class="o">=</span> <span class="n">lambda0</span><span class="o">*</span><span class="mi">1</span><span class="n">d</span><span class="o">-</span><span class="mi">9</span>
+        <span class="c">! reference wavelength [m]</span>
+    <span class="c">! stark-zeeman corrections to energy of n=2 states are -q0, 0 and q0</span>
+    <span class="n">q0</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">((</span><span class="n">e0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">B</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">m</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">a_0</span><span class="o">*</span><span class="n">e0</span><span class="o">*</span><span class="n">E</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c">! stark-zeeman corrections to energy of n=3 states are -q1, -0.5*q1, 0, 0.5*q1, and q1/2</span>
+    <span class="n">q1</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">e0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">B</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">m</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">9</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">a_0</span><span class="o">*</span><span class="n">e0</span><span class="o">*</span><span class="n">E</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c">! szratio is gamma/epsilon factor. can be thought of as roughly zeeman energy shift/ stark energy shift.</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">E</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
+<span class="k">    	</span><span class="n">szratio</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="k">else</span>
+<span class="k">    	</span><span class="n">szratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">e0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">B</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">m</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">a_0</span><span class="o">*</span><span class="n">e0</span><span class="o">*</span><span class="n">E</span><span class="p">)</span>
+    <span class="k">endif</span>
+    <span class="c">! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies</span>
+    <span class="c">! order is small wavelengths to large wavelengths</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">n_stark</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">15</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">wavel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">q1</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">circularity</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="mf">4.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="mf">5.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">9</span><span class="mf">7.0</span><span class="o">/</span><span class="mi">123</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="mf">7.0</span><span class="o">/</span><span class="mi">81</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="mf">7.0</span><span class="o">/</span><span class="mi">81</span><span class="p">,</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="mi">9</span><span class="mf">7.0</span><span class="o">/</span><span class="mi">123</span><span class="p">,</span><span class="o">-</span><span class="mf">5.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mf">4.0</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">circularity</span> <span class="o">=</span> <span class="n">circularity</span><span class="o">*</span><span class="n">szratio</span>
+    <span class="k">else if</span><span class="p">(</span><span class="n">n_stark</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">3</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">wavel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">wavel</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="n">c0</span><span class="o">*</span><span class="n">h</span><span class="o">+</span><span class="n">q0</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">l0</span><span class="p">)</span>
+        <span class="n">circularity</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
+        <span class="n">circularity</span> <span class="o">=</span> <span class="n">circularity</span><span class="o">*</span><span class="n">szratio</span>
+    <span class="k">endif</span>
+    <span class="c">!lambda =  lambda_shifted + E * stark_wavel ![nm] &lt;-old calculation for pure stark effect</span>
+    <span class="n">wavel</span> <span class="o">=</span> <span class="p">(</span><span class="n">wavel</span><span class="o">-</span><span class="n">l0</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">9</span>    <span class="c">! converting to [nm]</span>
+    <span class="n">lambda</span> <span class="o">=</span> <span class="n">lambda_shifted</span> <span class="o">+</span> <span class="n">wavel</span>
     <span class="c">!Intensities of stark components</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">E</span> <span class="p">.</span><span class="n">eq</span><span class="p">.</span> <span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">cos_los_Efield</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="k">else</span>
 <span class="k">        </span><span class="n">cos_los_Efield</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">efield</span><span class="p">)</span> <span class="o">/</span> <span class="n">E</span>
     <span class="k">endif</span>
-
-<span class="k">    </span><span class="n">intensity</span> <span class="o">=</span> <span class="n">stark_intens</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">+</span> <span class="n">stark_sign</span><span class="o">*</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">    if</span> <span class="p">(</span><span class="n">B</span> <span class="p">.</span><span class="n">eq</span><span class="p">.</span> <span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">cos_los_Bfield</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">cos_los_Bfield</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">bfield</span><span class="p">)</span> <span class="o">/</span> <span class="n">B</span>
+    <span class="k">endif</span>
+    <span class="c">!calculate stokes parameters</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">stark_intens</span>
+    <span class="n">stokes</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">intensity</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">+</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">stark_sigma</span><span class="o">*</span><span class="n">sigma_pi</span> <span class="o">+</span>  <span class="n">intensity</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">-</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">stark_pi</span>
+    <span class="n">stokes</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">intensity</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">-</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">stark_sigma</span><span class="o">*</span><span class="n">sigma_pi</span> <span class="o">-</span> <span class="n">intensity</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">-</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">stark_pi</span>
+    <span class="n">stokes</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">stokes</span><span class="p">(:,</span><span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">intensity</span><span class="o">*</span><span class="n">cos_los_Bfield</span><span class="o">*</span><span class="n">circularity</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">stark_intens</span><span class="o">*</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">+</span> <span class="n">stark_sign</span><span class="o">*</span> <span class="n">cos_los_Efield</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="c">!! E.g. mirrors may change the pi to sigma intensity ratio</span>
     <span class="k">where</span> <span class="p">(</span><span class="n">stark_sigma</span> <span class="p">.</span><span class="n">eq</span><span class="p">.</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="n">intensity</span> <span class="o">*</span> <span class="n">sigma_pi</span>
     <span class="k">endwhere</span>
-
     <span class="c">!! normalize and multiply with photon density from colrad</span>
+    <span class="n">normfactor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">intensity</span><span class="p">))</span><span class="o">*</span><span class="n">photons</span><span class="o">*</span><span class="n">dlength</span>
     <span class="n">intensity</span> <span class="o">=</span> <span class="n">intensity</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">intensity</span><span class="p">)</span><span class="o">*</span><span class="n">photons</span><span class="o">*</span><span class="n">dlength</span>
-
+    <span class="n">stokes</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">*</span><span class="n">normfactor</span>
 <span class="k">endsubroutine </span><span class="n">spectrum</span>
 </pre></div>
 

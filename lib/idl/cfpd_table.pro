@@ -63,6 +63,8 @@ FUNCTION cfpd_table, tname, gname, earray=earray, amu=amu, z=z, nrays=nrays, ste
         rc = geometry.rc
     endelse
 
+    device, decomposed=0
+    loadct, 39
     orb0 = orb_cfpd(g,rdist,zdist,v,d,rc,e0=earray[0],amu=amu,z=z,nrays=nrays,step=step,nsteps=nsteps,plot_show=plot_show)
     orb = replicate(orb0, nenergy)
     orb[0] = orb0

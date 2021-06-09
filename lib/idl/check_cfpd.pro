@@ -27,11 +27,13 @@ PRO check_cfpd, inp, cfpd
     nenergy = cfpd.nenergy
     zero_string = {dims:0, type:'STRING'}
     zero_long = {dims:0, type:'LONG'}
+    zero_double = {dims:0,type:'DOUBLE'}
     schema = {data_source:zero_string, $
               nchan:zero_long, $
               nrays:zero_long, $
               nsteps:zero_long, $
               nenergy:zero_long, $
+              dl:zero_double, $
               system:zero_string, $
               id:{dims:[nchan], type:'STRING'}, $
               a_shape:{dims:[nchan], type:'INT'},$

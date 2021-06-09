@@ -884,6 +884,10 @@ type CFPDRate
         !+ CFPD rate weight: weight(Ep,Ch,E,p)
     real(Float64), dimension(:,:), allocatable         :: flux
         !+ CFPD flux: flux(E3,chan) [kHz]
+    real(Float64), dimension(:,:), allocatable         :: p1_spec
+        !+ CFPD counts vs. fast-ion pitch: p1_spec(E3,chan) [kHz]
+    real(Float64), dimension(:,:), allocatable         :: p3_spec
+        !+ CFPD counts vs. particle 3 pitch: p3_spec(E3,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: prob
         !+ CFPD flux: probability_gyro(E3,chan) [unity]
     real(Float64), dimension(:,:), allocatable         :: gam
@@ -3294,6 +3298,7 @@ subroutine read_cfpd
 
     dims3 = [ctable%nenergy, ctable%nrays, ctable%nchan]
     dims5 = [ctable%nenergy, 6, ctable%nsteps, ctable%nrays, ctable%nchan]
+    call h5ltread_dataset_double_scalar_f(gid, "/cfpd/dl", ctable%dl, error)
     call h5ltread_dataset_double_f(gid, "/cfpd/earray", ctable%earray, dims3(1:1), error)
     call h5ltread_dataset_double_f(gid, "/cfpd/nactual", ctable%nactual, dims3, error)
     call h5ltread_dataset_double_f(gid, "/cfpd/daomega", ctable%daomega, dims3, error)
@@ -3307,21 +3312,6 @@ subroutine read_cfpd
 
     !!Close HDF5 interface
     call h5close_f(error)
-
-    rpzi(1) = ctable%sightline(1,4,1,1,1)
-    rpzi(2) = ctable%sightline(1,5,1,1,1)
-    rpzi(3) = ctable%sightline(1,6,1,1,1)
-    rpzf(1) = ctable%sightline(1,4,2,1,1)
-    rpzf(2) = ctable%sightline(1,5,2,1,1)
-    rpzf(3) = ctable%sightline(1,6,2,1,1)
-
-    uvwi(1) = rpzi(1)*cos(rpzi(2))
-    uvwi(2) = rpzi(1)*sin(rpzi(2))
-    uvwi(3) = rpzi(3)
-    uvwf(1) = rpzf(1)*cos(rpzf(2))
-    uvwf(2) = rpzf(1)*sin(rpzf(2))
-    uvwf(3) = rpzf(3)
-    ctable%dl = norm2(uvwf-uvwi)
 
     ctable%dE = ctable%earray(2)-ctable%earray(1)
 
@@ -5860,6 +5850,7 @@ subroutine write_cfpd_weights
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(2) :: dim2_p1, dim2_p3
     integer(HSIZE_T), dimension(4) :: dim4
     integer :: error
 
@@ -5878,9 +5869,13 @@ subroutine write_cfpd_weights
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
         dim2 = [ctable%nenergy, ctable%nchan]
+        dim2_p1 = [fbm%npitch, ctable%nchan]
+        dim2_p3 = [21, ctable%nchan]
         dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/p1_spec", 2, dim2_p1, cfpd%p1_spec, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/p3_spec", 2, dim2_p3, cfpd%p3_spec, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, cfpd%gam, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, cfpd%weight, error)
@@ -9334,6 +9329,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
         !+ Mass of reactants and products (1,2,3,4) [amu]
 
     real(Float64), dimension(3) :: a_hat, vrot
+    real(Float64), dimension(3) :: c_hat
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,E3max,E3min
     real(Float64) :: phip,cosphip,cosphib,cosphia,rhs,gammaplus,gammaminus
     real(Float64) :: eps,bracket,ccminus,ccplus,bbminus,bbplus,v3minus,v3plus
@@ -9371,7 +9367,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     vpar = norm_v1*pitch ![m/s]
     vperp = norm_v1*sqrt(1-pitch**2) ![m/s]
     vrot = plasma%vrot/100.d0 ![m/s]
-    a_hat = cross_product(fields%b_norm, v3_xyz) / norm2(v3_xyz) !(b,a,c)
+    c_hat = cross_product(v3_xyz, fields%b_norm) / norm2(v3_xyz) !(b,a,c)
+    a_hat = cross_product(fields%b_norm, c_hat) !(b,a,c)
 
     !! First, check E3 limits are valid for the given inputs
     !! Assumes cos(gamma) = +/- 1 and vrot = 0
@@ -12853,6 +12850,10 @@ end subroutine neutron_f
 subroutine cfpd_f
     !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
     real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
+    real(Float64) :: chi3
+    real(Float64), dimension(21) :: ptcharr
+    integer, dimension(1) :: ip3
+    integer :: i
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, vnet_square, factor, vabs
@@ -12871,11 +12872,20 @@ subroutine cfpd_f
         return
     endif
 
+    !! define pitch - array
+    do i=1, 21
+        ptcharr(i)=real(i-0.5)*2./20.5 - 1.
+    enddo
+
     allocate(cfpd%flux(ctable%nenergy, ctable%nchan))
+    allocate(cfpd%p1_spec(fbm%npitch, ctable%nchan))
+    allocate(cfpd%p3_spec(21, ctable%nchan))
     allocate(cfpd%prob(ctable%nenergy, ctable%nchan))
     allocate(cfpd%gam(ctable%nenergy, ctable%nchan))
     allocate(cfpd%weight(ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch))
     cfpd%flux = 0.d0
+    cfpd%p1_spec = 0.d0
+    cfpd%p3_spec = 0.d0
     cfpd%prob = 0.d0
     cfpd%gam = 0.d0
     cfpd%weight = 0.d0
@@ -12883,7 +12893,7 @@ subroutine cfpd_f
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
-    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt)
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3)
     channel_loop: do ich=1, ctable%nchan
         E3_loop: do ie3=1, ctable%nenergy
             cnt = 0
@@ -12893,6 +12903,9 @@ subroutine cfpd_f
 
                     !! Calculate position and velocity in beam coordinates
                     call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
+                    v3_xyz = -v3_xyz !flip time reversed orbit direction
+                    chi3 = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz) ![m/s]
+                    ip3 = minloc(abs(ptcharr - chi3))
 
                     !! Get fields at sightline position
                     call get_fields(fields, pos=xyz)
@@ -12945,6 +12958,12 @@ subroutine cfpd_f
                             cfpd%flux(ie3,ich) = cfpd%flux(ie3,ich) + rate * kappa * pgyro &
                                                                         * ctable%daomega(ie3,iray,ich) &
                                                                         * fbm_denf * factor
+                            cfpd%p1_spec(ip,ich) = cfpd%p1_spec(ip,ich) + rate * kappa * pgyro &
+                                                                        * ctable%daomega(ie3,iray,ich) &
+                                                                        * fbm_denf * factor
+                            cfpd%p3_spec(ip3,ich) = cfpd%p3_spec(ip3,ich) + rate * kappa * pgyro &
+                                                                          * ctable%daomega(ie3,iray,ich) &
+                                                                          * fbm_denf * factor
                             !$OMP END CRITICAL(cfpd_weight)
 
                         enddo energy_loop
@@ -12961,6 +12980,8 @@ subroutine cfpd_f
 
 #ifdef _MPI
     call parallel_sum(cfpd%flux)
+    call parallel_sum(cfpd%p1_spec)
+    call parallel_sum(cfpd%p3_spec)
     call parallel_sum(cfpd%weight)
     call parallel_sum(cfpd%prob)
     call parallel_sum(cfpd%gam)

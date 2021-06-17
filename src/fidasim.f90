@@ -885,9 +885,9 @@ type CFPDRate
     real(Float64), dimension(:,:), allocatable         :: flux
         !+ CFPD flux: flux(E3,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: proj_v1v3
-        !+ CFPD counts vs. projection of v1 onto v3: proj_v1v3(E3,chan) [kHz]
+        !+ CFPD counts vs. projection of v1 onto v3: proj_v1v3(21,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: p3_spec
-        !+ CFPD counts vs. particle 3 pitch: p3_spec(E3,chan) [kHz]
+        !+ CFPD counts vs. particle 3 pitch: p3_spec(21,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: prob
         !+ CFPD flux: probability_gyro(E3,chan) [unity]
     real(Float64), dimension(:,:), allocatable         :: gam
@@ -5850,7 +5850,7 @@ subroutine write_cfpd_weights
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(2) :: dim2
-    integer(HSIZE_T), dimension(2) :: dim2_p1, dim2_p3
+    integer(HSIZE_T), dimension(2) :: dim2_pitches
     integer(HSIZE_T), dimension(4) :: dim4
     integer :: error
 
@@ -5869,13 +5869,12 @@ subroutine write_cfpd_weights
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
         dim2 = [ctable%nenergy, ctable%nchan]
-        dim2_p1 = [fbm%npitch, ctable%nchan]
-        dim2_p3 = [21, ctable%nchan]
+        dim2_pitches = [21, ctable%nchan]
         dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/proj_v1v3", 2, dim2_p1, cfpd%proj_v1v3, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/p3_spec", 2, dim2_p3, cfpd%p3_spec, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/proj_v1v3", 2, dim2_pitches, cfpd%proj_v1v3, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/p3_spec", 2, dim2_pitches, cfpd%p3_spec, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, cfpd%gam, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, cfpd%weight, error)
@@ -12879,7 +12878,7 @@ subroutine cfpd_f
     enddo
 
     allocate(cfpd%flux(ctable%nenergy, ctable%nchan))
-    allocate(cfpd%proj_v1v3(fbm%npitch, ctable%nchan))
+    allocate(cfpd%proj_v1v3(21, ctable%nchan))
     allocate(cfpd%p3_spec(21, ctable%nchan))
     allocate(cfpd%prob(ctable%nenergy, ctable%nchan))
     allocate(cfpd%gam(ctable%nenergy, ctable%nchan))

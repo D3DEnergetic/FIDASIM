@@ -884,8 +884,8 @@ type CFPDRate
         !+ CFPD rate weight: weight(Ep,Ch,E,p)
     real(Float64), dimension(:,:), allocatable         :: flux
         !+ CFPD flux: flux(E3,chan) [kHz]
-    real(Float64), dimension(:,:), allocatable         :: p1_spec
-        !+ CFPD counts vs. fast-ion pitch: p1_spec(E3,chan) [kHz]
+    real(Float64), dimension(:,:), allocatable         :: proj_v1v3
+        !+ CFPD counts vs. projection of v1 onto v3: proj_v1v3(E3,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: p3_spec
         !+ CFPD counts vs. particle 3 pitch: p3_spec(E3,chan) [kHz]
     real(Float64), dimension(:,:), allocatable         :: prob
@@ -5874,7 +5874,7 @@ subroutine write_cfpd_weights
         dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
 
         call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, cfpd%flux, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/p1_spec", 2, dim2_p1, cfpd%p1_spec, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/proj_v1v3", 2, dim2_p1, cfpd%proj_v1v3, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/p3_spec", 2, dim2_p3, cfpd%p3_spec, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/prob", 2, dim2, cfpd%prob, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/gam", 2, dim2, cfpd%gam, error)
@@ -7144,6 +7144,7 @@ subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
     v3_uvw(3) = v3_rpz(3)
 
     v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
+    v3_xyz = v3_xyz/norm2(v3_xyz)
 
 end subroutine convert_sightline_to_xyz
 
@@ -12850,9 +12851,9 @@ end subroutine neutron_f
 subroutine cfpd_f
     !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
     real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
-    real(Float64) :: chi3
+    real(Float64) :: chi3,proj_13
     real(Float64), dimension(21) :: ptcharr
-    integer, dimension(1) :: ip3
+    integer, dimension(1) :: ip3,ip13
     integer :: i
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -12878,13 +12879,13 @@ subroutine cfpd_f
     enddo
 
     allocate(cfpd%flux(ctable%nenergy, ctable%nchan))
-    allocate(cfpd%p1_spec(fbm%npitch, ctable%nchan))
+    allocate(cfpd%proj_v1v3(fbm%npitch, ctable%nchan))
     allocate(cfpd%p3_spec(21, ctable%nchan))
     allocate(cfpd%prob(ctable%nenergy, ctable%nchan))
     allocate(cfpd%gam(ctable%nenergy, ctable%nchan))
     allocate(cfpd%weight(ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch))
     cfpd%flux = 0.d0
-    cfpd%p1_spec = 0.d0
+    cfpd%proj_v1v3 = 0.d0
     cfpd%p3_spec = 0.d0
     cfpd%prob = 0.d0
     cfpd%gam = 0.d0
@@ -12893,7 +12894,7 @@ subroutine cfpd_f
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
-    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3)
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3,proj_13,ip13)
     channel_loop: do ich=1, ctable%nchan
         E3_loop: do ie3=1, ctable%nenergy
             cnt = 0
@@ -12933,6 +12934,10 @@ subroutine cfpd_f
                             !!Correct for gyro orbit
                             call gyro_step(vi,fields,fbm%A,r_gyro)
 
+                            !! Get E3 shift spectrum
+                            proj_13 = dot_product(vi/norm2(vi), v3_xyz/norm2(v3_xyz))
+                            ip13 = minloc(abs(ptcharr - proj_13))
+
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then
                                 !get F at guiding center position
@@ -12958,7 +12963,7 @@ subroutine cfpd_f
                             cfpd%flux(ie3,ich) = cfpd%flux(ie3,ich) + rate * kappa * pgyro &
                                                                         * ctable%daomega(ie3,iray,ich) &
                                                                         * fbm_denf * factor
-                            cfpd%p1_spec(ip,ich) = cfpd%p1_spec(ip,ich) + rate * kappa * pgyro &
+                            cfpd%proj_v1v3(ip13,ich) = cfpd%proj_v1v3(ip13,ich) + rate * kappa * pgyro &
                                                                         * ctable%daomega(ie3,iray,ich) &
                                                                         * fbm_denf * factor
                             cfpd%p3_spec(ip3,ich) = cfpd%p3_spec(ip3,ich) + rate * kappa * pgyro &
@@ -12980,7 +12985,7 @@ subroutine cfpd_f
 
 #ifdef _MPI
     call parallel_sum(cfpd%flux)
-    call parallel_sum(cfpd%p1_spec)
+    call parallel_sum(cfpd%proj_v1v3)
     call parallel_sum(cfpd%p3_spec)
     call parallel_sum(cfpd%weight)
     call parallel_sum(cfpd%prob)

@@ -86,7 +86,6 @@ FUNCTION cfpd_table, tname, gname, earray=earray, amu=amu, z=z, nrays=nrays, ste
         nactual[i,*,*] = orb[i].nactual[*,*]
     endfor
     sightline *= 100.d0 ;[m] to [cm]
-    sightline[*,1,*,*,*] /= 100.d0 ;vphi is ok
     sightline[*,4,*,*,*] /= 100.d0 ;phi is ok
     daomega *= 1.d4 ;[m^2] to [cm^2]
 

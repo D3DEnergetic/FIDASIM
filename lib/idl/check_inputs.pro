@@ -39,6 +39,13 @@ PRO check_inputs, inputs
               calc_cfpd:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
               adaptive:zero_int, split_tol:zero_double, max_cell_splits:zero_int}
+    
+    keys = tag_names(inputs)
+    w = where(keys.capwords() eq 'ADAPTIVE')
+    if w eq -1 then begin
+        warn, 'Missing adaptive time step settings, defaulting to off'
+        inputs = create_struct(inputs, 'adaptive', 0, 'split_tol', 0.0, 'max_cell_splits', 1)
+    endif
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
     if err_status eq 1 then begin

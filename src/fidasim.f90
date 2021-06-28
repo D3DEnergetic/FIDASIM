@@ -892,6 +892,8 @@ type CFPDRate
         !+ CFPD flux: probability_gyro(E3,chan) [unity]
     real(Float64), dimension(:,:), allocatable         :: gam
         !+ CFPD flux: gyro(E3,chan) [rad]
+    real(Float64), dimension(:), allocatable :: vphi
+    real(Float64), dimension(:), allocatable :: chi3
 end type CFPDRate
 
 type NeutralParticle
@@ -5849,6 +5851,7 @@ subroutine write_cfpd_weights
     !+ Writes [[libfida:cfpd]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(1) :: dim1_steps
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(2) :: dim2_pitches
     integer(HSIZE_T), dimension(4) :: dim4
@@ -5868,6 +5871,7 @@ subroutine write_cfpd_weights
     !Write variables
     if(inputs%dist_type.eq.1) then
         dim1(1) = 1
+        dim1_steps(1) = ctable%nsteps
         dim2 = [ctable%nenergy, ctable%nchan]
         dim2_pitches = [21, ctable%nchan]
         dim4 = [ctable%nenergy, ctable%nchan, fbm%nenergy, fbm%npitch]
@@ -5881,6 +5885,8 @@ subroutine write_cfpd_weights
 
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/vphi", 1, dim1_steps, cfpd%vphi, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/chi3", 1, dim1_steps, cfpd%chi3, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(3:3), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(4:4), fbm%pitch, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/earray", 1, dim2(1:1), ctable%earray, error)
@@ -7104,7 +7110,7 @@ subroutine uvw_to_cyl(uvw, cyl)
 
 end subroutine uvw_to_cyl
 
-subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
+subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz, v3_cyl)
     !+ Convert sightline position and velocity from cylindrical coordinate `rpz` to beam coordinate `xyz`
     integer, intent(in) :: ie3
         !+ CFPD energy index
@@ -7118,6 +7124,8 @@ subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
         !+ Sightline position in beam coordinates
     real(Float64), dimension(3), intent(out) :: v3_xyz
         !+ Sightline velocity in beam coordinates
+    real(Float64), dimension(3), intent(out), optional :: v3_cyl
+        !+ Sightline velocity in cylindrical coordinates
 
     real(Float64), dimension(3) :: rpz, uvw, v3_rpz, v3_uvw
     real(Float64) :: phi
@@ -7133,17 +7141,18 @@ subroutine convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
     uvw(3) = rpz(3)
     call uvw_to_xyz(uvw, xyz)
 
-    !! Velocity
+    !! Velocity-time reversed and unit
     v3_rpz(1) = ctable%sightline(ie3,1,ist,iray,ich)
     v3_rpz(2) = ctable%sightline(ie3,2,ist,iray,ich)
     v3_rpz(3) = ctable%sightline(ie3,3,ist,iray,ich)
+    if(present(v3_cyl)) v3_cyl = v3_rpz/norm2(v3_rpz)
 
     v3_uvw(1) = v3_rpz(1)*cos(phi) - v3_rpz(2)*sin(phi)
     v3_uvw(2) = v3_rpz(1)*sin(phi) + v3_rpz(2)*cos(phi)
     v3_uvw(3) = v3_rpz(3)
 
     v3_xyz = matmul(beam_grid%inv_basis, v3_uvw)
-    v3_xyz = v3_xyz/norm2(v3_xyz)
+    v3_xyz = -v3_xyz/norm2(v3_xyz)
 
 end subroutine convert_sightline_to_xyz
 
@@ -12903,13 +12912,12 @@ subroutine cfpd_f
 
                     !! Calculate position and velocity in beam coordinates
                     call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz)
-                    v3_xyz = -v3_xyz !flip time reversed orbit direction
-                    chi3 = dot_product(v3_xyz, fields%b_norm) / norm2(v3_xyz) ![m/s]
-                    ip3 = minloc(abs(ptcharr - chi3))
 
                     !! Get fields at sightline position
                     call get_fields(fields, pos=xyz)
                     if(.not.fields%in_plasma) cycle step_loop
+                    chi3 = dot_product(v3_xyz, fields%b_norm)
+                    ip3 = minloc(abs(ptcharr - chi3))
 
                     !! Get plasma parameters at sightline position
                     call get_plasma(plasma, pos=xyz)
@@ -12934,7 +12942,7 @@ subroutine cfpd_f
                             call gyro_step(vi,fields,fbm%A,r_gyro)
 
                             !! Get E3 shift spectrum
-                            proj_13 = dot_product(vi/norm2(vi), v3_xyz/norm2(v3_xyz))
+                            proj_13 = dot_product(vi/norm2(vi), v3_xyz)
                             ip13 = minloc(abs(ptcharr - proj_13))
 
                             fbm_denf=0
@@ -13003,6 +13011,50 @@ subroutine cfpd_f
 #endif
 
 end subroutine cfpd_f
+
+subroutine check_pitch
+    !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
+    real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, v3_rpz, xyz, r_gyro
+    real(Float64) :: proj_13
+    real(Float64), dimension(21) :: ptcharr
+    integer, dimension(1) :: ip3,ip13
+    integer :: i
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: pgyro, vnet_square, factor, vabs
+    real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
+    integer :: ie, ip, ich, ie3, iray, ist, cnt
+
+    !!! Hardcoded
+    ich = 3
+    ie3 = 10
+    iray = 1
+
+    allocate(cfpd%vphi(ctable%nsteps))
+    allocate(cfpd%chi3(ctable%nsteps))
+    cfpd%vphi = 0.d0
+    cfpd%chi3 = 0.d0
+
+    !$OMP PARALLEL DO schedule(guided) private(v3_xyz,v3_rpz,xyz,fields)
+    step_loop: do ist=1, ctable%nsteps
+        if (ist.gt.ctable%nactual(ie3,iray,ich)) cycle step_loop
+
+        !! Calculate position and velocity in beam coordinates
+        call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz, v3_rpz)
+        call get_fields(fields, pos=xyz)
+        if(.not.fields%in_plasma) cycle step_loop
+        cfpd%chi3(ist) = dot_product(v3_xyz, fields%b_norm)
+        cfpd%vphi(ist) = v3_rpz(2)
+
+    enddo step_loop
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(cfpd%vphi)
+    call parallel_sum(cfpd%chi3)
+#endif
+
+end subroutine check_pitch
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
@@ -14142,6 +14194,7 @@ program fidasim
         if(inputs%verbose.ge.1) then
             write(*,*) 'charged fusion products:    ', time_string(time_start)
         endif
+        call check_pitch()
         call cfpd_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

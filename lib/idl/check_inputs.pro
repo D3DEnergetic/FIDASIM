@@ -44,7 +44,7 @@ PRO check_inputs, inputs
     w = where(keys.capwords() eq 'ADAPTIVE')
     if w eq -1 then begin
         warn, 'Missing adaptive time step settings, defaulting to off'
-        inputs = create_struct(inputs, 'adaptive', 0, 'split_tol', 0.0, 'max_cell_splits', 1)
+        inputs = create_struct(inputs, 'adaptive', 0, 'split_tol', double(0.0), 'max_cell_splits', 1)
     endif
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"

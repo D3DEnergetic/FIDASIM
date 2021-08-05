@@ -74,8 +74,11 @@
         
         
             <li><a href="../../lists/programs.html">Programs</a></li>
+               
+        
         
             </ul>
+        
             </li>
 
 
@@ -94,6 +97,8 @@
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+
 
           </ul>
         
@@ -154,7 +159,7 @@
 </div>
 <h1 id="create-fidasim-input-files-using-prefida">Create FIDASIM input files using PREFIDA</h1>
 <p>FIDASIM requires inputs to be in a specific format.
-PREFIDA(<a href="../../sourcefile/prefida.pro.html">IDL</a>,<a href="../../sourcefile/preprocessing.py.html#prefida">Python</a>) is an routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
+PREFIDA(<a href="./sourcefile/prefida.pro.html">IDL</a>,<a href="./sourcefile/preprocessing.py.html#prefida">Python</a>) is an routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
 <p>PREFIDA is called as follows</p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> prefida, inputs, grid, nbi, plasma, fields, <span class="nb">dist</span>, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
 </code></pre></div>
@@ -188,7 +193,7 @@ Click <a href="./05_devices.html">here</a> to find out if someone has done your 
 <p>PREFIDA uses two types of grids**: the <a href="../03_technical/01_prefida_inputs.html#interpolation-grid-structure">Interpolation Grid</a> and the <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">Beam Grid</a>. 
 By default, axisymmetry is assumed and the Interpolation Grid is a 2D grid in the R-Z plane that is used for interpolating the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma parameters</a> and the <a href="../03_technical/01_prefida_inputs.html#fields-structure">electromagnetic fields</a>.
 A 3D cylindrical grid in R, Z and Phi can be created if the user inputs phi variable information. 
-The routine <code>rz_grid</code>(<a href="../../sourcefile/rz_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#rz_grid">Python</a>) accomplishes the task and creates the <code>grid</code> structure. For example, the command below will create a 2D grid,</p>
+The routine <code>rz_grid</code>(<a href="./sourcefile/rz_grid.pro.html">IDL</a>,<a href="./sourcefile/utils.py.html#rz_grid">Python</a>) accomplishes the task and creates the <code>grid</code> structure. For example, the command below will create a 2D grid,</p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz)
 </code></pre></div>
 
@@ -209,7 +214,7 @@ The routine <code>rz_grid</code>(<a href="../../sourcefile/rz_grid.pro.html">IDL
 <p>The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.</p>
 <p>The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
-The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#beam_grid">Python</a>) calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
+The routine <code>beam_grid</code>(<a href="./sourcefile/beam_grid.pro.html">IDL</a>,<a href="./sourcefile/utils.py.html#beam_grid">Python</a>) calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> bgrid <span class="o">=</span> beam_grid(nbi,rstart)
 </code></pre></div>
 
@@ -221,7 +226,7 @@ The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html"
 <p>FIDASIM creates a third grid for <a href="../02_physics/08_passive.html#passive-grid">passive calculations</a>.</p>
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
-To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
+To make things easy we provide the IDL routine <a href="./sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> fields <span class="o">=</span> read_geqdsk(<span class="s1">&#39;g159243.00300&#39;</span>,grid,rho<span class="o">=</span>rho,btipsign<span class="o">=</span>btipsign)
 </code></pre></div>
 
@@ -240,7 +245,7 @@ For example:</p>
 
 <p>will create a GEQDSK file for every <code>.DATA*</code> file in the <code>159243H06</code> TRANSP run.
 Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
-<p>The IDL routine <a href="../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> or the equivalent Python function creates the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma structure</a> at a given time. </p>
+<p>The IDL routine <a href="./sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> or the equivalent Python function creates the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma structure</a> at a given time. </p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> plasma <span class="o">=</span> extract_transp_plasma(<span class="s2">&quot;159243H06.CDF&quot;</span>,<span class="mf">1.02</span>,grid,rho)
 </code></pre></div>
 
@@ -251,7 +256,7 @@ Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 
 <p>where <code>grid</code> is the interpolation grid and <code>rho</code> is the sqrt(normalized torodial flux).</p>
 <h1 id="translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</h1>
-<p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
+<p>The IDL routine <a href="./sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> nbi <span class="o">=</span> nubeam_geometry(nubeam)
 </code></pre></div>
 
@@ -272,9 +277,9 @@ Run <code>extract_transp_fbm -h</code> for the full documentation.</p>
 <p>Out of the box, FIDASIM provides IDL and Python routines for reading different fast-ion distributions.
 We provide routines for:</p>
 <ul>
-<li><a href="../../sourcefile/read_nubeam.pro.html">read_nubeam.pro</a>: TRANSP/NUBEAM distribution functions</li>
-<li><a href="../../sourcefile/read_mc_nubeam.pro.html">read_mc_nubeam.pro</a>: Monte Carlo TRANSP/NUBEAM Guiding Center distribution</li>
-<li><a href="../../sourcefile/read_spiral.pro.html">read_spiral.pro</a>: SPIRAL Guiding Center distribution</li>
+<li><a href="./sourcefile/read_nubeam.pro.html">read_nubeam.pro</a>: TRANSP/NUBEAM distribution functions</li>
+<li><a href="./sourcefile/read_mc_nubeam.pro.html">read_mc_nubeam.pro</a>: Monte Carlo TRANSP/NUBEAM Guiding Center distribution</li>
+<li><a href="./sourcefile/read_spiral.pro.html">read_spiral.pro</a>: SPIRAL Guiding Center distribution</li>
 </ul>
 <div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> f <span class="o">=</span> read_nubeam(nubeam_distribution_file,grid,btipsign <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>) 
 IDL<span class="o">&gt;</span> mcf <span class="o">=</span> read_mc_nubeam(mc_nubeam_distribution_file,Ntotal<span class="o">=</span>1e19,btipsign<span class="o">=-</span><span class="mi">1</span>)
@@ -414,16 +419,17 @@ IDL<span class="o">&gt;</span> s <span class="o">=</span> read_spiral(spiral_fil
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2021 
-                                          </p></div>
-        <div class="col-xs-6 col-md-4 col-md-push-4">
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
+                                          </p>
+        </div>
+        <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
-            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            
             
           </p>
         </div>
-        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
       </div>
       <br>
       </div> <!-- /container -->    

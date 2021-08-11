@@ -144,16 +144,17 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,time_reverse=
 
     ;---------
     ; Velocity angles to use
+    vsave=fltarr(3,naperture)
+    frac=replicate(0.,naperture)
 
     ; Find the maximum amount the curved orbit can expand the aperture
     rho=vconstant*sqrt(vr^2 + vz^2)
+    if rho lt d then return
     expand=rho - sqrt(rho^2 - d^2)
     aperture=a + expand
 
     ; Points on effective aperture to aim velocities at
     daperture=aperture*sunflower(naperture) ; (x,y) target array
-    vsave=fltarr(3,naperture)
-    frac=replicate(0.,naperture)
 
     ; Orbit initialization
     vi0=vi
@@ -235,7 +236,7 @@ PRO orb_collimator,g,ri,vi,d,a,naperture,vsave,frac,norm,step=step,time_reverse=
             end
         end
 
-        if plotarea then wait,5
+        if plotarea then wait,0.5
 
         ; Optional plotting of trajectories
         doplot=0
@@ -269,15 +270,15 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
     ;+##Arguments
     ;+    **g**: GEQDSK file
     ;+
-    ;+    **rdist**: Radial coordinates of detector [m]
+    ;+    **rdist**: Radial coordinates of detector; (nchan), [m]
     ;+
-    ;+    **zdist**: Vertical coordinates of detector [m]
+    ;+    **zdist**: Vertical coordinates of detector; (nchan), [m]
     ;+
-    ;+    **v**: Detector orientations [m/s, rad/s, m/s]
+    ;+    **v**: Detector orientations; (3,nchan), [m/s, rad/s, m/s]
     ;+
-    ;+    **d**: Collimator length [m]
+    ;+    **d**: Collimator length; (nchan), [m]
     ;+
-    ;+    **rc**: Outer collimator spacing [m]
+    ;+    **rc**: Outer collimator spacing; (nchan), [m]
     ;+
     ;+##Keyword Arguments
     ;+    **e0**: Energy (keV)
@@ -314,6 +315,8 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
   if ~keyword_set(time_reverse) then time_reverse=1
   if ~keyword_set(plot_show) then plot_show=0
 
+  max_steps = 48 ;Skips inital steps along trajectory to avoid boundary check
+
   ; storage arrays
   nch=n_elements(rc)
   daomega=fltarr(nrays,nch)
@@ -324,7 +327,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
   ;TRANSMISSION FACTORS
   ; collimator
   for ich=0,(nch-1) do begin
-    orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d,rc[ich],nrays,vsave,frac,norm, $
+    orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d[ich],rc[ich],nrays,vsave,frac,norm, $
       e0=e0
     initial_velocities[*,*,ich]=vsave
     daomega[*,ich]=norm*frac
@@ -370,13 +373,14 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
   ; Orbit loop
   i=0
   lwall=1		; logical to stop if hits wall
-  while i lt nsteps-1 and $; check_bdry(g,rwall,zwall,y(3),y(5)) do begin
-    check_bdry(g,rwall,zwall,y(3),y(5)) or i lt 100 do begin
+  inside = check_bdry(g,rwall,zwall,y(3),y(5))
+  while i lt nsteps-1 and inside do begin
     i=i + 1
   ; Van Zeeland's integrator
     ddeabm,'derivs',0.d,y,h,epsabs=1.e-8
     yout(*,i)=y(*)
     dydx=derivs(0.,y)
+    if i gt max_steps then inside = check_bdry(g,rwall,zwall,y(3),y(5))
   end
   nactual[iray,ich]=i+1
   for j=0,5 do sightline[j,0:i,iray,ich]=reform(yout[j,0:i])
@@ -390,14 +394,16 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
   ; Plot results
   if plot_show eq 1 then begin
     !p.multi=[0,2,0]
+    !p.background=0 ;black background
     ; (R,z) elevation
       xmin=min(g.r) & xmax=max(g.r) & ymin=min(g.z) & ymax=max(g.z)
 
-    contour,g.psirz,g.r,g.z,nlevels=10,color=100, $
-      xrange=[xmin,xmax],yrange=[ymin,ymax]
-    oplot,g.lim(0,*),g.lim(1,*)
-    oplot,g.bdry(0,0:g.nbdry-1),g.bdry(1,0:g.nbdry-1)
-    colors=255 - 50*indgen(nch)
+    contour,g.psirz,g.r,g.z,nlevels=10,color=255, $
+      xrange=[xmin,xmax],yrange=[ymin,ymax], $
+      xtitle='X [m]',ytitle='Y [m]',charsize=2
+    oplot,g.lim(0,*),g.lim(1,*),color=40
+    oplot,g.bdry(0,0:g.nbdry-1),g.bdry(1,0:g.nbdry-1),color=60
+    colors=[255,100,200,300]
     for ich=0,nch-1 do for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
      nact=nactual[iray,ich]-1
      oplot,sightline[3,0:nact,iray,ich],sightline[5,0:nact,iray,ich],psym=3,color=colors[ich]
@@ -407,9 +413,10 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
     theta=2.*!pi*findgen(31)/30.
       xmin=-max(g.r) & xmax=max(g.r) & ymin=xmin & ymax=xmax
     plot,max(rwall)*cos(theta),max(rwall)*sin(theta), $
-      xrange=[-2.5,2.5],yrange=[-4,4],xstyle=1
+      xrange=[-2.5,2.5],yrange=[-4,4],xstyle=1,$
+      xtitle='X [m]',ytitle='Y [m]',color=255,charsize=2
     ;  xrange=[xmin,xmax],yrange=[ymin,ymax]
-    oplot,min(rwall)*cos(theta),min(rwall)*sin(theta)
+    oplot,min(rwall)*cos(theta),min(rwall)*sin(theta),color=255
     for ich=0,nch-1 do for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
       nact=nactual[iray,ich]-1
       oplot,sightline[3,0:nact,iray,ich]*cos(sightline[4,0:nact,iray,ich]), $

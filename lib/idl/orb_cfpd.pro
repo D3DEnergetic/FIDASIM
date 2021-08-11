@@ -401,9 +401,9 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
     contour,g.psirz,g.r,g.z,nlevels=10,color=255, $
       xrange=[xmin,xmax],yrange=[ymin,ymax], $
       xtitle='X [m]',ytitle='Y [m]',charsize=2
-    oplot,g.lim(0,*),g.lim(1,*),color=40
-    oplot,g.bdry(0,0:g.nbdry-1),g.bdry(1,0:g.nbdry-1),color=60
-    colors=[255,100,200,300]
+    oplot,g.lim(0,*),g.lim(1,*),color=255
+    oplot,g.bdry(0,0:g.nbdry-1),g.bdry(1,0:g.nbdry-1),color=255
+    colors=[235,60,160,110]
     for ich=0,nch-1 do for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
      nact=nactual[iray,ich]-1
      oplot,sightline[3,0:nact,iray,ich],sightline[5,0:nact,iray,ich],psym=3,color=colors[ich]
@@ -411,7 +411,6 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
 
     ; (R,phi) plan
     theta=2.*!pi*findgen(31)/30.
-      xmin=-max(g.r) & xmax=max(g.r) & ymin=xmin & ymax=xmax
     plot,max(rwall)*cos(theta),max(rwall)*sin(theta), $
       xrange=[-2.5,2.5],yrange=[-4,4],xstyle=1,$
       xtitle='X [m]',ytitle='Y [m]',color=255,charsize=2

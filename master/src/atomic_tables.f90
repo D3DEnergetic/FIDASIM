@@ -4218,6 +4218,55 @@ function d_t_fusion(eb) result(sigma)
 
 end function d_t_fusion
 
+function d_he3_fusion(eb) result(sigma)
+    !+Calculates total cross section at a given Helium 3 energy, `eb`,
+    !+for Deuterium-Helium 3 nuclear reactions in the range [0.3-4800 keV]
+    !+
+    !+###Equation
+    !+$$ D + He3 \rightarrow He^4(3.6 MeV) + p(14.7 MeV)$$
+    !+
+    !+###References
+    !+* Equations 8-9
+    !+* Table IV, VI in Ref. 7 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Helium 3 energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(5), parameter :: A1 = [ 5.7501d6,  2.5226d3, &
+                                                    4.5566d1, 0.d0,  &
+                                                    0.d0 ]
+    real(Float64), dimension(4), parameter :: B1 = [-3.1995d-3,  -8.5530d-6, &
+                                                    5.9014d-8, 0.0d0  ]
+
+    real(Float64), dimension(5), parameter :: A2 = [-8.3993d5, 0.d0,  &
+                                                     0.d0, 0.d0, 0.d0 ]
+    real(Float64), dimension(4), parameter :: B2 = [-2.6830d-3, 1.1633d-6, &
+                                                    -2.1332d-10, 1.4250d-14 ]
+
+    real(Float64), parameter :: Bg = 68.7508
+
+    real(Float64), dimension(5) :: A
+    real(Float64), dimension(4) :: B
+    real(Float64) :: S, E
+
+    E = min(max(eb,0.3),4800.0)
+
+    if(E.le.900.0) then
+        A = A1
+        B = B1
+    else
+        A = A2
+        B = B2
+    endif
+
+    S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
+        (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
+
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
+
+end function d_he3_fusion
+
 function simpsons_rule(f, dx) result(I)
     !+ Performs 1D integration using Simpsons rule
     !+
@@ -5458,6 +5507,129 @@ subroutine write_bb_D_T(id, namelist_file)
 
 end subroutine write_bb_D_T
 
+subroutine write_bb_D_He3(id, namelist_file)
+    !+ Write Deuterium-Helium3 interaction cross sections to a HDF5 file
+    integer(HID_T), intent(inout) :: id
+        !+ HDF5 file or group object id
+    character(len=*), intent(in)  :: namelist_file
+        !+ Namelist file that contains settings
+
+    logical :: calculate
+    integer :: nbranch = 1
+    real(Float64) :: emin
+    real(Float64) :: emax
+    integer :: nenergy
+
+    real(Float64) :: eb
+    real(Float64) :: dlogE
+    real(Float64), dimension(:), allocatable :: ebarr
+
+    real(Float64), dimension(:,:), allocatable :: fusion
+
+    integer(HID_T) :: gid
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(2) :: dim2
+
+    integer :: i, cnt, error
+    logical :: exis
+
+    NAMELIST /D_He3_cross/ calculate, nenergy, emin, emax
+
+    calculate = .True.; nenergy = 100; emin = 1.d-3 ; emax = 4.d2
+
+    inquire(file=namelist_file,exist=exis)
+    if(.not.exis) then
+        write(*,'(a,a)') 'WRITE_BB_D_He3: Input file does not exist: ',trim(namelist_file)
+        write(*,'(a)') 'Continuing with default settings...'
+    else
+        open(13,file=namelist_file)
+        read(13,NML=D_He3_cross)
+        close(13)
+    endif
+
+    if(.not.calculate) return
+
+    allocate(ebarr(nenergy))
+    allocate(fusion(nenergy,nbranch))
+
+    ebarr = 0.d0
+    fusion = 0.d0
+
+    if(verbose) then
+        write(*,'(a)') "---- D-He3 cross sections settings ----"
+        write(*,'(T2,"Emin = ",e9.2, " keV")') emin
+        write(*,'(T2,"Emax = ",e9.2, " keV")') emax
+        write(*,'(T2,"Nenergy = ", i4)') nenergy
+        write(*,*) ''
+    endif
+
+    cnt = 0
+    dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
+    !$OMP PARALLEL DO private(i, eb)
+    do i=istart, nenergy, istep
+        eb = 10.d0**(log10(emin) + (i-1)*dlogE)
+        ebarr(i) = eb
+
+        fusion(i,1) = d_he3_fusion(eb)
+        cnt = cnt + 1
+        if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*cnt*istep/real(nenergy),char(13)
+    enddo
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(ebarr)
+    call parallel_sum(fusion)
+#endif
+
+    if(verbose) then
+        call h5gcreate_f(id, "D_He3", gid, error)
+
+        dim1 = [1]
+
+        call h5ltmake_dataset_int_f(gid, "nbranch", 0, dim1, [nbranch], error)
+        call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
+        call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
+        call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
+        call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
+
+        dim1 = [nenergy]
+        dim2 = [nenergy, nbranch]
+        call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
+        call h5ltmake_compressed_dataset_double_f(gid, "fusion", 2, dim2, fusion, error)
+
+        call h5ltset_attribute_string_f(id, "D_He3", "description", &
+             "Cross sections for Deuterium-Helium3 interactions", error)
+        call h5ltset_attribute_string_f(gid, "nbranch", "description", &
+             "Number of reaction branches", error)
+        call h5ltset_attribute_string_f(gid, "nenergy", "description", &
+             "Number of energy values", error)
+        call h5ltset_attribute_string_f(gid, "energy", "description", &
+             "Helium 3 energy values", error)
+        call h5ltset_attribute_string_f(gid, "energy", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "dlogE", "description", &
+             "Energy spacing in log-10", error)
+        call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV)", error)
+        call h5ltset_attribute_string_f(gid, "emin","description", &
+             "Minimum energy", error)
+        call h5ltset_attribute_string_f(gid, "emin", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "emax","description", &
+             "Maximum energy", error)
+        call h5ltset_attribute_string_f(gid, "emax", "units", "keV", error)
+
+        call h5ltset_attribute_string_f(gid, "fusion", "description", &
+             "Total cross sections for D-He3 nuclear reactions: fusion(Helium 3 energy, branch)", error)
+        call h5ltset_attribute_string_f(gid, "fusion", "units", "cm^2", error)
+        call h5ltset_attribute_string_f(gid, "fusion", "reaction", &
+             "D + He3 -> He4(3.6 MeV) + p(14.7 MeV)", error)
+
+        call h5gclose_f(gid, error)
+    endif
+
+    deallocate(ebarr, fusion)
+
+end subroutine write_bb_D_He3
+
+
 subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     !+ Write Hydrogen-Hydrogen reaction rates to a HDF5 file
     integer(HID_T), intent(inout) :: id
@@ -6478,6 +6650,182 @@ subroutine write_bt_D_T(id, namelist_file)
 
 end subroutine write_bt_D_T
 
+subroutine write_bt_D_He3(id, namelist_file)
+    !+ Write Deuterium-Helium3 reaction rates to a HDF5 file
+    integer(HID_T), intent(inout) :: id
+        !+ HDF5 file or group object id
+    character(len=*), intent(in)  :: namelist_file
+        !+ Namelist file that contains settings
+
+    integer :: nbranch = 1
+    real(Float64), dimension(2) :: bt_amu = [He3_amu, H2_amu] ! (beam, target)
+
+    logical :: calculate
+    real(Float64) :: emin
+    real(Float64) :: emax
+    integer :: nenergy
+
+    real(Float64) :: tmin
+    real(Float64) :: tmax
+    integer :: ntemp
+
+    real(Float64) :: eb
+    real(Float64) :: dlogE
+    real(Float64), dimension(:), allocatable :: ebarr
+
+    real(Float64) :: ti
+    real(Float64) :: dlogT
+    real(Float64), dimension(:), allocatable :: tarr
+
+    real(Float64), dimension(:,:,:), allocatable :: fusion
+
+    integer(HID_T) :: gid
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(3) :: dim3
+
+    integer :: ie, it, error, cnt
+    real(Float64) :: rate
+    logical :: exis
+
+    NAMELIST /D_He3_rates/ calculate, nenergy, emin, emax, ntemp, tmin, tmax
+
+    nenergy = 100; emin = 1.d-3 ; emax = 4.d2
+    ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
+    calculate = .True.
+
+    inquire(file=namelist_file,exist=exis)
+    if(.not.exis) then
+        write(*,'(a,a)') 'WRITE_BT_D_He3: Input file does not exist: ',trim(namelist_file)
+        write(*,'(a)') 'Continuing with default settings...'
+    else
+        open(13,file=namelist_file)
+        read(13,NML=D_He3_rates)
+        close(13)
+    endif
+
+    if(.not.calculate) return
+
+    allocate(ebarr(nenergy))
+    allocate(tarr(ntemp))
+    allocate(fusion(nenergy,ntemp,nbranch))
+
+    ebarr = 0.d0
+    tarr = 0.d0
+    fusion = 0.d0
+
+    dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
+    do ie=1, nenergy
+        ebarr(ie) = 10.d0**(log10(emin) + (ie-1)*dlogE)
+    enddo
+
+    dlogT = (log10(tmax) - log10(tmin))/(ntemp - 1)
+    do it=1, ntemp
+        tarr(it) = 10.d0**(log10(tmin) + (it-1)*dlogT)
+    enddo
+
+    if(verbose) then
+        write(*,'(a)') "---- D-He3 reaction rates settings ----"
+        write(*,'(T2,"Emin = ",e9.2, " keV")') emin
+        write(*,'(T2,"Emax = ",e9.2, " keV")') emax
+        write(*,'(T2,"Nenergy = ", i4)') nenergy
+        write(*,'(T2,"Tmin = ",e9.2, " keV")') tmin
+        write(*,'(T2,"Tmax = ",e9.2, " keV")') tmax
+        write(*,'(T2,"Ntemp = ", i4)') ntemp
+        write(*,*) ''
+    endif
+
+    cnt = 0
+    !$OMP PARALLEL DO private(ie, it, eb, ti, rate)
+    do ie=istart, nenergy, istep
+        eb = ebarr(ie)
+        do it=1, ntemp
+            ti = tarr(it)
+            call bt_maxwellian(d_he3_fusion, ti, eb, bt_amu(2), bt_amu(1), rate)
+            fusion(ie,it,1) = rate
+            cnt = cnt + 1
+            if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*istep*cnt/real(nenergy*ntemp),char(13)
+        enddo
+    enddo
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(fusion)
+#endif
+
+    if(verbose) then
+        call h5gcreate_f(id, "D_He3", gid, error)
+
+        dim1 = [1]
+        call h5ltmake_dataset_int_f(gid, "nbranch", 0, dim1, [nbranch], error)
+        call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
+        call h5ltmake_dataset_int_f(gid, "ntemp", 0, dim1, [ntemp], error)
+        call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
+        call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
+        call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
+        call h5ltmake_dataset_double_f(gid, "dlogT", 0, dim1, [dlogT], error)
+        call h5ltmake_dataset_double_f(gid, "tmin", 0, dim1, [tmin], error)
+        call h5ltmake_dataset_double_f(gid, "tmax", 0, dim1, [tmax], error)
+
+        dim1 = [2]
+        call h5ltmake_compressed_dataset_double_f(gid, "bt_amu", 1, dim1, bt_amu, error)
+        dim1 = [nenergy]
+        call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
+        dim1 = [ntemp]
+        call h5ltmake_compressed_dataset_double_f(gid, "temperature", 1, dim1, tarr, error)
+        dim3 = [nenergy, ntemp, nbranch]
+        call h5ltmake_compressed_dataset_double_f(gid, "fusion", 3, dim3, fusion, error)
+
+        call h5ltset_attribute_string_f(id, "D_He3", "description", &
+              "Beam-Target reaction rates for Helium3(beam)-Deuterium(target) interactions", error)
+        call h5ltset_attribute_string_f(gid, "nbranch", "description", &
+              "Number of reaction branches", error)
+        call h5ltset_attribute_string_f(gid, "nenergy", "description", &
+              "Number of energy values", error)
+        call h5ltset_attribute_string_f(gid, "ntemp", "description", &
+              "Number of target temperature values", error)
+        call h5ltset_attribute_string_f(gid, "energy", "description", &
+              "Energy values", error)
+        call h5ltset_attribute_string_f(gid, "energy", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "dlogE", "description", &
+              "Energy spacing in log-10", error)
+        call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV)", error)
+        call h5ltset_attribute_string_f(gid, "emin","description", &
+              "Minimum energy", error)
+        call h5ltset_attribute_string_f(gid, "emin", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "emax","description", &
+              "Maximum energy", error)
+        call h5ltset_attribute_string_f(gid, "emax", "units", "keV", error)
+
+        call h5ltset_attribute_string_f(gid, "temperature", "description", &
+              "Target temperature values", error)
+        call h5ltset_attribute_string_f(gid, "temperature", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "dlogT", "description", &
+              "Temperature spacing in log-10", error)
+        call h5ltset_attribute_string_f(gid, "dlogT", "units", "log10(keV)", error)
+        call h5ltset_attribute_string_f(gid, "tmin","description", &
+              "Minimum temperature", error)
+        call h5ltset_attribute_string_f(gid, "tmin", "units", "keV", error)
+        call h5ltset_attribute_string_f(gid, "tmax","description", &
+              "Maximum temperature", error)
+        call h5ltset_attribute_string_f(gid, "tmax", "units", "keV", error)
+
+        call h5ltset_attribute_string_f(gid, "bt_amu", "description", &
+              "Isotope mass of the beam and target species respectively", error)
+        call h5ltset_attribute_string_f(gid, "bt_amu", "units", "amu", error)
+
+        call h5ltset_attribute_string_f(gid, "fusion", "description", &
+              "Beam-Target reaction rates for D-He3 nuclear reactions: fusion(energy, temperature, branch)", error)
+        call h5ltset_attribute_string_f(gid, "fusion", "units", "cm^3/s", error)
+        call h5ltset_attribute_string_f(gid, "fusion", "reaction", &
+              "D + He3 -> He4(3.6 MeV) + p(14.7 MeV)", error)
+
+        call h5gclose_f(gid, error)
+    endif
+
+    deallocate(ebarr, tarr, fusion)
+
+end subroutine write_bt_D_He3
+
 subroutine print_default_namelist
     !+ Prints out the default settings as a namelist
 
@@ -6517,6 +6865,13 @@ subroutine print_default_namelist
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
     write(*,'(a)') "/"
+    write(*,'(a)') "!Deuterium-Helium3 Nuclear Cross Sections"
+    write(*,'(a)') "&D_He3_cross"
+    write(*,'(a)') "calculate = T, !Calculate Table"
+    write(*,'(a)') "nenergy = 100, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
+    write(*,'(a)') "/"
     write(*,'(a)') "!Hydrogen-Hydrogen Reaction Rates"
     write(*,'(a)') "&H_H_rates"
     write(*,'(a)') "calculate = T, !Calculate Table"
@@ -6552,6 +6907,16 @@ subroutine print_default_namelist
     write(*,'(a)') "/"
     write(*,'(a)') "!Deuterium-Deuterium Nuclear Reaction Rates"
     write(*,'(a)') "&D_D_rates"
+    write(*,'(a)') "calculate = T, !Calculate Table"
+    write(*,'(a)') "nenergy = 100, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
+    write(*,'(a)') "ntemp = 100,   !Number of temperature values"
+    write(*,'(a)') "tmin = 1.0E-3, !Minimum deuterium temperature [keV]"
+    write(*,'(a)') "tmax = 2.0E1   !Maximum deuterium temperature [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Deuterium-Helium3 Nuclear Reaction Rates"
+    write(*,'(a)') "&D_He3_rates"
     write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 100, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
@@ -6673,6 +7038,7 @@ program generate_tables
     call write_bb_H_e(gid, namelist_file, n_max, m_max)
     call write_bb_H_Aq(gid, namelist_file, n_max, m_max)
     call write_bb_D_D(gid, namelist_file)
+    call write_bb_D_He3(gid, namelist_file)
 
     if(verbose) then
         !! Close cross section group
@@ -6692,6 +7058,7 @@ program generate_tables
     call write_bt_H_Aq(gid, namelist_file, n_max, m_max)
     call write_einstein(gid, n_max, m_max)
     call write_bt_D_D(gid, namelist_file)
+    call write_bt_D_He3(gid, namelist_file)
 
     if(verbose) then
         !! Close reaction rates group

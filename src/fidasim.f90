@@ -641,6 +641,8 @@ type AtomicTables
         !+ Einstein coefficients for spontaneous emission
     type(NuclearRates)       :: D_D
         !+ Deuterium-Deuterium reaction rates
+    type(NuclearRates)       :: D_He3
+        !+ Deuterium-Helium 3 reaction rates
 end type AtomicTables
 
 type LineOfSight
@@ -4311,7 +4313,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
             write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
                  rates%bt_amu(2),' amu got ', thermal_mass(1), ' amu'
         endif
-     !!!err = .True.
+        err = .True.
     endif
 
     if(err) then
@@ -4407,8 +4409,13 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.eq.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
+    endif
+
+    !!Read nuclear Deuterium-Helium 3 rates
+    if(inputs%calc_cfpd.eq.2) then
+        call read_nuclear_rates(fid, "/rates/D_He3", tables%D_He3)
     endif
 
     !!Close file
@@ -9164,8 +9171,8 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
 
 end subroutine bt_cx_rates
 
-subroutine get_dd_rate(plasma, eb, rate, branch)
-    !+ Gets d(d,p)T rate for a beam with energy `eb` interacting with a target plasma
+subroutine get_bt_rate(plasma, eb, rate, branch)
+    !+ Gets rate for a beam (D or He3) with energy `eb` interacting with a target plasma (D)
     type(LocalProfiles), intent(in) :: plasma
         !+ Plasma Paramters
     real(Float64), intent(in)       :: eb
@@ -9190,14 +9197,24 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
     logeb = log10(eb)
     logti = log10(plasma%ti)
 
-    !!D_D
     err_status = 1
-    logEmin = tables%D_D%logemin
-    logTmin = tables%D_D%logtmin
-    dlogE = tables%D_D%dlogE
-    dlogT = tables%D_D%dlogT
-    neb = tables%D_D%nenergy
-    nt = tables%D_D%ntemp
+    if (inputs%calc_cfpd.eq.1) then
+        !!D_D
+        logEmin = tables%D_D%logemin
+        logTmin = tables%D_D%logtmin
+        dlogE = tables%D_D%dlogE
+        dlogT = tables%D_D%dlogT
+        neb = tables%D_D%nenergy
+        nt = tables%D_D%ntemp
+    else
+        !!D_He3
+        logEmin = tables%D_He3%logemin
+        logTmin = tables%D_He3%logtmin
+        dlogE = tables%D_He3%dlogE
+        dlogT = tables%D_He3%dlogT
+        neb = tables%D_He3%nenergy
+        nt = tables%D_He3%ntemp
+    endif
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
                         logeb, logti, c, err_status)
     ebi = c%i
@@ -9208,35 +9225,64 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
     b22 = c%b22
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "GET_DD_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            if (inputs%calc_cfpd.eq.1) then
+                write(*,'(a)') "GET_BT_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            else
+                write(*,'(a)') "GET_BT_RATE: Eb or Ti out of range of D_He3 table. Setting D_He3 rates to zero"
+            endif
         endif
         rate = 0.d0
         return
     endif
 
-    lograte = (b11*tables%D_D%log_rate(ebi,tii,ib)   + &
-               b12*tables%D_D%log_rate(ebi,tii+1,ib) + &
-               b21*tables%D_D%log_rate(ebi+1,tii,ib) + &
-               b22*tables%D_D%log_rate(ebi+1,tii+1,ib))
+    if (inputs%calc_cfpd.eq.1) then
+        !!D_D
+        lograte = (b11*tables%D_D%log_rate(ebi,tii,ib)   + &
+                   b12*tables%D_D%log_rate(ebi,tii+1,ib) + &
+                   b21*tables%D_D%log_rate(ebi+1,tii,ib) + &
+                   b22*tables%D_D%log_rate(ebi+1,tii+1,ib))
 
-    if (lograte.lt.tables%D_D%minlog_rate) then
-        rate = 0.d0
-    else
-        rate = 0.d0
-        if (beam_mass.eq.H2_amu) then
-            rate = plasma%denf * exp(lograte*log_10)
+        if (lograte.lt.tables%D_D%minlog_rate) then
+            rate = 0.d0
+        else
+            rate = 0.d0
+            do is=1,n_thermal
+                if(thermal_mass(is).eq.H2_amu) then
+                    rate = rate + plasma%deni(is) * exp(lograte*log_10)
+                endif
+            enddo
         endif
-        do is=1,n_thermal
-            if(thermal_mass(is).eq.H2_amu) then
-                rate = rate + plasma%deni(is) * exp(lograte*log_10)
-            endif
-        enddo
+    else
+        !!D_He3
+        lograte = (b11*tables%D_He3%log_rate(ebi,tii,ib)   + &
+                   b12*tables%D_He3%log_rate(ebi,tii+1,ib) + &
+                   b21*tables%D_He3%log_rate(ebi+1,tii,ib) + &
+                   b22*tables%D_He3%log_rate(ebi+1,tii+1,ib))
+
+        if (lograte.lt.tables%D_He3%minlog_rate) then
+            rate = 0.d0
+        else
+            rate = 0.d0
+            do is=1,n_thermal
+                if(thermal_mass(is).eq.H2_amu) then
+                    rate = rate + plasma%deni(is) * exp(lograte*log_10)
+                endif
+            enddo
+        endif
+        else
+            rate = 0.d0
+            do is=1,n_thermal
+                if(thermal_mass(is).eq.H2_amu) then
+                    rate = rate + plasma%deni(is) * exp(lograte*log_10)
+                endif
+            enddo
+        endif
     endif
 
-end subroutine get_dd_rate
+end subroutine get_bt_rate
 
-subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
-    !+ Gets d(d,p)T anisotropy defecit/enhancement factor for a beam interacting with a target plasma
+subroutine get_rate_anisotropy(plasma, v1, v3, kappa)
+    !+ Gets anisotropy defecit/enhancement factor for a beam (D or He3) interacting with a target plasma (D)
     type(LocalProfiles), intent(in)         :: plasma
         !+ Plasma Paramters
     real(Float64), dimension(3), intent(in) :: v1
@@ -9266,11 +9312,17 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
     !!!Need to generalize
     mp = H1_amu*mass_u  ![kg]
-    Q = 4.04*JMeV ![J]
-
     vcm = 0.5*(v1+plasma%vrot) ![cm/s]
     KE = 0.5*mp*vnet_square*1.d-4  ! [J] C-O-M kinetic energy
-    k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+
+    if (inputs%calc_cfpd.eq.1) then !D-D
+        Q = 4.04*JMeV ![J]
+        k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+    else !D-He3
+        Q = 18.3*JMeV ![J]
+        k0 = norm2(vcm) * sqrt(5*mp/(8*(Q+KE)))*100.d0 ![(cm/s)**2]
+    endif
+
     if ((norm2(vcm)*norm2(v3)).gt.0.d0) then
         cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
         sin_phi = sin(acos(cos_phi))
@@ -9285,35 +9337,42 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
         cos_theta = 0.d0
     endif
 
-    !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
-    e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
-    a = [0.0,0.0208,0.0886,0.1882,0.3215,0.4636,0.6055,0.7528,0.8976,1.041,1.166,1.243]
-    b = [0.0,0.0023,0.0184,0.0659,0.076,0.168,0.251,0.250,0.378,0.367,0.521,0.55]
-    c = [0.0,0.0,0.0,0.0,0.048,0.021,0.039,0.162,0.142,0.276,0.203,0.34]
-    e(1) = 10.0
-    a(1) = 0.00903775/(4*pi)
-    abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
+    if (inputs%calc_cfpd.eq.1) then !D-D
+        !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
+        e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
+        a = [0.0,0.0208,0.0886,0.1882,0.3215,0.4636,0.6055,0.7528,0.8976,1.041,1.166,1.243]
+        b = [0.0,0.0023,0.0184,0.0659,0.076,0.168,0.251,0.250,0.378,0.367,0.521,0.55]
+        c = [0.0,0.0,0.0,0.0,0.048,0.021,0.039,0.162,0.142,0.276,0.203,0.34]
+        e(1) = 10.0
+        a(1) = 0.00903775/(4*pi)
+        abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
 
-    !Correction factor to make it consistent with Bosch & Hale
-    bhcor=[1.0,1.02614,.98497,1.006,1.015,1.012,1.0115,1.021,1.012,1.012,1.016,1.018,1.012]
-    do i=1,12
-        abc(:,i) = abc(:,i)*bhcor(i)
-    enddo
+        !Correction factor to make it consistent with Bosch & Hale
+        bhcor=[1.0,1.02614,.98497,1.006,1.015,1.012,1.0115,1.021,1.012,1.012,1.016,1.018,1.012]
+        do i=1,12
+            abc(:,i) = abc(:,i)*bhcor(i)
+        enddo
 
-    e1com=0.5d0*eb
-    call interpol_coeff(e, e1com, c1D, err_status)
+        e1com=0.5d0*eb
+        call interpol_coeff(e, e1com, c1D, err_status)
 
-    ei = c1D%i
-    b1 = c1D%b1
-    b2 = c1D%b2
+        ei = c1D%i
+        b1 = c1D%b1
+        b2 = c1D%b2
 
-    ai = b1*abc(1,ei) + b2*abc(1,ei+1)
-    bi = b1*abc(2,ei) + b2*abc(2,ei+1)
-    ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+        ai = b1*abc(1,ei) + b2*abc(1,ei+1)
+        bi = b1*abc(2,ei) + b2*abc(2,ei+1)
+        ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+    else !D-He3
+        !Assume D tensor polarization = 0.2
+        ai = 1.05d0
+        bi = -0.15d0
+        ci = 0.d0
+    endif
 
     kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
 
-end subroutine get_ddpt_anisotropy
+end subroutine get_rate_anisotropy
 
 subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     !+ Returns fraction of gyroangles that can produce a reaction with
@@ -9369,7 +9428,11 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
     JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
     mp = H1_amu*mass_u  ![kg]
-    Q = 4.04*JMeV ![J]
+    if (inputs%calc_cfpd.eq.1) then
+        Q = 4.04*JMeV ![J]
+    else
+        Q = 18.3*JMeV ![J]
+    endif
     q = 2*Q/m4 ![J/kg]
     norm_v3 = sqrt(E3/(m3/mass_u*v2_to_E_per_amu)) / 100 ![m/s]
     norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
@@ -9404,8 +9467,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     ! Find E3 limits for these parameters (step #1)
     ccminus= 1/mu3 * (q - (mu1**2-mu1)*norm_v1**2 + (mu2**2-mu2)*norm2(vrot) - 2*mu1*mu2*(vpar*vb-vperp*va))
     ccplus = 1/mu3 * (q - (mu1**2-mu1)*norm_v1**2 + (mu2**2-mu2)*norm2(vrot) - 2*mu1*mu2*(vpar*vb+vperp*va))
-    bbminus = 2*mu1*(-vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) + va*sin(phip))
-    bbplus = 2*mu1*(vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) + va*sin(phip))
+    bbminus = 2*mu1*(-vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) - va*sin(phip))
+    bbplus = 2*mu1*(vperp*sin(phip) - vpar*cos(phip)) - 2*mu2*(vb*cos(phip) - va*sin(phip))
     aa = 1+mu3
     v3minus = (-bbminus + sqrt(bbminus**2 + 4*aa*ccminus)) / (2*aa)
     v3plus = (-bbplus + sqrt(bbplus**2 + 4*aa*ccplus)) / (2*aa)
@@ -9510,7 +9573,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
         endif
     else if ((E3plus.lt.E3max) .and. (E3minus.le.E3min)) then
         !'Case 4d'
-        if (gammaminus.gt.gammaplus) then
+        if (gammaminus.ge.gammaplus) then
             pgyro = (pi-gammaplus)/pi
             return
         else
@@ -12811,7 +12874,7 @@ subroutine neutron_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
-                            call get_dd_rate(plasma, erel, rate, branch=2)
+                            call get_bt_rate(plasma, erel, rate, branch=2)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
@@ -12859,6 +12922,7 @@ end subroutine neutron_f
 subroutine cfpd_f
     !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
     real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, xyz, r_gyro
+    real(Float64), dimension(4) :: mamu
     real(Float64) :: chi3,proj_13
     real(Float64), dimension(21) :: ptcharr
     integer, dimension(1) :: ip3,ip13
@@ -12866,7 +12930,7 @@ subroutine cfpd_f
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, vnet_square, factor, vabs
-    real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
+    real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf, tol
     integer :: ie, ip, ich, ie3, iray, ist, cnt
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
@@ -12876,8 +12940,9 @@ subroutine cfpd_f
     if(any(thermal_mass.eq.H3_amu)) then
         write(*,'(T2,a)') 'CFPD_F: D-T cfpd production is not implemented'
     endif
-    if(beam_mass.ne.H2_amu) then
-        write(*,'(T2,a)') 'CFPD_F: Fast-ion species is not Deuterium'
+    tol = 0.01
+    if ((.not.approx_eq(beam_mass,H2_amu,tol)).and.(.not.approx_eq(beam_mass,He3_amu,tol))) then
+        write(*,'(T2,a)') 'CFPD_F: Fast-ion species is not Deuterium or Helium 3'
         return
     endif
 
@@ -12899,8 +12964,17 @@ subroutine cfpd_f
     cfpd%gam = 0.d0
     cfpd%weight = 0.d0
 
+    mamu(1) = beam_mass  ![kg]
+    mamu(2) = H2_amu  ![kg]
+    mamu(3) = H1_amu  ![kg]
+    if (inputs%calc_cfpd.eq.1) then
+        mamu(4) = H3_amu  ![kg]
+    else
+        mamu(4) = He4_amu  ![kg]
+    endif
+
     rate = 0.d0
-    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
+    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl*1.d-6 !0.5 for TRANSP-pitch (E,p) space factor !!!Remove 1.d-6
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
     !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3,proj_13,ip13)
     channel_loop: do ich=1, ctable%nchan
@@ -12930,7 +13004,7 @@ subroutine cfpd_f
                             eb = fbm%energy(ie)
 
                             !! Get the probability factor
-                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro)
+                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu)
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1
 
@@ -12957,8 +13031,8 @@ subroutine cfpd_f
                             erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get the cfpd production rate and anisotropy term
-                            call get_dd_rate(plasma, erel, rate, branch=1)
-                            call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
+                            call get_bt_rate(plasma, erel, rate, branch=1)
+                            call get_rate_anisotropy(plasma, vi, v3_xyz, kappa)
 
                             !$OMP CRITICAL(cfpd_weight)
                             cfpd%weight(ie3,ich,ie,ip) = cfpd%weight(ie3,ich,ie,ip) &
@@ -13135,7 +13209,7 @@ subroutine neutron_mc
                 eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
-                call get_dd_rate(plasma, eb, rate, branch=2)
+                call get_bt_rate(plasma, eb, rate, branch=2)
                 rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
@@ -13155,7 +13229,7 @@ subroutine neutron_mc
             eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
-            call get_dd_rate(plasma, eb, rate, branch=2)
+            call get_bt_rate(plasma, eb, rate, branch=2)
             rate = rate*fast_ion%weight*factor
 
             !! Store neutrons

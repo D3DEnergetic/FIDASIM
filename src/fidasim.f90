@@ -9353,20 +9353,19 @@ subroutine get_dhe3_anisotropy(plasma, v1, v3, fields, kappa)
     !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
     !!! TODO Sterling reference above
 
-    real(Float64), dimension(3)    :: v_com, v3_com, b_com
+    real(Float64), dimension(3)    :: v_com, v3_com
     type(InterpolCoeffs1D) :: c1D
     real(Float64) :: ai, bi, cos_theta
 
     !!Calculate anisotropy enhancement/deficit factor
     v_com = 0.5*(v1+plasma%vrot) ![cm/s]
-    b_com = fields%b_norm - v_com
     v3_com = v3 - v_com
-    if ((norm2(b_com)*norm2(v3_com)).eq.0) then
+    if ((norm2(fields%b_norm)*norm2(v3_com)).eq.0) then
         kappa = 0.d0
     else
-        cos_theta = dot_product(b_com, v3_com) / (norm2(b_com)*norm2(v3_com))
+        cos_theta = dot_product(fields%b_norm, v3_com) / (norm2(fields%b_norm)*norm2(v3_com))
 
-        !Assume D tensor polarization = 0.2
+        !Assume D tensor polarization = 1.0
         ai = 1.25d0
         bi = -0.75d0
 

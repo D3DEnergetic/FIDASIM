@@ -315,7 +315,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
   if ~keyword_set(time_reverse) then time_reverse=1
   if ~keyword_set(plot_show) then plot_show=0
 
-  max_steps = 48 ;Skips inital steps along trajectory to avoid boundary check
+  max_steps = 10 ;Skips inital steps along trajectory to avoid boundary check
 
   ; storage arrays
   nch=n_elements(rc)
@@ -330,7 +330,7 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
     orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d[ich],rc[ich],nrays,vsave,frac,norm, $
       e0=e0
     initial_velocities[*,*,ich]=vsave
-    daomega[*,ich]=norm*frac
+    daomega[*,ich]=norm*frac ;use 1.d-4 to turn off
   end
 
   ;---------------
@@ -363,29 +363,29 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
     ri=[rdist[ich],0,zdist[ich]]
     for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
 
-  Velocity=vconstant*reform(initial_velocities[*,iray,ich])
-  y=dblarr(6) & y(0:2)=Velocity & y(3:5)=ri
-  h=double(step*omega/v0) & if time_reverse then h=-h
-  yout=dblarr(6,nsteps)
-  dydx=derivs(0.,y)
-  yout(*,0)=y(*)
+      Velocity=vconstant*reform(initial_velocities[*,iray,ich])
+      y=dblarr(6) & y(0:2)=Velocity & y(3:5)=ri
+      h=double(step*omega/v0) & if time_reverse then h=-h
+      yout=dblarr(6,nsteps)
+      dydx=derivs(0.,y)
+      yout(*,0)=y(*)
 
-  ; Orbit loop
-  i=0
-  lwall=1		; logical to stop if hits wall
-  inside = check_bdry(g,rwall,zwall,y(3),y(5))
-  while i lt nsteps-1 and inside do begin
-    i=i + 1
-  ; Van Zeeland's integrator
-    ddeabm,'derivs',0.d,y,h,epsabs=1.e-8
-    yout(*,i)=y(*)
-    dydx=derivs(0.,y)
-    if i gt max_steps then inside = check_bdry(g,rwall,zwall,y(3),y(5))
-  end
-  nactual[iray,ich]=i+1
-  for j=0,5 do sightline[j,0:i,iray,ich]=reform(yout[j,0:i])
+      ; Orbit loop
+      i=0
+      lwall=1		; logical to stop if hits wall
+      inside = check_bdry(g,rwall,zwall,y(3),y(5))
+      while i lt nsteps-1 and inside do begin
+        i=i + 1
+      ; Van Zeeland's integrator
+        ddeabm,'derivs',0.d,y,h,epsabs=1.e-8
+        yout(*,i)=y(*)
+        dydx=derivs(0.,y)
+        if i gt max_steps then inside = check_bdry(g,rwall,zwall,y(3),y(5))
+      end
+      nactual[iray,ich]=i+1
+      for j=0,5 do sightline[j,0:i,iray,ich]=reform(yout[j,0:i])
 
-  end ; iray loop
+    end ; iray loop
   end ; ich loop
 
   sightline[0:2,*,*,*]*=omega

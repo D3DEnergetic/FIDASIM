@@ -12968,7 +12968,7 @@ subroutine cfpd_f
     if (inputs%calc_cfpd.eq.2) mamu(4) = He4_amu  ![kg]
 
     rate = 0.d0
-    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl*1.d-6 !0.5 for TRANSP-pitch (E,p) space factor !!!Remove 1.d-6
+    factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
     !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3,proj_13,ip13)
     channel_loop: do ich=1, ctable%nchan

@@ -837,7 +837,6 @@ type Spectra
         !+ Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)
     real(Float64), dimension(:,:,:,:), allocatable   :: thirdstokes
         !+ Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)
-
     real(Float64), dimension(:,:,:,:), allocatable :: dcx
         !+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)
     real(Float64), dimension(:,:,:,:,:), allocatable :: dcxstokes
@@ -10897,7 +10896,7 @@ subroutine dcx
     integer :: jj       !! counter along track
 
     real(Float64):: tot_denn, photons  !! photon flux
-    real(Float64):: iflux, ipostflux, isource,cur_birth  !! photon flux
+    real(Float64):: iflux, ipostflux, cur_birth  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -10940,8 +10939,8 @@ subroutine dcx
        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction,iflux)
-    isource=0
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction,iflux, &
+    !$OMP& ipostflux,cur_birth)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -10974,6 +10973,7 @@ subroutine dcx
 
                 if(inputs%calc_birth.ge.1) then
                    iflux = sum(states)
+                   !$OMP ATOMIC UPDATE
                    icerprev(i,j,k) = icerprev(i,j,k) + iflux * beam_grid%dv/nlaunch(i,j,k)
                 endif
                 loop_along_track: do jj=1,ntrack
@@ -10985,8 +10985,10 @@ subroutine dcx
                     if(inputs%calc_birth.ge.1) then
                        ipostflux = sum(states)
                        cur_birth = (iflux - ipostflux)*beam_grid%dv/nlaunch(i,j,k)
-                       ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3)) = ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3)) + cur_birth
-                       isource = isource + cur_birth
+                       !$OMP ATOMIC UPDATE
+                       ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3))= &
+                            ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3)) + cur_birth
+                       !$OMP END ATOMIC
                        iflux=ipostflux
                     endif
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
@@ -11011,14 +11013,17 @@ subroutine dcx
        call parallel_sum(icerprev)
     endif
 #endif
+    ! Store information information about the dcx neutral source 
     birth%dens(dcx_type,:,:,:) = ibirth
-    if (my_rank().eq.0) then
+    if(inputs%verbose.ge.1) then
        write(*,'(T2,"Sum of full: ",e15.2," part/s/cm3")') sum(birth%dens(nbif_type,:,:,:))
        write(*,'(T2,"Sum of dcx: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
        write(*,'(T2,"Sum of dcx source: ",e15.2," part/s/cm3")') sum(icerprev)
     endif
+
+    ! Why do we subtract them at all and why only off the full energy (and not half, third)
     birth%dens(nbif_type,:,:,:) = birth%dens(nbif_type,:,:,:) - icerprev
-    if (my_rank().eq.0) then
+    if(inputs%verbose.ge.1) then
        write(*,'(T2,"Sum of full - dcx source: ",e15.2," part/s/cm3")') sum(birth%dens(nbif_type,:,:,:))
     endif
     deallocate(ibirth, icerprev)
@@ -11048,7 +11053,7 @@ subroutine halo
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
     integer :: ii,jj,kk,it,is
     real(Float64) :: tot_denn, photons  !! photon flux
-    real(Float64):: iflux, ipostflux, isource, cur_birth  !! photon flux
+    real(Float64):: iflux, ipostflux, cur_birth  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -11116,7 +11121,7 @@ subroutine halo
         endif
 
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction,iflux)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction,iflux,ipostflux,cur_birth)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -11155,33 +11160,30 @@ subroutine halo
                        iflux = sum(states)
                        ! For halo 1 need to debit CE source from DCX, otherwise we debit from self
                        if (hh.eq.1) then
+                          !$OMP ATOMIC UPDATE
                           icerprev(i,j,k) = icerprev(i,j,k) + iflux * beam_grid%dv/nlaunch(i,j,k)
                        else
+                          !$OMP ATOMIC UPDATE
                           ibirth(i,j,k) = ibirth(i,j,k) - iflux * beam_grid%dv/nlaunch(i,j,k)
                        endif
 
                     endif
 
                     loop_along_track: do it=1,ntrack
-                        !! Store Neutrals
-                        tind = tracks(it)%ind
-                        dens_cur(:,tind(1),tind(2),tind(3),cur_slice) = &
-                             dens_cur(:,tind(1),tind(2),tind(3),cur_slice) + denn/nlaunch(i,j,k)
-                        local_iter_dens = &
-                             local_iter_dens + sum(denn)/nlaunch(i,j,k)
-                        if(inputs%calc_birth.ge.1) then
-                           ipostflux = sum(states)
-                           cur_birth = (iflux - ipostflux)*beam_grid%dv/nlaunch(i,j,k)
-                           ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) = ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) + cur_birth
-                           isource = isource + cur_birth
-                           iflux=ipostflux
-                        endif
                         call get_plasma(plasma,pos=tracks(it)%pos)
                         if(.not.plasma%in_plasma) exit loop_along_track
                         call colrad(plasma,thermal_mass(is),vihalo,tracks(it)%time,states,denn,photons)
 
                         !! Store Neutrals
                         call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
+                        if(inputs%calc_birth.ge.1) then
+                           ipostflux = sum(states)
+                           cur_birth = (iflux - ipostflux)*beam_grid%dv/nlaunch(i,j,k)
+                           !$OMP ATOMIC UPDATE
+                           ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) = ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) + cur_birth
+                           iflux=ipostflux
+                        endif
+
 
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                             photons = fi_correction*photons !! Correct for including fast-ions in states
@@ -11233,13 +11235,13 @@ subroutine halo
     endif
 #endif
     birth%dens(halo_type,:,:,:) = ibirth
-    if (my_rank().eq.0) then
+    if(inputs%verbose.ge.1) then
        write(*,'(T2,"Sum of halo birth: ",e15.2," part/s/cm3")') sum(birth%dens(halo_type,:,:,:))
        write(*,'(T2,"Sum of halo source: ",e15.2," part/s/cm3")') sum(icerprev)
        write(*,'(T2,"Sum of dcx: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
     endif
     birth%dens(dcx_type,:,:,:) = birth%dens(dcx_type,:,:,:) - icerprev
-    if (my_rank().eq.0) then
+    if(inputs%verbose.ge.1) then
        write(*,'(T2,"Sum of dcx - halo source: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
     endif
 
@@ -13742,10 +13744,10 @@ program fidasim
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
                 if(inputs%calc_birth.eq.1)then
-                    if(inputs%verbose.ge.1) then
-                        write(*,*) 'write birth:    ' , time(time_start)
-                    endif
-                    call write_birth_profile()
+                    !if(inputs%verbose.ge.1) then
+                    !    write(*,*) 'write birth:    ' , time(time_start)
+                    !endif
+                    !call write_birth_profile()
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
             endif

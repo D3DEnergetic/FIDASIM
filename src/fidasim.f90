@@ -10954,14 +10954,14 @@ subroutine dcx
                 call track(ri,vihalo,tracks,ntrack)
                 if(ntrack.eq.0) cycle loop_over_dcx
 
-                !! Calculate CX probability
+                !! Calculate CX probability, rates has units of 1/s
                 call get_total_cx_rate(tracks(1)%ind, ri, vihalo, neut_types, rates)
                 if(sum(rates).le.0.) cycle loop_over_dcx
 
                 !! Solve collisional radiative model along track
                 call get_plasma(plasma,pos=tracks(1)%pos)
 
-                !! Weight CX rates by ion source density
+                !! Weight CX rates by ion source density, states has units of 1/s/cm3
                 if(beam_mass.eq.thermal_mass(is)) then
                     states = rates*(plasma%deni(is) + plasma%denf)
                     fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
@@ -10972,9 +10972,12 @@ subroutine dcx
                 if(sum(states).eq.0) cycle loop_over_dcx
 
                 if(inputs%calc_birth.ge.1) then
+                   !! iflux has units of 1/s/m3, so probably shouldn't be multiplied by beam_grid%dv
+                   !! divide by nlaunch because that is how many tracks we are going to launch
+                   !! However, this doesn't take into account that we could skip this loop in ntrack==0 or sum(rates)<=0 or sum(states)==0
                    iflux = sum(states)
                    !$OMP ATOMIC UPDATE
-                   icerprev(i,j,k) = icerprev(i,j,k) + iflux * beam_grid%dv/nlaunch(i,j,k)
+                   icerprev(i,j,k) = icerprev(i,j,k) + iflux/nlaunch(i,j,k)
                 endif
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -10983,12 +10986,16 @@ subroutine dcx
                     call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
 
                     if(inputs%calc_birth.ge.1) then
+                       !! Check difference between 1/s/m3 of neutrals due to step along track
                        ipostflux = sum(states)
-                       cur_birth = (iflux - ipostflux)*beam_grid%dv/nlaunch(i,j,k)
+                       !! divide by nlaunch because that is how many tracks we are going to launch
+                       !! iflux has units of 1/s/m3, so probably shouldn't be multiplied by beam_grid%dv
+                       cur_birth = (iflux - ipostflux)/nlaunch(i,j,k)
                        !$OMP ATOMIC UPDATE
                        ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3))= &
                             ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3)) + cur_birth
                        !$OMP END ATOMIC
+                       !! Save the current flux to compare with in the next step along track
                        iflux=ipostflux
                     endif
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
@@ -11021,7 +11028,10 @@ subroutine dcx
        write(*,'(T2,"Sum of dcx source: ",e15.2," part/s/cm3")') sum(icerprev)
     endif
 
-    ! Why do we subtract them at all and why only off the full energy (and not half, third)
+    !! icerprev is the source rate for this generation due to H0(prev gen [NBI]) + H+ -> H+ + H0
+    !! Deduct this from the birth for the previous generation because it is not an electron thermal H+ source (if we are treating birth%dens as the thermal H+ source or e- source)
+    !! Probably should create an birth source, so that this does not interfere with calculating the fast ion birth profile
+    !! This is kludged in here for where there is only full energy cold neutrals as gen0
     birth%dens(nbif_type,:,:,:) = birth%dens(nbif_type,:,:,:) - icerprev
     if(inputs%verbose.ge.1) then
        write(*,'(T2,"Sum of full - dcx source: ",e15.2," part/s/cm3")') sum(birth%dens(nbif_type,:,:,:))
@@ -11161,10 +11171,10 @@ subroutine halo
                        ! For halo 1 need to debit CE source from DCX, otherwise we debit from self
                        if (hh.eq.1) then
                           !$OMP ATOMIC UPDATE
-                          icerprev(i,j,k) = icerprev(i,j,k) + iflux * beam_grid%dv/nlaunch(i,j,k)
+                          icerprev(i,j,k) = icerprev(i,j,k) + iflux/nlaunch(i,j,k)
                        else
                           !$OMP ATOMIC UPDATE
-                          ibirth(i,j,k) = ibirth(i,j,k) - iflux * beam_grid%dv/nlaunch(i,j,k)
+                          ibirth(i,j,k) = ibirth(i,j,k) - iflux/nlaunch(i,j,k)
                        endif
 
                     endif
@@ -11178,7 +11188,7 @@ subroutine halo
                         call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
                         if(inputs%calc_birth.ge.1) then
                            ipostflux = sum(states)
-                           cur_birth = (iflux - ipostflux)*beam_grid%dv/nlaunch(i,j,k)
+                           cur_birth = (iflux - ipostflux)/nlaunch(i,j,k)
                            !$OMP ATOMIC UPDATE
                            ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) = ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) + cur_birth
                            iflux=ipostflux

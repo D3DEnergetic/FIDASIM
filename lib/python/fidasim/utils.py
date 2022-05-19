@@ -760,7 +760,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         if key in units:
             ds.attrs['units'] = units[key]
 
-def read_geqdsk(filename, grid, poloidal=False):
+def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
     """
     #+#read_geqdsk
     #+Reads an EFIT GEQDSK file
@@ -772,6 +772,12 @@ def read_geqdsk(filename, grid, poloidal=False):
     #+
     #+##Keyword Arguments
     #+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))
+    #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+    **sigma_Ip**: 2-element tuple (in, out) of signs of plasma currents if requested
+    #+    **sigma_B0**: 2-element tuple (in, out) of signs of toroidal fields if requested
+    #+    **l_d**: 2-element tuple (in, out) of length scale factors
+    #+    **l_B**: 2-element tuple (in, out) of B-field scale factors
+    #+    **exp_mu0**: 2-element typle (in, out) of mu0 exponent for normalized/natural units
     #+
     #+##Return Value
     #+Electronmagnetic fields structure, rho, btipsign
@@ -784,7 +790,7 @@ def read_geqdsk(filename, grid, poloidal=False):
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = efit.readg(filename)
+    g = convert_COCOS(efit.readg(filename), ccw_phi=ccw_phi, sigma_Ip=sigma_Ip, sigma_B0=sigma_B0, l_d=l_d, l_B=l_B, exp_mu0=exp_mu0)
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -865,7 +871,7 @@ def convert_COCOS(g, ccw_phi=True, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=
     sigma_Bp_in = -1 * np.sign(g['pprime'][0] / g['current'])
     sigma_RphZ_in = 1 if ccw_phi else -1
     sigma_rhothph_in = np.sign(g['qpsi'][0] / (g['current'] * g['bcentr']))
-    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]]
+    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
     if sigmas == [1, 1, 1]:
         index = 1
     elif sigmas == [1, -1, 1]:
@@ -890,6 +896,7 @@ def convert_COCOS(g, ccw_phi=True, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=
     # Sauter, Appendix C
     new_g = g.copy()
     if cc_in.cocos != cc_out.cocos:
+        print(f'CONVERT_COCOS: cocos_in ({cc_in.cocos}) != cocos_out ({cc_out.cocos}), applying COCOS conversion.')
         mu0 = 4*np.pi*1e-7
         
         l_d_eff = l_d[1]/l_d[0]

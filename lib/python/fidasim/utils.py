@@ -818,6 +818,122 @@ def read_geqdsk(filename, grid, poloidal=False):
 
     return equil, rhogrid, btipsign
 
+def convert_COCOS(g, ccw_phi=True, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
+    '''
+    #+#convert_COCOS
+    #+Identifies the COCOS index of a geqdsk object and converts to fidasim COCOS
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **g**: geqdsk dict read from efit.readg(filename)
+    #+
+    #+##Keyword Arguments
+    #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+    **sigma_Ip**: 2-element tuple (in, out) of signs of plasma currents if requested
+    #+    **sigma_B0**: 2-element tuple (in, out) of signs of toroidal fields if requested
+    #+    **l_d**: 2-element tuple (in, out) of length scale factors
+    #+    **l_B**: 2-element tuple (in, out) of B-field scale factors
+    #+    **exp_mu0**: 2-element typle (in, out) of mu0 exponent for normalized/natural units
+    #+
+    #+##Return Value
+    #+geqdsk dict with converted COCOS
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> g = efit.readg(filename)
+    #+>>> g = convert_COCOS(g)
+    #+```
+    '''
+
+    class COCOS:
+        def __init__(self, index=3):
+            # FIDASIM default COCOS = 3
+            self.cocos = index
+            self.exp_Bp = 0 if index < 10 else 1
+            self.sigma_Bp = 1 if index in [1,2,5,6,11,12,15,16] else -1
+            self.sigma_RphZ = 1 if index%2 != 0 else -1
+            self.sigma_rhothph = 1 if index in [1,2,7,8,11,12,17,18] else -1
+            self.sign_q = self.sigma_rhothph
+            self.sign_pprime = -1*self.sigma_Bp
+    
+    cc_out = COCOS()
+    
+    # Identify cocos_in
+    # Sauter, eq. 22
+    sigma_Bp_in = -1 * np.sign(g['pprime'][0] / g['current'])
+    sigma_RphZ_in = 1 if ccw_phi else -1
+    sigma_rhothph_in = np.sign(g['qpsi'][0] / (g['current'] * g['bcentr']))
+    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]]
+    if sigmas == [1, 1, 1]:
+        index = 1
+    elif sigmas == [1, -1, 1]:
+        index = 2
+    elif sigmas == [-1, 1, -1]:
+        index = 3
+    elif sigmas == [-1, -1, -1]:
+        index = 4
+    elif sigmas == [1, 1, -1]:
+        index = 5
+    elif sigmas == [1, -1, -1]:
+        index = 6
+    elif sigmas == [-1, 1, 1]:
+        index = 7
+    elif sigmas == [-1, -1, 1]:
+        index = 8
+    else:
+        index = 3
+    cc_in = COCOS(index)
+
+    # Convert g from cocos_in to cocos_out
+    # Sauter, Appendix C
+    new_g = g.copy()
+    if cc_in.cocos != cc_out.cocos:
+        mu0 = 4*np.pi*1e-7
+        
+        l_d_eff = l_d[1]/l_d[0]
+        l_B_eff = l_B[1]/l_B[0]
+        exp_mu0_eff = exp_mu0[1] - exp_mu0[0]
+
+        exp_Bp_eff = cc_out.exp_Bp - cc_in.exp_Bp
+        sigma_Bp_eff = cc_out.sigma_Bp * cc_in.sigma_Bp
+        sigma_RphZ_eff = cc_out.sigma_RphZ * cc_in.sigma_RphZ
+        sigma_rhothph_eff = cc_out.sigma_rhothph * cc_in.sigma_rhothph
+
+        if sigma_Ip is None:
+            sigma_Ip_eff = sigma_RphZ_eff
+        else:
+            sigma_Ip_eff = np.prod(sigma_Ip)
+
+        if sigma_B0 is None:
+            sigma_B0_eff = sigma_RphZ_eff
+        else:
+            sigma_B0_eff = np.prod(sigma_B0)
+
+        for key, val in new_g.items():
+            if key in ['r', 'rdim', 'rleft', 'rbbbs', 'rlim', 'rcentr', 'rmaxis', 'z', 'zdim', 'zmid', 'zbbbz', 'zlim', 'zmaxis', 'nbdry', 'lim']:
+                new_g[key] = np.array(val) * l_d_eff
+            elif key == 'bcentr':
+                new_g[key] = np.array(val) * l_B_eff * sigma_B0_eff
+            elif key in ['simag', 'ssimag', 'sibry', 'ssibry', 'psi', 'psirz']:
+                new_g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff * ((2*np.pi)**exp_Bp_eff) * (l_d_eff**2) * (l_B_eff)
+            elif key == 'current':
+                new_g[key] = np.array(val) * sigma_Ip_eff * l_d_eff * l_B_eff / (mu0**exp_mu0_eff)
+            elif key == 'fpol':
+                new_g[key] = np.array(val) * sigma_B0_eff * l_d_eff * l_B_eff
+            elif key == 'pres':
+                # Sauter, end of Sec. 4
+                new_g[key] = np.array(val) * (l_d_eff**2) / (mu0**exp_mu0_eff)
+            elif key == 'ffprim':
+                new_g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff / ((2*np.pi)**exp_Bp_eff) * l_B_eff
+            elif key == 'pprime':
+                new_g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff / ((2*np.pi)**exp_Bp_eff) * l_B_eff / ((mu0**exp_mu0_eff) * (l_d_eff**2))
+            elif key == 'qpsi':
+                new_g[key] = np.array(val) * sigma_Ip_eff * sigma_B0_eff * sigma_rhothph_eff
+
+    return new_g
+
 def read_ncdf(filename, vars=None):
     '''
     #+#read_ncdf

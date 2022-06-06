@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>gyro_surface
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.2% of total for procedures.">27 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">gyro_surface</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,124 +121,54 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
+    <h2>public subroutine gyro_surface(fields, energy, pitch, Ai, gs)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates the surface of all possible trajectories</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-fields%7E3"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>fields</strong></td><td><p>Electromagnetic fields at guiding center</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-energy%7E7"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>energy</strong></td><td><p>Energy of particle</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-pitch%7E7"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-ai%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>Ai</strong></td><td><p>Ion atomic mass</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-gs%7E2"></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
-  <td>intent(out)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -351,20 +199,20 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
 </g>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge3" class="edge"><title>proc~npa_f&#45;&gt;proc~gyro_surface</title>
+<g id="proc~~gyro_surface~~CalledByGraph_edge1" class="edge"><title>proc~npa_f&#45;&gt;proc~gyro_surface</title>
 <path fill="none" stroke="#000000" d="M139.474,-125.853C154.564,-116.44 175.689,-103.263 192.654,-92.6813"/>
 <polygon fill="#000000" stroke="#000000" points="194.954,-95.3719 201.586,-87.1097 191.249,-89.4326 194.954,-95.3719"/>
 </g>
-<!-- proc~pnpa_f -->
-<g id="proc~~gyro_surface~~CalledByGraph_node3" class="node"><title>proc~pnpa_f</title>
-<g id="a_proc~~gyro_surface~~CalledByGraph_node3"><a xlink:href=".././proc/pnpa_f.html" xlink:title="pnpa_f">
+<!-- proc~npa_mc -->
+<g id="proc~~gyro_surface~~CalledByGraph_node3" class="node"><title>proc~npa_mc</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node3"><a xlink:href=".././proc/npa_mc.html" xlink:title="npa_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="146,-108 92,-108 92,-84 146,-84 146,-108"/>
-<text text-anchor="middle" x="119" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pnpa_f</text>
+<text text-anchor="middle" x="119" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
 </g>
-<!-- proc~pnpa_f&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge2" class="edge"><title>proc~pnpa_f&#45;&gt;proc~gyro_surface</title>
+<!-- proc~npa_mc&#45;&gt;proc~gyro_surface -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge2" class="edge"><title>proc~npa_mc&#45;&gt;proc~gyro_surface</title>
 <path fill="none" stroke="#000000" d="M146.01,-90.592C154.686,-88.7881 164.634,-86.7196 174.388,-84.6916"/>
 <polygon fill="#000000" stroke="#000000" points="175.343,-88.0681 184.421,-82.6056 173.918,-81.2146 175.343,-88.0681"/>
 </g>
@@ -377,20 +225,20 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
 </g>
 </g>
 <!-- proc~pnpa_mc&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge1" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~gyro_surface</title>
+<g id="proc~~gyro_surface~~CalledByGraph_edge3" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~gyro_surface</title>
 <path fill="none" stroke="#000000" d="M147.599,-59.7383C155.92,-61.4685 165.293,-63.4174 174.489,-65.3295"/>
 <polygon fill="#000000" stroke="#000000" points="173.837,-68.7687 184.34,-67.3777 175.262,-61.9152 173.837,-68.7687"/>
 </g>
-<!-- proc~npa_mc -->
-<g id="proc~~gyro_surface~~CalledByGraph_node5" class="node"><title>proc~npa_mc</title>
-<g id="a_proc~~gyro_surface~~CalledByGraph_node5"><a xlink:href=".././proc/npa_mc.html" xlink:title="npa_mc">
+<!-- proc~pnpa_f -->
+<g id="proc~~gyro_surface~~CalledByGraph_node5" class="node"><title>proc~pnpa_f</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node5"><a xlink:href=".././proc/pnpa_f.html" xlink:title="pnpa_f">
 <polygon fill="#d9534f" stroke="#d9534f" points="146,-24 92,-24 92,-0 146,-0 146,-24"/>
-<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pnpa_f</text>
 </a>
 </g>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge4" class="edge"><title>proc~npa_mc&#45;&gt;proc~gyro_surface</title>
+<!-- proc~pnpa_f&#45;&gt;proc~gyro_surface -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge4" class="edge"><title>proc~pnpa_f&#45;&gt;proc~gyro_surface</title>
 <path fill="none" stroke="#000000" d="M139.474,-24.147C154.564,-33.5598 175.689,-46.7368 192.654,-57.3187"/>
 <polygon fill="#000000" stroke="#000000" points="191.249,-60.5674 201.586,-62.8903 194.954,-54.6281 191.249,-60.5674"/>
 </g>
@@ -407,8 +255,8 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
 <path fill="none" stroke="#000000" d="M45.3529,-87.147C58.6752,-96.4726 77.2758,-109.493 92.3202,-120.024"/>
 <polygon fill="#000000" stroke="#000000" points="90.5009,-123.023 100.7,-125.89 94.5152,-117.288 90.5009,-123.023"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~pnpa_f -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_f</title>
+<!-- program~fidasim&#45;&gt;proc~npa_mc -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
 <path fill="none" stroke="#000000" d="M54.0317,-81.0741C62.7242,-83.1023 72.5725,-85.4003 81.8911,-87.5746"/>
 <polygon fill="#000000" stroke="#000000" points="81.1812,-91.0029 91.715,-89.8668 82.7719,-84.186 81.1812,-91.0029"/>
 </g>
@@ -417,8 +265,8 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
 <path fill="none" stroke="#000000" d="M54.0317,-68.9259C62.33,-66.9897 71.6816,-64.8076 80.6201,-62.722"/>
 <polygon fill="#000000" stroke="#000000" points="81.5151,-66.1072 90.4582,-60.4264 79.9245,-59.2903 81.5151,-66.1072"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<!-- program~fidasim&#45;&gt;proc~pnpa_f -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_f</title>
 <path fill="none" stroke="#000000" d="M45.3529,-62.853C58.6752,-53.5274 77.2758,-40.5069 92.3202,-29.9759"/>
 <polygon fill="#000000" stroke="#000000" points="94.5152,-32.7117 100.7,-24.1097 90.5009,-26.9771 94.5152,-32.7117"/>
 </g>
@@ -479,34 +327,11 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -514,96 +339,81 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
-    <span class="c">!+ Calculates the surface of all possible trajectories</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
-        <span class="c">!+ Electromagnetic fields at guiding center</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">energy</span>
-        <span class="c">!+ Energy of particle</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">pitch</span>
-        <span class="c">!+ Particle pitch w.r.t the magnetic field</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">Ai</span>
-        <span class="c">!+ Ion atomic mass</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">gs</span>
-        <span class="c">!+ Gyro-surface</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="w"> </span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="n">pitch</span><span class="p">,</span><span class="w"> </span><span class="n">Ai</span><span class="p">,</span><span class="w"> </span><span class="n">gs</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates the surface of all possible trajectories</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fields</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Electromagnetic fields at guiding center</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">energy</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Energy of particle</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">pitch</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Particle pitch w.r.t the magnetic field</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">Ai</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Ion atomic mass</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">gs</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Gyro-surface</span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">omega</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">s</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">alpha</span><span class="p">,</span><span class="w"> </span><span class="n">vabs</span><span class="p">,</span><span class="w"> </span><span class="n">omega</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">s</span><span class="w"></span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">Ai</span><span class="p">))</span>
-    <span class="n">omega</span><span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="p">)</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">vabs</span><span class="o">/</span><span class="n">omega</span>
+<span class="w">    </span><span class="n">vabs</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">Ai</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">omega</span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vabs</span><span class="o">/</span><span class="n">omega</span><span class="w"></span>
 
-    <span class="n">gs</span><span class="p">%</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">v</span> <span class="o">=</span> <span class="n">vabs</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">pitch</span><span class="o">*</span><span class="n">alpha</span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">omega</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">omega</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vabs</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pitch</span><span class="o">*</span><span class="n">alpha</span><span class="w"></span>
 
-    <span class="n">s</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="n">s</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">s</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">s</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
+<span class="w">    </span><span class="n">s</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">s</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">s</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">gs</span><span class="p">%</span><span class="n">axes</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
 
-    <span class="n">gs</span><span class="p">%</span><span class="n">center</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">pos</span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">pos</span><span class="w"></span>
 
-    <span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">a_norm</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">c_norm</span>
-    <span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">a_norm</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">c_norm</span><span class="w"></span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="w"></span>
 
-    <span class="n">gs</span><span class="p">%</span><span class="n">A</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="nb">matmul</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="nb">transpose</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">)))</span>
+<span class="w">    </span><span class="n">gs</span><span class="p">%</span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">matmul</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="nb">matmul</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="nb">transpose</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">)))</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">gyro_surface</span>
+<span class="k">end subroutine </span><span class="n">gyro_surface</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -631,14 +441,11 @@ public subroutine gyro_surface(fields, energy, pitch, Ai, gs)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

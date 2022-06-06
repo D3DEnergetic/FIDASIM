@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>plane_basis
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.1% of total for procedures.">18 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">plane_basis</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,123 +121,54 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
+    <h2>public subroutine plane_basis(center, redge, tedge, basis, inv_basis)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates basis from 3 points on a plane with +z being the plane normal</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-center%7E3"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>center</strong></td><td><p>Plane origin</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-redge"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>redge</strong></td><td><p>Right edge of plane</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-tedge"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>tedge</strong></td><td><p>Top edge of plane</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-basis%7E7"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td></td>
-  
-  <td>dimension(3,3)</td><td>::</td>
+<td>intent(out),</td>
+  <td></td>  <td>dimension(3,3)</td><td>::</td>
   <td><strong>basis</strong></td><td><p>Basis for transforming from plane to cartesian coordinates</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-inv_basis%7E6"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td>optional</td>
-  
-  <td>dimension(3,3)</td><td>::</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td>dimension(3,3)</td><td>::</td>
   <td><strong>inv_basis</strong></td><td><p>Inverse basis for the reverse transformation cartesian to plane</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -411,8 +260,6 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -473,35 +320,22 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
 <path fill="none" stroke="#000000" d="M179.131,-89.7541C195.825,-85.9108 217.793,-80.8534 237.839,-76.2385"/>
 <polygon fill="#000000" stroke="#000000" points="238.84,-79.5996 247.8,-73.9453 237.27,-72.7781 238.84,-79.5996"/>
 </g>
-<!-- proc~make_diagnostic_grids -->
-<g id="proc~~plane_basis~~CalledByGraph_node5" class="node"><title>proc~make_diagnostic_grids</title>
-<g id="a_proc~~plane_basis~~CalledByGraph_node5"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
-<polygon fill="#d9534f" stroke="#d9534f" points="212,-66 90,-66 90,-42 212,-42 212,-66"/>
-<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
-</a>
-</g>
-</g>
-<!-- proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical -->
-<g id="proc~~plane_basis~~CalledByGraph_edge5" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical</title>
-<path fill="none" stroke="#000000" d="M212.159,-58.328C220.714,-58.9434 229.461,-59.5727 237.869,-60.1776"/>
-<polygon fill="#000000" stroke="#000000" points="237.696,-63.6741 247.921,-60.9008 238.198,-56.6922 237.696,-63.6741"/>
-</g>
 <!-- proc~pfida_f -->
-<g id="proc~~plane_basis~~CalledByGraph_node6" class="node"><title>proc~pfida_f</title>
-<g id="a_proc~~plane_basis~~CalledByGraph_node6"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="178,-24 124,-24 124,-0 178,-0 178,-24"/>
-<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
+<g id="proc~~plane_basis~~CalledByGraph_node5" class="node"><title>proc~pfida_f</title>
+<g id="a_proc~~plane_basis~~CalledByGraph_node5"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="178,-66 124,-66 124,-42 178,-42 178,-66"/>
+<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
 </a>
 </g>
 </g>
 <!-- proc~pfida_f&#45;&gt;proc~track_cylindrical -->
-<g id="proc~~plane_basis~~CalledByGraph_edge6" class="edge"><title>proc~pfida_f&#45;&gt;proc~track_cylindrical</title>
-<path fill="none" stroke="#000000" d="M178.065,-20.8859C188.631,-24.5493 200.929,-28.892 212,-33 224.989,-37.8195 239.094,-43.281 251.743,-48.2625"/>
-<polygon fill="#000000" stroke="#000000" points="250.504,-51.5359 261.09,-51.9598 253.078,-45.0267 250.504,-51.5359"/>
+<g id="proc~~plane_basis~~CalledByGraph_edge5" class="edge"><title>proc~pfida_f&#45;&gt;proc~track_cylindrical</title>
+<path fill="none" stroke="#000000" d="M178.145,-55.8809C194.897,-57.0861 217.243,-58.6938 237.63,-60.1605"/>
+<polygon fill="#000000" stroke="#000000" points="237.534,-63.6625 247.759,-60.8892 238.036,-56.6805 237.534,-63.6625"/>
 </g>
 <!-- program~fidasim -->
-<g id="proc~~plane_basis~~CalledByGraph_node7" class="node"><title>program~fidasim</title>
-<g id="a_proc~~plane_basis~~CalledByGraph_node7"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<g id="proc~~plane_basis~~CalledByGraph_node6" class="node"><title>program~fidasim</title>
+<g id="a_proc~~plane_basis~~CalledByGraph_node6"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-87 0,-87 0,-63 54,-63 54,-87"/>
 <text text-anchor="middle" x="27" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
@@ -517,15 +351,28 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
 <path fill="none" stroke="#000000" d="M54.1721,-79.505C71.1857,-82.4336 93.6353,-86.2979 112.529,-89.55"/>
 <polygon fill="#000000" stroke="#000000" points="112.153,-93.0367 122.602,-91.2839 113.341,-86.1382 112.153,-93.0367"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
-<g id="proc~~plane_basis~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
-<path fill="none" stroke="#000000" d="M54.1721,-70.495C61.8846,-69.1674 70.7143,-67.6475 79.8233,-66.0796"/>
-<polygon fill="#000000" stroke="#000000" points="80.5163,-69.5119 89.7777,-64.3661 79.3288,-62.6133 80.5163,-69.5119"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~pfida_f -->
-<g id="proc~~plane_basis~~CalledByGraph_edge9" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
-<path fill="none" stroke="#000000" d="M43.6139,-62.7477C55.7484,-53.6501 73.2749,-41.4127 90,-33 97.6402,-29.157 106.153,-25.7164 114.309,-22.7866"/>
-<polygon fill="#000000" stroke="#000000" points="115.67,-26.0205 124,-19.4737 113.405,-19.3969 115.67,-26.0205"/>
+<g id="proc~~plane_basis~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<path fill="none" stroke="#000000" d="M54.1721,-70.495C71.6205,-67.4915 94.7864,-63.504 113.97,-60.2019"/>
+<polygon fill="#000000" stroke="#000000" points="114.61,-63.6433 123.871,-58.4976 113.422,-56.7447 114.61,-63.6433"/>
+</g>
+<!-- proc~make_diagnostic_grids -->
+<g id="proc~~plane_basis~~CalledByGraph_node7" class="node"><title>proc~make_diagnostic_grids</title>
+<g id="a_proc~~plane_basis~~CalledByGraph_node7"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
+<polygon fill="#d9534f" stroke="#d9534f" points="212,-24 90,-24 90,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
+<g id="proc~~plane_basis~~CalledByGraph_edge9" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
+<path fill="none" stroke="#000000" d="M43.6139,-62.7477C55.7484,-53.6501 73.2749,-41.4127 90,-33 93.7157,-31.131 97.6378,-29.3572 101.625,-27.691"/>
+<polygon fill="#000000" stroke="#000000" points="102.959,-30.9272 110.98,-24.0045 100.393,-24.4146 102.959,-30.9272"/>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical -->
+<g id="proc~~plane_basis~~CalledByGraph_edge6" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical</title>
+<path fill="none" stroke="#000000" d="M187.295,-24.1073C195.43,-26.966 204.033,-30.0437 212,-33 224.989,-37.8195 239.094,-43.281 251.743,-48.2625"/>
+<polygon fill="#000000" stroke="#000000" points="250.504,-51.5359 261.09,-51.9598 253.078,-45.0267 250.504,-51.5359"/>
 </g>
 </g>
 </svg>
@@ -584,34 +431,11 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -619,84 +443,69 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">plane_basis</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">redge</span><span class="p">,</span> <span class="n">tedge</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">inv_basis</span><span class="p">)</span>
-    <span class="c">!+ Calculates basis from 3 points on a plane with +z being the plane normal</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">center</span>
-        <span class="c">!+ Plane origin</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">redge</span>
-        <span class="c">!+ Right edge of plane</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">tedge</span>
-        <span class="c">!+ Top edge of plane</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">basis</span>
-        <span class="c">!+ Basis for transforming from plane to cartesian coordinates</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">inv_basis</span>
-        <span class="c">!+ Inverse basis for the reverse transformation cartesian to plane</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">plane_basis</span><span class="p">(</span><span class="n">center</span><span class="p">,</span><span class="w"> </span><span class="n">redge</span><span class="p">,</span><span class="w"> </span><span class="n">tedge</span><span class="p">,</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">inv_basis</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates basis from 3 points on a plane with +z being the plane normal</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">center</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Plane origin</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">redge</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Right edge of plane</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">tedge</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Top edge of plane</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">basis</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Basis for transforming from plane to cartesian coordinates</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">inv_basis</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Inverse basis for the reverse transformation cartesian to plane</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u1</span><span class="p">,</span><span class="n">u2</span><span class="p">,</span><span class="n">u3</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">u1</span><span class="p">,</span><span class="n">u2</span><span class="p">,</span><span class="n">u3</span><span class="w"></span>
 
-    <span class="n">u1</span> <span class="o">=</span> <span class="p">(</span><span class="n">redge</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span>
-    <span class="n">u1</span> <span class="o">=</span> <span class="n">u1</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span>
-    <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">tedge</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span>
-    <span class="n">u2</span> <span class="o">=</span> <span class="n">u2</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span>
-    <span class="n">u3</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span><span class="n">u2</span><span class="p">)</span>
-    <span class="n">u3</span> <span class="o">=</span> <span class="n">u3</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">u1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">redge</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">center</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u1</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tedge</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">center</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cross_product</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span><span class="n">u2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u3</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">u3</span><span class="p">)</span><span class="w"></span>
 
-    <span class="n">basis</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">u1</span>
-    <span class="n">basis</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">u2</span>
-    <span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">u3</span>
+<span class="w">    </span><span class="n">basis</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u1</span><span class="w"></span>
+<span class="w">    </span><span class="n">basis</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2</span><span class="w"></span>
+<span class="w">    </span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u3</span><span class="w"></span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">))</span> <span class="n">inv_basis</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">))</span><span class="w"> </span><span class="n">inv_basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transpose</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">plane_basis</span>
+<span class="k">end subroutine </span><span class="n">plane_basis</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -724,14 +533,11 @@ public subroutine plane_basis(center, redge, tedge, basis, inv_basis)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

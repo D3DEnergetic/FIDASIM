@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>update_reservoir
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.2% of total for procedures.">23 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">update_reservoir</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,93 +121,42 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine update_reservoir(res, vn, wght)
+    <h2>public subroutine update_reservoir(res, vn, wght)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Store neutrals in reservoir</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-res%7E3"></span>type(<a href='../type/neutralparticlereservoir.html'>NeutralParticleReservoir</a>),</td>
-  <td>intent(inout)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>res</strong></td><td><p><a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vn"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vn</strong></td><td><p>Neutral particle velocity [cm/s]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-wght"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>wght</strong></td><td><p>Neutral weight</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -301,11 +168,11 @@ public subroutine update_reservoir(res, vn, wght)
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~update_reservoir~~CallsGraph Pages: 1 -->
-<svg id="procupdate_reservoirCallsGraph" width="302pt" height="94pt"
- viewBox="0.00 0.00 302.00 94.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~update_reservoir~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 90)">
+<svg id="procupdate_reservoirCallsGraph" width="302pt" height="87pt"
+ viewBox="0.00 0.00 302.00 86.82" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~update_reservoir~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 82.818)">
 <title>proc~~update_reservoir~~CallsGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-90 298,-90 298,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-82.818 298,-82.818 298,4 -4,4"/>
 <!-- proc~update_reservoir -->
 <g id="proc~~update_reservoir~~CallsGraph_node1" class="node"><title>proc~update_reservoir</title>
 <polygon fill="none" stroke="black" points="94,-66 -7.10543e-15,-66 -7.10543e-15,-42 94,-42 94,-66"/>
@@ -314,46 +181,46 @@ public subroutine update_reservoir(res, vn, wght)
 <!-- interface~randu -->
 <g id="proc~~update_reservoir~~CallsGraph_node2" class="node"><title>interface~randu</title>
 <g id="a_proc~~update_reservoir~~CallsGraph_node2"><a xlink:href=".././interface/randu.html" xlink:title="randu">
-<polygon fill="#a7506f" stroke="#a7506f" points="294,-86 240,-86 240,-62 294,-62 294,-86"/>
-<text text-anchor="middle" x="267" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="294,-65 240,-65 240,-41 294,-41 294,-65"/>
+<text text-anchor="middle" x="267" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
 </a>
 </g>
 </g>
 <!-- proc~update_reservoir&#45;&gt;interface~randu -->
 <g id="proc~~update_reservoir~~CallsGraph_edge1" class="edge"><title>proc~update_reservoir&#45;&gt;interface~randu</title>
-<path fill="none" stroke="#000000" d="M86.8216,-66.0662C100.346,-69.6999 115.711,-73.1994 130,-75 162.631,-79.112 171.112,-75.2652 204,-75 212.25,-74.9335 221.118,-74.8171 229.493,-74.6868"/>
-<polygon fill="#000000" stroke="#000000" points="229.815,-78.1821 239.755,-74.5169 229.699,-71.183 229.815,-78.1821"/>
-</g>
-<!-- proc~init_reservoir -->
-<g id="proc~~update_reservoir~~CallsGraph_node3" class="node"><title>proc~init_reservoir</title>
-<g id="a_proc~~update_reservoir~~CallsGraph_node3"><a xlink:href=".././proc/init_reservoir.html" xlink:title="init_reservoir">
-<polygon fill="#d9534f" stroke="#d9534f" points="204,-66 130,-66 130,-42 204,-42 204,-66"/>
-<text text-anchor="middle" x="167" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">init_reservoir</text>
-</a>
-</g>
-</g>
-<!-- proc~update_reservoir&#45;&gt;proc~init_reservoir -->
-<g id="proc~~update_reservoir~~CallsGraph_edge2" class="edge"><title>proc~update_reservoir&#45;&gt;proc~init_reservoir</title>
-<path fill="none" stroke="#000000" d="M94.298,-54C102.561,-54 111.172,-54 119.442,-54"/>
-<polygon fill="#000000" stroke="#000000" points="119.682,-57.5001 129.682,-54 119.682,-50.5001 119.682,-57.5001"/>
+<path fill="none" stroke="#000000" d="M86.8216,-66.0662C100.346,-69.6999 115.711,-73.1994 130,-75 162.631,-79.112 171.588,-80.5801 204,-75 212.737,-73.4958 221.877,-70.881 230.37,-67.9675"/>
+<polygon fill="#000000" stroke="#000000" points="231.789,-71.1756 239.982,-64.4587 229.389,-64.6001 231.789,-71.1756"/>
 </g>
 <!-- interface~randind -->
-<g id="proc~~update_reservoir~~CallsGraph_node4" class="node"><title>interface~randind</title>
-<g id="a_proc~~update_reservoir~~CallsGraph_node4"><a xlink:href=".././interface/randind.html" xlink:title="randind">
-<polygon fill="#a7506f" stroke="#a7506f" points="194,-24 140,-24 140,-0 194,-0 194,-24"/>
-<text text-anchor="middle" x="167" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randind</text>
+<g id="proc~~update_reservoir~~CallsGraph_node3" class="node"><title>interface~randind</title>
+<g id="a_proc~~update_reservoir~~CallsGraph_node3"><a xlink:href=".././interface/randind.html" xlink:title="randind">
+<polygon fill="#a7506f" stroke="#a7506f" points="194,-66 140,-66 140,-42 194,-42 194,-66"/>
+<text text-anchor="middle" x="167" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randind</text>
 </a>
 </g>
 </g>
 <!-- proc~update_reservoir&#45;&gt;interface~randind -->
-<g id="proc~~update_reservoir~~CallsGraph_edge3" class="edge"><title>proc~update_reservoir&#45;&gt;interface~randind</title>
-<path fill="none" stroke="#000000" d="M81.8141,-41.9645C96.8978,-36.5957 114.685,-30.2645 130.015,-24.8083"/>
-<polygon fill="#000000" stroke="#000000" points="131.433,-28.0187 139.68,-21.368 129.086,-21.424 131.433,-28.0187"/>
+<g id="proc~~update_reservoir~~CallsGraph_edge2" class="edge"><title>proc~update_reservoir&#45;&gt;interface~randind</title>
+<path fill="none" stroke="#000000" d="M94.298,-54C106.041,-54 118.489,-54 129.659,-54"/>
+<polygon fill="#000000" stroke="#000000" points="129.913,-57.5001 139.913,-54 129.913,-50.5001 129.913,-57.5001"/>
+</g>
+<!-- proc~init_reservoir -->
+<g id="proc~~update_reservoir~~CallsGraph_node4" class="node"><title>proc~init_reservoir</title>
+<g id="a_proc~~update_reservoir~~CallsGraph_node4"><a xlink:href=".././proc/init_reservoir.html" xlink:title="init_reservoir">
+<polygon fill="#d9534f" stroke="#d9534f" points="204,-24 130,-24 130,-0 204,-0 204,-24"/>
+<text text-anchor="middle" x="167" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">init_reservoir</text>
+</a>
+</g>
+</g>
+<!-- proc~update_reservoir&#45;&gt;proc~init_reservoir -->
+<g id="proc~~update_reservoir~~CallsGraph_edge3" class="edge"><title>proc~update_reservoir&#45;&gt;proc~init_reservoir</title>
+<path fill="none" stroke="#000000" d="M81.8141,-41.9645C94.5281,-37.4392 109.163,-32.2301 122.628,-27.4376"/>
+<polygon fill="#000000" stroke="#000000" points="123.934,-30.6879 132.181,-24.0373 121.586,-24.0932 123.934,-30.6879"/>
 </g>
 <!-- proc~init_reservoir&#45;&gt;interface~randu -->
 <g id="proc~~update_reservoir~~CallsGraph_edge4" class="edge"><title>proc~init_reservoir&#45;&gt;interface~randu</title>
-<path fill="none" stroke="#000000" d="M204.213,-61.3904C212.586,-63.0992 221.495,-64.9173 229.864,-66.6253"/>
-<polygon fill="#000000" stroke="#000000" points="229.236,-70.0692 239.734,-68.6395 230.636,-63.2106 229.236,-70.0692"/>
+<path fill="none" stroke="#000000" d="M196.873,-24.0796C207.354,-28.4643 219.321,-33.471 230.319,-38.0723"/>
+<polygon fill="#000000" stroke="#000000" points="229.097,-41.355 239.673,-41.9858 231.799,-34.8974 229.097,-41.355"/>
 </g>
 </g>
 </svg>
@@ -412,8 +279,6 @@ public subroutine update_reservoir(res, vn, wght)
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -425,175 +290,175 @@ public subroutine update_reservoir(res, vn, wght)
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~update_reservoir~~CalledByGraph Pages: 1 -->
-<svg id="procupdate_reservoirCalledByGraph" width="641pt" height="118pt"
- viewBox="0.00 0.00 641.00 117.82" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~update_reservoir~~CalledByGraph" class="graph" transform="scale(0.823907 0.823907) rotate(0) translate(4 139)">
+<svg id="procupdate_reservoirCalledByGraph" width="641pt" height="110pt"
+ viewBox="0.00 0.00 641.00 110.40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~update_reservoir~~CalledByGraph" class="graph" transform="scale(0.823907 0.823907) rotate(0) translate(4 130)">
 <title>proc~~update_reservoir~~CalledByGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-139 774,-139 774,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-130 774,-130 774,4 -4,4"/>
 <!-- proc~update_reservoir -->
 <g id="proc~~update_reservoir~~CalledByGraph_node1" class="node"><title>proc~update_reservoir</title>
-<polygon fill="none" stroke="black" points="770,-104 676,-104 676,-80 770,-80 770,-104"/>
-<text text-anchor="middle" x="723" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50">update_reservoir</text>
-</g>
-<!-- proc~merge_reservoirs -->
-<g id="proc~~update_reservoir~~CalledByGraph_node2" class="node"><title>proc~merge_reservoirs</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node2"><a xlink:href=".././proc/merge_reservoirs.html" xlink:title="merge_reservoirs">
-<polygon fill="#d9534f" stroke="#d9534f" points="639.5,-84 542.5,-84 542.5,-60 639.5,-60 639.5,-84"/>
-<text text-anchor="middle" x="591" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">merge_reservoirs</text>
-</a>
-</g>
-</g>
-<!-- proc~merge_reservoirs&#45;&gt;proc~update_reservoir -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge1" class="edge"><title>proc~merge_reservoirs&#45;&gt;proc~update_reservoir</title>
-<path fill="none" stroke="#000000" d="M639.669,-79.3337C648.107,-80.6318 656.965,-81.9945 665.615,-83.3254"/>
-<polygon fill="#000000" stroke="#000000" points="665.222,-86.806 675.638,-84.8673 666.286,-79.8874 665.222,-86.806"/>
+<polygon fill="none" stroke="black" points="770,-95 676,-95 676,-71 770,-71 770,-95"/>
+<text text-anchor="middle" x="723" y="-80.6" font-family="Helvetica,sans-Serif" font-size="10.50">update_reservoir</text>
 </g>
 <!-- proc~update_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_node3" class="node"><title>proc~update_neutrals</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node3"><a xlink:href=".././proc/update_neutrals.html" xlink:title="update_neutrals">
-<polygon fill="#d9534f" stroke="#d9534f" points="479,-126 389,-126 389,-102 479,-102 479,-126"/>
-<text text-anchor="middle" x="434" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_neutrals</text>
+<g id="proc~~update_reservoir~~CalledByGraph_node2" class="node"><title>proc~update_neutrals</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node2"><a xlink:href=".././proc/update_neutrals.html" xlink:title="update_neutrals">
+<polygon fill="#d9534f" stroke="#d9534f" points="479,-117 389,-117 389,-93 479,-93 479,-117"/>
+<text text-anchor="middle" x="434" y="-102.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_neutrals</text>
 </a>
 </g>
 </g>
 <!-- proc~update_neutrals&#45;&gt;proc~update_reservoir -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge2" class="edge"><title>proc~update_neutrals&#45;&gt;proc~update_reservoir</title>
-<path fill="none" stroke="#000000" d="M479.215,-110.611C529.291,-106.772 611.006,-100.508 665.625,-96.3214"/>
-<polygon fill="#000000" stroke="#000000" points="666.129,-99.7931 675.832,-95.539 665.594,-92.8136 666.129,-99.7931"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge1" class="edge"><title>proc~update_neutrals&#45;&gt;proc~update_reservoir</title>
+<path fill="none" stroke="#000000" d="M479.215,-101.611C529.291,-97.7721 611.006,-91.5082 665.625,-87.3214"/>
+<polygon fill="#000000" stroke="#000000" points="666.129,-90.7931 675.832,-86.539 665.594,-83.8136 666.129,-90.7931"/>
 </g>
-<!-- proc~parallel_merge_reservoirs -->
-<g id="proc~~update_reservoir~~CalledByGraph_node4" class="node"><title>proc~parallel_merge_reservoirs</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node4"><a xlink:href=".././proc/parallel_merge_reservoirs.html" xlink:title="parallel_merge_reservoirs">
-<polygon fill="#d9534f" stroke="#d9534f" points="502.5,-84 365.5,-84 365.5,-60 502.5,-60 502.5,-84"/>
-<text text-anchor="middle" x="434" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_merge_reservoirs</text>
+<!-- proc~merge_reservoirs -->
+<g id="proc~~update_reservoir~~CalledByGraph_node3" class="node"><title>proc~merge_reservoirs</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node3"><a xlink:href=".././proc/merge_reservoirs.html" xlink:title="merge_reservoirs">
+<polygon fill="#d9534f" stroke="#d9534f" points="639.5,-75 542.5,-75 542.5,-51 639.5,-51 639.5,-75"/>
+<text text-anchor="middle" x="591" y="-60.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">merge_reservoirs</text>
 </a>
 </g>
 </g>
-<!-- proc~parallel_merge_reservoirs&#45;&gt;proc~merge_reservoirs -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge3" class="edge"><title>proc~parallel_merge_reservoirs&#45;&gt;proc~merge_reservoirs</title>
-<path fill="none" stroke="#000000" d="M502.534,-72C512.36,-72 522.402,-72 532.016,-72"/>
-<polygon fill="#000000" stroke="#000000" points="532.25,-75.5001 542.25,-72 532.25,-68.5001 532.25,-75.5001"/>
-</g>
-<!-- proc~store_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_node5" class="node"><title>proc~store_neutrals</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node5"><a xlink:href=".././proc/store_neutrals.html" xlink:title="store_neutrals">
-<polygon fill="#d9534f" stroke="#d9534f" points="293.5,-135 212.5,-135 212.5,-111 293.5,-111 293.5,-135"/>
-<text text-anchor="middle" x="253" y="-120.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_neutrals</text>
-</a>
-</g>
-</g>
-<!-- proc~store_neutrals&#45;&gt;proc~update_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge6" class="edge"><title>proc~store_neutrals&#45;&gt;proc~update_neutrals</title>
-<path fill="none" stroke="#000000" d="M293.726,-121.003C318.75,-119.744 351.387,-118.103 378.776,-116.726"/>
-<polygon fill="#000000" stroke="#000000" points="379.178,-120.211 388.99,-116.213 378.826,-113.219 379.178,-120.211"/>
+<!-- proc~merge_reservoirs&#45;&gt;proc~update_reservoir -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge2" class="edge"><title>proc~merge_reservoirs&#45;&gt;proc~update_reservoir</title>
+<path fill="none" stroke="#000000" d="M639.669,-70.3337C648.107,-71.6318 656.965,-72.9945 665.615,-74.3254"/>
+<polygon fill="#000000" stroke="#000000" points="665.222,-77.806 675.638,-75.8673 666.286,-70.8874 665.222,-77.806"/>
 </g>
 <!-- proc~merge_neutral_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_node6" class="node"><title>proc~merge_neutral_populations</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node6"><a xlink:href=".././proc/merge_neutral_populations.html" xlink:title="merge_neutral_populations">
+<g id="proc~~update_reservoir~~CalledByGraph_node4" class="node"><title>proc~merge_neutral_populations</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node4"><a xlink:href=".././proc/merge_neutral_populations.html" xlink:title="merge_neutral_populations">
 <polygon fill="#d9534f" stroke="#d9534f" points="505.5,-24 362.5,-24 362.5,-0 505.5,-0 505.5,-24"/>
 <text text-anchor="middle" x="434" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">merge_neutral_populations</text>
 </a>
 </g>
 </g>
 <!-- proc~merge_neutral_populations&#45;&gt;proc~merge_reservoirs -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge4" class="edge"><title>proc~merge_neutral_populations&#45;&gt;proc~merge_reservoirs</title>
-<path fill="none" stroke="#000000" d="M466.367,-24.1419C490.29,-33.4028 523.436,-46.2333 549.386,-56.2784"/>
-<polygon fill="#000000" stroke="#000000" points="548.356,-59.6327 558.945,-59.9787 550.883,-53.1047 548.356,-59.6327"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge5" class="edge"><title>proc~merge_neutral_populations&#45;&gt;proc~merge_reservoirs</title>
+<path fill="none" stroke="#000000" d="M471.733,-24.0863C493.274,-31.1741 520.69,-40.1948 543.701,-47.766"/>
+<polygon fill="#000000" stroke="#000000" points="542.67,-51.1113 553.263,-50.9122 544.857,-44.462 542.67,-51.1113"/>
+</g>
+<!-- proc~store_neutrals -->
+<g id="proc~~update_reservoir~~CalledByGraph_node5" class="node"><title>proc~store_neutrals</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node5"><a xlink:href=".././proc/store_neutrals.html" xlink:title="store_neutrals">
+<polygon fill="#d9534f" stroke="#d9534f" points="293.5,-126 212.5,-126 212.5,-102 293.5,-102 293.5,-126"/>
+<text text-anchor="middle" x="253" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_neutrals</text>
+</a>
+</g>
+</g>
+<!-- proc~store_neutrals&#45;&gt;proc~update_neutrals -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge3" class="edge"><title>proc~store_neutrals&#45;&gt;proc~update_neutrals</title>
+<path fill="none" stroke="#000000" d="M293.726,-112.003C318.75,-110.744 351.387,-109.103 378.776,-107.726"/>
+<polygon fill="#000000" stroke="#000000" points="379.178,-111.211 388.99,-107.213 378.826,-104.219 379.178,-111.211"/>
+</g>
+<!-- proc~parallel_merge_reservoirs -->
+<g id="proc~~update_reservoir~~CalledByGraph_node6" class="node"><title>proc~parallel_merge_reservoirs</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node6"><a xlink:href=".././proc/parallel_merge_reservoirs.html" xlink:title="parallel_merge_reservoirs">
+<polygon fill="#d9534f" stroke="#d9534f" points="502.5,-75 365.5,-75 365.5,-51 502.5,-51 502.5,-75"/>
+<text text-anchor="middle" x="434" y="-60.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_merge_reservoirs</text>
+</a>
+</g>
+</g>
+<!-- proc~parallel_merge_reservoirs&#45;&gt;proc~merge_reservoirs -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge6" class="edge"><title>proc~parallel_merge_reservoirs&#45;&gt;proc~merge_reservoirs</title>
+<path fill="none" stroke="#000000" d="M502.534,-63C512.36,-63 522.402,-63 532.016,-63"/>
+<polygon fill="#000000" stroke="#000000" points="532.25,-66.5001 542.25,-63 532.25,-59.5001 532.25,-66.5001"/>
 </g>
 <!-- proc~halo -->
 <g id="proc~~update_reservoir~~CalledByGraph_node7" class="node"><title>proc~halo</title>
 <g id="a_proc~~update_reservoir~~CalledByGraph_node7"><a xlink:href=".././proc/halo.html" xlink:title="halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-51 90,-51 90,-27 144,-27 144,-51"/>
-<text text-anchor="middle" x="117" y="-36.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-42 90,-42 90,-18 144,-18 144,-42"/>
+<text text-anchor="middle" x="117" y="-27.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
 </a>
 </g>
 </g>
 <!-- proc~halo&#45;&gt;proc~update_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge5" class="edge"><title>proc~halo&#45;&gt;proc~update_neutrals</title>
-<path fill="none" stroke="#000000" d="M144.308,-36.5232C185.144,-33.7787 265.388,-32.839 326,-60 345.807,-68.8759 343.108,-82.314 362,-93 367.433,-96.0733 373.36,-98.7363 379.398,-101.034"/>
-<polygon fill="#000000" stroke="#000000" points="378.327,-104.367 388.922,-104.351 380.629,-97.7566 378.327,-104.367"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge4" class="edge"><title>proc~halo&#45;&gt;proc~update_neutrals</title>
+<path fill="none" stroke="#000000" d="M144.308,-27.5232C185.144,-24.7787 265.388,-23.839 326,-51 345.807,-59.8759 343.108,-73.314 362,-84 367.433,-87.0733 373.36,-89.7363 379.398,-92.034"/>
+<polygon fill="#000000" stroke="#000000" points="378.327,-95.3672 388.922,-95.3506 380.629,-88.7566 378.327,-95.3672"/>
 </g>
 <!-- proc~halo&#45;&gt;proc~merge_neutral_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge10" class="edge"><title>proc~halo&#45;&gt;proc~merge_neutral_populations</title>
-<path fill="none" stroke="#000000" d="M144.123,-33.15C155.143,-30.8893 168.143,-28.4923 180,-27 237.384,-19.7777 302.539,-16.0175 352.358,-14.0682"/>
-<polygon fill="#000000" stroke="#000000" points="352.566,-17.5629 362.428,-13.6906 352.304,-10.5678 352.566,-17.5629"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge7" class="edge"><title>proc~halo&#45;&gt;proc~merge_neutral_populations</title>
+<path fill="none" stroke="#000000" d="M144.099,-23.9416C155.115,-21.6473 168.119,-19.2816 180,-18 237.418,-11.8067 302.573,-10.3915 352.382,-10.4806"/>
+<polygon fill="#000000" stroke="#000000" points="352.437,-13.9807 362.451,-10.5193 352.464,-6.98076 352.437,-13.9807"/>
 </g>
 <!-- proc~parallel_merge_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_node10" class="node"><title>proc~parallel_merge_populations</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node10"><a xlink:href=".././proc/parallel_merge_populations.html" xlink:title="parallel_merge_populations">
-<polygon fill="#d9534f" stroke="#d9534f" points="325.5,-93 180.5,-93 180.5,-69 325.5,-69 325.5,-93"/>
-<text text-anchor="middle" x="253" y="-78.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_merge_populations</text>
+<g id="proc~~update_reservoir~~CalledByGraph_node8" class="node"><title>proc~parallel_merge_populations</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node8"><a xlink:href=".././proc/parallel_merge_populations.html" xlink:title="parallel_merge_populations">
+<polygon fill="#d9534f" stroke="#d9534f" points="325.5,-84 180.5,-84 180.5,-60 325.5,-60 325.5,-84"/>
+<text text-anchor="middle" x="253" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_merge_populations</text>
 </a>
 </g>
 </g>
 <!-- proc~halo&#45;&gt;proc~parallel_merge_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge15" class="edge"><title>proc~halo&#45;&gt;proc~parallel_merge_populations</title>
-<path fill="none" stroke="#000000" d="M144.155,-47.1977C161.107,-52.5112 183.702,-59.593 203.829,-65.9015"/>
-<polygon fill="#000000" stroke="#000000" points="202.886,-69.274 213.475,-68.9251 204.98,-62.5944 202.886,-69.274"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge13" class="edge"><title>proc~halo&#45;&gt;proc~parallel_merge_populations</title>
+<path fill="none" stroke="#000000" d="M144.155,-38.1977C161.107,-43.5112 183.702,-50.593 203.829,-56.9015"/>
+<polygon fill="#000000" stroke="#000000" points="202.886,-60.274 213.475,-59.9251 204.98,-53.5944 202.886,-60.274"/>
 </g>
-<!-- proc~ndmc -->
-<g id="proc~~update_reservoir~~CalledByGraph_node8" class="node"><title>proc~ndmc</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node8"><a xlink:href=".././proc/ndmc.html" xlink:title="ndmc">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-135 90,-135 90,-111 144,-111 144,-135"/>
-<text text-anchor="middle" x="117" y="-120.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
-</a>
-</g>
-</g>
-<!-- proc~ndmc&#45;&gt;proc~store_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge8" class="edge"><title>proc~ndmc&#45;&gt;proc~store_neutrals</title>
-<path fill="none" stroke="#000000" d="M144.155,-123C160.694,-123 182.603,-123 202.351,-123"/>
-<polygon fill="#000000" stroke="#000000" points="202.442,-126.5 212.442,-123 202.442,-119.5 202.442,-126.5"/>
-</g>
-<!-- proc~ndmc&#45;&gt;proc~parallel_merge_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge14" class="edge"><title>proc~ndmc&#45;&gt;proc~parallel_merge_populations</title>
-<path fill="none" stroke="#000000" d="M144.165,-113.861C155.191,-110.082 168.185,-105.722 180,-102 186.425,-99.9759 193.194,-97.9123 199.904,-95.9078"/>
-<polygon fill="#000000" stroke="#000000" points="201.053,-99.2181 209.649,-93.0247 199.067,-92.5058 201.053,-99.2181"/>
+<!-- proc~parallel_merge_populations&#45;&gt;proc~parallel_merge_reservoirs -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge10" class="edge"><title>proc~parallel_merge_populations&#45;&gt;proc~parallel_merge_reservoirs</title>
+<path fill="none" stroke="#000000" d="M325.517,-68.4042C335.274,-67.9136 345.329,-67.4081 355.19,-66.9122"/>
+<polygon fill="#000000" stroke="#000000" points="355.566,-70.3979 365.377,-66.4 355.214,-63.4067 355.566,-70.3979"/>
 </g>
 <!-- proc~dcx -->
 <g id="proc~~update_reservoir~~CalledByGraph_node9" class="node"><title>proc~dcx</title>
 <g id="a_proc~~update_reservoir~~CalledByGraph_node9"><a xlink:href=".././proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-93 90,-93 90,-69 144,-69 144,-93"/>
-<text text-anchor="middle" x="117" y="-78.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-126 90,-126 90,-102 144,-102 144,-126"/>
+<text text-anchor="middle" x="117" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
 </a>
 </g>
 </g>
 <!-- proc~dcx&#45;&gt;proc~store_neutrals -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge9" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
-<path fill="none" stroke="#000000" d="M144.165,-90.1389C155.191,-93.9184 168.185,-98.2779 180,-102 187.254,-104.285 194.945,-106.621 202.497,-108.865"/>
-<polygon fill="#000000" stroke="#000000" points="201.715,-112.283 212.296,-111.75 203.692,-105.568 201.715,-112.283"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge8" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
+<path fill="none" stroke="#000000" d="M144.155,-114C160.694,-114 182.603,-114 202.351,-114"/>
+<polygon fill="#000000" stroke="#000000" points="202.442,-117.5 212.442,-114 202.442,-110.5 202.442,-117.5"/>
 </g>
 <!-- proc~dcx&#45;&gt;proc~parallel_merge_populations -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge16" class="edge"><title>proc~dcx&#45;&gt;proc~parallel_merge_populations</title>
-<path fill="none" stroke="#000000" d="M144.155,-81C151.873,-81 160.762,-81 170.055,-81"/>
-<polygon fill="#000000" stroke="#000000" points="170.26,-84.5001 180.26,-81 170.26,-77.5001 170.26,-84.5001"/>
-</g>
-<!-- proc~parallel_merge_populations&#45;&gt;proc~parallel_merge_reservoirs -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge7" class="edge"><title>proc~parallel_merge_populations&#45;&gt;proc~parallel_merge_reservoirs</title>
-<path fill="none" stroke="#000000" d="M325.517,-77.4042C335.274,-76.9136 345.329,-76.4081 355.19,-75.9122"/>
-<polygon fill="#000000" stroke="#000000" points="355.566,-79.3979 365.377,-75.4 355.214,-72.4067 355.566,-79.3979"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge12" class="edge"><title>proc~dcx&#45;&gt;proc~parallel_merge_populations</title>
+<path fill="none" stroke="#000000" d="M144.165,-104.861C155.191,-101.082 168.185,-96.7221 180,-93 186.425,-90.9759 193.194,-88.9123 199.904,-86.9078"/>
+<polygon fill="#000000" stroke="#000000" points="201.053,-90.2181 209.649,-84.0247 199.067,-83.5058 201.053,-90.2181"/>
 </g>
 <!-- program~fidasim -->
-<g id="proc~~update_reservoir~~CalledByGraph_node11" class="node"><title>program~fidasim</title>
-<g id="a_proc~~update_reservoir~~CalledByGraph_node11"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-93 0,-93 0,-69 54,-69 54,-93"/>
-<text text-anchor="middle" x="27" y="-78.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~update_reservoir~~CalledByGraph_node10" class="node"><title>program~fidasim</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node10"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-84 0,-84 0,-60 54,-60 54,-84"/>
+<text text-anchor="middle" x="27" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~halo -->
 <g id="proc~~update_reservoir~~CalledByGraph_edge11" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
-<path fill="none" stroke="#000000" d="M53.4532,-68.8519C62.2096,-64.6727 72.1654,-59.9211 81.5185,-55.4571"/>
-<polygon fill="#000000" stroke="#000000" points="83.0867,-58.5869 90.604,-51.1208 80.0716,-52.2695 83.0867,-58.5869"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~ndmc -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge12" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
-<path fill="none" stroke="#000000" d="M53.4532,-93.1481C62.2096,-97.3273 72.1654,-102.079 81.5185,-106.543"/>
-<polygon fill="#000000" stroke="#000000" points="80.0716,-109.73 90.604,-110.879 83.0867,-103.413 80.0716,-109.73"/>
+<path fill="none" stroke="#000000" d="M53.4532,-59.8519C62.2096,-55.6727 72.1654,-50.9211 81.5185,-46.4571"/>
+<polygon fill="#000000" stroke="#000000" points="83.0867,-49.5869 90.604,-42.1208 80.0716,-43.2695 83.0867,-49.5869"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="proc~~update_reservoir~~CalledByGraph_edge13" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
-<path fill="none" stroke="#000000" d="M54.4029,-81C62.3932,-81 71.3106,-81 79.8241,-81"/>
-<polygon fill="#000000" stroke="#000000" points="79.919,-84.5001 89.919,-81 79.919,-77.5001 79.919,-84.5001"/>
+<g id="proc~~update_reservoir~~CalledByGraph_edge15" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="#000000" d="M53.4532,-84.1481C62.2096,-88.3273 72.1654,-93.0789 81.5185,-97.5429"/>
+<polygon fill="#000000" stroke="#000000" points="80.0716,-100.73 90.604,-101.879 83.0867,-94.4131 80.0716,-100.73"/>
+</g>
+<!-- proc~ndmc -->
+<g id="proc~~update_reservoir~~CalledByGraph_node11" class="node"><title>proc~ndmc</title>
+<g id="a_proc~~update_reservoir~~CalledByGraph_node11"><a xlink:href=".././proc/ndmc.html" xlink:title="ndmc">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-84 90,-84 90,-60 144,-60 144,-84"/>
+<text text-anchor="middle" x="117" y="-69.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~ndmc -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge16" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
+<path fill="none" stroke="#000000" d="M54.4029,-72C62.3932,-72 71.3106,-72 79.8241,-72"/>
+<polygon fill="#000000" stroke="#000000" points="79.919,-75.5001 89.919,-72 79.919,-68.5001 79.919,-75.5001"/>
+</g>
+<!-- proc~ndmc&#45;&gt;proc~store_neutrals -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge9" class="edge"><title>proc~ndmc&#45;&gt;proc~store_neutrals</title>
+<path fill="none" stroke="#000000" d="M144.165,-81.1389C155.191,-84.9184 168.185,-89.2779 180,-93 187.254,-95.2851 194.945,-97.6206 202.497,-99.8646"/>
+<polygon fill="#000000" stroke="#000000" points="201.715,-103.283 212.296,-102.75 203.692,-96.5677 201.715,-103.283"/>
+</g>
+<!-- proc~ndmc&#45;&gt;proc~parallel_merge_populations -->
+<g id="proc~~update_reservoir~~CalledByGraph_edge14" class="edge"><title>proc~ndmc&#45;&gt;proc~parallel_merge_populations</title>
+<path fill="none" stroke="#000000" d="M144.155,-72C151.873,-72 160.762,-72 170.055,-72"/>
+<polygon fill="#000000" stroke="#000000" points="170.26,-75.5001 180.26,-72 170.26,-68.5001 170.26,-75.5001"/>
 </g>
 </g>
 </svg>
@@ -652,34 +517,11 @@ public subroutine update_reservoir(res, vn, wght)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -687,91 +529,76 @@ public subroutine update_reservoir(res, vn, wght)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">update_reservoir</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">wght</span><span class="p">)</span>
-    <span class="c">!+ Store neutrals in reservoir</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">NeutralParticleReservoir</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">res</span>
-        <span class="c">!+ [[libfida:beam_grid]] indices</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">vn</span>
-        <span class="c">!+ Neutral particle velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">wght</span>
-        <span class="c">!+ Neutral weight</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">update_reservoir</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="n">vn</span><span class="p">,</span><span class="w"> </span><span class="n">wght</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Store neutrals in reservoir</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">NeutralParticleReservoir</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ [[libfida:beam_grid]] indices</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">vn</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Neutral particle velocity [cm/s]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">wght</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Neutral weight</span>
 
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">randomi</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">randomu</span><span class="w"></span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">)</span> <span class="k">then</span>
-        <span class="c">!$OMP CRITICAL(update_reservoir_1)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            call </span><span class="n">init_reservoir</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="n">reservoir_size</span><span class="p">)</span>
-        <span class="k">endif</span>
-<span class="k">        </span><span class="n">res</span><span class="p">%</span><span class="n">R</span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">NeutralParticle</span><span class="p">(</span><span class="n">wght</span><span class="p">,</span> <span class="n">vn</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">%</span><span class="n">n</span> <span class="o">=</span> <span class="n">res</span><span class="p">%</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="c">!$OMP END CRITICAL(update_reservoir_1)</span>
-        <span class="k">return</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">        </span><span class="c">!$OMP CRITICAL(update_reservoir_1)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            call </span><span class="n">init_reservoir</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="n">reservoir_size</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">endif</span>
+<span class="k">        </span><span class="n">res</span><span class="p">%</span><span class="n">R</span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NeutralParticle</span><span class="p">(</span><span class="n">wght</span><span class="p">,</span><span class="w"> </span><span class="n">vn</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span><span class="c">!$OMP END CRITICAL(update_reservoir_1)</span>
+<span class="w">        </span><span class="k">return</span>
 <span class="k">    endif</span>
 
-<span class="k">    if</span> <span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">res</span><span class="p">%</span><span class="n">i</span><span class="p">)</span> <span class="k">then</span>
-        <span class="c">!$OMP CRITICAL(update_reservoir_2)</span>
-        <span class="k">call </span><span class="n">randind</span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">,</span> <span class="n">randomi</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">%</span><span class="n">R</span><span class="p">(</span><span class="n">randomi</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">=</span> <span class="n">NeutralParticle</span><span class="p">(</span><span class="n">wght</span><span class="p">,</span> <span class="n">vn</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">%</span><span class="n">W</span> <span class="o">=</span> <span class="n">res</span><span class="p">%</span><span class="n">W</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">%</span><span class="n">i</span> <span class="o">=</span> <span class="n">res</span><span class="p">%</span><span class="n">i</span> <span class="o">+</span> <span class="nb">floor</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="nb">log</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">res</span><span class="p">%</span><span class="n">W</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="c">!$OMP END CRITICAL(update_reservoir_2)</span>
-    <span class="k">endif</span>
+<span class="k">    if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">res</span><span class="p">%</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">        </span><span class="c">!$OMP CRITICAL(update_reservoir_2)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">randind</span><span class="p">(</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">randomi</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="p">%</span><span class="n">R</span><span class="p">(</span><span class="n">randomi</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NeutralParticle</span><span class="p">(</span><span class="n">wght</span><span class="p">,</span><span class="w"> </span><span class="n">vn</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="p">%</span><span class="n">W</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">%</span><span class="n">W</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">res</span><span class="p">%</span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="p">%</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">%</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">floor</span><span class="p">(</span><span class="nb">log</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="nb">log</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">res</span><span class="p">%</span><span class="n">W</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span><span class="c">!$OMP END CRITICAL(update_reservoir_2)</span>
+<span class="w">    </span><span class="k">endif</span>
 
-<span class="k">    </span><span class="n">res</span><span class="p">%</span><span class="n">n</span> <span class="o">=</span> <span class="n">res</span><span class="p">%</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="k">    </span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">%</span><span class="n">n</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">update_reservoir</span>
+<span class="k">end subroutine </span><span class="n">update_reservoir</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -799,14 +626,11 @@ public subroutine update_reservoir(res, vn, wght)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

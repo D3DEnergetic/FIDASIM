@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>line_basis
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.1% of total for procedures.">14 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">line_basis</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,108 +121,48 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine line_basis(r0, v0, basis, inv_basis)
+    <h2>public subroutine line_basis(r0, v0, basis, inv_basis)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates basis from a line with +x in the direction of line</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-r0"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>r0</strong></td><td><p>Starting point of line [cm]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-v0"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>v0</strong></td><td><p>Direction of line</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-basis%7E6"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td></td>
-  
-  <td>dimension(3,3)</td><td>::</td>
+<td>intent(out),</td>
+  <td></td>  <td>dimension(3,3)</td><td>::</td>
   <td><strong>basis</strong></td><td><p>Basis for transforming from line coordinates to cartesian</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-inv_basis%7E5"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td>optional</td>
-  
-  <td>dimension(3,3)</td><td>::</td>
+<td>intent(out),</td>
+  <td>optional</td>  <td>dimension(3,3)</td><td>::</td>
   <td><strong>inv_basis</strong></td><td><p>Inverse basis for the reverse transformation cartesian to line</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -396,8 +254,6 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -419,31 +275,31 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
 <polygon fill="none" stroke="black" points="308,-45 248,-45 248,-21 308,-21 308,-45"/>
 <text text-anchor="middle" x="278" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">line_basis</text>
 </g>
-<!-- proc~make_diagnostic_grids -->
-<g id="proc~~line_basis~~CalledByGraph_node2" class="node"><title>proc~make_diagnostic_grids</title>
-<g id="a_proc~~line_basis~~CalledByGraph_node2"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
-<polygon fill="#d9534f" stroke="#d9534f" points="212,-66 90,-66 90,-42 212,-42 212,-66"/>
-<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
-</a>
-</g>
-</g>
-<!-- proc~make_diagnostic_grids&#45;&gt;proc~line_basis -->
-<g id="proc~~line_basis~~CalledByGraph_edge1" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~line_basis</title>
-<path fill="none" stroke="#000000" d="M212.303,-43.8691C220.995,-42.4089 229.743,-40.9392 237.875,-39.5731"/>
-<polygon fill="#000000" stroke="#000000" points="238.512,-43.0151 247.794,-37.9066 237.352,-36.1118 238.512,-43.0151"/>
-</g>
 <!-- proc~bremsstrahlung -->
-<g id="proc~~line_basis~~CalledByGraph_node3" class="node"><title>proc~bremsstrahlung</title>
-<g id="a_proc~~line_basis~~CalledByGraph_node3"><a xlink:href=".././proc/bremsstrahlung.html" xlink:title="bremsstrahlung">
-<polygon fill="#d9534f" stroke="#d9534f" points="194.5,-24 107.5,-24 107.5,-0 194.5,-0 194.5,-24"/>
-<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bremsstrahlung</text>
+<g id="proc~~line_basis~~CalledByGraph_node2" class="node"><title>proc~bremsstrahlung</title>
+<g id="a_proc~~line_basis~~CalledByGraph_node2"><a xlink:href=".././proc/bremsstrahlung.html" xlink:title="bremsstrahlung">
+<polygon fill="#d9534f" stroke="#d9534f" points="194.5,-66 107.5,-66 107.5,-42 194.5,-42 194.5,-66"/>
+<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bremsstrahlung</text>
 </a>
 </g>
 </g>
 <!-- proc~bremsstrahlung&#45;&gt;proc~line_basis -->
-<g id="proc~~line_basis~~CalledByGraph_edge2" class="edge"><title>proc~bremsstrahlung&#45;&gt;proc~line_basis</title>
-<path fill="none" stroke="#000000" d="M194.668,-19.1683C208.645,-21.5164 224.099,-24.1126 237.806,-26.4155"/>
-<polygon fill="#000000" stroke="#000000" points="237.453,-29.9051 247.895,-28.1104 238.613,-23.0019 237.453,-29.9051"/>
+<g id="proc~~line_basis~~CalledByGraph_edge1" class="edge"><title>proc~bremsstrahlung&#45;&gt;proc~line_basis</title>
+<path fill="none" stroke="#000000" d="M194.668,-46.8317C208.645,-44.4836 224.099,-41.8874 237.806,-39.5845"/>
+<polygon fill="#000000" stroke="#000000" points="238.613,-42.9981 247.895,-37.8896 237.453,-36.0949 238.613,-42.9981"/>
+</g>
+<!-- proc~make_diagnostic_grids -->
+<g id="proc~~line_basis~~CalledByGraph_node3" class="node"><title>proc~make_diagnostic_grids</title>
+<g id="a_proc~~line_basis~~CalledByGraph_node3"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
+<polygon fill="#d9534f" stroke="#d9534f" points="212,-24 90,-24 90,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~line_basis -->
+<g id="proc~~line_basis~~CalledByGraph_edge2" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~line_basis</title>
+<path fill="none" stroke="#000000" d="M212.303,-22.1309C220.995,-23.5911 229.743,-25.0608 237.875,-26.4269"/>
+<polygon fill="#000000" stroke="#000000" points="237.352,-29.8882 247.794,-28.0934 238.512,-22.9849 237.352,-29.8882"/>
 </g>
 <!-- program~fidasim -->
 <g id="proc~~line_basis~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
@@ -453,15 +309,15 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
 </a>
 </g>
 </g>
-<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
-<g id="proc~~line_basis~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
-<path fill="none" stroke="#000000" d="M54.1721,-37.505C61.8846,-38.8326 70.7143,-40.3525 79.8233,-41.9204"/>
-<polygon fill="#000000" stroke="#000000" points="79.3288,-45.3867 89.7777,-43.6339 80.5163,-38.4881 79.3288,-45.3867"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~bremsstrahlung -->
-<g id="proc~~line_basis~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~bremsstrahlung</title>
-<path fill="none" stroke="#000000" d="M54.1721,-28.495C66.6872,-26.3407 82.1438,-23.6802 96.9626,-21.1294"/>
-<polygon fill="#000000" stroke="#000000" points="97.8145,-24.5343 107.076,-19.3886 96.627,-17.6358 97.8145,-24.5343"/>
+<g id="proc~~line_basis~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~bremsstrahlung</title>
+<path fill="none" stroke="#000000" d="M54.1721,-37.505C66.6872,-39.6593 82.1438,-42.3198 96.9626,-44.8706"/>
+<polygon fill="#000000" stroke="#000000" points="96.627,-48.3642 107.076,-46.6114 97.8145,-41.4657 96.627,-48.3642"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
+<g id="proc~~line_basis~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
+<path fill="none" stroke="#000000" d="M54.1721,-28.495C61.8846,-27.1674 70.7143,-25.6475 79.8233,-24.0796"/>
+<polygon fill="#000000" stroke="#000000" points="80.5163,-27.5119 89.7777,-22.3661 79.3288,-20.6133 80.5163,-27.5119"/>
 </g>
 </g>
 </svg>
@@ -520,34 +376,11 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -555,79 +388,64 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">line_basis</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">inv_basis</span><span class="p">)</span>
-    <span class="c">!+ Calculates basis from a line with +x in the direction of line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">r0</span>
-        <span class="c">!+ Starting point of line [cm]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">v0</span>
-        <span class="c">!+ Direction of line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">basis</span>
-        <span class="c">!+ Basis for transforming from line coordinates to cartesian</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">inv_basis</span>
-        <span class="c">!+ Inverse basis for the reverse transformation cartesian to line</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">line_basis</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="w"> </span><span class="n">v0</span><span class="p">,</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">inv_basis</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates basis from a line with +x in the direction of line</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">r0</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Starting point of line [cm]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">v0</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Direction of line</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">basis</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Basis for transforming from line coordinates to cartesian</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">inv_basis</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Inverse basis for the reverse transformation cartesian to line</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rf</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">dis</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rf</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">alpha</span><span class="p">,</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span><span class="w"> </span><span class="n">dis</span><span class="w"></span>
 
-    <span class="n">rf</span> <span class="o">=</span> <span class="n">r0</span> <span class="o">+</span> <span class="n">v0</span>
-    <span class="n">dis</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">((</span><span class="n">rf</span> <span class="o">-</span> <span class="n">r0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-    <span class="n">beta</span> <span class="o">=</span> <span class="nb">asin</span><span class="p">((</span><span class="n">r0</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">rf</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="n">dis</span><span class="p">)</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">rf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">r0</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">rf</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">r0</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">rf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v0</span><span class="w"></span>
+<span class="w">    </span><span class="n">dis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">((</span><span class="n">rf</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">beta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">asin</span><span class="p">((</span><span class="n">r0</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">rf</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="n">dis</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">rf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">r0</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">rf</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">r0</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
 
-    <span class="k">call </span><span class="n">tb_zyx</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span>
+<span class="w">    </span><span class="k">call </span><span class="n">tb_zyx</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span><span class="w"></span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">))</span> <span class="n">inv_basis</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">))</span><span class="w"> </span><span class="n">inv_basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transpose</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">line_basis</span>
+<span class="k">end subroutine </span><span class="n">line_basis</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -655,14 +473,11 @@ public subroutine line_basis(r0, v0, basis, inv_basis)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../../css/pygments.css" rel="stylesheet">
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/local.css" rel="stylesheet">
-    
     <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../../lists/types.html">Derived Types</a></li>
             <li><a href="../../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,31 +73,23 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
   <div class="row">
     <h1>Reading Outputs</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
       <ul class="list-inline" style="margin-bottom:0px; display:inline">
-         
-         
 <!--
-        
 -->
       </ul>
         <ol class="breadcrumb in-well">
-      
          <li><a href='../../page/index.html'>User Guide</a></li>
-      
          <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
-      
          <li class="active">Reading Outputs</li>
       </ol>
     </div>
@@ -205,41 +160,41 @@ src                      Dataset <span class="o">{</span><span class="m">3</span
 
 <h2 id="using-idl">Using IDL</h2>
 <p>The IDL routine <a href="./sourcefile/read_hdf5.pro.html">read_hdf5.pro</a> is provided to read any HDF5 file.</p>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> f <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_geometry.h5&quot;</span>)
-IDL<span class="o">&gt;</span> <span class="nb">help</span>,f
-<span class="o">**</span> Structure <span class="o">&lt;</span>284b698<span class="o">&gt;</span>, <span class="mi">4</span> tags, length<span class="o">=</span><span class="mi">2224</span>, data length<span class="o">=</span><span class="mi">2194</span>, refs<span class="o">=</span><span class="mi">1</span><span class="o">:</span>
-   NBI             STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   NPA             STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   SPEC            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   DESCRIPTION     <span class="nb">STRING</span>    <span class="s1">&#39;Geometric quantities for FIDASIM&#39;</span>
-IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi
-<span class="o">**</span> Structure <span class="o">&lt;</span>27fb4d8<span class="o">&gt;</span>, <span class="mi">20</span> tags, length<span class="o">=</span><span class="mi">752</span>, data length<span class="o">=</span><span class="mi">734</span>, refs<span class="o">=</span><span class="mi">2</span><span class="o">:</span>
-   ADIST           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   AOFFY           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   AOFFZ           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   ASHAPE          STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   AWIDY           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   AWIDZ           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   <span class="nb">AXIS</span>            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   DATA_SOURCE     STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   DIVY            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   DIVZ            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   FOCY            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   FOCZ            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   NAME            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   NAPERTURE       STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   SHAPE           STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   SRC             STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   WIDY            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   WIDZ            STRUCT    <span class="o">-&gt;</span> <span class="o">&lt;</span>Anonymous<span class="o">&gt;</span> Array[<span class="mi">1</span>]
-   DESCRIPTION     <span class="nb">STRING</span>    <span class="s1">&#39;Neutral Beam Geometry&#39;</span>
-   COORDINATE_SYSTEM
-                   <span class="nb">STRING</span>    <span class="s1">&#39;Right-handed cartesian&#39;</span>
-IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
-<span class="o">**</span> Structure <span class="o">&lt;</span>27f5908<span class="o">&gt;</span>, <span class="mi">3</span> tags, length<span class="o">=</span><span class="mi">56</span>, data length<span class="o">=</span><span class="mi">56</span>, refs<span class="o">=</span><span class="mi">2</span><span class="o">:</span>
-   DESCRIPTION     <span class="nb">STRING</span>    <span class="s1">&#39;Position of the center of the beam source grid&#39;</span>
-   UNITS           <span class="nb">STRING</span>    <span class="s1">&#39;cm&#39;</span>
-   DATA            <span class="nb">DOUBLE</span>    Array[<span class="mi">3</span>]
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span><span class="w"> </span>f<span class="w"> </span><span class="o">=</span><span class="w"> </span>read_hdf5(<span class="s2">&quot;./test_geometry.h5&quot;</span>)<span class="w"></span>
+IDL<span class="o">&gt;</span><span class="w"> </span><span class="nb">help</span>,f<span class="w"></span>
+<span class="o">**</span><span class="w"> </span>Structure<span class="w"> </span><span class="o">&lt;</span>284b698<span class="o">&gt;</span>,<span class="w"> </span><span class="mi">4</span><span class="w"> </span>tags,<span class="w"> </span>length<span class="o">=</span><span class="mi">2224</span>,<span class="w"> </span>data<span class="w"> </span>length<span class="o">=</span><span class="mi">2194</span>,<span class="w"> </span>refs<span class="o">=</span><span class="mi">1</span><span class="o">:</span><span class="w"></span>
+<span class="w">   </span>NBI<span class="w">             </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>NPA<span class="w">             </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>SPEC<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>DESCRIPTION<span class="w">     </span><span class="nb">STRING</span><span class="w">    </span><span class="s1">&#39;Geometric quantities for FIDASIM&#39;</span><span class="w"></span>
+IDL<span class="o">&gt;</span><span class="w"> </span><span class="nb">help</span>,f.nbi<span class="w"></span>
+<span class="o">**</span><span class="w"> </span>Structure<span class="w"> </span><span class="o">&lt;</span>27fb4d8<span class="o">&gt;</span>,<span class="w"> </span><span class="mi">20</span><span class="w"> </span>tags,<span class="w"> </span>length<span class="o">=</span><span class="mi">752</span>,<span class="w"> </span>data<span class="w"> </span>length<span class="o">=</span><span class="mi">734</span>,<span class="w"> </span>refs<span class="o">=</span><span class="mi">2</span><span class="o">:</span><span class="w"></span>
+<span class="w">   </span>ADIST<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>AOFFY<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>AOFFZ<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>ASHAPE<span class="w">          </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>AWIDY<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>AWIDZ<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span><span class="nb">AXIS</span><span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>DATA_SOURCE<span class="w">     </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>DIVY<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>DIVZ<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>FOCY<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>FOCZ<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>NAME<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>NAPERTURE<span class="w">       </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>SHAPE<span class="w">           </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>SRC<span class="w">             </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>WIDY<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>WIDZ<span class="w">            </span>STRUCT<span class="w">    </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">&lt;</span>Anonymous<span class="o">&gt;</span><span class="w"> </span>Array[<span class="mi">1</span>]<span class="w"></span>
+<span class="w">   </span>DESCRIPTION<span class="w">     </span><span class="nb">STRING</span><span class="w">    </span><span class="s1">&#39;Neutral Beam Geometry&#39;</span><span class="w"></span>
+<span class="w">   </span>COORDINATE_SYSTEM<span class="w"></span>
+<span class="w">                   </span><span class="nb">STRING</span><span class="w">    </span><span class="s1">&#39;Right-handed cartesian&#39;</span><span class="w"></span>
+IDL<span class="o">&gt;</span><span class="w"> </span><span class="nb">help</span>,f.nbi.src<span class="w"></span>
+<span class="o">**</span><span class="w"> </span>Structure<span class="w"> </span><span class="o">&lt;</span>27f5908<span class="o">&gt;</span>,<span class="w"> </span><span class="mi">3</span><span class="w"> </span>tags,<span class="w"> </span>length<span class="o">=</span><span class="mi">56</span>,<span class="w"> </span>data<span class="w"> </span>length<span class="o">=</span><span class="mi">56</span>,<span class="w"> </span>refs<span class="o">=</span><span class="mi">2</span><span class="o">:</span><span class="w"></span>
+<span class="w">   </span>DESCRIPTION<span class="w">     </span><span class="nb">STRING</span><span class="w">    </span><span class="s1">&#39;Position of the center of the beam source grid&#39;</span><span class="w"></span>
+<span class="w">   </span>UNITS<span class="w">           </span><span class="nb">STRING</span><span class="w">    </span><span class="s1">&#39;cm&#39;</span><span class="w"></span>
+<span class="w">   </span>DATA<span class="w">            </span><span class="nb">DOUBLE</span><span class="w">    </span>Array[<span class="mi">3</span>]<span class="w"></span>
 </code></pre></div>
 
 <h2 id="using-python">Using Python</h2>
@@ -273,52 +228,51 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
 
 <h2 id="using-julia">Using Julia</h2>
 <p>The <a href="https://github.com/JuliaLang/HDF5.jl">HDF5.jl</a> library can be used to read and write HDF5 files.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">HDF5</span>
+<div class="codehilite"><pre><span></span><code><span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="k">using</span><span class="w"> </span><span class="n">HDF5</span><span class="w"></span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">h5open</span><span class="p">(</span><span class="s">&quot;test_geometry.h5&quot;</span><span class="p">)</span>
-<span class="n">HDF5</span> <span class="n">data</span> <span class="n">file</span><span class="o">:</span> <span class="n">test_geometry</span><span class="o">.</span><span class="n">h5</span>
+<span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h5open</span><span class="p">(</span><span class="s">&quot;test_geometry.h5&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">HDF5</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">file</span><span class="o">:</span><span class="w"> </span><span class="n">test_geometry</span><span class="o">.</span><span class="n">h5</span><span class="w"></span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
-<span class="s">&quot;nbi&quot;</span> 
-<span class="s">&quot;npa&quot;</span> 
-<span class="s">&quot;spec&quot;</span>
+<span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w"></span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span><span class="w"> </span><span class="kt">Array</span><span class="p">{</span><span class="kt">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span><span class="w"></span>
+<span class="s">&quot;nbi&quot;</span><span class="w"> </span>
+<span class="s">&quot;npa&quot;</span><span class="w"> </span>
+<span class="s">&quot;spec&quot;</span><span class="w"></span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi&quot;</span><span class="p">])</span>
-<span class="mi">11</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
-<span class="s">&quot;adist&quot;</span>
-<span class="s">&quot;aoffy&quot;</span>
-<span class="s">&quot;aoffz&quot;</span>
-<span class="s">&quot;ashape&quot;</span>
-<span class="s">&quot;awidy&quot;</span>
-<span class="s">&quot;awidz&quot;</span>
-<span class="s">&quot;axis&quot;</span>
-<span class="s">&quot;data_source&quot;</span>
-<span class="s">&quot;divy&quot;</span>
-<span class="s">&quot;divz&quot;</span>
-<span class="s">&quot;focy&quot;</span>
-<span class="s">&quot;focz&quot;</span>
-<span class="s">&quot;name&quot;</span>
-<span class="s">&quot;naperture&quot;</span>
-<span class="s">&quot;shape&quot;</span>
-<span class="s">&quot;src&quot;</span>
-<span class="s">&quot;widy&quot;</span>
-<span class="s">&quot;widz&quot;</span>
+<span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi&quot;</span><span class="p">])</span><span class="w"></span>
+<span class="mi">11</span><span class="o">-</span><span class="n">element</span><span class="w"> </span><span class="kt">Array</span><span class="p">{</span><span class="kt">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span><span class="w"></span>
+<span class="s">&quot;adist&quot;</span><span class="w"></span>
+<span class="s">&quot;aoffy&quot;</span><span class="w"></span>
+<span class="s">&quot;aoffz&quot;</span><span class="w"></span>
+<span class="s">&quot;ashape&quot;</span><span class="w"></span>
+<span class="s">&quot;awidy&quot;</span><span class="w"></span>
+<span class="s">&quot;awidz&quot;</span><span class="w"></span>
+<span class="s">&quot;axis&quot;</span><span class="w"></span>
+<span class="s">&quot;data_source&quot;</span><span class="w"></span>
+<span class="s">&quot;divy&quot;</span><span class="w"></span>
+<span class="s">&quot;divz&quot;</span><span class="w"></span>
+<span class="s">&quot;focy&quot;</span><span class="w"></span>
+<span class="s">&quot;focz&quot;</span><span class="w"></span>
+<span class="s">&quot;name&quot;</span><span class="w"></span>
+<span class="s">&quot;naperture&quot;</span><span class="w"></span>
+<span class="s">&quot;shape&quot;</span><span class="w"></span>
+<span class="s">&quot;src&quot;</span><span class="w"></span>
+<span class="s">&quot;widy&quot;</span><span class="w"></span>
+<span class="s">&quot;widz&quot;</span><span class="w"></span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">])</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
-<span class="mf">0.0</span>
-<span class="o">-</span><span class="mf">532.0</span>
-<span class="mf">0.0</span>
+<span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">])</span><span class="w"></span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span><span class="w"> </span><span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span><span class="w"></span>
+<span class="mf">0.0</span><span class="w"></span>
+<span class="o">-</span><span class="mf">532.0</span><span class="w"></span>
+<span class="mf">0.0</span><span class="w"></span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">h5read</span><span class="p">(</span><span class="s">&quot;test_geometry.h5&quot;</span><span class="p">,</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">)</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
-<span class="mf">0.0</span>
-<span class="o">-</span><span class="mf">532.0</span>
-<span class="mf">0.0</span>
+<span class="n">julia</span><span class="o">&gt;</span><span class="w"> </span><span class="n">h5read</span><span class="p">(</span><span class="s">&quot;test_geometry.h5&quot;</span><span class="p">,</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span><span class="w"> </span><span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span><span class="w"></span>
+<span class="mf">0.0</span><span class="w"></span>
+<span class="o">-</span><span class="mf">532.0</span><span class="w"></span>
+<span class="mf">0.0</span><span class="w"></span>
 </code></pre></div>
     </div>
-    
     <div class="col-md-3 col-md-pull-9">
       <hr class="visible-xs visible-sm">
         <div class="well toc">
@@ -327,134 +281,88 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
           </ul>
           <hr>
           <ul class="nav nav-stacked nav-pills">
-            
             <li role="presentation">
             <a href='../../page/01_getting_started/index.html'>Getting Started</a>
-            
             <ul class="nav nav-stacked nav-pills">
-              
-            <li role="presentation">
+                          <li role="presentation">
             <a href='../../page/01_getting_started/01_install.html'>Installation</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
-            
             </li>
-            
             <li role="presentation" class="disabled">
             <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/01_getting_started/05_visual.html'>Visualization</a>
-            
             </li>
-            
+
             </ul>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/index.html'>Physics</a>
-            
             <ul class="nav nav-stacked nav-pills">
-              
-            <li role="presentation">
+                          <li role="presentation">
             <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a>
-            
             </li>
-            
+
             </ul>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/03_technical/index.html'>Technical Details</a>
-            
             <ul class="nav nav-stacked nav-pills">
-              
-            <li role="presentation">
+                          <li role="presentation">
             <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
-            
             </li>
-            
             <li role="presentation">
             <a href='../../page/03_technical/03_advanced.html'>Advanced Settings</a>
-            
             </li>
-            
+
             </ul>
-            
             </li>
-            
           </ul>
         </div>
     </div>
-    
   </div>
-
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -482,14 +390,11 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../../tipuesearch/tipuesearch_content.js"></script>
     <script src="../../tipuesearch/tipuesearch_set.js"></script>
     <script src="../../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

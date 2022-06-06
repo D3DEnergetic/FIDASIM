@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>line_cylinder_intersect
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.2% of total for procedures.">35 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">line_cylinder_intersect</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,124 +121,54 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine line_cylinder_intersect(l0, l, p0, p, t)
+    <h2>public subroutine line_cylinder_intersect(l0, l, p0, p, t)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates the intersection of a line and a cylinder</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-l0%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>l0</strong></td><td><p>Point on line</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-l%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>l</strong></td><td><p>Ray of line</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-p0%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>p0</strong></td><td><p>Point on cylinder</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-p%7E5"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(out),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>p</strong></td><td><p>Line-cylinder intersect point</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-t%7E2"></span>real(kind=Float64),</td>
-  <td>intent(out)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>t</strong></td><td><p>"time" to intersect</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -368,31 +216,31 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
 <path fill="none" stroke="#000000" d="M179.131,-87.8023C196.796,-82.4646 220.366,-75.3425 241.316,-69.0125"/>
 <polygon fill="#000000" stroke="#000000" points="242.478,-72.3178 251.038,-66.0749 240.453,-65.617 242.478,-72.3178"/>
 </g>
-<!-- proc~make_diagnostic_grids -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_node4" class="node"><title>proc~make_diagnostic_grids</title>
-<g id="a_proc~~line_cylinder_intersect~~CalledByGraph_node4"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
-<polygon fill="#d9534f" stroke="#d9534f" points="212,-66 90,-66 90,-42 212,-42 212,-66"/>
-<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
-</a>
-</g>
-</g>
-<!-- proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge3" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical</title>
-<path fill="none" stroke="#000000" d="M212.159,-54C220.714,-54 229.461,-54 237.869,-54"/>
-<polygon fill="#000000" stroke="#000000" points="237.921,-57.5001 247.921,-54 237.921,-50.5001 237.921,-57.5001"/>
-</g>
 <!-- proc~pfida_f -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_node5" class="node"><title>proc~pfida_f</title>
-<g id="a_proc~~line_cylinder_intersect~~CalledByGraph_node5"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="178,-24 124,-24 124,-0 178,-0 178,-24"/>
-<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_node4" class="node"><title>proc~pfida_f</title>
+<g id="a_proc~~line_cylinder_intersect~~CalledByGraph_node4"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="178,-66 124,-66 124,-42 178,-42 178,-66"/>
+<text text-anchor="middle" x="151" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
 </a>
 </g>
 </g>
 <!-- proc~pfida_f&#45;&gt;proc~track_cylindrical -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge4" class="edge"><title>proc~pfida_f&#45;&gt;proc~track_cylindrical</title>
-<path fill="none" stroke="#000000" d="M178.145,-19.8999C195.944,-25.2782 220.061,-32.5652 241.431,-39.0224"/>
-<polygon fill="#000000" stroke="#000000" points="240.439,-42.3789 251.024,-41.921 242.464,-35.6781 240.439,-42.3789"/>
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge3" class="edge"><title>proc~pfida_f&#45;&gt;proc~track_cylindrical</title>
+<path fill="none" stroke="#000000" d="M178.145,-54C194.897,-54 217.243,-54 237.63,-54"/>
+<polygon fill="#000000" stroke="#000000" points="237.759,-57.5001 247.759,-54 237.759,-50.5001 237.759,-57.5001"/>
+</g>
+<!-- proc~make_diagnostic_grids -->
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_node5" class="node"><title>proc~make_diagnostic_grids</title>
+<g id="a_proc~~line_cylinder_intersect~~CalledByGraph_node5"><a xlink:href=".././proc/make_diagnostic_grids.html" xlink:title="make_diagnostic_grids">
+<polygon fill="#d9534f" stroke="#d9534f" points="212,-24 90,-24 90,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_diagnostic_grids</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical -->
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge4" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical</title>
+<path fill="none" stroke="#000000" d="M191.832,-24.0355C207.245,-28.6926 225.054,-34.0739 241.291,-38.9801"/>
+<polygon fill="#000000" stroke="#000000" points="240.577,-42.4206 251.162,-41.9627 242.602,-35.7198 240.577,-42.4206"/>
 </g>
 <!-- program~fidasim -->
 <g id="proc~~line_cylinder_intersect~~CalledByGraph_node6" class="node"><title>program~fidasim</title>
@@ -407,15 +255,15 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
 <path fill="none" stroke="#000000" d="M54.1721,-63.0101C71.3432,-68.9214 94.0515,-76.739 113.052,-83.2803"/>
 <polygon fill="#000000" stroke="#000000" points="112.007,-86.622 122.602,-86.5678 114.286,-80.0033 112.007,-86.622"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
-<path fill="none" stroke="#000000" d="M54.1721,-54C61.8026,-54 70.5266,-54 79.5327,-54"/>
-<polygon fill="#000000" stroke="#000000" points="79.7777,-57.5001 89.7777,-54 79.7776,-50.5001 79.7777,-57.5001"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~pfida_f -->
-<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge7" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
-<path fill="none" stroke="#000000" d="M54.1721,-44.9899C71.7009,-38.9554 95.0001,-30.9344 114.235,-24.3125"/>
-<polygon fill="#000000" stroke="#000000" points="115.555,-27.5597 123.871,-20.9952 113.277,-20.941 115.555,-27.5597"/>
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<path fill="none" stroke="#000000" d="M54.1721,-54C71.5401,-54 94.573,-54 113.705,-54"/>
+<polygon fill="#000000" stroke="#000000" points="113.871,-57.5001 123.871,-54 113.871,-50.5001 113.871,-57.5001"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
+<g id="proc~~line_cylinder_intersect~~CalledByGraph_edge7" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
+<path fill="none" stroke="#000000" d="M54.1721,-44.9899C69.0382,-39.8721 88.0546,-33.3255 105.222,-27.4152"/>
+<polygon fill="#000000" stroke="#000000" points="106.756,-30.5891 115.072,-24.0245 104.477,-23.9703 106.756,-30.5891"/>
 </g>
 </g>
 </svg>
@@ -474,34 +322,11 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -509,99 +334,84 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">line_cylinder_intersect</span><span class="p">(</span><span class="n">l0</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="c">!+ Calculates the intersection of a line and a cylinder</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">l0</span>
-        <span class="c">!+ Point on line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">l</span>
-        <span class="c">!+ Ray of line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p0</span>
-        <span class="c">!+ Point on cylinder</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p</span>
-        <span class="c">!+ Line-cylinder intersect point</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">t</span>
-        <span class="c">!+ &quot;time&quot; to intersect</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">line_cylinder_intersect</span><span class="p">(</span><span class="n">l0</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">p0</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates the intersection of a line and a cylinder</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">l0</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Point on line</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">l</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Ray of line</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">p0</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Point on cylinder</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Line-cylinder intersect point</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">t</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ &quot;time&quot; to intersect</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">times</span>
-    <span class="kt">logical</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mask</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">radicand</span><span class="p">,</span> <span class="n">npos</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">times</span><span class="w"></span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mask</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">vx</span><span class="p">,</span><span class="w"> </span><span class="n">vy</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">,</span><span class="w"> </span><span class="n">y0</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">radicand</span><span class="p">,</span><span class="w"> </span><span class="n">npos</span><span class="w"></span>
 
-    <span class="n">r</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">p0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">p0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">p0</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">l0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">l0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">vx</span> <span class="o">=</span> <span class="n">l</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="p">;</span> <span class="n">vy</span> <span class="o">=</span> <span class="n">l</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">p0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p0</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">x0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">y0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">vx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">  </span><span class="p">;</span><span class="w"> </span><span class="n">vy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
 
-    <span class="k">if</span><span class="p">((</span><span class="n">vx</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">vy</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">t</span> <span class="o">=</span> <span class="mf">0.d0</span>        <span class="c">! Parallel to a plane tangent to the cylinder</span>
-    <span class="k">else</span>
-<span class="k">        </span><span class="n">radicand</span> <span class="o">=</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">vy</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">vx</span> <span class="o">*</span> <span class="n">y0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">radicand</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">t</span> <span class="o">=</span> <span class="mf">0.d0</span>    <span class="c">! Parallel to a plane tangent to the cylinder</span>
-        <span class="k">else</span>
-<span class="k">            </span><span class="n">times</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">vx</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">vy</span> <span class="o">*</span> <span class="n">y0</span> <span class="o">-</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">times</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">vx</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">vy</span> <span class="o">*</span> <span class="n">y0</span> <span class="o">+</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">times</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span>
-            <span class="n">npos</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">npos</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">t</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">else</span>
-<span class="k">                </span><span class="n">t</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">endif</span>
+<span class="w">    </span><span class="k">if</span><span class="p">((</span><span class="n">vx</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">vy</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w">        </span><span class="c">! Parallel to a plane tangent to the cylinder</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">        </span><span class="n">radicand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">vy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">vx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">radicand</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w">    </span><span class="c">! Parallel to a plane tangent to the cylinder</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">times</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="w"> </span><span class="n">vx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">vy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">times</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="w"> </span><span class="n">vx</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">vy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">times</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="w"></span>
+<span class="w">            </span><span class="n">npos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">count</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">npos</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">minval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="w"> </span><span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">maxval</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="w"> </span><span class="n">mask</span><span class="o">=</span><span class="n">times</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
 <span class="k">        endif</span>
 <span class="k">    endif</span>
 
-<span class="k">    </span><span class="n">p</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">l</span> <span class="o">*</span> <span class="n">t</span>
+<span class="k">    </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">line_cylinder_intersect</span>
+<span class="k">end subroutine </span><span class="n">line_cylinder_intersect</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -629,14 +439,11 @@ public subroutine line_cylinder_intersect(l0, l, p0, p, t)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

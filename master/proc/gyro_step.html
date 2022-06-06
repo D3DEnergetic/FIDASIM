@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>gyro_step
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.3% of total for procedures.">49 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">gyro_step</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,113 +121,53 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine gyro_step(vi, fields, Ai, r_gyro)
+    <h2>public subroutine gyro_step(vi, fields, Ai, r_gyro)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates gyro-step</p>
 <h3 id="references">References</h3>
 <p>Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-
  ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003):
  3240-3251. Appendix A: Last equation</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vi%7E13"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Ion velocity</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-fields%7E10"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>fields</strong></td><td><p>Electro-magnetic fields</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-ai%7E3"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>Ai</strong></td><td><p>Atomic mass of ion</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-r_gyro"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(out),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>r_gyro</strong></td><td><p>Gyro-step
 Gyro-radius vector from particle position to guiding center</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -401,8 +259,6 @@ Gyro-radius vector from particle position to guiding center</p></td>
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -424,31 +280,31 @@ Gyro-radius vector from particle position to guiding center</p></td>
 <polygon fill="none" stroke="black" points="402,-308 342,-308 342,-284 402,-284 402,-308"/>
 <text text-anchor="middle" x="372" y="-293.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_step</text>
 </g>
-<!-- proc~ndmc -->
-<g id="proc~~gyro_step~~CalledByGraph_node2" class="node"><title>proc~ndmc</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node2"><a xlink:href=".././proc/ndmc.html" xlink:title="ndmc">
+<!-- proc~cfpd_f -->
+<g id="proc~~gyro_step~~CalledByGraph_node2" class="node"><title>proc~cfpd_f</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node2"><a xlink:href=".././proc/cfpd_f.html" xlink:title="cfpd_f">
 <polygon fill="#d9534f" stroke="#d9534f" points="289,-392 235,-392 235,-368 289,-368 289,-392"/>
-<text text-anchor="middle" x="262" y="-377.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
+<text text-anchor="middle" x="262" y="-377.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cfpd_f</text>
+</a>
+</g>
+</g>
+<!-- proc~cfpd_f&#45;&gt;proc~gyro_step -->
+<g id="proc~~gyro_step~~CalledByGraph_edge1" class="edge"><title>proc~cfpd_f&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M289.216,-368.834C294.943,-365.952 300.832,-362.628 306,-359 323.682,-346.588 341.117,-329.34 353.472,-316.028"/>
+<polygon fill="#000000" stroke="#000000" points="356.333,-318.083 360.465,-308.327 351.151,-313.378 356.333,-318.083"/>
+</g>
+<!-- proc~ndmc -->
+<g id="proc~~gyro_step~~CalledByGraph_node3" class="node"><title>proc~ndmc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node3"><a xlink:href=".././proc/ndmc.html" xlink:title="ndmc">
+<polygon fill="#d9534f" stroke="#d9534f" points="289,-350 235,-350 235,-326 289,-326 289,-350"/>
+<text text-anchor="middle" x="262" y="-335.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
 </a>
 </g>
 </g>
 <!-- proc~ndmc&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_step~~CalledByGraph_edge1" class="edge"><title>proc~ndmc&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M289.216,-368.834C294.943,-365.952 300.832,-362.628 306,-359 323.682,-346.588 341.117,-329.34 353.472,-316.028"/>
-<polygon fill="#000000" stroke="#000000" points="356.333,-318.083 360.465,-308.327 351.151,-313.378 356.333,-318.083"/>
-</g>
-<!-- proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_node3" class="node"><title>proc~gyro_correction</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node3"><a xlink:href=".././proc/gyro_correction.html" xlink:title="gyro_correction">
-<polygon fill="#d9534f" stroke="#d9534f" points="305.5,-192 218.5,-192 218.5,-168 305.5,-168 305.5,-192"/>
-<text text-anchor="middle" x="262" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
-</a>
-</g>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_step~~CalledByGraph_edge2" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M274.558,-192.414C293.234,-212.473 330.206,-252.184 352.554,-276.188"/>
-<polygon fill="#000000" stroke="#000000" points="350.149,-278.741 359.525,-283.675 355.273,-273.971 350.149,-278.741"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge2" class="edge"><title>proc~ndmc&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M289.144,-327.833C302.027,-322.823 317.824,-316.68 332.092,-311.131"/>
+<polygon fill="#000000" stroke="#000000" points="333.62,-314.292 341.671,-307.406 331.083,-307.768 333.62,-314.292"/>
 </g>
 <!-- proc~gyro_radius -->
 <g id="proc~~gyro_step~~CalledByGraph_node4" class="node"><title>proc~gyro_radius</title>
@@ -459,47 +315,47 @@ Gyro-radius vector from particle position to guiding center</p></td>
 </g>
 </g>
 <!-- proc~gyro_radius&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_step~~CalledByGraph_edge3" class="edge"><title>proc~gyro_radius&#45;&gt;proc~gyro_step</title>
+<g id="proc~~gyro_step~~CalledByGraph_edge4" class="edge"><title>proc~gyro_radius&#45;&gt;proc~gyro_step</title>
 <path fill="none" stroke="#000000" d="M294.298,-150.105C298.552,-152.622 302.612,-155.574 306,-159 338.641,-192.012 357.156,-244.551 365.517,-274.05"/>
 <polygon fill="#000000" stroke="#000000" points="362.163,-275.054 368.146,-283.797 368.921,-273.231 362.163,-275.054"/>
 </g>
-<!-- proc~cfpd_f -->
-<g id="proc~~gyro_step~~CalledByGraph_node5" class="node"><title>proc~cfpd_f</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node5"><a xlink:href=".././proc/cfpd_f.html" xlink:title="cfpd_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="289,-350 235,-350 235,-326 289,-326 289,-350"/>
-<text text-anchor="middle" x="262" y="-335.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cfpd_f</text>
-</a>
-</g>
-</g>
-<!-- proc~cfpd_f&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_step~~CalledByGraph_edge4" class="edge"><title>proc~cfpd_f&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M289.144,-327.833C302.027,-322.823 317.824,-316.68 332.092,-311.131"/>
-<polygon fill="#000000" stroke="#000000" points="333.62,-314.292 341.671,-307.406 331.083,-307.768 333.62,-314.292"/>
-</g>
 <!-- proc~npa_weights -->
-<g id="proc~~gyro_step~~CalledByGraph_node6" class="node"><title>proc~npa_weights</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node6"><a xlink:href=".././proc/npa_weights.html" xlink:title="npa_weights">
+<g id="proc~~gyro_step~~CalledByGraph_node5" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node5"><a xlink:href=".././proc/npa_weights.html" xlink:title="npa_weights">
 <polygon fill="#d9534f" stroke="#d9534f" points="298.5,-308 225.5,-308 225.5,-284 298.5,-284 298.5,-308"/>
 <text text-anchor="middle" x="262" y="-293.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
 </g>
 </g>
 <!-- proc~npa_weights&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_step~~CalledByGraph_edge5" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
+<g id="proc~~gyro_step~~CalledByGraph_edge3" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
 <path fill="none" stroke="#000000" d="M298.663,-296C309.278,-296 320.967,-296 331.796,-296"/>
 <polygon fill="#000000" stroke="#000000" points="331.852,-299.5 341.851,-296 331.851,-292.5 331.852,-299.5"/>
 </g>
-<!-- proc~fida_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_node7" class="node"><title>proc~fida_mc</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node7"><a xlink:href=".././proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-276 109,-276 109,-252 163,-252 163,-276"/>
-<text text-anchor="middle" x="136" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+<!-- proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_node6" class="node"><title>proc~gyro_correction</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node6"><a xlink:href=".././proc/gyro_correction.html" xlink:title="gyro_correction">
+<polygon fill="#d9534f" stroke="#d9534f" points="305.5,-192 218.5,-192 218.5,-168 305.5,-168 305.5,-192"/>
+<text text-anchor="middle" x="262" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_edge7" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M163.251,-253.023C169.545,-250.047 176.138,-246.634 182,-243 202.884,-230.055 224.563,-212.416 239.917,-199.095"/>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="proc~~gyro_step~~CalledByGraph_edge5" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M274.558,-192.414C293.234,-212.473 330.206,-252.184 352.554,-276.188"/>
+<polygon fill="#000000" stroke="#000000" points="350.149,-278.741 359.525,-283.675 355.273,-273.971 350.149,-278.741"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_node7" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node7"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-276 90,-276 90,-252 182,-252 182,-276"/>
+<text text-anchor="middle" x="136" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge9" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M165.623,-251.887C171.182,-249.19 176.871,-246.18 182,-243 202.884,-230.055 224.563,-212.416 239.917,-199.095"/>
 <polygon fill="#000000" stroke="#000000" points="242.559,-201.432 247.75,-192.196 237.933,-196.179 242.559,-201.432"/>
 </g>
 <!-- proc~fida_f -->
@@ -511,132 +367,132 @@ Gyro-radius vector from particle position to guiding center</p></td>
 </g>
 </g>
 <!-- proc~fida_f&#45;&gt;proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_edge8" class="edge"><title>proc~fida_f&#45;&gt;proc~gyro_correction</title>
+<g id="proc~~gyro_step~~CalledByGraph_edge10" class="edge"><title>proc~fida_f&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M163.297,-213.093C178.533,-207.932 198.133,-201.294 215.773,-195.319"/>
 <polygon fill="#000000" stroke="#000000" points="216.983,-198.604 225.332,-192.081 214.737,-191.974 216.983,-198.604"/>
 </g>
-<!-- proc~pfida_f -->
-<g id="proc~~gyro_step~~CalledByGraph_node9" class="node"><title>proc~pfida_f</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node9"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<!-- proc~fida_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_node9" class="node"><title>proc~fida_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node9"><a xlink:href=".././proc/fida_mc.html" xlink:title="fida_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="163,-192 109,-192 109,-168 163,-168 163,-192"/>
-<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
+<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
 </a>
 </g>
 </g>
-<!-- proc~pfida_f&#45;&gt;proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_edge10" class="edge"><title>proc~pfida_f&#45;&gt;proc~gyro_correction</title>
+<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge11" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M163.297,-180C176.36,-180 192.631,-180 208.125,-180"/>
 <polygon fill="#000000" stroke="#000000" points="208.153,-183.5 218.153,-180 208.153,-176.5 208.153,-183.5"/>
 </g>
-<!-- proc~neutron_f -->
-<g id="proc~~gyro_step~~CalledByGraph_node10" class="node"><title>proc~neutron_f</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node10"><a xlink:href=".././proc/neutron_f.html" xlink:title="neutron_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="165,-150 107,-150 107,-126 165,-126 165,-150"/>
-<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
-</a>
-</g>
-</g>
-<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_edge11" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M165.138,-147.53C180.071,-152.588 198.784,-158.927 215.704,-164.658"/>
-<polygon fill="#000000" stroke="#000000" points="214.823,-168.055 225.417,-167.948 217.069,-161.425 214.823,-168.055"/>
-</g>
 <!-- proc~neutron_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_node11" class="node"><title>proc~neutron_mc</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node11"><a xlink:href=".././proc/neutron_mc.html" xlink:title="neutron_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="171,-108 101,-108 101,-84 171,-84 171,-108"/>
-<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
+<g id="proc~~gyro_step~~CalledByGraph_node10" class="node"><title>proc~neutron_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node10"><a xlink:href=".././proc/neutron_mc.html" xlink:title="neutron_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="171,-150 101,-150 101,-126 171,-126 171,-150"/>
+<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
 </a>
 </g>
 </g>
 <!-- proc~neutron_mc&#45;&gt;proc~gyro_correction -->
 <g id="proc~~gyro_step~~CalledByGraph_edge12" class="edge"><title>proc~neutron_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M167.553,-108.088C172.596,-110.683 177.605,-113.663 182,-117 201.581,-131.867 198.551,-143.961 218,-159 219.577,-160.22 221.237,-161.395 222.949,-162.524"/>
-<polygon fill="#000000" stroke="#000000" points="221.428,-165.691 231.817,-167.77 224.992,-159.666 221.428,-165.691"/>
+<path fill="none" stroke="#000000" d="M171.212,-149.588C184.841,-154.204 200.729,-159.586 215.319,-164.528"/>
+<polygon fill="#000000" stroke="#000000" points="214.575,-167.971 225.169,-167.864 216.821,-161.341 214.575,-167.971"/>
 </g>
 <!-- proc~pfida_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_node12" class="node"><title>proc~pfida_mc</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node12"><a xlink:href=".././proc/pfida_mc.html" xlink:title="pfida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="164,-66 108,-66 108,-42 164,-42 164,-66"/>
-<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_mc</text>
+<g id="proc~~gyro_step~~CalledByGraph_node11" class="node"><title>proc~pfida_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node11"><a xlink:href=".././proc/pfida_mc.html" xlink:title="pfida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="164,-108 108,-108 108,-84 164,-84 164,-108"/>
+<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_mc</text>
 </a>
 </g>
 </g>
 <!-- proc~pfida_mc&#45;&gt;proc~gyro_correction -->
 <g id="proc~~gyro_step~~CalledByGraph_edge13" class="edge"><title>proc~pfida_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M164.289,-62.8794C170.696,-65.9431 177.081,-69.9224 182,-75 210.262,-104.173 189.997,-129.578 218,-159 218.902,-159.948 219.856,-160.859 220.852,-161.733"/>
-<polygon fill="#000000" stroke="#000000" points="218.995,-164.71 229.146,-167.746 223.104,-159.043 218.995,-164.71"/>
+<path fill="none" stroke="#000000" d="M164.245,-106.442C170.375,-109.396 176.644,-112.934 182,-117 201.581,-131.867 198.551,-143.961 218,-159 219.577,-160.22 221.237,-161.395 222.949,-162.524"/>
+<polygon fill="#000000" stroke="#000000" points="221.428,-165.691 231.817,-167.77 224.992,-159.666 221.428,-165.691"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_node13" class="node"><title>proc~fida_weights_mc</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node13"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-24 90,-24 90,-0 182,-0 182,-24"/>
-<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<!-- proc~pfida_f -->
+<g id="proc~~gyro_step~~CalledByGraph_node12" class="node"><title>proc~pfida_f</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node12"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-66 109,-66 109,-42 163,-42 163,-66"/>
+<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="proc~~gyro_step~~CalledByGraph_edge9" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M171.642,-24.255C175.506,-26.6976 179.091,-29.5892 182,-33 219.797,-77.3103 180.596,-114.357 218,-159 218.72,-159.86 219.484,-160.687 220.285,-161.483"/>
-<polygon fill="#000000" stroke="#000000" points="218.299,-164.375 228.314,-167.832 222.641,-158.884 218.299,-164.375"/>
+<!-- proc~pfida_f&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge14" class="edge"><title>proc~pfida_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M163.352,-62.4375C170.07,-65.5575 176.841,-69.6747 182,-75 210.262,-104.173 189.997,-129.578 218,-159 218.902,-159.948 219.856,-160.859 220.852,-161.733"/>
+<polygon fill="#000000" stroke="#000000" points="218.995,-164.71 229.146,-167.746 223.104,-159.043 218.995,-164.71"/>
 </g>
 <!-- program~fidasim -->
-<g id="proc~~gyro_step~~CalledByGraph_node14" class="node"><title>program~fidasim</title>
-<g id="a_proc~~gyro_step~~CalledByGraph_node14"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<g id="proc~~gyro_step~~CalledByGraph_node13" class="node"><title>program~fidasim</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node13"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-213 0,-213 0,-189 54,-189 54,-213"/>
 <text text-anchor="middle" x="27" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 </g>
-<!-- program~fidasim&#45;&gt;proc~ndmc -->
-<g id="proc~~gyro_step~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
+<!-- program~fidasim&#45;&gt;proc~cfpd_f -->
+<g id="proc~~gyro_step~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~cfpd_f</title>
 <path fill="none" stroke="#000000" d="M29.9522,-213.308C34.8698,-240.1 50.3293,-303.943 90,-337 128.263,-368.884 186.962,-377.609 224.665,-379.734"/>
 <polygon fill="#000000" stroke="#000000" points="224.565,-383.232 234.708,-380.172 224.87,-376.239 224.565,-383.232"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~cfpd_f -->
-<g id="proc~~gyro_step~~CalledByGraph_edge14" class="edge"><title>program~fidasim&#45;&gt;proc~cfpd_f</title>
+<!-- program~fidasim&#45;&gt;proc~ndmc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge7" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
 <path fill="none" stroke="#000000" d="M31.3509,-213.293C38.2273,-236.011 56.2046,-284.397 90,-308 129.921,-335.881 187.556,-340.52 224.65,-340.148"/>
 <polygon fill="#000000" stroke="#000000" points="225.081,-343.639 234.997,-339.909 224.919,-336.641 225.081,-343.639"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="proc~~gyro_step~~CalledByGraph_edge15" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<g id="proc~~gyro_step~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
 <path fill="none" stroke="#000000" d="M32.8696,-213.093C41.2951,-232.222 60.5662,-268.936 90,-285 128.264,-305.884 178.751,-306.464 214.93,-303.142"/>
 <polygon fill="#000000" stroke="#000000" points="215.622,-306.588 225.201,-302.059 214.889,-299.627 215.622,-306.588"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_edge16" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M44.3814,-213.149C56.6225,-221.964 73.9423,-233.891 90,-243 93.0932,-244.755 96.358,-246.489 99.6587,-248.164"/>
-<polygon fill="#000000" stroke="#000000" points="98.4215,-251.455 108.943,-252.696 101.492,-245.165 98.4215,-251.455"/>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge16" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M44.3814,-213.149C56.6225,-221.964 73.9423,-233.891 90,-243 92.5308,-244.436 95.1765,-245.858 97.8627,-247.245"/>
+<polygon fill="#000000" stroke="#000000" points="96.5298,-250.491 107.044,-251.796 99.6386,-244.219 96.5298,-250.491"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
 <g id="proc~~gyro_step~~CalledByGraph_edge17" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
 <path fill="none" stroke="#000000" d="M54.1751,-206.137C67.5177,-208.756 83.9597,-211.983 98.5231,-214.841"/>
 <polygon fill="#000000" stroke="#000000" points="98.2374,-218.352 108.724,-216.843 99.5855,-211.483 98.2374,-218.352"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~pfida_f -->
-<g id="proc~~gyro_step~~CalledByGraph_edge18" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge18" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
 <path fill="none" stroke="#000000" d="M54.1751,-195.863C67.5177,-193.244 83.9597,-190.017 98.5231,-187.159"/>
 <polygon fill="#000000" stroke="#000000" points="99.5855,-190.517 108.724,-185.157 98.2374,-183.648 99.5855,-190.517"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~neutron_f -->
-<g id="proc~~gyro_step~~CalledByGraph_edge19" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge19" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
 <path fill="none" stroke="#000000" d="M44.3814,-188.851C56.6225,-180.036 73.9423,-168.109 90,-159 92.5308,-157.564 95.1765,-156.142 97.8627,-154.755"/>
 <polygon fill="#000000" stroke="#000000" points="99.6386,-157.781 107.044,-150.204 96.5298,-151.509 99.6386,-157.781"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_edge20" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
-<path fill="none" stroke="#000000" d="M34.3087,-188.945C44.1296,-171.165 64.6099,-137.776 90,-117 91.5513,-115.731 93.192,-114.519 94.893,-113.364"/>
-<polygon fill="#000000" stroke="#000000" points="96.9725,-116.199 103.767,-108.069 93.3859,-110.188 96.9725,-116.199"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~pfida_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_edge21" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_mc</title>
-<path fill="none" stroke="#000000" d="M30.9954,-188.991C37.6556,-164.533 55.8642,-108.438 90,-75 92.6829,-72.3719 95.7558,-70.0302 99.0083,-67.9534"/>
-<polygon fill="#000000" stroke="#000000" points="100.822,-70.9504 107.892,-63.0603 97.4446,-64.8189 100.822,-70.9504"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge20" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_mc</title>
+<path fill="none" stroke="#000000" d="M34.3087,-188.945C44.1296,-171.165 64.6099,-137.776 90,-117 92.6835,-114.804 95.6345,-112.78 98.7027,-110.928"/>
+<polygon fill="#000000" stroke="#000000" points="100.396,-113.991 107.535,-106.163 97.0724,-107.83 100.396,-113.991"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="proc~~gyro_step~~CalledByGraph_edge22" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M29.3193,-188.798C33.1829,-158.641 47.0547,-79.6703 90,-33 90.8866,-32.0365 91.8264,-31.1134 92.8099,-30.2293"/>
-<polygon fill="#000000" stroke="#000000" points="95.0521,-32.9255 101.05,-24.1921 90.915,-27.2788 95.0521,-32.9255"/>
+<!-- program~fidasim&#45;&gt;proc~pfida_f -->
+<g id="proc~~gyro_step~~CalledByGraph_edge21" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<path fill="none" stroke="#000000" d="M30.9954,-188.991C37.6556,-164.533 55.8642,-108.438 90,-75 92.8966,-72.1626 96.2477,-69.659 99.7885,-67.4623"/>
+<polygon fill="#000000" stroke="#000000" points="101.668,-70.426 108.83,-62.6187 98.3626,-64.2556 101.668,-70.426"/>
+</g>
+<!-- proc~neutron_f -->
+<g id="proc~~gyro_step~~CalledByGraph_node14" class="node"><title>proc~neutron_f</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node14"><a xlink:href=".././proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="165,-24 107,-24 107,-0 165,-0 165,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_f -->
+<g id="proc~~gyro_step~~CalledByGraph_edge22" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M29.3193,-188.798C33.1829,-158.641 47.0547,-79.6703 90,-33 92.2767,-30.5258 94.9042,-28.3181 97.7226,-26.353"/>
+<polygon fill="#000000" stroke="#000000" points="99.7287,-29.2344 106.591,-21.1624 96.1928,-23.193 99.7287,-29.2344"/>
+</g>
+<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge15" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M165.216,-20.6888C171.451,-23.7341 177.524,-27.7526 182,-33 219.797,-77.3103 180.596,-114.357 218,-159 218.72,-159.86 219.484,-160.687 220.285,-161.483"/>
+<polygon fill="#000000" stroke="#000000" points="218.299,-164.375 228.314,-167.832 222.641,-158.884 218.299,-164.375"/>
 </g>
 </g>
 </svg>
@@ -695,34 +551,11 @@ Gyro-radius vector from particle position to guiding center</p></td>
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -730,127 +563,112 @@ Gyro-radius vector from particle position to guiding center</p></td>
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
-    <span class="c">!+ Calculates gyro-step</span>
-    <span class="c">!+</span>
-    <span class="c">!+###References</span>
-    <span class="c">!+ Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. &quot;Self-consistent equilibrium model of low aspect-</span>
-    <span class="c">!+ ratio toroidal plasma with energetic beam ions.&quot; Physics of Plasmas (1994-present) 10.8 (2003):</span>
-    <span class="c">!+ 3240-3251. Appendix A: Last equation</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
-        <span class="c">!+ Ion velocity</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
-        <span class="c">!+ Electro-magnetic fields</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">Ai</span>
-        <span class="c">!+ Atomic mass of ion</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_gyro</span>
-        <span class="c">!+ Gyro-step</span>
-        <span class="c">!+ Gyro-radius vector from particle position to guiding center</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="w"> </span><span class="n">fields</span><span class="p">,</span><span class="w"> </span><span class="n">Ai</span><span class="p">,</span><span class="w"> </span><span class="n">r_gyro</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates gyro-step</span>
+<span class="w">    </span><span class="c">!+</span>
+<span class="w">    </span><span class="c">!+###References</span>
+<span class="w">    </span><span class="c">!+ Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. &quot;Self-consistent equilibrium model of low aspect-</span>
+<span class="w">    </span><span class="c">!+ ratio toroidal plasma with energetic beam ions.&quot; Physics of Plasmas (1994-present) 10.8 (2003):</span>
+<span class="w">    </span><span class="c">!+ 3240-3251. Appendix A: Last equation</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">vi</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Ion velocity</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">          </span><span class="kd">::</span><span class="w"> </span><span class="n">fields</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Electro-magnetic fields</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                </span><span class="kd">::</span><span class="w"> </span><span class="n">Ai</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Atomic mass of ion</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">r_gyro</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Gyro-step</span>
+<span class="w">        </span><span class="c">!+ Gyro-radius vector from particle position to guiding center</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vxB</span><span class="p">,</span> <span class="n">rg_uvw</span><span class="p">,</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">cuvrxb</span><span class="p">,</span> <span class="n">b_rtz</span><span class="p">,</span> <span class="n">grad_B</span><span class="p">,</span> <span class="n">rg_rtz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">one_over_omega</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">vpar</span><span class="p">,</span> <span class="n">term1</span><span class="p">,</span> <span class="n">term2</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vxB</span><span class="p">,</span><span class="w"> </span><span class="n">rg_uvw</span><span class="p">,</span><span class="w"> </span><span class="n">uvw</span><span class="p">,</span><span class="w"> </span><span class="n">cuvrxb</span><span class="p">,</span><span class="w"> </span><span class="n">b_rtz</span><span class="p">,</span><span class="w"> </span><span class="n">grad_B</span><span class="p">,</span><span class="w"> </span><span class="n">rg_rtz</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">one_over_omega</span><span class="p">,</span><span class="w"> </span><span class="n">phi</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">vpar</span><span class="p">,</span><span class="w"> </span><span class="n">term1</span><span class="p">,</span><span class="w"> </span><span class="n">term2</span><span class="w"></span>
 
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">flr</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">uvw</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">uvw</span>
-        <span class="n">R</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">phi</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">one_over_omega</span><span class="o">=</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span>
-        <span class="n">vxB</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
-        <span class="n">vpar</span> <span class="o">=</span>  <span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
-        <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">vxB</span><span class="o">*</span><span class="n">one_over_omega</span> <span class="c">!points towards gyrocenter, in beam coordinates</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">flr</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">uvw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">uvw</span><span class="w"></span>
+<span class="w">        </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">phi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">one_over_omega</span><span class="o">=</span><span class="n">Ai</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">vxB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cross_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">vpar</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">r_gyro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vxB</span><span class="o">*</span><span class="n">one_over_omega</span><span class="w"> </span><span class="c">!points towards gyrocenter, in beam coordinates</span>
 
-        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">flr</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
-            <span class="c">!! convert the r_gyro vector to machine coordiantes</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">coords</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">rg_uvw</span><span class="o">=</span>  <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
-            <span class="k">endif</span>
-<span class="k">            if</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">coords</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">rg_uvw</span> <span class="o">=</span> <span class="n">r_gyro</span>
-            <span class="k">endif</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">flr</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
+<span class="w">            </span><span class="c">!! convert the r_gyro vector to machine coordiantes</span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">coords</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">rg_uvw</span><span class="o">=</span><span class="w">  </span><span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">r_gyro</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
+<span class="k">            if</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">coords</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">rg_uvw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r_gyro</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
 
-<span class="k">            </span><span class="n">b_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">b_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">b_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dphi</span><span class="o">-</span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span> <span class="o">-</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span> <span class="o">-</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dphi</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">term1</span> <span class="o">=</span> <span class="n">vpar</span><span class="o">*</span><span class="n">one_over_omega</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">b_rtz</span><span class="p">,</span><span class="n">cuvrxb</span><span class="p">)</span>
-            <span class="n">grad_B</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dr</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span>
-                        <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">grad_B</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dphi</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dphi</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dphi</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span>
-                        <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="n">grad_B</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dz</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span>
-                        <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
-            <span class="c">!convert rg_uvw vector to cylindrical coordiantes</span>
-            <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-            <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-            <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">term2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="p">)</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">rg_rtz</span><span class="p">,</span><span class="n">grad_B</span><span class="p">)</span>
-        <span class="k">else</span>
-<span class="k">            </span><span class="n">term1</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="n">term2</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">endif</span>
+<span class="k">            </span><span class="n">b_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">b_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">b_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">cuvrxb</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dphi</span><span class="o">-</span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">cuvrxb</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">cuvrxb</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dphi</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">term1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vpar</span><span class="o">*</span><span class="n">one_over_omega</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">b_rtz</span><span class="p">,</span><span class="n">cuvrxb</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">grad_B</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                        </span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">grad_B</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="o">/</span><span class="n">R</span><span class="o">*</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dphi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dphi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dphi</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                        </span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="n">grad_B</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dz</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                        </span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="w"></span>
+<span class="w">            </span><span class="c">!convert rg_uvw vector to cylindrical coordiantes</span>
+<span class="w">            </span><span class="n">rg_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rg_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rg_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rg_uvw</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">term2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="p">)</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">rg_rtz</span><span class="p">,</span><span class="n">grad_B</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">term1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"></span>
+<span class="w">            </span><span class="n">term2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"></span>
+<span class="w">        </span><span class="k">endif</span>
 
-<span class="k">        </span><span class="n">r_gyro</span> <span class="o">=</span> <span class="n">r_gyro</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">term1</span> <span class="o">-</span> <span class="n">term2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">term1</span> <span class="o">-</span> <span class="n">term2</span> <span class="p">.</span><span class="n">le</span><span class="p">.</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">term1</span> <span class="o">-</span> <span class="n">term2</span> <span class="p">.</span><span class="n">ge</span><span class="p">.</span> <span class="mf">2.0</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
-<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;GYRO_STEP: Gyro correction results in negative distances or too large shift: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                          <span class="mf">1.0</span><span class="o">-</span><span class="n">term1</span><span class="o">-</span><span class="n">term2</span>
-            <span class="k">stop</span>
+<span class="k">        </span><span class="n">r_gyro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r_gyro</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term2</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term2</span><span class="w"> </span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">term2</span><span class="w"> </span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;GYRO_STEP: Gyro correction results in negative distances or too large shift: &#39;</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                          </span><span class="mf">1.0</span><span class="o">-</span><span class="n">term1</span><span class="o">-</span><span class="n">term2</span><span class="w"></span>
+<span class="w">            </span><span class="k">stop</span>
 <span class="k">        endif</span>
 <span class="k">    else</span>
-<span class="k">        </span><span class="n">r_gyro</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="k">endif</span>
+<span class="k">        </span><span class="n">r_gyro</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
 
-<span class="k">end subroutine </span><span class="n">gyro_step</span>
+<span class="k">end subroutine </span><span class="n">gyro_step</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -878,14 +696,11 @@ Gyro-radius vector from particle position to guiding center</p></td>
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>store_fw_photons_at_chan
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.2% of total for procedures.">29 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">store_fw_photons_at_chan</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,213 +121,90 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, fields, dlength, sigma_pi, denf, photons)
+    <h2>public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, fields, dlength, sigma_pi, denf, photons)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Store FIDA weight photons in <a href="../module/libfida.html#variable-fweight">fweight</a> for a specific channel</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-ichan%7E2"></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>ichan</strong></td><td><p>Channel index</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-eind"></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>eind</strong></td><td><p>Energy index</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-pind"></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>pind</strong></td><td><p>Pitch index</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vp"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vp</strong></td><td><p>Vector pointing toward optical head</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vi%7E11"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Velocity of neutral [cm/s]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-lambda0%7E6"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>lambda0</strong></td><td><p>Reference Wavelength [nm]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-fields%7E8"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>fields</strong></td><td><p>Electro-magnetic fields</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-dlength%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>dlength</strong></td><td><p>LOS intersection length with <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> cell particle is in</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-sigma_pi%7E3"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>sigma_pi</strong></td><td><p>Sigma-pi ratio for channel</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-denf%7E5"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>denf</strong></td><td><p>Fast-ion density [cm^-3]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-photons%7E6"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>photons</strong></td><td><p>Photons from <a href="../module/libfida.html#proc-colrad">colrad</a> [Ph/(s*cm^3)]</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -501,8 +296,6 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -550,22 +343,9 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
 <path fill="none" stroke="#000000" d="M312.543,-47.9259C321.737,-46.6722 331.687,-45.3154 341.711,-43.9484"/>
 <polygon fill="#000000" stroke="#000000" points="342.3,-47.4007 351.735,-42.5816 341.354,-40.4649 342.3,-47.4007"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_node4" class="node"><title>proc~fida_weights_mc</title>
-<g id="a_proc~~store_fw_photons_at_chan~~CalledByGraph_node4"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-25 90,-25 90,-1 182,-1 182,-25"/>
-<text text-anchor="middle" x="136" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~store_fw_photons -->
-<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_edge3" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
-<path fill="none" stroke="#000000" d="M182.118,-12.6502C190.578,-12.5847 199.528,-12.5153 208.308,-12.4472"/>
-<polygon fill="#000000" stroke="#000000" points="208.525,-15.9457 218.498,-12.3682 208.471,-8.94596 208.525,-15.9457"/>
-</g>
 <!-- program~fidasim -->
-<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_node5" class="node"><title>program~fidasim</title>
-<g id="a_proc~~store_fw_photons_at_chan~~CalledByGraph_node5"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~store_fw_photons_at_chan~~CalledByGraph_node4"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
 <text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
@@ -576,10 +356,23 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
 <path fill="none" stroke="#000000" d="M54.3795,-35.3276C92.0054,-38.6475 161.961,-44.8201 211.113,-49.157"/>
 <polygon fill="#000000" stroke="#000000" points="210.998,-52.6604 221.267,-50.053 211.613,-45.6875 210.998,-52.6604"/>
 </g>
+<!-- proc~fida_weights_mc -->
+<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_node5" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~store_fw_photons_at_chan~~CalledByGraph_node5"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-25 90,-25 90,-1 182,-1 182,-25"/>
+<text text-anchor="middle" x="136" y="-10.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
 <g id="proc~~store_fw_photons_at_chan~~CalledByGraph_edge5" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
 <path fill="none" stroke="#000000" d="M54.1751,-28.1074C61.9968,-26.6455 70.8836,-24.9844 79.8327,-23.3116"/>
 <polygon fill="#000000" stroke="#000000" points="80.7228,-26.706 89.9095,-21.4281 79.4366,-19.8251 80.7228,-26.706"/>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~store_fw_photons -->
+<g id="proc~~store_fw_photons_at_chan~~CalledByGraph_edge3" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
+<path fill="none" stroke="#000000" d="M182.118,-12.6502C190.578,-12.5847 199.528,-12.5153 208.308,-12.4472"/>
+<polygon fill="#000000" stroke="#000000" points="208.525,-15.9457 218.498,-12.3682 208.471,-8.94596 208.525,-15.9457"/>
 </g>
 </g>
 </svg>
@@ -638,34 +431,11 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -673,108 +443,93 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">dlength</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">denf</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
-    <span class="c">!+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">ichan</span>
-        <span class="c">!+ Channel index</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">eind</span>
-        <span class="c">!+ Energy index</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">pind</span>
-        <span class="c">!+ Pitch index</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span>
-        <span class="c">!+ Vector pointing toward optical head</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span>
-        <span class="c">!+ Velocity of neutral [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">lambda0</span>
-        <span class="c">!+ Reference Wavelength [nm]</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">fields</span>
-        <span class="c">!+ Electro-magnetic fields</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">dlength</span>
-        <span class="c">!+ LOS intersection length with [[libfida:beam_grid]] cell particle is in</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">sigma_pi</span>
-        <span class="c">!+ Sigma-pi ratio for channel</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">denf</span>
-        <span class="c">!+ Fast-ion density [cm^-3]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">photons</span>
-        <span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">lambda0</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">dlength</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">denf</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">ichan</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Channel index</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">eind</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Energy index</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">pind</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Pitch index</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vp</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Vector pointing toward optical head</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vi</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Velocity of neutral [cm/s]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">lambda0</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Reference Wavelength [nm]</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">         </span><span class="kd">::</span><span class="w"> </span><span class="n">fields</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Electro-magnetic fields</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">dlength</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ LOS intersection length with [[libfida:beam_grid]] cell particle is in</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">sigma_pi</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Sigma-pi ratio for channel</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">denf</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Fast-ion density [cm^-3]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">               </span><span class="kd">::</span><span class="w"> </span><span class="n">photons</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stokes</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlambda</span><span class="p">,</span><span class="n">intens_fac</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">bin</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_stark</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">stokes</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dlambda</span><span class="p">,</span><span class="n">intens_fac</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="n">bin</span><span class="w"></span>
 
 
-    <span class="n">dlambda</span><span class="o">=</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span>
-    <span class="n">intens_fac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span> <span class="n">lambda0</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span> <span class="p">&amp;</span>
-                  <span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">,</span> <span class="n">stokes</span> <span class="o">=</span> <span class="n">stokes</span><span class="p">)</span>
+<span class="w">    </span><span class="n">dlambda</span><span class="o">=</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span><span class="w"></span>
+<span class="w">    </span><span class="n">intens_fac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="w"> </span><span class="n">lambda0</span><span class="p">,</span><span class="w"> </span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                  </span><span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">,</span><span class="w"> </span><span class="n">stokes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stokes</span><span class="p">)</span><span class="w"></span>
 
-    <span class="c">!$OMP CRITICAL(fida_wght)</span>
-    <span class="n">loop_over_stark</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_stark</span>
-        <span class="n">bin</span><span class="o">=</span><span class="nb">floor</span><span class="p">((</span><span class="n">lambda</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">dlambda</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span>                   <span class="k">cycle </span><span class="n">loop_over_stark</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_stark</span>
-        <span class="c">!fida(bin,ichan)= fida(bin,ichan) + &amp;</span>
-        <span class="c">!  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)</span>
-        <span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="p">&amp;</span>
-          <span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="n">intensity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">intens_fac</span> <span class="c">!(ph*cm)/(s*nm*sr*fast-ion*dE*dp)</span>
-    <span class="k">enddo </span><span class="n">loop_over_stark</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">denf</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                          <span class="p">(</span><span class="n">denf</span><span class="o">*</span><span class="n">intens_fac</span><span class="p">)</span><span class="o">*</span><span class="nb">sum</span><span class="p">(</span><span class="n">intensity</span><span class="p">)</span>
-    <span class="k">endif</span>
-    <span class="c">!$OMP END CRITICAL(fida_wght)</span>
+<span class="w">    </span><span class="c">!$OMP CRITICAL(fida_wght)</span>
+<span class="w">    </span><span class="n">loop_over_stark</span><span class="p">:</span><span class="w"> </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_stark</span><span class="w"></span>
+<span class="w">        </span><span class="n">bin</span><span class="o">=</span><span class="nb">floor</span><span class="p">((</span><span class="n">lambda</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">dlambda</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="w">                   </span><span class="k">cycle </span><span class="n">loop_over_stark</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span><span class="p">)</span><span class="w"> </span><span class="k">cycle </span><span class="n">loop_over_stark</span><span class="w"></span>
+<span class="w">        </span><span class="c">!fida(bin,ichan)= fida(bin,ichan) + &amp;</span>
+<span class="w">        </span><span class="c">!  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)</span>
+<span class="w">        </span><span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">          </span><span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">intensity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">intens_fac</span><span class="w"> </span><span class="c">!(ph*cm)/(s*nm*sr*fast-ion*dE*dp)</span>
+<span class="w">    </span><span class="k">enddo </span><span class="n">loop_over_stark</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">denf</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                                          </span><span class="p">(</span><span class="n">denf</span><span class="o">*</span><span class="n">intens_fac</span><span class="p">)</span><span class="o">*</span><span class="nb">sum</span><span class="p">(</span><span class="n">intensity</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span><span class="w"></span>
+<span class="w">    </span><span class="c">!$OMP END CRITICAL(fida_wght)</span>
 
-<span class="k">end subroutine </span><span class="n">store_fw_photons_at_chan</span>
+<span class="k">end subroutine </span><span class="n">store_fw_photons_at_chan</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -802,14 +557,11 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, lambda0, f
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

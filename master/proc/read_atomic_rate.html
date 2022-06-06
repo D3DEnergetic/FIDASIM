@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>read_atomic_rate
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.5% of total for procedures.">67 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">read_atomic_rate</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,94 +121,43 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine read_atomic_rate(fid, grp, rates)
+    <h2>public subroutine read_atomic_rate(fid, grp, rates)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Reads in a atomic rate table from file
 and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-fid%7E4"></span>integer(kind=HID_T),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>fid</strong></td><td><p>HDF5 file ID</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-grp%7E2"></span>character(len=*),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>grp</strong></td><td><p>HDF5 group to read from</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-rates"></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
-  <td>intent(inout)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(inout)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>rates</strong></td><td><p>Atomic reaction rates</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -302,86 +169,86 @@ and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_atomic_rate~~CallsGraph Pages: 1 -->
-<svg id="procread_atomic_rateCallsGraph" width="494pt" height="183pt"
- viewBox="0.00 0.00 494.00 182.54" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_atomic_rate~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 178.543)">
+<svg id="procread_atomic_rateCallsGraph" width="494pt" height="196pt"
+ viewBox="0.00 0.00 494.00 196.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_atomic_rate~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 192)">
 <title>proc~~read_atomic_rate~~CallsGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-178.543 490,-178.543 490,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-192 490,-192 490,4 -4,4"/>
 <!-- proc~read_atomic_rate -->
 <g id="proc~~read_atomic_rate~~CallsGraph_node1" class="node"><title>proc~read_atomic_rate</title>
-<polygon fill="none" stroke="black" points="97.5,-108 0.5,-108 0.5,-84 97.5,-84 97.5,-108"/>
-<text text-anchor="middle" x="49" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_rate</text>
-</g>
-<!-- h5ltread_dataset_double_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_node2" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="486,-128 346,-128 346,-104 486,-104 486,-128"/>
-<text text-anchor="middle" x="416" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
-</g>
-<!-- proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_edge1" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M61.072,-108.163C75.917,-123.47 103.909,-148.97 134,-159 208.208,-183.736 233.25,-174.107 310,-159 335.862,-153.91 363.375,-142.393 383.747,-132.558"/>
-<polygon fill="#000000" stroke="#000000" points="385.449,-135.621 392.854,-128.045 382.34,-129.35 385.449,-135.621"/>
-</g>
-<!-- h5ltget_dataset_ndims_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_node3" class="node"><title>h5ltget_dataset_ndims_f</title>
-<polygon fill="#777777" stroke="#777777" points="287,-150 157,-150 157,-126 287,-126 287,-150"/>
-<text text-anchor="middle" x="222" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltget_dataset_ndims_f</text>
-</g>
-<!-- proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_edge2" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f</title>
-<path fill="none" stroke="#000000" d="M97.5165,-107.951C109.424,-110.926 122.176,-114.095 134,-117 142.754,-119.151 152.009,-121.405 161.087,-123.606"/>
-<polygon fill="#000000" stroke="#000000" points="160.294,-127.015 170.837,-125.965 161.941,-120.211 160.294,-127.015"/>
-</g>
-<!-- h5ltpath_valid_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_node4" class="node"><title>h5ltpath_valid_f</title>
-<polygon fill="#777777" stroke="#777777" points="266,-108 178,-108 178,-84 266,-84 266,-108"/>
-<text text-anchor="middle" x="222" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
-</g>
-<!-- proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_edge3" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M97.633,-96C119.4,-96 145.271,-96 167.686,-96"/>
-<polygon fill="#000000" stroke="#000000" points="167.715,-99.5001 177.715,-96 167.715,-92.5001 167.715,-99.5001"/>
+<polygon fill="none" stroke="black" points="97.5,-106 0.5,-106 0.5,-82 97.5,-82 97.5,-106"/>
+<text text-anchor="middle" x="49" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_rate</text>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<g id="a_proc~~read_atomic_rate~~CallsGraph_node5"><a xlink:href=".././proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="299,-24 145,-24 145,-0 299,-0 299,-24"/>
-<text text-anchor="middle" x="222" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<g id="proc~~read_atomic_rate~~CallsGraph_node2" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_atomic_rate~~CallsGraph_node2"><a xlink:href=".././proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="299,-188 145,-188 145,-164 299,-164 299,-188"/>
+<text text-anchor="middle" x="222" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
 </g>
 </g>
 <!-- proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_atomic_rate~~CallsGraph_edge4" class="edge"><title>proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M62.5782,-83.9181C78.1214,-69.6535 105.964,-46.2046 134,-33 138.424,-30.9166 143.074,-29.028 147.829,-27.3179"/>
-<polygon fill="#000000" stroke="#000000" points="149.302,-30.5171 157.697,-24.0531 147.104,-23.8714 149.302,-30.5171"/>
+<g id="proc~~read_atomic_rate~~CallsGraph_edge1" class="edge"><title>proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M63.208,-106.17C78.9242,-120.005 106.509,-142.31 134,-155 138.642,-157.143 143.528,-159.082 148.519,-160.834"/>
+<polygon fill="#000000" stroke="#000000" points="147.617,-164.221 158.209,-163.977 149.777,-157.562 147.617,-164.221"/>
+</g>
+<!-- h5ltpath_valid_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_node3" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="266,-146 178,-146 178,-122 266,-122 266,-146"/>
+<text text-anchor="middle" x="222" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_edge2" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M97.633,-105.142C119.4,-110.234 145.271,-116.286 167.686,-121.529"/>
+<polygon fill="#000000" stroke="#000000" points="167.18,-125.005 177.715,-123.875 168.775,-118.189 167.18,-125.005"/>
+</g>
+<!-- h5ltread_dataset_double_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_node4" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="486,-65 346,-65 346,-41 486,-41 486,-65"/>
+<text text-anchor="middle" x="416" y="-50.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_edge3" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M97.6462,-92.4277C149.942,-90.2583 236.274,-85.3701 310,-75 324.536,-72.9554 340.073,-70.0846 354.618,-67.0901"/>
+<polygon fill="#000000" stroke="#000000" points="355.442,-70.4935 364.504,-65.0058 353.997,-63.644 355.442,-70.4935"/>
+</g>
+<!-- h5ltget_dataset_ndims_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_node5" class="node"><title>h5ltget_dataset_ndims_f</title>
+<polygon fill="#777777" stroke="#777777" points="287,-66 157,-66 157,-42 287,-42 287,-66"/>
+<text text-anchor="middle" x="222" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltget_dataset_ndims_f</text>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f -->
+<g id="proc~~read_atomic_rate~~CallsGraph_edge4" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f</title>
+<path fill="none" stroke="#000000" d="M97.633,-82.8578C116.826,-78.3681 139.21,-73.1321 159.602,-68.3621"/>
+<polygon fill="#000000" stroke="#000000" points="160.49,-71.749 169.43,-66.0632 158.895,-64.933 160.49,-71.749"/>
 </g>
 <!-- proc~h5ltread_dataset_double_scalar_f -->
 <g id="proc~~read_atomic_rate~~CallsGraph_node6" class="node"><title>proc~h5ltread_dataset_double_scalar_f</title>
 <g id="a_proc~~read_atomic_rate~~CallsGraph_node6"><a xlink:href=".././proc/h5ltread_dataset_double_scalar_f.html" xlink:title="h5ltread_dataset_double_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="309.5,-66 134.5,-66 134.5,-42 309.5,-42 309.5,-66"/>
-<text text-anchor="middle" x="222" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="309.5,-24 134.5,-24 134.5,-0 309.5,-0 309.5,-24"/>
+<text text-anchor="middle" x="222" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
 </a>
 </g>
 </g>
 <!-- proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
 <g id="proc~~read_atomic_rate~~CallsGraph_edge5" class="edge"><title>proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M97.5165,-84.0493C109.424,-81.0742 122.176,-77.9051 134,-75 142.754,-72.8492 152.009,-70.5948 161.087,-68.3941"/>
-<polygon fill="#000000" stroke="#000000" points="161.941,-71.7886 170.837,-66.0347 160.294,-64.985 161.941,-71.7886"/>
+<path fill="none" stroke="#000000" d="M63.208,-81.83C78.9242,-67.995 106.509,-45.6902 134,-33 138.642,-30.8571 143.528,-28.9181 148.519,-27.166"/>
+<polygon fill="#000000" stroke="#000000" points="149.777,-30.4376 158.209,-24.0226 147.617,-23.7791 149.777,-30.4376"/>
 </g>
 <!-- h5ltread_dataset_int_f -->
 <g id="proc~~read_atomic_rate~~CallsGraph_node7" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="475.5,-24 356.5,-24 356.5,-0 475.5,-0 475.5,-24"/>
-<text text-anchor="middle" x="416" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+<polygon fill="#777777" stroke="#777777" points="475.5,-188 356.5,-188 356.5,-164 475.5,-164 475.5,-188"/>
+<text text-anchor="middle" x="416" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
 <g id="proc~~read_atomic_rate~~CallsGraph_edge6" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M299.159,-12C314.641,-12 330.843,-12 346.058,-12"/>
-<polygon fill="#000000" stroke="#000000" points="346.413,-15.5001 356.413,-12 346.413,-8.5001 346.413,-15.5001"/>
+<path fill="none" stroke="#000000" d="M299.159,-176C314.641,-176 330.843,-176 346.058,-176"/>
+<polygon fill="#000000" stroke="#000000" points="346.413,-179.5 356.413,-176 346.413,-172.5 346.413,-179.5"/>
 </g>
 <!-- proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f -->
 <g id="proc~~read_atomic_rate~~CallsGraph_edge7" class="edge"><title>proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M278.074,-66.0992C288.738,-68.7775 299.772,-71.785 310,-75 332.942,-82.2117 358.054,-91.9476 377.966,-100.122"/>
-<polygon fill="#000000" stroke="#000000" points="376.713,-103.392 387.291,-103.992 379.396,-96.9264 376.713,-103.392"/>
+<path fill="none" stroke="#000000" d="M279.309,-24.0243C301.093,-28.676 326.186,-34.0345 348.823,-38.8683"/>
+<polygon fill="#000000" stroke="#000000" points="348.182,-42.3103 358.692,-40.9759 349.643,-35.4647 348.182,-42.3103"/>
 </g>
 </g>
 </svg>
@@ -440,8 +307,6 @@ and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -546,34 +411,11 @@ and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -581,143 +423,128 @@ and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_atomic_rate</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
-    <span class="c">!+ Reads in a atomic rate table from file</span>
-    <span class="c">!+ and puts it into a [[AtomicRates]] type</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">fid</span>
-        <span class="c">!+ HDF5 file ID</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">grp</span>
-        <span class="c">!+ HDF5 group to read from</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">AtomicRates</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">rates</span>
-        <span class="c">!+ Atomic reaction rates</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_atomic_rate</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Reads in a atomic rate table from file</span>
+<span class="w">    </span><span class="c">!+ and puts it into a [[AtomicRates]] type</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">              </span><span class="kd">::</span><span class="w"> </span><span class="n">fid</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ HDF5 file ID</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">            </span><span class="kd">::</span><span class="w"> </span><span class="n">grp</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ HDF5 group to read from</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">AtomicRates</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w">        </span><span class="kd">::</span><span class="w"> </span><span class="n">rates</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Atomic reaction rates</span>
 
-    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim2</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim3</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim4</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim5</span>
-    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">path_valid</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">error</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">drank</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emin</span><span class="p">,</span><span class="n">emax</span><span class="p">,</span><span class="n">tmin</span><span class="p">,</span><span class="n">tmax</span><span class="p">,</span><span class="n">rmin</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy2</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy3</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy4</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy5</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dim2</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dim3</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dim4</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dim5</span><span class="w"></span>
+<span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">path_valid</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">n_max</span><span class="p">,</span><span class="w"> </span><span class="n">m_max</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">drank</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">emin</span><span class="p">,</span><span class="n">emax</span><span class="p">,</span><span class="n">tmin</span><span class="p">,</span><span class="n">tmax</span><span class="p">,</span><span class="n">rmin</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dummy2</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:,:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dummy3</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:,:,:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dummy4</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:,:,:,:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dummy5</span><span class="w"></span>
 
-    <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_ATOMIC_RATE: Unknown atomic interaction: &#39;</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
-        <span class="k">endif</span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">True</span><span class="p">.,</span><span class="w"> </span><span class="n">path_valid</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;READ_ATOMIC_RATE: Unknown atomic interaction: &#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">endif</span>
 <span class="k">        stop</span>
 <span class="k">    endif</span>
 
-<span class="k">    call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/n_max&quot;</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/m_max&quot;</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/nenergy&quot;</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/emin&quot;</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/emax&quot;</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/dlogE&quot;</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">dlogE</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/ntemp&quot;</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/tmin&quot;</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/tmax&quot;</span><span class="p">,</span> <span class="n">tmax</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/dlogT&quot;</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">dlogT</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">logemin</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">emin</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">logemax</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">logtmin</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">tmin</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">logtmax</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">tmax</span><span class="p">)</span>
+<span class="k">    call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/n_max&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n_max</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/m_max&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_max</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/nenergy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/emin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">emin</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/emax&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">emax</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/dlogE&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">dlogE</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/ntemp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/tmin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tmin</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/tmax&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tmax</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltread_dataset_double_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/dlogT&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">dlogT</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">logemin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">emin</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">logemax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">logtmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">tmin</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">logtmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">tmax</span><span class="p">)</span><span class="w"></span>
 
 
-    <span class="k">allocate</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">m_max</span><span class="p">,</span> <span class="p">&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<span class="w">    </span><span class="k">allocate</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(&amp;</span><span class="w"></span>
+<span class="w">                    </span><span class="n">rates</span><span class="p">%</span><span class="n">m_max</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                    </span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                    </span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                    </span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
 
-    <span class="c">!!Read CX</span>
-    <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        call </span><span class="n">h5ltget_dataset_ndims_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">drank</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">4</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="p">&amp;</span>
-                           <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                           <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
-            <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span>
-            <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">dummy4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<span class="w">    </span><span class="c">!!Read CX</span>
+<span class="w">    </span><span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">True</span><span class="p">.,</span><span class="w"> </span><span class="n">path_valid</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">path_valid</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        call </span><span class="n">h5ltget_dataset_ndims_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">drank</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="w"> </span><span class="n">m_max</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                           </span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                           </span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="n">dim4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">n_max</span><span class="p">,</span><span class="w"> </span><span class="n">m_max</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span><span class="w"></span>
+<span class="w">            </span><span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="w"> </span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dummy4</span><span class="p">,</span><span class="w"> </span><span class="n">dim4</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"></span>
 
-            <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
-                <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
-                <span class="k">enddo</span>
+<span class="w">            </span><span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="w"></span>
+<span class="w">                </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="w"></span>
+<span class="w">                        </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transpose</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">                        </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">transpose</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">enddo</span>
 <span class="k">            enddo</span>
-<span class="k">            deallocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">)</span>
-        <span class="k">else</span>
-<span class="k">            if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_ATOMIC_RATE: Unsupported atomic interaction: &#39;</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
-            <span class="k">endif</span>
+<span class="k">            deallocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s1">&#39;READ_ATOMIC_RATE: Unsupported atomic interaction: &#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">trim</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
 <span class="k">            stop</span>
 <span class="k">        endif</span>
 <span class="k">    endif</span>
 
-<span class="k">    </span><span class="n">rmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-    <span class="k">where</span> <span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-        <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span> <span class="o">=</span> <span class="mf">0.9</span><span class="o">*</span><span class="n">rmin</span>
-    <span class="k">end where</span>
-<span class="k">    </span><span class="n">rates</span><span class="p">%</span><span class="n">minlog_rate</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">rmin</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">)</span>
+<span class="k">    </span><span class="n">rmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">minval</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.9</span><span class="o">*</span><span class="n">rmin</span><span class="w"></span>
+<span class="w">    </span><span class="k">end where</span>
+<span class="k">    </span><span class="n">rates</span><span class="p">%</span><span class="n">minlog_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">rmin</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_rate</span><span class="p">)</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">read_atomic_rate</span>
+<span class="k">end subroutine </span><span class="n">read_atomic_rate</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -745,14 +572,11 @@ and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>bb_cx_rates
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.3% of total for procedures.">42 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
-    
      <li><a href='../module/libfida.html'>libfida</a></li>
-    
-  
      <li class="active">bb_cx_rates</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,108 +121,48 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine bb_cx_rates(denn, vn, vi, rates)
+    <h2>public subroutine bb_cx_rates(denn, vn, vi, rates)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Get beam-beam neutralization/cx rates</p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-denn%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(nlevs)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(nlevs)</td><td>::</td>
   <td><strong>denn</strong></td><td><p>Neutral density [cm^-3]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vn%7E5"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-vi%7E3"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
   <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-rates%7E4"></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td></td>
-  
-  <td>dimension(nlevs)</td><td>::</td>
+<td>intent(out),</td>
+  <td></td>  <td>dimension(nlevs)</td><td>::</td>
   <td><strong>rates</strong></td><td><p>Reaction rates [1/s]</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -396,8 +254,6 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -445,35 +301,9 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
 <path fill="none" stroke="#000000" d="M311.669,-337.939C355.162,-333.985 420.896,-328.009 464.375,-324.057"/>
 <polygon fill="#000000" stroke="#000000" points="464.738,-327.538 474.38,-323.147 464.104,-320.567 464.738,-327.538"/>
 </g>
-<!-- proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node4" class="node"><title>proc~get_total_cx_rate</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node4"><a xlink:href=".././proc/get_total_cx_rate.html" xlink:title="get_total_cx_rate">
-<polygon fill="#d9534f" stroke="#d9534f" points="313.5,-171 218.5,-171 218.5,-147 313.5,-147 313.5,-171"/>
-<text text-anchor="middle" x="266" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_total_cx_rate</text>
-</a>
-</g>
-</g>
-<!-- proc~get_total_cx_rate&#45;&gt;proc~neutral_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge3" class="edge"><title>proc~get_total_cx_rate&#45;&gt;proc~neutral_cx_rate</title>
-<path fill="none" stroke="#000000" d="M277.743,-171.022C299.393,-195.249 348.466,-250.165 375.062,-279.926"/>
-<polygon fill="#000000" stroke="#000000" points="372.652,-282.482 381.925,-287.607 377.872,-277.818 372.652,-282.482"/>
-</g>
-<!-- proc~halo -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node5" class="node"><title>proc~halo</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node5"><a xlink:href=".././proc/halo.html" xlink:title="halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="293,-312 239,-312 239,-288 293,-288 293,-312"/>
-<text text-anchor="middle" x="266" y="-297.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
-</a>
-</g>
-</g>
-<!-- proc~halo&#45;&gt;proc~neutral_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge4" class="edge"><title>proc~halo&#45;&gt;proc~neutral_cx_rate</title>
-<path fill="none" stroke="#000000" d="M293.107,-300C306.589,-300 323.551,-300 339.651,-300"/>
-<polygon fill="#000000" stroke="#000000" points="340.062,-303.5 350.062,-300 340.062,-296.5 340.062,-303.5"/>
-</g>
 <!-- program~fidasim -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node6" class="node"><title>program~fidasim</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node6"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<g id="proc~~bb_cx_rates~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node4"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-192 0,-192 0,-168 54,-168 54,-192"/>
 <text text-anchor="middle" x="27" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
@@ -484,135 +314,161 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
 <path fill="none" stroke="#000000" d="M30.0514,-192.361C35.0971,-218.597 50.6859,-279.907 90,-310 124.075,-336.083 172.71,-343.28 210.063,-344.408"/>
 <polygon fill="#000000" stroke="#000000" points="210.222,-347.911 220.278,-344.576 210.337,-340.912 210.222,-347.911"/>
 </g>
+<!-- proc~halo -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node6" class="node"><title>proc~halo</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node6"><a xlink:href=".././proc/halo.html" xlink:title="halo">
+<polygon fill="#d9534f" stroke="#d9534f" points="293,-312 239,-312 239,-288 293,-288 293,-312"/>
+<text text-anchor="middle" x="266" y="-297.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+</a>
+</g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~halo -->
 <g id="proc~~bb_cx_rates~~CalledByGraph_edge13" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
 <path fill="none" stroke="#000000" d="M31.2363,-192.349C37.9219,-215.117 55.5938,-263.359 90,-285 131.997,-311.415 191.3,-310.313 228.946,-306.001"/>
 <polygon fill="#000000" stroke="#000000" points="229.483,-309.461 238.958,-304.719 228.594,-302.517 229.483,-309.461"/>
 </g>
-<!-- proc~fida_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node7" class="node"><title>proc~fida_mc</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node7"><a xlink:href=".././proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-276 109,-276 109,-252 163,-252 163,-276"/>
-<text text-anchor="middle" x="136" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
-</a>
-</g>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge14" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M37.6808,-192.188C49.0618,-205.909 69.0685,-228.214 90,-243 93.0675,-245.167 96.3941,-247.204 99.8027,-249.094"/>
-<polygon fill="#000000" stroke="#000000" points="98.3979,-252.306 108.896,-253.737 101.581,-246.072 98.3979,-252.306"/>
-</g>
-<!-- proc~fida_f -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node8" class="node"><title>proc~fida_f</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node8"><a xlink:href=".././proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-234 109,-234 109,-210 163,-210 163,-234"/>
-<text text-anchor="middle" x="136" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
-</a>
-</g>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge15" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M54.1751,-190.274C67.7768,-195.613 84.5994,-202.217 99.3693,-208.014"/>
-<polygon fill="#000000" stroke="#000000" points="98.1368,-211.29 108.724,-211.686 100.695,-204.774 98.1368,-211.29"/>
-</g>
 <!-- proc~npa_f -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node9" class="node"><title>proc~npa_f</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node9"><a xlink:href=".././proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-192 109,-192 109,-168 163,-168 163,-192"/>
-<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<g id="proc~~bb_cx_rates~~CalledByGraph_node7" class="node"><title>proc~npa_f</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node7"><a xlink:href=".././proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-276 109,-276 109,-252 163,-252 163,-276"/>
+<text text-anchor="middle" x="136" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge16" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M54.1751,-180C67.5177,-180 83.9597,-180 98.5231,-180"/>
-<polygon fill="#000000" stroke="#000000" points="98.7243,-183.5 108.724,-180 98.7242,-176.5 98.7243,-183.5"/>
-</g>
-<!-- proc~fida_weights_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node10" class="node"><title>proc~fida_weights_mc</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node10"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-150 90,-150 90,-126 182,-126 182,-150"/>
-<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge17" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M54.1751,-169.726C66.3228,-164.957 81.0397,-159.181 94.5689,-153.87"/>
-<polygon fill="#000000" stroke="#000000" points="96.1269,-157.019 104.157,-150.107 93.5692,-150.503 96.1269,-157.019"/>
-</g>
-<!-- proc~npa_weights -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node11" class="node"><title>proc~npa_weights</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node11"><a xlink:href=".././proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="172.5,-108 99.5,-108 99.5,-84 172.5,-84 172.5,-108"/>
-<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
-</a>
-</g>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge18" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M37.6808,-167.812C49.0618,-154.091 69.0685,-131.786 90,-117 91.888,-115.666 93.8742,-114.382 95.9173,-113.15"/>
-<polygon fill="#000000" stroke="#000000" points="98.0267,-115.985 105.111,-108.107 94.66,-109.848 98.0267,-115.985"/>
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge14" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M37.6808,-192.188C49.0618,-205.909 69.0685,-228.214 90,-243 93.0675,-245.167 96.3941,-247.204 99.8027,-249.094"/>
+<polygon fill="#000000" stroke="#000000" points="98.3979,-252.306 108.896,-253.737 101.581,-246.072 98.3979,-252.306"/>
 </g>
 <!-- proc~npa_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node12" class="node"><title>proc~npa_mc</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node12"><a xlink:href=".././proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-66 109,-66 109,-42 163,-42 163,-66"/>
-<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<g id="proc~~bb_cx_rates~~CalledByGraph_node8" class="node"><title>proc~npa_mc</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node8"><a xlink:href=".././proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-234 109,-234 109,-210 163,-210 163,-234"/>
+<text text-anchor="middle" x="136" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge19" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M32.4294,-167.714C40.6983,-146.307 60.3728,-101.891 90,-75 92.9326,-72.3383 96.2617,-69.9556 99.7506,-67.8375"/>
-<polygon fill="#000000" stroke="#000000" points="101.44,-70.9031 108.618,-63.1095 98.1468,-64.7263 101.44,-70.9031"/>
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge15" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-190.274C67.7768,-195.613 84.5994,-202.217 99.3693,-208.014"/>
+<polygon fill="#000000" stroke="#000000" points="98.1368,-211.29 108.724,-211.686 100.695,-204.774 98.1368,-211.29"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node9" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node9"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-192 90,-192 90,-168 182,-168 182,-192"/>
+<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge16" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-180C61.9968,-180 70.8836,-180 79.8327,-180"/>
+<polygon fill="#000000" stroke="#000000" points="79.9095,-183.5 89.9095,-180 79.9094,-176.5 79.9095,-183.5"/>
+</g>
+<!-- proc~fida_f -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node10" class="node"><title>proc~fida_f</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node10"><a xlink:href=".././proc/fida_f.html" xlink:title="fida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-150 109,-150 109,-126 163,-126 163,-150"/>
+<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_f -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge17" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M54.1751,-169.726C67.7768,-164.387 84.5994,-157.783 99.3693,-151.986"/>
+<polygon fill="#000000" stroke="#000000" points="100.695,-155.226 108.724,-148.314 98.1368,-148.71 100.695,-155.226"/>
+</g>
+<!-- proc~fida_mc -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node11" class="node"><title>proc~fida_mc</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node11"><a xlink:href=".././proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-108 109,-108 109,-84 163,-84 163,-108"/>
+<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge18" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M37.6808,-167.812C49.0618,-154.091 69.0685,-131.786 90,-117 93.0675,-114.833 96.3941,-112.796 99.8027,-110.906"/>
+<polygon fill="#000000" stroke="#000000" points="101.581,-113.928 108.896,-106.263 98.3979,-107.694 101.581,-113.928"/>
 </g>
 <!-- proc~dcx -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_node13" class="node"><title>proc~dcx</title>
-<g id="a_proc~~bb_cx_rates~~CalledByGraph_node13"><a xlink:href=".././proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-24 109,-24 109,-0 163,-0 163,-24"/>
-<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+<g id="proc~~bb_cx_rates~~CalledByGraph_node12" class="node"><title>proc~dcx</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node12"><a xlink:href=".././proc/dcx.html" xlink:title="dcx">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-66 109,-66 109,-42 163,-42 163,-66"/>
+<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
 </a>
 </g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge20" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
-<path fill="none" stroke="#000000" d="M30.0857,-167.702C35.3453,-140.177 51.5705,-72.8982 90,-33 92.8129,-30.0796 96.111,-27.5235 99.6212,-25.2964"/>
-<polygon fill="#000000" stroke="#000000" points="101.502,-28.2583 108.628,-20.4179 98.1678,-22.1032 101.502,-28.2583"/>
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge19" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="#000000" d="M32.4294,-167.714C40.6983,-146.307 60.3728,-101.891 90,-75 92.9326,-72.3383 96.2617,-69.9556 99.7506,-67.8375"/>
+<polygon fill="#000000" stroke="#000000" points="101.44,-70.9031 108.618,-63.1095 98.1468,-64.7263 101.44,-70.9031"/>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge6" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_total_cx_rate</title>
+<!-- proc~npa_weights -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node13" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node13"><a xlink:href=".././proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="172.5,-24 99.5,-24 99.5,-0 172.5,-0 172.5,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_weights -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge20" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M30.0857,-167.702C35.3453,-140.177 51.5705,-72.8982 90,-33 91.0466,-31.9134 92.1605,-30.8771 93.3274,-29.8895"/>
+<polygon fill="#000000" stroke="#000000" points="95.4691,-32.6626 101.651,-24.0579 91.4524,-26.9297 95.4691,-32.6626"/>
+</g>
+<!-- proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_node5" class="node"><title>proc~get_total_cx_rate</title>
+<g id="a_proc~~bb_cx_rates~~CalledByGraph_node5"><a xlink:href=".././proc/get_total_cx_rate.html" xlink:title="get_total_cx_rate">
+<polygon fill="#d9534f" stroke="#d9534f" points="313.5,-171 218.5,-171 218.5,-147 313.5,-147 313.5,-171"/>
+<text text-anchor="middle" x="266" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_total_cx_rate</text>
+</a>
+</g>
+</g>
+<!-- proc~get_total_cx_rate&#45;&gt;proc~neutral_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge3" class="edge"><title>proc~get_total_cx_rate&#45;&gt;proc~neutral_cx_rate</title>
+<path fill="none" stroke="#000000" d="M277.743,-171.022C299.393,-195.249 348.466,-250.165 375.062,-279.926"/>
+<polygon fill="#000000" stroke="#000000" points="372.652,-282.482 381.925,-287.607 377.872,-277.818 372.652,-282.482"/>
+</g>
+<!-- proc~halo&#45;&gt;proc~neutral_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge4" class="edge"><title>proc~halo&#45;&gt;proc~neutral_cx_rate</title>
+<path fill="none" stroke="#000000" d="M293.107,-300C306.589,-300 323.551,-300 339.651,-300"/>
+<polygon fill="#000000" stroke="#000000" points="340.062,-303.5 350.062,-300 340.062,-296.5 340.062,-303.5"/>
+</g>
+<!-- proc~npa_f&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge6" class="edge"><title>proc~npa_f&#45;&gt;proc~get_total_cx_rate</title>
 <path fill="none" stroke="#000000" d="M163.099,-253.728C169.528,-250.691 176.222,-247.073 182,-243 208.156,-224.562 233.274,-197.379 248.894,-178.97"/>
 <polygon fill="#000000" stroke="#000000" points="251.662,-181.116 255.373,-171.193 246.283,-176.636 251.662,-181.116"/>
 </g>
-<!-- proc~fida_f&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge8" class="edge"><title>proc~fida_f&#45;&gt;proc~get_total_cx_rate</title>
+<!-- proc~npa_mc&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge7" class="edge"><title>proc~npa_mc&#45;&gt;proc~get_total_cx_rate</title>
 <path fill="none" stroke="#000000" d="M163.242,-209.925C169.412,-207.038 175.952,-203.94 182,-201 198.718,-192.872 217.183,-183.561 232.444,-175.776"/>
 <polygon fill="#000000" stroke="#000000" points="234.179,-178.819 241.487,-171.149 230.99,-172.588 234.179,-178.819"/>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge9" class="edge"><title>proc~npa_f&#45;&gt;proc~get_total_cx_rate</title>
-<path fill="none" stroke="#000000" d="M163.212,-175.7C176.231,-173.564 192.501,-170.894 208.188,-168.321"/>
-<polygon fill="#000000" stroke="#000000" points="209.071,-171.723 218.372,-166.65 207.938,-164.815 209.071,-171.723"/>
-</g>
 <!-- proc~fida_weights_mc&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge10" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_total_cx_rate</title>
-<path fill="none" stroke="#000000" d="M182.128,-145.404C190.509,-146.779 199.364,-148.232 208.044,-149.656"/>
-<polygon fill="#000000" stroke="#000000" points="207.679,-153.143 218.114,-151.308 208.813,-146.235 207.679,-153.143"/>
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge8" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_total_cx_rate</title>
+<path fill="none" stroke="#000000" d="M182.128,-172.596C190.509,-171.221 199.364,-169.768 208.044,-168.344"/>
+<polygon fill="#000000" stroke="#000000" points="208.813,-171.765 218.114,-166.692 207.679,-164.857 208.813,-171.765"/>
 </g>
-<!-- proc~npa_weights&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge11" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_total_cx_rate</title>
+<!-- proc~fida_f&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge9" class="edge"><title>proc~fida_f&#45;&gt;proc~get_total_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.212,-142.3C176.231,-144.436 192.501,-147.106 208.188,-149.679"/>
+<polygon fill="#000000" stroke="#000000" points="207.938,-153.185 218.372,-151.35 209.071,-146.277 207.938,-153.185"/>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge10" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_total_cx_rate</title>
 <path fill="none" stroke="#000000" d="M163.242,-108.075C169.412,-110.962 175.952,-114.06 182,-117 198.718,-125.128 217.183,-134.439 232.444,-142.224"/>
 <polygon fill="#000000" stroke="#000000" points="230.99,-145.412 241.487,-146.851 234.179,-139.181 230.99,-145.412"/>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge7" class="edge"><title>proc~npa_mc&#45;&gt;proc~get_total_cx_rate</title>
+<!-- proc~dcx&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge11" class="edge"><title>proc~dcx&#45;&gt;proc~get_total_cx_rate</title>
 <path fill="none" stroke="#000000" d="M163.099,-64.2715C169.528,-67.3086 176.222,-70.9269 182,-75 208.156,-93.4376 233.274,-120.621 248.894,-139.03"/>
 <polygon fill="#000000" stroke="#000000" points="246.283,-141.364 255.373,-146.807 251.662,-136.884 246.283,-141.364"/>
 </g>
-<!-- proc~dcx&#45;&gt;proc~get_total_cx_rate -->
-<g id="proc~~bb_cx_rates~~CalledByGraph_edge12" class="edge"><title>proc~dcx&#45;&gt;proc~get_total_cx_rate</title>
-<path fill="none" stroke="#000000" d="M163.223,-21.2897C169.791,-24.3776 176.52,-28.2659 182,-33 216.427,-62.7387 242.342,-110.117 255.45,-137.515"/>
+<!-- proc~npa_weights&#45;&gt;proc~get_total_cx_rate -->
+<g id="proc~~bb_cx_rates~~CalledByGraph_edge12" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_total_cx_rate</title>
+<path fill="none" stroke="#000000" d="M168.859,-24.1336C173.534,-26.6686 178.085,-29.6185 182,-33 216.427,-62.7387 242.342,-110.117 255.45,-137.515"/>
 <polygon fill="#000000" stroke="#000000" points="252.301,-139.044 259.692,-146.635 258.648,-136.092 252.301,-139.044"/>
 </g>
 </g>
@@ -672,34 +528,11 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -707,108 +540,93 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
-    <span class="c">!+ Get beam-beam neutralization/cx rates</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">denn</span>
-        <span class="c">!+ Neutral density [cm^-3]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vn</span>
-        <span class="c">!+ Neutral velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
-        <span class="c">!+ Ion velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>
-        <span class="c">!+ Reaction rates [1/s]</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span><span class="w"> </span><span class="n">vn</span><span class="p">,</span><span class="w"> </span><span class="n">vi</span><span class="p">,</span><span class="w"> </span><span class="n">rates</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Get beam-beam neutralization/cx rates</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">denn</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Neutral density [cm^-3]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w">     </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">vn</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Neutral velocity [cm/s]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w">     </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">vi</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Ion velocity [cm/s]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rates</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Reaction rates [1/s]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neut</span>  <span class="c">!!rate coeff</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span> <span class="c">!! relative Energy</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs1D</span><span class="p">)</span> <span class="kd">::</span> <span class="n">c</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogE</span><span class="p">,</span> <span class="n">logEmin</span><span class="p">,</span> <span class="n">logeb</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vrel</span> <span class="c">!! relative velocity</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ebi</span><span class="p">,</span> <span class="n">neb</span><span class="p">,</span> <span class="n">err</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">nlevs</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">neut</span><span class="w">  </span><span class="c">!!rate coeff</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eb</span><span class="w"> </span><span class="c">!! relative Energy</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs1D</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dlogE</span><span class="p">,</span><span class="w"> </span><span class="n">logEmin</span><span class="p">,</span><span class="w"> </span><span class="n">logeb</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vrel</span><span class="w"> </span><span class="c">!! relative velocity</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ebi</span><span class="p">,</span><span class="w"> </span><span class="n">neb</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="w"></span>
 
-    <span class="c">!Eeff</span>
-    <span class="n">vrel</span><span class="o">=</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vi</span><span class="o">-</span><span class="n">vn</span><span class="p">)</span>
-    <span class="n">eb</span><span class="o">=</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">vrel</span><span class="o">**</span><span class="mi">2</span>  <span class="c">! [kev/amu]</span>
-    <span class="n">logeb</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span>
-    <span class="n">logEmin</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">logemin</span>
-    <span class="n">dlogE</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">dlogE</span>
-    <span class="n">neb</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">nenergy</span>
-    <span class="k">call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">logEmin</span><span class="p">,</span><span class="n">dlogE</span><span class="p">,</span><span class="n">neb</span><span class="p">,</span><span class="n">logeb</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err</span><span class="p">)</span>
-    <span class="n">ebi</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">i</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;BB_CX_RATES: Eb out of range of H_H_cx table. Using nearest energy value.&quot;</span>
-            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;eb = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">eb</span>
-        <span class="k">endif</span>
-<span class="k">        if</span><span class="p">(</span><span class="n">ebi</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="mi">1</span>
-            <span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">1.0</span> <span class="p">;</span> <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">0.0</span>
-        <span class="k">else</span>
-<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="n">neb</span><span class="o">-</span><span class="mi">1</span>
-            <span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">;</span> <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">1.0</span>
-        <span class="k">endif</span>
+<span class="w">    </span><span class="c">!Eeff</span>
+<span class="w">    </span><span class="n">vrel</span><span class="o">=</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vi</span><span class="o">-</span><span class="n">vn</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">eb</span><span class="o">=</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">vrel</span><span class="o">**</span><span class="mi">2</span><span class="w">  </span><span class="c">! [kev/amu]</span>
+<span class="w">    </span><span class="n">logeb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">logEmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">logemin</span><span class="w"></span>
+<span class="w">    </span><span class="n">dlogE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">dlogE</span><span class="w"></span>
+<span class="w">    </span><span class="n">neb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">nenergy</span><span class="w"></span>
+<span class="w">    </span><span class="k">call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">logEmin</span><span class="p">,</span><span class="n">dlogE</span><span class="p">,</span><span class="n">neb</span><span class="p">,</span><span class="n">logeb</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ebi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">%</span><span class="n">i</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span><span class="w"> </span><span class="s2">&quot;BB_CX_RATES: Eb out of range of H_H_cx table. Using nearest energy value.&quot;</span><span class="w"></span>
+<span class="w">            </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;eb = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">eb</span><span class="w"></span>
+<span class="w">        </span><span class="k">endif</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">ebi</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">1.0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">0.0</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="n">neb</span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<span class="w">            </span><span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">0.0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">1.0</span><span class="w"></span>
+<span class="w">        </span><span class="k">endif</span>
 <span class="k">    endif</span>
 
-<span class="k">    </span><span class="n">neut</span><span class="p">(:,:)</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                 <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">    </span><span class="n">neut</span><span class="p">(:,:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">                 </span><span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
 
-    <span class="k">where</span> <span class="p">(</span><span class="n">neut</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">minlog_cross</span><span class="p">)</span>
-        <span class="n">neut</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="n">elsewhere</span>
-        <span class="n">neut</span> <span class="o">=</span> <span class="nb">exp</span><span class="p">(</span><span class="n">neut</span><span class="o">*</span><span class="n">log_10</span><span class="p">)</span>
-    <span class="k">end where</span>
+<span class="w">    </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="n">neut</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">%</span><span class="n">minlog_cross</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">neut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
+<span class="w">    </span><span class="n">elsewhere</span><span class="w"></span>
+<span class="w">        </span><span class="n">neut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">exp</span><span class="p">(</span><span class="n">neut</span><span class="o">*</span><span class="n">log_10</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">end where</span>
 
-<span class="k">    </span><span class="n">rates</span><span class="o">=</span><span class="nb">matmul</span><span class="p">(</span><span class="n">neut</span><span class="p">,</span><span class="n">denn</span><span class="p">)</span><span class="o">*</span><span class="n">vrel</span>
+<span class="k">    </span><span class="n">rates</span><span class="o">=</span><span class="nb">matmul</span><span class="p">(</span><span class="n">neut</span><span class="p">,</span><span class="n">denn</span><span class="p">)</span><span class="o">*</span><span class="n">vrel</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">bb_cx_rates</span>
+<span class="k">end subroutine </span><span class="n">bb_cx_rates</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -836,14 +654,11 @@ public subroutine bb_cx_rates(denn, vn, vi, rates)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

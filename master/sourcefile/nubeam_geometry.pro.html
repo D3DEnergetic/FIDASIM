@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,41 +73,22 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>nubeam_geometry.pro
     <small>Source File</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/nubeam_geometry.pro"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
-  
      <li class="active">nubeam_geometry.pro</li>
   </ol>
 </div>
@@ -159,40 +103,15 @@
   </div>
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
     <a class="list-group-item" href="../sourcefile/nubeam_geometry.pro.html#src">nubeam_geometry.pro</a>
   </div>
 </div>
-
-
 
 </div>
 
@@ -231,38 +150,13 @@
 <h2 id="return-value">Return Value</h2>
 <p>Neutral beam structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span> nbi <span class="o">=</span> nubeam_geometry(nubeam)
+<div class="codehilite"><pre><span></span><code>IDL<span class="o">&gt;</span><span class="w"> </span>nbi<span class="w"> </span><span class="o">=</span><span class="w"> </span>nubeam_geometry(nubeam)<span class="w"></span>
 </code></pre></div>
       <br>
-    
-      
-      <br>
-
+<br>
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -270,150 +164,145 @@
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
     <section>
       <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1"></a><span class="k">FUNCTION</span> nubeam_geometry, nubeam, angle<span class="o">=</span>angle, verbose<span class="o">=</span>verbose,<span class="nb">plot</span><span class="o">=</span><span class="nb">plot</span>
-<a id="ln-2" name="ln-2"></a><span class="c1">    ;+#nubeam_geometry</span>
-<a id="ln-3" name="ln-3"></a><span class="c1">    ;+Calculates the FIDASIM beam geometry from the beam geometry variables in the TRANSP/NUBEAM namelist</span>
-<a id="ln-4" name="ln-4"></a><span class="c1">    ;+***</span>
-<a id="ln-5" name="ln-5"></a><span class="c1">    ;+##Arguments</span>
-<a id="ln-6" name="ln-6"></a><span class="c1">    ;+     **NUBEAM**: Structure containing the following</span>
-<a id="ln-7" name="ln-7"></a><span class="c1">    ;+</span>
-<a id="ln-8" name="ln-8"></a><span class="c1">    ;+     **NUBEAM.NAME**: Ion source name</span>
-<a id="ln-9" name="ln-9"></a><span class="c1">    ;+</span>
-<a id="ln-10" name="ln-10"></a><span class="c1">    ;+     **NUBEAM.NBSHAP**: Ion source shape 1=rectangular, 2=circular</span>
-<a id="ln-11" name="ln-11"></a><span class="c1">    ;+</span>
-<a id="ln-12" name="ln-12"></a><span class="c1">    ;+     **NUBEAM.FOCLZ**: Vertical focal length [cm]</span>
-<a id="ln-13" name="ln-13"></a><span class="c1">    ;+</span>
-<a id="ln-14" name="ln-14"></a><span class="c1">    ;+     **NUBEAM.FOCLR**: Horizontal focal length [cm]</span>
-<a id="ln-15" name="ln-15"></a><span class="c1">    ;+</span>
-<a id="ln-16" name="ln-16"></a><span class="c1">    ;+     **NUBEAM.DIVZ**: Vertical divergence [rad]</span>
-<a id="ln-17" name="ln-17"></a><span class="c1">    ;+</span>
-<a id="ln-18" name="ln-18"></a><span class="c1">    ;+     **NUBEAM.DIVR**: Horizontal divergence [rad]</span>
-<a id="ln-19" name="ln-19"></a><span class="c1">    ;+</span>
-<a id="ln-20" name="ln-20"></a><span class="c1">    ;+     **NUBEAM.BMWIDZ**: Ion source half height [cm]</span>
-<a id="ln-21" name="ln-21"></a><span class="c1">    ;+</span>
-<a id="ln-22" name="ln-22"></a><span class="c1">    ;+     **NUBEAM.BMWIDR**: Ion source half width [cm]</span>
-<a id="ln-23" name="ln-23"></a><span class="c1">    ;+</span>
-<a id="ln-24" name="ln-24"></a><span class="c1">    ;+     **NUBEAM.RTCENA**: Radius of tangency point [cm]</span>
-<a id="ln-25" name="ln-25"></a><span class="c1">    ;+</span>
-<a id="ln-26" name="ln-26"></a><span class="c1">    ;+     **NUBEAM.XLBTNA**: Distance from center of beam source grid to tangency point [cm]</span>
-<a id="ln-27" name="ln-27"></a><span class="c1">    ;+</span>
-<a id="ln-28" name="ln-28"></a><span class="c1">    ;+     **NUBEAM.XBZETA**: Torodial angle [deg] Positive angles defined to be in the counter-clockwise direction</span>
-<a id="ln-29" name="ln-29"></a><span class="c1">    ;+</span>
-<a id="ln-30" name="ln-30"></a><span class="c1">    ;+     **NUBEAM.XYBSCA**: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]</span>
-<a id="ln-31" name="ln-31"></a><span class="c1">    ;+</span>
-<a id="ln-32" name="ln-32"></a><span class="c1">    ;+     **NUBEAM.NLJCCW**: Orientation of Ip. 1 for True/Counter-clockwise current, 0 or -1 for False/Clock-wise current</span>
-<a id="ln-33" name="ln-33"></a><span class="c1">    ;+</span>
-<a id="ln-34" name="ln-34"></a><span class="c1">    ;+     **NUBEAM.NLCO**: 1 for Co-beam, 0 or -1 for Counter-beam</span>
-<a id="ln-35" name="ln-35"></a><span class="c1">    ;+</span>
-<a id="ln-36" name="ln-36"></a><span class="c1">    ;+     **NUBEAM.NBAPSHA**: Vector of aperture shapes 1=rectangular, 2=circular</span>
-<a id="ln-37" name="ln-37"></a><span class="c1">    ;+</span>
-<a id="ln-38" name="ln-38"></a><span class="c1">    ;+     **NUBEAM.XLBAPA**: Vector of distances from center of beam source grid to the aperture plane [cm]</span>
-<a id="ln-39" name="ln-39"></a><span class="c1">    ;+</span>
-<a id="ln-40" name="ln-40"></a><span class="c1">    ;+     **NUBEAM.XYBAPA**: Vector of elevation above/below vacuum vessel midplane of beam centerline at aperture [cm]</span>
-<a id="ln-41" name="ln-41"></a><span class="c1">    ;+</span>
-<a id="ln-42" name="ln-42"></a><span class="c1">    ;+     **NUBEAM.RAPEDGA**: Vector of aperture half-widths [cm]</span>
-<a id="ln-43" name="ln-43"></a><span class="c1">    ;+</span>
-<a id="ln-44" name="ln-44"></a><span class="c1">    ;+     **NUBEAM.XZPEDGA**: Vector of aperture half-heights [cm]</span>
-<a id="ln-45" name="ln-45"></a><span class="c1">    ;+</span>
-<a id="ln-46" name="ln-46"></a><span class="c1">    ;+     **NUBEAM.XRAPOFFA**: Vector of horizontal (y) offsets relative to the +x aligned beam centerline [cm]</span>
-<a id="ln-47" name="ln-47"></a><span class="c1">    ;+</span>
-<a id="ln-48" name="ln-48"></a><span class="c1">    ;+     **NUBEAM.XZAPOFFA**: Vector of vertical (z) offsets relative to the +x aligned beam centerline [cm]</span>
-<a id="ln-49" name="ln-49"></a><span class="c1">    ;+</span>
-<a id="ln-50" name="ln-50"></a><span class="c1">    ;+##Keyword Arguments</span>
-<a id="ln-51" name="ln-51"></a><span class="c1">    ;+     **angle**: Angle to add to XBZETA to rotate the beams into correct coordinates [deg]</span>
-<a id="ln-52" name="ln-52"></a><span class="c1">    ;+</span>
-<a id="ln-53" name="ln-53"></a><span class="c1">    ;+     **verbose**: Print out positions</span>
-<a id="ln-54" name="ln-54"></a><span class="c1">    ;+</span>
-<a id="ln-55" name="ln-55"></a><span class="c1">    ;+     **plot**: Plot the beam</span>
-<a id="ln-56" name="ln-56"></a><span class="c1">    ;+</span>
-<a id="ln-57" name="ln-57"></a><span class="c1">    ;+##Return Value</span>
-<a id="ln-58" name="ln-58"></a><span class="c1">    ;+ Neutral beam structure</span>
-<a id="ln-59" name="ln-59"></a><span class="c1">    ;+</span>
-<a id="ln-60" name="ln-60"></a><span class="c1">    ;+##Example Usage</span>
-<a id="ln-61" name="ln-61"></a><span class="c1">    ;+```idl</span>
-<a id="ln-62" name="ln-62"></a><span class="c1">    ;+IDL&gt; nbi = nubeam_geometry(nubeam)</span>
-<a id="ln-63" name="ln-63"></a><span class="c1">    ;+```</span>
-<a id="ln-64" name="ln-64"></a>
-<a id="ln-65" name="ln-65"></a>    <span class="k">if</span> <span class="k">not</span> <span class="nb">keyword_set</span>(angle) <span class="k">then</span> angle<span class="o">=</span><span class="mi">0</span>
-<a id="ln-66" name="ln-66"></a>    <span class="k">if</span> nubeam.nlco <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> nubeam.nlco <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<a id="ln-67" name="ln-67"></a>    <span class="k">if</span> <span class="nb">where</span>(<span class="nb">tag_names</span>(nubeam) <span class="k">eq</span> <span class="s1">&#39;NLJCCW&#39;</span>) <span class="k">ge</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">begin</span>
-<a id="ln-68" name="ln-68"></a>        <span class="k">if</span> nubeam.nljccw <span class="k">eq</span> <span class="mi">0</span> <span class="k">then</span> nubeam.nljccw <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<a id="ln-69" name="ln-69"></a>    <span class="k">endif</span> <span class="k">else</span> <span class="k">begin</span>
-<a id="ln-70" name="ln-70"></a>        warn,<span class="s1">&#39;Current orientation not specified. Assuming Counter-clockwise.&#39;</span>
-<a id="ln-71" name="ln-71"></a>        nubeam <span class="o">=</span> <span class="nb">create_struct</span>(nubeam, <span class="s1">&#39;NLJCCW&#39;</span>, <span class="mi">1</span>)
-<a id="ln-72" name="ln-72"></a>    <span class="k">endelse</span>
-<a id="ln-73" name="ln-73"></a>
-<a id="ln-74" name="ln-74"></a>
-<a id="ln-75" name="ln-75"></a>    phi_s<span class="o">=</span>(nubeam.XBZETA<span class="o">+</span>angle)<span class="o">*</span>!DPI<span class="o">/</span><span class="mf">180.0</span>
-<a id="ln-76" name="ln-76"></a>    zs<span class="o">=</span>nubeam.XYBSCA
-<a id="ln-77" name="ln-77"></a>    za<span class="o">=</span>nubeam.XYBAPA[<span class="mi">0</span>]
-<a id="ln-78" name="ln-78"></a>    alpha<span class="o">=</span><span class="nb">asin</span>((zs<span class="o">-</span>za)<span class="o">/</span>nubeam.XLBAPA[<span class="mi">0</span>])
-<a id="ln-79" name="ln-79"></a>    pdst<span class="o">=</span>nubeam.XLBTNA<span class="o">*</span><span class="nb">cos</span>(alpha)
-<a id="ln-80" name="ln-80"></a>    rs<span class="o">=</span><span class="nb">sqrt</span>(nubeam.RTCENA<span class="o">^</span><span class="mf">2.0</span> <span class="o">+</span> pdst<span class="o">^</span><span class="mf">2.0</span>)
-<a id="ln-81" name="ln-81"></a>    dat<span class="o">=</span>nubeam.XLBTNA<span class="o">-</span>nubeam.XLBAPA[<span class="mi">0</span>]
-<a id="ln-82" name="ln-82"></a>    pdat<span class="o">=</span>dat<span class="o">*</span><span class="nb">cos</span>(alpha)
-<a id="ln-83" name="ln-83"></a>    ra<span class="o">=</span><span class="nb">sqrt</span>(nubeam.RTCENA<span class="o">^</span><span class="mf">2.0</span> <span class="o">+</span> pdat<span class="o">^</span><span class="mf">2.0</span>)
-<a id="ln-84" name="ln-84"></a>    beta_s<span class="o">=</span><span class="nb">acos</span>(nubeam.RTCENA<span class="o">/</span>rs)
-<a id="ln-85" name="ln-85"></a>    beta_a<span class="o">=</span><span class="nb">acos</span>(nubeam.RTCENA<span class="o">/</span>ra)
-<a id="ln-86" name="ln-86"></a>    phi_a<span class="o">=</span>phi_s <span class="o">+</span> nubeam.NLJCCW<span class="o">*</span>nubeam.NLCO<span class="o">*</span>(beta_s<span class="o">-</span>beta_a)
-<a id="ln-87" name="ln-87"></a>
-<a id="ln-88" name="ln-88"></a>    src<span class="o">=</span>[rs<span class="o">*</span><span class="nb">cos</span>(phi_s),rs<span class="o">*</span><span class="nb">sin</span>(phi_s),zs]
-<a id="ln-89" name="ln-89"></a>    aper_src<span class="o">=</span>[ra<span class="o">*</span><span class="nb">cos</span>(phi_a),ra<span class="o">*</span><span class="nb">sin</span>(phi_a),za]
-<a id="ln-90" name="ln-90"></a>    <span class="nb">axis</span><span class="o">=</span>(aper_src<span class="o">-</span>src)
-<a id="ln-91" name="ln-91"></a>    <span class="nb">axis</span><span class="o">=</span><span class="nb">axis</span><span class="o">/</span><span class="nb">sqrt</span>(<span class="nb">total</span>(<span class="nb">axis</span><span class="o">^</span><span class="mi">2</span>))
-<a id="ln-92" name="ln-92"></a>    pos<span class="o">=</span>src<span class="o">+</span><span class="nb">axis</span><span class="o">*</span>nubeam.XLBTNA
-<a id="ln-93" name="ln-93"></a>
-<a id="ln-94" name="ln-94"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(verbose) <span class="k">then</span> <span class="k">begin</span>
-<a id="ln-95" name="ln-95"></a>        <span class="nb">print</span>,<span class="s1">&#39;Source position: &#39;</span>,src
-<a id="ln-96" name="ln-96"></a>        <span class="nb">print</span>,<span class="s1">&#39;1st Aperture position: &#39;</span>,aper_src
-<a id="ln-97" name="ln-97"></a>        <span class="nb">print</span>,<span class="s1">&#39;Tangency position: &#39;</span>, pos
-<a id="ln-98" name="ln-98"></a>    <span class="k">endif</span>
-<a id="ln-99" name="ln-99"></a>
-<a id="ln-100" name="ln-100"></a>    <span class="k">if</span> <span class="nb">keyword_set</span>(<span class="nb">plot</span>) <span class="k">then</span> <span class="k">begin</span>
-<a id="ln-101" name="ln-101"></a>        <span class="nb">plot</span>,[src[<span class="mi">0</span>],pos[<span class="mi">0</span>]],[src[<span class="mi">1</span>],pos[<span class="mi">1</span>]]
-<a id="ln-102" name="ln-102"></a>    <span class="k">endif</span>
-<a id="ln-103" name="ln-103"></a>
-<a id="ln-104" name="ln-104"></a>    nbi <span class="o">=</span> {data_source<span class="o">:</span><span class="s2">&quot;TRANSP/NUBEAM namelist&quot;</span>,name<span class="o">:</span>nubeam.name, $
-<a id="ln-105" name="ln-105"></a>           shape<span class="o">:</span>nubeam.nbshap,src<span class="o">:</span>src,<span class="nb">axis</span><span class="o">:</span><span class="nb">axis</span>, $
-<a id="ln-106" name="ln-106"></a>           focy<span class="o">:</span><span class="nb">double</span>(nubeam.foclr),focz<span class="o">:</span><span class="nb">double</span>(nubeam.foclz), $
-<a id="ln-107" name="ln-107"></a>           divy<span class="o">:</span><span class="nb">replicate</span>(<span class="nb">double</span>(nubeam.divr),<span class="mi">3</span>), $
-<a id="ln-108" name="ln-108"></a>           divz<span class="o">:</span><span class="nb">replicate</span>(<span class="nb">double</span>(nubeam.divz),<span class="mi">3</span>), $
-<a id="ln-109" name="ln-109"></a>           widy<span class="o">:</span><span class="nb">double</span>(nubeam.bmwidr), widz<span class="o">:</span><span class="nb">double</span>(nubeam.bmwidz), $
-<a id="ln-110" name="ln-110"></a>           naperture<span class="o">:</span><span class="nb">fix</span>(<span class="nb">n_elements</span>(nubeam.nbapsha)),ashape<span class="o">:</span>nubeam.nbapsha, $
-<a id="ln-111" name="ln-111"></a>           awidy<span class="o">:</span><span class="nb">double</span>(nubeam.rapedga),awidz<span class="o">:</span><span class="nb">double</span>(nubeam.xzpedga), $
-<a id="ln-112" name="ln-112"></a>           aoffy<span class="o">:</span><span class="nb">double</span>(nubeam.xrapoffa),aoffz<span class="o">:</span><span class="nb">double</span>(nubeam.xzapoffa), $
-<a id="ln-113" name="ln-113"></a>           adist<span class="o">:</span><span class="nb">double</span>(nubeam.xlbapa) }
-<a id="ln-114" name="ln-114"></a>
-<a id="ln-115" name="ln-115"></a>    <span class="nb">return</span>, nbi
-<a id="ln-116" name="ln-116"></a><span class="k">END</span>
+    <div class="hl"><pre><span></span><a id="ln-1" name="ln-1" href="#ln-1"></a><span class="k">FUNCTION</span><span class="w"> </span>nubeam_geometry,<span class="w"> </span>nubeam,<span class="w"> </span>angle<span class="o">=</span>angle,<span class="w"> </span>verbose<span class="o">=</span>verbose,<span class="nb">plot</span><span class="o">=</span><span class="nb">plot</span><span class="w"></span>
+<a id="ln-2" name="ln-2" href="#ln-2"></a><span class="w">    </span><span class="c1">;+#nubeam_geometry</span><span class="w"></span>
+<a id="ln-3" name="ln-3" href="#ln-3"></a><span class="w">    </span><span class="c1">;+Calculates the FIDASIM beam geometry from the beam geometry variables in the TRANSP/NUBEAM namelist</span><span class="w"></span>
+<a id="ln-4" name="ln-4" href="#ln-4"></a><span class="w">    </span><span class="c1">;+***</span><span class="w"></span>
+<a id="ln-5" name="ln-5" href="#ln-5"></a><span class="w">    </span><span class="c1">;+##Arguments</span><span class="w"></span>
+<a id="ln-6" name="ln-6" href="#ln-6"></a><span class="w">    </span><span class="c1">;+     **NUBEAM**: Structure containing the following</span><span class="w"></span>
+<a id="ln-7" name="ln-7" href="#ln-7"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-8" name="ln-8" href="#ln-8"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.NAME**: Ion source name</span><span class="w"></span>
+<a id="ln-9" name="ln-9" href="#ln-9"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-10" name="ln-10" href="#ln-10"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.NBSHAP**: Ion source shape 1=rectangular, 2=circular</span><span class="w"></span>
+<a id="ln-11" name="ln-11" href="#ln-11"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-12" name="ln-12" href="#ln-12"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.FOCLZ**: Vertical focal length [cm]</span><span class="w"></span>
+<a id="ln-13" name="ln-13" href="#ln-13"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-14" name="ln-14" href="#ln-14"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.FOCLR**: Horizontal focal length [cm]</span><span class="w"></span>
+<a id="ln-15" name="ln-15" href="#ln-15"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-16" name="ln-16" href="#ln-16"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.DIVZ**: Vertical divergence [rad]</span><span class="w"></span>
+<a id="ln-17" name="ln-17" href="#ln-17"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-18" name="ln-18" href="#ln-18"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.DIVR**: Horizontal divergence [rad]</span><span class="w"></span>
+<a id="ln-19" name="ln-19" href="#ln-19"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-20" name="ln-20" href="#ln-20"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.BMWIDZ**: Ion source half height [cm]</span><span class="w"></span>
+<a id="ln-21" name="ln-21" href="#ln-21"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-22" name="ln-22" href="#ln-22"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.BMWIDR**: Ion source half width [cm]</span><span class="w"></span>
+<a id="ln-23" name="ln-23" href="#ln-23"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-24" name="ln-24" href="#ln-24"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.RTCENA**: Radius of tangency point [cm]</span><span class="w"></span>
+<a id="ln-25" name="ln-25" href="#ln-25"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-26" name="ln-26" href="#ln-26"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XLBTNA**: Distance from center of beam source grid to tangency point [cm]</span><span class="w"></span>
+<a id="ln-27" name="ln-27" href="#ln-27"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-28" name="ln-28" href="#ln-28"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XBZETA**: Torodial angle [deg] Positive angles defined to be in the counter-clockwise direction</span><span class="w"></span>
+<a id="ln-29" name="ln-29" href="#ln-29"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-30" name="ln-30" href="#ln-30"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XYBSCA**: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]</span><span class="w"></span>
+<a id="ln-31" name="ln-31" href="#ln-31"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-32" name="ln-32" href="#ln-32"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.NLJCCW**: Orientation of Ip. 1 for True/Counter-clockwise current, 0 or -1 for False/Clock-wise current</span><span class="w"></span>
+<a id="ln-33" name="ln-33" href="#ln-33"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-34" name="ln-34" href="#ln-34"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.NLCO**: 1 for Co-beam, 0 or -1 for Counter-beam</span><span class="w"></span>
+<a id="ln-35" name="ln-35" href="#ln-35"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-36" name="ln-36" href="#ln-36"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.NBAPSHA**: Vector of aperture shapes 1=rectangular, 2=circular</span><span class="w"></span>
+<a id="ln-37" name="ln-37" href="#ln-37"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-38" name="ln-38" href="#ln-38"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XLBAPA**: Vector of distances from center of beam source grid to the aperture plane [cm]</span><span class="w"></span>
+<a id="ln-39" name="ln-39" href="#ln-39"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-40" name="ln-40" href="#ln-40"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XYBAPA**: Vector of elevation above/below vacuum vessel midplane of beam centerline at aperture [cm]</span><span class="w"></span>
+<a id="ln-41" name="ln-41" href="#ln-41"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-42" name="ln-42" href="#ln-42"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.RAPEDGA**: Vector of aperture half-widths [cm]</span><span class="w"></span>
+<a id="ln-43" name="ln-43" href="#ln-43"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-44" name="ln-44" href="#ln-44"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XZPEDGA**: Vector of aperture half-heights [cm]</span><span class="w"></span>
+<a id="ln-45" name="ln-45" href="#ln-45"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-46" name="ln-46" href="#ln-46"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XRAPOFFA**: Vector of horizontal (y) offsets relative to the +x aligned beam centerline [cm]</span><span class="w"></span>
+<a id="ln-47" name="ln-47" href="#ln-47"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-48" name="ln-48" href="#ln-48"></a><span class="w">    </span><span class="c1">;+     **NUBEAM.XZAPOFFA**: Vector of vertical (z) offsets relative to the +x aligned beam centerline [cm]</span><span class="w"></span>
+<a id="ln-49" name="ln-49" href="#ln-49"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-50" name="ln-50" href="#ln-50"></a><span class="w">    </span><span class="c1">;+##Keyword Arguments</span><span class="w"></span>
+<a id="ln-51" name="ln-51" href="#ln-51"></a><span class="w">    </span><span class="c1">;+     **angle**: Angle to add to XBZETA to rotate the beams into correct coordinates [deg]</span><span class="w"></span>
+<a id="ln-52" name="ln-52" href="#ln-52"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-53" name="ln-53" href="#ln-53"></a><span class="w">    </span><span class="c1">;+     **verbose**: Print out positions</span><span class="w"></span>
+<a id="ln-54" name="ln-54" href="#ln-54"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-55" name="ln-55" href="#ln-55"></a><span class="w">    </span><span class="c1">;+     **plot**: Plot the beam</span><span class="w"></span>
+<a id="ln-56" name="ln-56" href="#ln-56"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-57" name="ln-57" href="#ln-57"></a><span class="w">    </span><span class="c1">;+##Return Value</span><span class="w"></span>
+<a id="ln-58" name="ln-58" href="#ln-58"></a><span class="w">    </span><span class="c1">;+ Neutral beam structure</span><span class="w"></span>
+<a id="ln-59" name="ln-59" href="#ln-59"></a><span class="w">    </span><span class="c1">;+</span><span class="w"></span>
+<a id="ln-60" name="ln-60" href="#ln-60"></a><span class="w">    </span><span class="c1">;+##Example Usage</span><span class="w"></span>
+<a id="ln-61" name="ln-61" href="#ln-61"></a><span class="w">    </span><span class="c1">;+```idl</span><span class="w"></span>
+<a id="ln-62" name="ln-62" href="#ln-62"></a><span class="w">    </span><span class="c1">;+IDL&gt; nbi = nubeam_geometry(nubeam)</span><span class="w"></span>
+<a id="ln-63" name="ln-63" href="#ln-63"></a><span class="w">    </span><span class="c1">;+```</span><span class="w"></span>
+<a id="ln-64" name="ln-64" href="#ln-64"></a>
+<a id="ln-65" name="ln-65" href="#ln-65"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="nb">keyword_set</span>(angle)<span class="w"> </span><span class="k">then</span><span class="w"> </span>angle<span class="o">=</span><span class="mi">0</span><span class="w"></span>
+<a id="ln-66" name="ln-66" href="#ln-66"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span>nubeam.nlco<span class="w"> </span><span class="k">eq</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w"> </span>nubeam.nlco<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<a id="ln-67" name="ln-67" href="#ln-67"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">where</span>(<span class="nb">tag_names</span>(nubeam)<span class="w"> </span><span class="k">eq</span><span class="w"> </span><span class="s1">&#39;NLJCCW&#39;</span>)<span class="w"> </span><span class="k">ge</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<a id="ln-68" name="ln-68" href="#ln-68"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span>nubeam.nljccw<span class="w"> </span><span class="k">eq</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w"> </span>nubeam.nljccw<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"></span>
+<a id="ln-69" name="ln-69" href="#ln-69"></a><span class="w">    </span><span class="k">endif</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<a id="ln-70" name="ln-70" href="#ln-70"></a><span class="w">        </span>warn,<span class="s1">&#39;Current orientation not specified. Assuming Counter-clockwise.&#39;</span><span class="w"></span>
+<a id="ln-71" name="ln-71" href="#ln-71"></a><span class="w">        </span>nubeam<span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">create_struct</span>(nubeam,<span class="w"> </span><span class="s1">&#39;NLJCCW&#39;</span>,<span class="w"> </span><span class="mi">1</span>)<span class="w"></span>
+<a id="ln-72" name="ln-72" href="#ln-72"></a><span class="w">    </span><span class="k">endelse</span><span class="w"></span>
+<a id="ln-73" name="ln-73" href="#ln-73"></a>
+<a id="ln-74" name="ln-74" href="#ln-74"></a>
+<a id="ln-75" name="ln-75" href="#ln-75"></a><span class="w">    </span>phi_s<span class="o">=</span>(nubeam.XBZETA<span class="o">+</span>angle)<span class="o">*</span>!DPI<span class="o">/</span><span class="mf">180.0</span><span class="w"></span>
+<a id="ln-76" name="ln-76" href="#ln-76"></a><span class="w">    </span>zs<span class="o">=</span>nubeam.XYBSCA<span class="w"></span>
+<a id="ln-77" name="ln-77" href="#ln-77"></a><span class="w">    </span>za<span class="o">=</span>nubeam.XYBAPA[<span class="mi">0</span>]<span class="w"></span>
+<a id="ln-78" name="ln-78" href="#ln-78"></a><span class="w">    </span>alpha<span class="o">=</span><span class="nb">asin</span>((zs<span class="o">-</span>za)<span class="o">/</span>nubeam.XLBAPA[<span class="mi">0</span>])<span class="w"></span>
+<a id="ln-79" name="ln-79" href="#ln-79"></a><span class="w">    </span>pdst<span class="o">=</span>nubeam.XLBTNA<span class="o">*</span><span class="nb">cos</span>(alpha)<span class="w"></span>
+<a id="ln-80" name="ln-80" href="#ln-80"></a><span class="w">    </span>rs<span class="o">=</span><span class="nb">sqrt</span>(nubeam.RTCENA<span class="o">^</span><span class="mf">2.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>pdst<span class="o">^</span><span class="mf">2.0</span>)<span class="w"></span>
+<a id="ln-81" name="ln-81" href="#ln-81"></a><span class="w">    </span>dat<span class="o">=</span>nubeam.XLBTNA<span class="o">-</span>nubeam.XLBAPA[<span class="mi">0</span>]<span class="w"></span>
+<a id="ln-82" name="ln-82" href="#ln-82"></a><span class="w">    </span>pdat<span class="o">=</span>dat<span class="o">*</span><span class="nb">cos</span>(alpha)<span class="w"></span>
+<a id="ln-83" name="ln-83" href="#ln-83"></a><span class="w">    </span>ra<span class="o">=</span><span class="nb">sqrt</span>(nubeam.RTCENA<span class="o">^</span><span class="mf">2.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>pdat<span class="o">^</span><span class="mf">2.0</span>)<span class="w"></span>
+<a id="ln-84" name="ln-84" href="#ln-84"></a><span class="w">    </span>beta_s<span class="o">=</span><span class="nb">acos</span>(nubeam.RTCENA<span class="o">/</span>rs)<span class="w"></span>
+<a id="ln-85" name="ln-85" href="#ln-85"></a><span class="w">    </span>beta_a<span class="o">=</span><span class="nb">acos</span>(nubeam.RTCENA<span class="o">/</span>ra)<span class="w"></span>
+<a id="ln-86" name="ln-86" href="#ln-86"></a><span class="w">    </span>phi_a<span class="o">=</span>phi_s<span class="w"> </span><span class="o">+</span><span class="w"> </span>nubeam.NLJCCW<span class="o">*</span>nubeam.NLCO<span class="o">*</span>(beta_s<span class="o">-</span>beta_a)<span class="w"></span>
+<a id="ln-87" name="ln-87" href="#ln-87"></a>
+<a id="ln-88" name="ln-88" href="#ln-88"></a><span class="w">    </span>src<span class="o">=</span>[rs<span class="o">*</span><span class="nb">cos</span>(phi_s),rs<span class="o">*</span><span class="nb">sin</span>(phi_s),zs]<span class="w"></span>
+<a id="ln-89" name="ln-89" href="#ln-89"></a><span class="w">    </span>aper_src<span class="o">=</span>[ra<span class="o">*</span><span class="nb">cos</span>(phi_a),ra<span class="o">*</span><span class="nb">sin</span>(phi_a),za]<span class="w"></span>
+<a id="ln-90" name="ln-90" href="#ln-90"></a><span class="w">    </span><span class="nb">axis</span><span class="o">=</span>(aper_src<span class="o">-</span>src)<span class="w"></span>
+<a id="ln-91" name="ln-91" href="#ln-91"></a><span class="w">    </span><span class="nb">axis</span><span class="o">=</span><span class="nb">axis</span><span class="o">/</span><span class="nb">sqrt</span>(<span class="nb">total</span>(<span class="nb">axis</span><span class="o">^</span><span class="mi">2</span>))<span class="w"></span>
+<a id="ln-92" name="ln-92" href="#ln-92"></a><span class="w">    </span>pos<span class="o">=</span>src<span class="o">+</span><span class="nb">axis</span><span class="o">*</span>nubeam.XLBTNA<span class="w"></span>
+<a id="ln-93" name="ln-93" href="#ln-93"></a>
+<a id="ln-94" name="ln-94" href="#ln-94"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">keyword_set</span>(verbose)<span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<a id="ln-95" name="ln-95" href="#ln-95"></a><span class="w">        </span><span class="nb">print</span>,<span class="s1">&#39;Source position: &#39;</span>,src<span class="w"></span>
+<a id="ln-96" name="ln-96" href="#ln-96"></a><span class="w">        </span><span class="nb">print</span>,<span class="s1">&#39;1st Aperture position: &#39;</span>,aper_src<span class="w"></span>
+<a id="ln-97" name="ln-97" href="#ln-97"></a><span class="w">        </span><span class="nb">print</span>,<span class="s1">&#39;Tangency position: &#39;</span>,<span class="w"> </span>pos<span class="w"></span>
+<a id="ln-98" name="ln-98" href="#ln-98"></a><span class="w">    </span><span class="k">endif</span><span class="w"></span>
+<a id="ln-99" name="ln-99" href="#ln-99"></a>
+<a id="ln-100" name="ln-100" href="#ln-100"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nb">keyword_set</span>(<span class="nb">plot</span>)<span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span><span class="w"></span>
+<a id="ln-101" name="ln-101" href="#ln-101"></a><span class="w">        </span><span class="nb">plot</span>,[src[<span class="mi">0</span>],pos[<span class="mi">0</span>]],[src[<span class="mi">1</span>],pos[<span class="mi">1</span>]]<span class="w"></span>
+<a id="ln-102" name="ln-102" href="#ln-102"></a><span class="w">    </span><span class="k">endif</span><span class="w"></span>
+<a id="ln-103" name="ln-103" href="#ln-103"></a>
+<a id="ln-104" name="ln-104" href="#ln-104"></a><span class="w">    </span>nbi<span class="w"> </span><span class="o">=</span><span class="w"> </span>{data_source<span class="o">:</span><span class="s2">&quot;TRANSP/NUBEAM namelist&quot;</span>,name<span class="o">:</span>nubeam.name,<span class="w"> </span>$<span class="w"></span>
+<a id="ln-105" name="ln-105" href="#ln-105"></a><span class="w">           </span>shape<span class="o">:</span>nubeam.nbshap,src<span class="o">:</span>src,<span class="nb">axis</span><span class="o">:</span><span class="nb">axis</span>,<span class="w"> </span>$<span class="w"></span>
+<a id="ln-106" name="ln-106" href="#ln-106"></a><span class="w">           </span>focy<span class="o">:</span><span class="nb">double</span>(nubeam.foclr),focz<span class="o">:</span><span class="nb">double</span>(nubeam.foclz),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-107" name="ln-107" href="#ln-107"></a><span class="w">           </span>divy<span class="o">:</span><span class="nb">replicate</span>(<span class="nb">double</span>(nubeam.divr),<span class="mi">3</span>),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-108" name="ln-108" href="#ln-108"></a><span class="w">           </span>divz<span class="o">:</span><span class="nb">replicate</span>(<span class="nb">double</span>(nubeam.divz),<span class="mi">3</span>),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-109" name="ln-109" href="#ln-109"></a><span class="w">           </span>widy<span class="o">:</span><span class="nb">double</span>(nubeam.bmwidr),<span class="w"> </span>widz<span class="o">:</span><span class="nb">double</span>(nubeam.bmwidz),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-110" name="ln-110" href="#ln-110"></a><span class="w">           </span>naperture<span class="o">:</span><span class="nb">fix</span>(<span class="nb">n_elements</span>(nubeam.nbapsha)),ashape<span class="o">:</span>nubeam.nbapsha,<span class="w"> </span>$<span class="w"></span>
+<a id="ln-111" name="ln-111" href="#ln-111"></a><span class="w">           </span>awidy<span class="o">:</span><span class="nb">double</span>(nubeam.rapedga),awidz<span class="o">:</span><span class="nb">double</span>(nubeam.xzpedga),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-112" name="ln-112" href="#ln-112"></a><span class="w">           </span>aoffy<span class="o">:</span><span class="nb">double</span>(nubeam.xrapoffa),aoffz<span class="o">:</span><span class="nb">double</span>(nubeam.xzapoffa),<span class="w"> </span>$<span class="w"></span>
+<a id="ln-113" name="ln-113" href="#ln-113"></a><span class="w">           </span>adist<span class="o">:</span><span class="nb">double</span>(nubeam.xlbapa)<span class="w"> </span>}<span class="w"></span>
+<a id="ln-114" name="ln-114" href="#ln-114"></a>
+<a id="ln-115" name="ln-115" href="#ln-115"></a><span class="w">    </span><span class="nb">return</span>,<span class="w"> </span>nbi<span class="w"></span>
+<a id="ln-116" name="ln-116" href="#ln-116"></a><span class="k">END</span><span class="w"></span>
 </pre></div>
 
     </section>
     </div>
   </div>
 
-  
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -441,14 +330,11 @@
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

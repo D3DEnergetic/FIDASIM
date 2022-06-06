@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
    <meta name="description" content="">
-    
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
@@ -16,10 +14,7 @@
     <link href="../css/pygments.css" rel="stylesheet">
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
-    
     <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    
-    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,60 +43,28 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-        
             <li><a href='../page/index.html'>User Guide</a></li>
-      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
      aria-expanded="false">Contents <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          
-              
             <li><a href="../lists/files.html">Source Files</a></li>
-        
-        
-        
             <li><a href="../lists/modules.html">Modules</a></li>
-        
-            
-                                
             <li><a href="../lists/procedures.html">Procedures</a></li>
-        
-               
-            <li><a href="../lists/types.html">Derived Types</a></li>
-        
-        
+                   <li><a href="../lists/types.html">Derived Types</a></li>
             <li><a href="../lists/programs.html">Programs</a></li>
-               
-        
-        
+       
             </ul>
         
             </li>
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
-
-
-
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
-
-                             
-<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
-
-
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
-
-
-
           </ul>
-        
         <form action="../search.html" class="navbar-form navbar-right" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
@@ -110,51 +73,29 @@
         <button type="submit" class="btn btn-default">Submit</button>
 -->
         </form>
-        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-    
-  
   <div class="row">
     <h1>bt_maxwellian_n_m
       <small>Subroutine</small>
-    
     </h1>
-    
-<div class="row">
+    <div class="row">
   <div class="col-lg-12">
 <div class="well well-sm">
   <ul class="list-inline" style="margin-bottom:0px;display:inline">
-     
-     
-     
-     
-     
-    
-    
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
     title=" 0.6% of total for procedures.">79 statements</a>
      </li> 
-     
-     
-     
     <li><i class="fa fa-code"></i><a href="../src/atomic_tables.f90"> Source File</a></li>
-     
-     
   </ul>
   <ol class="breadcrumb in-well text-right">
-  
-    
      <li><a href='../sourcefile/atomic_tables.f90.html'>atomic_tables.f90</a></li>
-    
      <li><a href='../module/atomic_tables.html'>atomic_tables</a></li>
-    
-  
      <li class="active">bt_maxwellian_n_m</li>
   </ol>
 </div>
@@ -170,32 +111,9 @@
   
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
-    
-<div id="sidebar">
-  
-<h3>Contents</h3>
+    <div id="sidebar">
+  <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -203,268 +121,105 @@
   </div>
 </div>
 
-
-
 </div>
 
     </div>
     
     <div class="col-md-9" id='text'>
-    <h2>
-public subroutine bt_maxwellian_n_m(fnm, T, eb, am, ab, n, m, rate, deexcit)
+    <h2>public subroutine bt_maxwellian_n_m(fnm, T, eb, am, ab, n, m, rate, deexcit)</h2>
     
-    
-   
-</h2>
-    
-  
 
-
-    
     <p>Calculates Maxwellian reaction rate for a <code>n</code>(\rightarrow)<code>m</code> transition due to a beam with atomic mass <code>ab</code> and energy <code>eb</code>
 firing into a target with atomic mass <code>am</code> and temperature <code>T</code> which has a cross section given by the function <code>fnm</code></p>
-    
 
     <h3>Arguments</h3>
-    
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td colspan="7">
-      <small>
+      <small><h5>public function fnm(a, b, c)</h5><p>Cross section function</p>
     
-    <h5>
-public function fnm(a, b, c)
-    
-    
-   
-</h5>
-    
-
-
-
-<p>Cross section function</p>
-    
-    <h6>Arguments</h6>
-    
-      
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
+<h6>Arguments</h6>      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
 <tbody>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" ></span>real(kind=8),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>a</strong></td><td></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" ></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>b</strong></td><td></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" ></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>c</strong></td><td></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-      
-    
-    
-
-  
-  
-  
-  
-     <h6>Return Value <small>real(kind=8)
-  </small></h6>
-  
-    
+<h6>Return Value <small>real(kind=8)</small></h6>  
 </small>
   </td> 
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-t%7E4"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>T</strong></td><td><p>Target temperature [keV]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-eb%7E101"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>eb</strong></td><td><p>Beam energy [keV]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-am%7E4"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>am</strong></td><td><p>Target atomic mass [amu]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-ab%7E6"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>ab</strong></td><td><p>Beam atomic mass [amu]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-n%7E35"></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>n</strong></td><td><p>Initial atomic energy level/state</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-m%7E6"></span>integer,</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>m</strong></td><td><p>Final atomic energy level/state</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-rate%7E7"></span>real(kind=Float64),</td>
-  <td>intent(out)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
+<td>intent(out)</td>
+  <td></td>  <td></td><td>::</td>
   <td><strong>rate</strong></td><td><p>Reaction Rate [<script type="math/tex">cm^3/s</script>]</p></td>
-  
 </tr>
-
-  
-  
-  
-  
 <tr>
-  
   <td><span class="anchor" id="variable-deexcit"></span>logical,</td>
-  <td>intent(in),</td>
-  <td>optional</td>
-  
-  <td></td><td>::</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
   <td><strong>deexcit</strong></td><td><p>Calculate de-excitation reaction rate</p></td>
-  
 </tr>
-
 </tbody>
 </table>
 
-    
-    
-    
     <br>
-    
-    
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Calls</h3>
@@ -556,8 +311,6 @@ public function fnm(a, b, c)
     </div></div></div></div>
       </div>
     </div>
-     
-     
     <div class="panel panel-default">
       <div class="panel-heading">
   <h3 class="panel-title">Called by</h3>
@@ -592,16 +345,16 @@ public function fnm(a, b, c)
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M206.1,-117C214.433,-117 223.433,-117 232.397,-117"/>
 <polygon fill="#000000" stroke="#000000" points="232.464,-120.5 242.464,-117 232.464,-113.5 232.464,-120.5"/>
 </g>
-<!-- proc~write_bt_h_e -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node3" class="node"><title>proc~write_bt_h_e</title>
-<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node3"><a xlink:href=".././proc/write_bt_h_e.html" xlink:title="write_bt_H_e">
-<polygon fill="#d9534f" stroke="#d9534f" points="83,-234 7,-234 7,-210 83,-210 83,-234"/>
-<text text-anchor="middle" x="45" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_H_e</text>
+<!-- proc~write_bt_d_d -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node3" class="node"><title>proc~write_bt_d_d</title>
+<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node3"><a xlink:href=".././proc/write_bt_d_d.html" xlink:title="write_bt_D_D">
+<polygon fill="#d9534f" stroke="#d9534f" points="83.5,-234 6.5,-234 6.5,-210 83.5,-210 83.5,-234"/>
+<text text-anchor="middle" x="45" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_D</text>
 </a>
 </g>
 </g>
-<!-- proc~write_bt_h_e&#45;&gt;interface~bt_maxwellian -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge2" class="edge"><title>proc~write_bt_h_e&#45;&gt;interface~bt_maxwellian</title>
+<!-- proc~write_bt_d_d&#45;&gt;interface~bt_maxwellian -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge2" class="edge"><title>proc~write_bt_d_d&#45;&gt;interface~bt_maxwellian</title>
 <path fill="none" stroke="#000000" d="M75.8125,-209.767C80.75,-207.189 85.6667,-204.251 90,-201 114.191,-182.852 136.531,-155.966 150.424,-137.528"/>
 <polygon fill="#000000" stroke="#000000" points="153.424,-139.358 156.537,-129.231 147.788,-135.206 153.424,-139.358"/>
 </g>
@@ -618,55 +371,55 @@ public function fnm(a, b, c)
 <path fill="none" stroke="#000000" d="M72.1967,-167.842C78.0893,-165.011 84.2878,-161.959 90,-159 105.074,-151.193 121.559,-142.031 135.226,-134.261"/>
 <polygon fill="#000000" stroke="#000000" points="137.242,-137.14 144.185,-129.137 133.767,-131.063 137.242,-137.14"/>
 </g>
+<!-- proc~write_bt_h_e -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node5" class="node"><title>proc~write_bt_h_e</title>
+<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node5"><a xlink:href=".././proc/write_bt_h_e.html" xlink:title="write_bt_H_e">
+<polygon fill="#d9534f" stroke="#d9534f" points="83,-150 7,-150 7,-126 83,-126 83,-150"/>
+<text text-anchor="middle" x="45" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_H_e</text>
+</a>
+</g>
+</g>
+<!-- proc~write_bt_h_e&#45;&gt;interface~bt_maxwellian -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge4" class="edge"><title>proc~write_bt_h_e&#45;&gt;interface~bt_maxwellian</title>
+<path fill="none" stroke="#000000" d="M83,-131.471C93.4474,-129.627 104.98,-127.592 116.015,-125.644"/>
+<polygon fill="#000000" stroke="#000000" points="116.723,-129.074 125.963,-123.889 115.507,-122.18 116.723,-129.074"/>
+</g>
 <!-- proc~write_bt_h_aq -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node5" class="node"><title>proc~write_bt_h_aq</title>
-<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node5"><a xlink:href=".././proc/write_bt_h_aq.html" xlink:title="write_bt_H_Aq">
-<polygon fill="#d9534f" stroke="#d9534f" points="86,-150 4,-150 4,-126 86,-126 86,-150"/>
-<text text-anchor="middle" x="45" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_H_Aq</text>
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node6" class="node"><title>proc~write_bt_h_aq</title>
+<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node6"><a xlink:href=".././proc/write_bt_h_aq.html" xlink:title="write_bt_H_Aq">
+<polygon fill="#d9534f" stroke="#d9534f" points="86,-108 4,-108 4,-84 86,-84 86,-108"/>
+<text text-anchor="middle" x="45" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_H_Aq</text>
 </a>
 </g>
 </g>
 <!-- proc~write_bt_h_aq&#45;&gt;interface~bt_maxwellian -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge4" class="edge"><title>proc~write_bt_h_aq&#45;&gt;interface~bt_maxwellian</title>
-<path fill="none" stroke="#000000" d="M86.288,-130.89C95.7963,-129.212 106.038,-127.405 115.888,-125.667"/>
-<polygon fill="#000000" stroke="#000000" points="116.723,-129.074 125.963,-123.889 115.507,-122.18 116.723,-129.074"/>
-</g>
-<!-- proc~write_bt_d_t -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node6" class="node"><title>proc~write_bt_d_t</title>
-<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node6"><a xlink:href=".././proc/write_bt_d_t.html" xlink:title="write_bt_D_T">
-<polygon fill="#d9534f" stroke="#d9534f" points="83,-108 7,-108 7,-84 83,-84 83,-108"/>
-<text text-anchor="middle" x="45" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_T</text>
-</a>
-</g>
-</g>
-<!-- proc~write_bt_d_t&#45;&gt;interface~bt_maxwellian -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge5" class="edge"><title>proc~write_bt_d_t&#45;&gt;interface~bt_maxwellian</title>
-<path fill="none" stroke="#000000" d="M83,-102.529C93.4474,-104.373 104.98,-106.408 116.015,-108.356"/>
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge5" class="edge"><title>proc~write_bt_h_aq&#45;&gt;interface~bt_maxwellian</title>
+<path fill="none" stroke="#000000" d="M86.288,-103.11C95.7963,-104.788 106.038,-106.595 115.888,-108.333"/>
 <polygon fill="#000000" stroke="#000000" points="115.507,-111.82 125.963,-110.111 116.723,-104.926 115.507,-111.82"/>
 </g>
-<!-- proc~write_bt_d_d -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node7" class="node"><title>proc~write_bt_d_d</title>
-<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node7"><a xlink:href=".././proc/write_bt_d_d.html" xlink:title="write_bt_D_D">
-<polygon fill="#d9534f" stroke="#d9534f" points="83.5,-66 6.5,-66 6.5,-42 83.5,-42 83.5,-66"/>
-<text text-anchor="middle" x="45" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_D</text>
-</a>
-</g>
-</g>
-<!-- proc~write_bt_d_d&#45;&gt;interface~bt_maxwellian -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge6" class="edge"><title>proc~write_bt_d_d&#45;&gt;interface~bt_maxwellian</title>
-<path fill="none" stroke="#000000" d="M72.1967,-66.1585C78.0893,-68.9887 84.2878,-72.0414 90,-75 105.074,-82.8072 121.559,-91.9686 135.226,-99.7394"/>
-<polygon fill="#000000" stroke="#000000" points="133.767,-102.937 144.185,-104.863 137.242,-96.8604 133.767,-102.937"/>
-</g>
 <!-- proc~write_bt_d_he3 -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node8" class="node"><title>proc~write_bt_d_he3</title>
-<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node8"><a xlink:href=".././proc/write_bt_d_he3.html" xlink:title="write_bt_D_He3">
-<polygon fill="#d9534f" stroke="#d9534f" points="89.5,-24 0.5,-24 0.5,-0 89.5,-0 89.5,-24"/>
-<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_He3</text>
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node7" class="node"><title>proc~write_bt_d_he3</title>
+<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node7"><a xlink:href=".././proc/write_bt_d_he3.html" xlink:title="write_bt_D_He3">
+<polygon fill="#d9534f" stroke="#d9534f" points="89.5,-66 0.5,-66 0.5,-42 89.5,-42 89.5,-66"/>
+<text text-anchor="middle" x="45" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_He3</text>
 </a>
 </g>
 </g>
 <!-- proc~write_bt_d_he3&#45;&gt;interface~bt_maxwellian -->
-<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge7" class="edge"><title>proc~write_bt_d_he3&#45;&gt;interface~bt_maxwellian</title>
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge6" class="edge"><title>proc~write_bt_d_he3&#45;&gt;interface~bt_maxwellian</title>
+<path fill="none" stroke="#000000" d="M72.1967,-66.1585C78.0893,-68.9887 84.2878,-72.0414 90,-75 105.074,-82.8072 121.559,-91.9686 135.226,-99.7394"/>
+<polygon fill="#000000" stroke="#000000" points="133.767,-102.937 144.185,-104.863 137.242,-96.8604 133.767,-102.937"/>
+</g>
+<!-- proc~write_bt_d_t -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_node8" class="node"><title>proc~write_bt_d_t</title>
+<g id="a_proc~~bt_maxwellian_n_m~~CalledByGraph_node8"><a xlink:href=".././proc/write_bt_d_t.html" xlink:title="write_bt_D_T">
+<polygon fill="#d9534f" stroke="#d9534f" points="83,-24 7,-24 7,-0 83,-0 83,-24"/>
+<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bt_D_T</text>
+</a>
+</g>
+</g>
+<!-- proc~write_bt_d_t&#45;&gt;interface~bt_maxwellian -->
+<g id="proc~~bt_maxwellian_n_m~~CalledByGraph_edge7" class="edge"><title>proc~write_bt_d_t&#45;&gt;interface~bt_maxwellian</title>
 <path fill="none" stroke="#000000" d="M75.8125,-24.233C80.75,-26.8113 85.6667,-29.7492 90,-33 114.191,-51.1481 136.531,-78.034 150.424,-96.472"/>
 <polygon fill="#000000" stroke="#000000" points="147.788,-98.7943 156.537,-104.769 153.424,-94.6424 147.788,-98.7943"/>
 </g>
@@ -727,34 +480,11 @@ public function fnm(a, b, c)
     </div></div></div></div>
       </div>
     </div>
-     
     <br>
 
     <section class="visible-xs visible-sm hidden-md">
-      
-<h3>Contents</h3>
+      <h3>Contents</h3>
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
@@ -762,157 +492,142 @@ public function fnm(a, b, c)
   </div>
 </div>
 
-
-
     </section>
     <br class="visible-xs visible-sm hidden-md">
 
-    
 
-    
-    
-    
     
     
 
     
     
-    
-    
-    
 
 
-    
-    
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bt_maxwellian_n_m</span><span class="p">(</span><span class="n">fnm</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="n">am</span><span class="p">,</span> <span class="n">ab</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">deexcit</span><span class="p">)</span>
-    <span class="c">!+ Calculates Maxwellian reaction rate for a `n`\(\rightarrow)`m` transition due to a beam with atomic mass `ab` and energy `eb`</span>
-    <span class="c">!+firing into a target with atomic mass `am` and temperature `T` which has a cross section given by the function `fnm`</span>
-    <span class="k">interface</span>
-<span class="k">        function </span><span class="n">fnm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-            <span class="c">!+Cross section function</span>
-            <span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">fnm</span> <span class="c">!sigma</span>
-            <span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span> <span class="c">!eb</span>
-            <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b</span> <span class="c">!n</span>
-            <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">c</span> <span class="c">!m</span>
-        <span class="k">end function </span><span class="n">fnm</span>
-    <span class="k">end interface</span>
-<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">T</span>
-        <span class="c">!+Target temperature [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">eb</span>
-        <span class="c">!+Beam energy [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">am</span>
-        <span class="c">!+Target atomic mass [amu]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">ab</span>
-        <span class="c">!+Beam atomic mass [amu]</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">n</span>
-        <span class="c">!+Initial atomic energy level/state</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">m</span>
-        <span class="c">!+Final atomic energy level/state</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">rate</span>
-        <span class="c">!+Reaction Rate [\(cm^3/s\)]</span>
-    <span class="kt">logical</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">deexcit</span>
-        <span class="c">!+Calculate de-excitation reaction rate</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bt_maxwellian_n_m</span><span class="p">(</span><span class="n">fnm</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">eb</span><span class="p">,</span><span class="w"> </span><span class="n">am</span><span class="p">,</span><span class="w"> </span><span class="n">ab</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">rate</span><span class="p">,</span><span class="w"> </span><span class="n">deexcit</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Calculates Maxwellian reaction rate for a `n`\(\rightarrow)`m` transition due to a beam with atomic mass `ab` and energy `eb`</span>
+<span class="w">    </span><span class="c">!+firing into a target with atomic mass `am` and temperature `T` which has a cross section given by the function `fnm`</span>
+<span class="w">    </span><span class="k">interface</span>
+<span class="k">        function </span><span class="n">fnm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="c">!+Cross section function</span>
+<span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="w">             </span><span class="kd">::</span><span class="w"> </span><span class="n">fnm</span><span class="w"> </span><span class="c">!sigma</span>
+<span class="w">            </span><span class="kt">real</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="c">!eb</span>
+<span class="w">            </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="c">!n</span>
+<span class="w">            </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="c">!m</span>
+<span class="w">        </span><span class="k">end function </span><span class="n">fnm</span><span class="w"></span>
+<span class="w">    </span><span class="k">end interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">T</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Target temperature [keV]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">eb</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Beam energy [keV]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">am</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Target atomic mass [amu]</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">     </span><span class="kd">::</span><span class="w"> </span><span class="n">ab</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Beam atomic mass [amu]</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Initial atomic energy level/state</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">           </span><span class="kd">::</span><span class="w"> </span><span class="n">m</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Final atomic energy level/state</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w">    </span><span class="kd">::</span><span class="w"> </span><span class="n">rate</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Reaction Rate [\(cm^3/s\)]</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">deexcit</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+Calculate de-excitation reaction rate</span>
 
-    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">dxc</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_vr</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr_max</span><span class="p">,</span> <span class="n">dvr</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fr</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_vz</span> <span class="o">=</span> <span class="mi">60</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz_max</span><span class="p">,</span><span class="n">dvz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">T_per_amu</span><span class="p">,</span> <span class="n">eb_per_amu</span><span class="p">,</span> <span class="n">ared</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sig_eff</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zb</span><span class="p">,</span> <span class="n">u2_to_erel</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">erel</span><span class="p">,</span> <span class="n">dE</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">En</span><span class="p">,</span> <span class="n">Em</span><span class="p">,</span> <span class="n">v_therm</span>
+<span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dxc</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_vr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vr_max</span><span class="p">,</span><span class="w"> </span><span class="n">dvr</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vr</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fr</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">n_vz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vz_max</span><span class="p">,</span><span class="n">dvz</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">vz</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fz</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">T_per_amu</span><span class="p">,</span><span class="w"> </span><span class="n">eb_per_amu</span><span class="p">,</span><span class="w"> </span><span class="n">ared</span><span class="p">,</span><span class="w"> </span><span class="n">sig</span><span class="p">,</span><span class="w"> </span><span class="n">sig_eff</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zb</span><span class="p">,</span><span class="w"> </span><span class="n">u2_to_erel</span><span class="p">,</span><span class="w"> </span><span class="n">u2</span><span class="p">,</span><span class="w"> </span><span class="n">erel</span><span class="p">,</span><span class="w"> </span><span class="n">dE</span><span class="p">,</span><span class="w"> </span><span class="n">factor</span><span class="p">,</span><span class="w"> </span><span class="n">En</span><span class="p">,</span><span class="w"> </span><span class="n">Em</span><span class="p">,</span><span class="w"> </span><span class="n">v_therm</span><span class="w"></span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="w"></span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">deexcit</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">dxc</span> <span class="o">=</span> <span class="n">deexcit</span>
-    <span class="k">else</span>
-<span class="k">        </span><span class="n">dxc</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
-    <span class="k">endif</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">deexcit</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">dxc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">deexcit</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">        </span><span class="n">dxc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">False</span><span class="p">.</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
 
-<span class="k">    </span><span class="n">vr_max</span> <span class="o">=</span> <span class="mf">4.d0</span>
-    <span class="n">dvr</span> <span class="o">=</span> <span class="n">vr_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vr</span> <span class="o">-</span> <span class="mf">1.d0</span><span class="p">)</span>
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vr</span>
-        <span class="n">vr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dvr</span>
-    <span class="k">enddo</span>
+<span class="k">    </span><span class="n">vr_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.d0</span><span class="w"></span>
+<span class="w">    </span><span class="n">dvr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vr_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.d0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vr</span><span class="w"></span>
+<span class="w">        </span><span class="n">vr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dvr</span><span class="w"></span>
+<span class="w">    </span><span class="k">enddo</span>
 
-<span class="k">    </span><span class="n">vz_max</span> <span class="o">=</span> <span class="mf">4.d0</span>
-    <span class="n">dvz</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">vz_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vz</span> <span class="o">-</span> <span class="mf">1.d0</span><span class="p">)</span>
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vz</span>
-        <span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dvz</span> <span class="o">-</span> <span class="n">vz_max</span>
-    <span class="k">enddo</span>
+<span class="k">    </span><span class="n">vz_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.d0</span><span class="w"></span>
+<span class="w">    </span><span class="n">dvz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="o">*</span><span class="n">vz_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.d0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vz</span><span class="w"></span>
+<span class="w">        </span><span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dvz</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">vz_max</span><span class="w"></span>
+<span class="w">    </span><span class="k">enddo</span>
 
-<span class="k">    </span><span class="n">En</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="mf">3.6d-3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.d0</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">Em</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="mf">3.6d-3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.d0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">dE</span> <span class="o">=</span> <span class="n">Em</span> <span class="o">-</span> <span class="n">En</span>
+<span class="k">    </span><span class="n">En</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">3.6d-3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mf">1.d0</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">Em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">3.6d-3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mf">1.d0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">dE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Em</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">En</span><span class="w"></span>
 
-    <span class="n">T_per_amu</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mf">1.d-6</span><span class="p">)</span><span class="o">/</span><span class="n">am</span>
-    <span class="n">eb_per_amu</span> <span class="o">=</span> <span class="n">eb</span><span class="o">/</span><span class="n">ab</span>
-    <span class="n">ared</span> <span class="o">=</span> <span class="n">am</span><span class="o">*</span><span class="n">ab</span><span class="o">/</span><span class="p">(</span><span class="n">am</span> <span class="o">+</span> <span class="n">ab</span><span class="p">)</span>
+<span class="w">    </span><span class="n">T_per_amu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="mf">1.d-6</span><span class="p">)</span><span class="o">/</span><span class="n">am</span><span class="w"></span>
+<span class="w">    </span><span class="n">eb_per_amu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eb</span><span class="o">/</span><span class="n">ab</span><span class="w"></span>
+<span class="w">    </span><span class="n">ared</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">am</span><span class="o">*</span><span class="n">ab</span><span class="o">/</span><span class="p">(</span><span class="n">am</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ab</span><span class="p">)</span><span class="w"></span>
 
-    <span class="n">v_therm</span> <span class="o">=</span> <span class="mf">1.384d6</span> <span class="o">*</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">T_per_amu</span><span class="o">*</span><span class="mf">1.d3</span><span class="p">)</span>
-    <span class="n">zb</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">eb_per_amu</span><span class="o">/</span><span class="n">T_per_amu</span><span class="p">)</span>
-    <span class="n">u2_to_erel</span> <span class="o">=</span> <span class="n">ared</span><span class="o">*</span><span class="n">T_per_amu</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">ared</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.5</span><span class="p">)</span> <span class="n">ared</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="w">    </span><span class="n">v_therm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.384d6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">T_per_amu</span><span class="o">*</span><span class="mf">1.d3</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">zb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">eb_per_amu</span><span class="o">/</span><span class="n">T_per_amu</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">u2_to_erel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ared</span><span class="o">*</span><span class="n">T_per_amu</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">ared</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="n">ared</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"></span>
 
-    <span class="n">fz</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="n">fr</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<span class="w">    </span><span class="n">fz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
+<span class="w">    </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
 
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vz</span>
-        <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vr</span>
-            <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="n">zb</span> <span class="o">-</span> <span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span>
-            <span class="n">erel</span> <span class="o">=</span> <span class="n">u2_to_erel</span><span class="o">*</span><span class="n">u2</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">dxc</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="n">erel</span> <span class="o">+</span> <span class="n">dE</span><span class="p">)</span><span class="o">/</span><span class="n">erel</span>
-                <span class="n">erel</span> <span class="o">=</span> <span class="n">erel</span> <span class="o">+</span> <span class="n">dE</span>
-            <span class="k">else</span>
-<span class="k">                </span><span class="n">factor</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="k">endif</span>
-<span class="k">            if</span><span class="p">(</span><span class="n">erel</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="n">dE</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">sig</span> <span class="o">=</span> <span class="n">fnm</span><span class="p">(</span><span class="n">erel</span><span class="o">/</span><span class="n">ared</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
-            <span class="k">else</span>
-<span class="k">                </span><span class="n">sig</span> <span class="o">=</span> <span class="mf">0.d0</span>
-            <span class="k">endif</span>
-<span class="k">            </span><span class="n">fr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">factor</span><span class="o">*</span><span class="n">sig</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">*</span><span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-        <span class="k">enddo</span>
-<span class="k">        </span><span class="n">fz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">simpsons_rule</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">dvr</span><span class="p">)</span>
-    <span class="k">enddo</span>
+<span class="w">    </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vz</span><span class="w"></span>
+<span class="w">        </span><span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vr</span><span class="w"></span>
+<span class="w">            </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">zb</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">))</span><span class="o">**</span><span class="mf">2.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="w"></span>
+<span class="w">            </span><span class="n">erel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u2_to_erel</span><span class="o">*</span><span class="n">u2</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">dxc</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">erel</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dE</span><span class="p">)</span><span class="o">/</span><span class="n">erel</span><span class="w"></span>
+<span class="w">                </span><span class="n">erel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">erel</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dE</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
+<span class="k">            if</span><span class="p">(</span><span class="n">erel</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="n">dE</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">sig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fnm</span><span class="p">(</span><span class="n">erel</span><span class="o">/</span><span class="n">ared</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">sig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span><span class="w"></span>
+<span class="w">            </span><span class="k">endif</span>
+<span class="k">            </span><span class="n">fr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factor</span><span class="o">*</span><span class="n">sig</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span><span class="p">))</span><span class="o">*</span><span class="n">vr</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">enddo</span>
+<span class="k">        </span><span class="n">fz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simpsons_rule</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span><span class="w"> </span><span class="n">dvr</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">enddo</span>
 
-<span class="k">    </span><span class="n">sig_eff</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">PI</span><span class="p">))</span><span class="o">*</span><span class="n">simpsons_rule</span><span class="p">(</span><span class="n">fz</span><span class="p">,</span> <span class="n">dvz</span><span class="p">)</span>
-    <span class="n">rate</span> <span class="o">=</span> <span class="n">sig_eff</span><span class="o">*</span><span class="n">v_therm</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">dxc</span><span class="p">)</span> <span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">*</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">m</span><span class="p">))</span><span class="o">**</span><span class="mf">2.0</span>
+<span class="k">    </span><span class="n">sig_eff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">PI</span><span class="p">))</span><span class="o">*</span><span class="n">simpsons_rule</span><span class="p">(</span><span class="n">fz</span><span class="p">,</span><span class="w"> </span><span class="n">dvz</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sig_eff</span><span class="o">*</span><span class="n">v_therm</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">dxc</span><span class="p">)</span><span class="w"> </span><span class="n">rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rate</span><span class="o">*</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">m</span><span class="p">))</span><span class="o">**</span><span class="mf">2.0</span><span class="w"></span>
 
-<span class="k">end subroutine </span><span class="n">bt_maxwellian_n_m</span>
+<span class="k">end subroutine </span><span class="n">bt_maxwellian_n_m</span><span class="w"></span>
 </pre></div>
 
     </section>
     <br>
     
-    
     </div>
   </div>
-
 
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2021 
-                                          </p>
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
         </div>
         <div class="col-xs-6 col-md-6">
           <p class="text-right">
             Documentation generated by 
             <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
-            
-            
           </p>
         </div>
       </div>
@@ -940,14 +655,11 @@ public function fnm(a, b, c)
         extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
     
     <script src="../tipuesearch/tipuesearch_content.js"></script>
     <script src="../tipuesearch/tipuesearch_set.js"></script>
     <script src="../tipuesearch/tipuesearch.js"></script>
-    
     
   </body>
 </html>

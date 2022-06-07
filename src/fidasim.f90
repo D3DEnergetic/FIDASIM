@@ -101,7 +101,7 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-integer :: reservoir_size = 50
+integer, parameter :: reservoir_size = 50
     !+ Size of Neutral Particle Reservoir
 
 !!Loop Parallization Settings
@@ -903,7 +903,7 @@ type NeutralParticleReservoir
         !+ Size of the reservoir
     real(Float64)  :: W = 0.d0
         !+ Sampling weight
-    type(NeutralParticle), dimension(:), allocatable :: R
+    type(NeutralParticle) :: R(reservoir_size)
         !+ Neutral Particle Reservoir
 end type NeutralParticleReservoir
 
@@ -6106,8 +6106,8 @@ subroutine read_neutral_population(id, pop, error)
     call h5ltread_dataset_double_f(id, "dens", pop%dens, dims4, error)
 
     call h5gopen_f(id, "reservoir", gid, error)
-    call h5ltread_dataset_int_scalar_f(gid, "k", reservoir_size, error)
     k = reservoir_size
+    call h5ltread_dataset_int_scalar_f(gid, "k", k, error)
 
     allocate(v(3,k,nx,ny,nz))
     allocate(w(k,nx,ny,nz))
@@ -8477,16 +8477,6 @@ subroutine init_reservoir(res, k)
         res%i = k + floor(log(randomu(2))/log(1.0-res%W)) + 1
     endif
 
-    !! Allocate reservoir if not already
-    if (.not.allocated(res%R)) then
-        allocate(res%R(k))
-    else
-        if(size(res%R).ne.k) then
-            deallocate(res%R)
-            allocate(res%R(k))
-        endif
-    endif
-
 end subroutine init_reservoir
 
 subroutine update_reservoir(res, vn, wght)
@@ -8592,6 +8582,22 @@ subroutine init_neutral_population(pop)
     pop%res%n = 0
 
 end subroutine init_neutral_population
+
+subroutine free_neutral_population(pop)
+    !+ Initialize [[NeutralPopulation]]
+    type(NeutralPopulation), intent(inout) :: pop
+        !+ Neutral Population to initialize
+
+    integer :: i, j, k, ic, ind(3)
+
+    if(allocated(pop%dens)) then
+        deallocate(pop%dens)
+    endif
+    if(allocated(pop%res)) then
+        deallocate(pop%res)
+    endif
+
+end subroutine free_neutral_population
 
 subroutine update_neutrals(pop, ind, vn, dens)
     !+Update [NeutralPopulation]] `pop` at `ind`
@@ -9731,8 +9737,18 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     !! Calculate Stark Splitting
     !! Calculate E-field
     bfield = fields%b_norm*fields%b_abs        ! planck constant in SI units
+    efield = fields%e_norm*fields%e_abs
+    efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
+    efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
+    efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
+
+    E = norm2(efield)
+    B = norm2(bfield)
+
     m = 9.109384d-31
         ! mass of electron [kg]
+    h = 6.62607004d-34
+        ! planck constant in SI units
     l0 = lambda0*1d-9
         ! reference wavelength [m]
     ! stark-zeeman corrections to energy of n=2 states are -q0, 0 and q0
@@ -9741,21 +9757,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
-    efield = fields%e_norm*fields%e_abs
-    efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
-    efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
-    efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
-    E = norm2(efield)
-    B = norm2(bfield)
-    !Stark Splitting
-    h=6.62607004d-34
-        ! planck constant in SI units
-    m = 9.109384d-31
-        ! mass of electron
-    l0 = lambda0*1d-9
-        ! reference wavelength in [m]
-    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
-    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
+
     if(n_stark.eq.15) then
         wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
         wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
@@ -10957,12 +10959,13 @@ subroutine dcx
                 !! Weight CX rates by ion source density
                 if(beam_mass.eq.thermal_mass(is)) then
                     states = rates*(plasma%deni(is) + plasma%denf)
+                    if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
                 else
                     states = rates*plasma%deni(is)
+                    if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = 1.d0
                 endif
-                if(sum(states).eq.0) cycle loop_over_dcx
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -11104,12 +11107,13 @@ subroutine halo
                     !! Weight CX rates by ion source density
                     if(beam_mass.eq.thermal_mass(is)) then
                         states = rates*(plasma%deni(is) + plasma%denf)
+                        if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
                     else
                         states = rates*plasma%deni(is)
+                        if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = 1.d0
                     endif
-                    if(sum(states).eq.0) cycle loop_over_halos
 
                     loop_along_track: do it=1,ntrack
                         call get_plasma(plasma,pos=tracks(it)%pos)
@@ -11157,6 +11161,9 @@ subroutine halo
 
         if(seed_dcx.lt.0.01) exit iterations
     enddo iterations
+
+    call free_neutral_population(cur_pop)
+    call free_neutral_population(prev_pop)
 
 #ifdef _MPI
     !! Combine Spectra
@@ -12553,7 +12560,7 @@ subroutine neutron_f
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time(time_start)
+        write(*,*) 'write neutrons:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -12683,7 +12690,7 @@ subroutine cfpd_f
 
     if(inputs%verbose.ge.1) then
         write(*,'(30X,a)') ''
-        write(*,*) 'write charged fusion products:    ' , time(time_start)
+        write(*,*) 'write charged fusion products:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -12809,7 +12816,7 @@ subroutine neutron_mc
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time(time_start)
+        write(*,*) 'write neutrons:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -12979,7 +12986,7 @@ subroutine fida_weights_mc
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write fida weights:    ' , time(time_start)
+        write(*,*) 'write fida weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13211,7 +13218,7 @@ subroutine fida_weights_los
     fweight%mean_f = fweight%mean_f/(dEdP)
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write fida weights:    ' , time(time_start)
+        write(*,*) 'write fida weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13382,7 +13389,7 @@ subroutine npa_weights
     enddo
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write npa weights:    ' , time(time_start)
+        write(*,*) 'write npa weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13631,7 +13638,7 @@ program fidasim
 
         if(inputs%calc_bes.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'nbi:     ' , time(time_start)
+                write(*,*) 'nbi:     ' , time_string(time_start)
             endif
             call nbi_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13639,7 +13646,7 @@ program fidasim
 
         if(inputs%calc_dcx.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'dcx:     ' , time(time_start)
+                write(*,*) 'dcx:     ' , time_string(time_start)
             endif
             call dcx_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13647,7 +13654,7 @@ program fidasim
 
         if(inputs%calc_halo.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'halo:    ' , time(time_start)
+                write(*,*) 'halo:    ' , time_string(time_start)
             endif
             call halo_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13657,14 +13664,14 @@ program fidasim
             !! ----------- BEAM NEUTRALS ---------- !!
             if(inputs%calc_nbi_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'nbi:     ' , time(time_start)
+                    write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
                 call ndmc()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
                 if(inputs%calc_birth.eq.1)then
                     if(inputs%verbose.ge.1) then
-                        write(*,*) 'write birth:    ' , time(time_start)
+                        write(*,*) 'write birth:    ' , time_string(time_start)
                     endif
                     call write_birth_profile()
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13674,7 +13681,7 @@ program fidasim
             !! ---------- DCX (Direct charge exchange) ---------- !!
             if(inputs%calc_dcx_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'dcx:     ' , time(time_start)
+                    write(*,*) 'dcx:     ' , time_string(time_start)
                 endif
                 call dcx()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13683,7 +13690,7 @@ program fidasim
             !! ---------- HALO ---------- !!
             if(inputs%calc_halo_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'halo:    ' , time(time_start)
+                    write(*,*) 'halo:    ' , time_string(time_start)
                 endif
                 call halo()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13691,7 +13698,7 @@ program fidasim
 
             !! ---------- WRITE NEUTRALS ---------- !!
             if(inputs%verbose.ge.1) then
-                write(*,*) 'write neutrals:    ' , time(time_start)
+                write(*,*) 'write neutrals:    ' , time_string(time_start)
             endif
 #ifdef _MPI
             if(my_rank().eq.0) call write_neutrals()
@@ -13707,7 +13714,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_cold.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'cold:    ' ,time(time_start)
+            write(*,*) 'cold:    ' ,time_string(time_start)
         endif
         call cold_spec()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13718,7 +13725,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_brems.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'bremsstrahlung:    ' ,time(time_start)
+            write(*,*) 'bremsstrahlung:    ' ,time_string(time_start)
         endif
         call bremsstrahlung()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13729,7 +13736,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_fida.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'fida:    ' ,time(time_start)
+            write(*,*) 'fida:    ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call fida_f()
@@ -13741,7 +13748,7 @@ program fidasim
 
     if(inputs%calc_pfida.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'pfida:   ' ,time(time_start)
+            write(*,*) 'pfida:   ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call pfida_f()
@@ -13753,7 +13760,7 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'write spectra:    ' , time(time_start)
+            write(*,*) 'write spectra:    ' , time_string(time_start)
         endif
 #ifdef _MPI
         if(my_rank().eq.0) call write_spectra()
@@ -13768,7 +13775,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_npa.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'npa:     ' ,time(time_start)
+            write(*,*) 'npa:     ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call npa_f()
@@ -13780,7 +13787,7 @@ program fidasim
 
     if(inputs%calc_pnpa.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'pnpa:     ' ,time(time_start)
+            write(*,*) 'pnpa:     ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call pnpa_f()
@@ -13792,7 +13799,7 @@ program fidasim
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'write npa:    ' , time(time_start)
+            write(*,*) 'write npa:    ' , time_string(time_start)
         endif
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13803,7 +13810,7 @@ program fidasim
     !! -------------------------------------------------------------------
     if(inputs%calc_neutron.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'neutron rate:    ', time(time_start)
+            write(*,*) 'neutron rate:    ', time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call neutron_f()
@@ -13815,7 +13822,7 @@ program fidasim
 
     if(inputs%calc_cfpd.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'charged fusion products:    ', time(time_start)
+            write(*,*) 'charged fusion products:    ', time_string(time_start)
         endif
         call cfpd_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13826,7 +13833,7 @@ program fidasim
     !! -------------------------------------------------------------------
     if(inputs%calc_fida_wght.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'fida weight function:    ', time(time_start)
+            write(*,*) 'fida weight function:    ', time_string(time_start)
         endif
         if(inputs%calc_fida_wght.eq.1) then
             call fida_weights_los()
@@ -13838,7 +13845,7 @@ program fidasim
 
     if(inputs%calc_npa_wght.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'npa weight function:    ', time(time_start)
+            write(*,*) 'npa weight function:    ', time_string(time_start)
         endif
         call npa_weights()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13849,7 +13856,7 @@ program fidasim
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'END: hour:minute:second ', time(time_start)
+        write(*,*) 'END: hour:minute:second ', time_string(time_start)
     endif
 
 end program fidasim

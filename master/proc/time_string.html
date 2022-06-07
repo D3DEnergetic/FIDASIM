@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="">
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>time_string &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>3.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>User Guide</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+            <li><a href="../lists/programs.html">Programs</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>time_string
+      <small>Function</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.2% of total for procedures.">26 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/utilities.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/utilities.f90.html'>utilities.f90</a></li>
+     <li><a href='../module/utilities.html'>utilities</a></li>
+     <li class="active">time_string</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/time_string.html#src">time_string</a>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public function time_string(time_start) result(time_str)</h2>
+    
+
+    <p>Returns time string</p>
+
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-time_start"></span>integer,</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td>dimension(8)</td><td>::</td>
+  <td><strong>time_start</strong></td><td><p>Optional start time</p></td>
+</tr>
+</tbody>
+</table>
+
+   <h3>Return Value <small><span class="anchor" id="variable-time_str"></span>character(len=30)</small></h3>
+    <p>Time string</p>
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~time_string~~CalledByGraph Pages: 1 -->
+<svg id="proctime_stringCalledByGraph" width="292pt" height="309pt"
+ viewBox="0.00 0.00 292.00 308.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~time_string~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 304.501)">
+<title>proc~~time_string~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-304.501 288,-304.501 288,4 -4,4"/>
+<!-- proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_node1" class="node"><title>proc~time_string</title>
+<polygon fill="none" stroke="black" points="283.5,-171 218.5,-171 218.5,-147 283.5,-147 283.5,-171"/>
+<text text-anchor="middle" x="251" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50">time_string</text>
+</g>
+<!-- proc~cfpd_f -->
+<g id="proc~~time_string~~CalledByGraph_node2" class="node"><title>proc~cfpd_f</title>
+<g id="a_proc~~time_string~~CalledByGraph_node2"><a xlink:href=".././proc/cfpd_f.html" xlink:title="cfpd_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-276 109,-276 109,-252 163,-252 163,-276"/>
+<text text-anchor="middle" x="136" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cfpd_f</text>
+</a>
+</g>
+</g>
+<!-- proc~cfpd_f&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge1" class="edge"><title>proc~cfpd_f&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M163.387,-254.117C169.811,-251.073 176.43,-247.354 182,-243 204.89,-225.108 224.967,-198.13 237.26,-179.602"/>
+<polygon fill="#000000" stroke="#000000" points="240.317,-181.319 242.8,-171.02 234.436,-177.523 240.317,-181.319"/>
+</g>
+<!-- proc~neutron_mc -->
+<g id="proc~~time_string~~CalledByGraph_node3" class="node"><title>proc~neutron_mc</title>
+<g id="a_proc~~time_string~~CalledByGraph_node3"><a xlink:href=".././proc/neutron_mc.html" xlink:title="neutron_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="171,-234 101,-234 101,-210 171,-210 171,-234"/>
+<text text-anchor="middle" x="136" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
+</a>
+</g>
+</g>
+<!-- proc~neutron_mc&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge2" class="edge"><title>proc~neutron_mc&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M164.381,-209.845C170.257,-207.064 176.386,-204.03 182,-201 195.952,-193.469 210.997,-184.293 223.379,-176.441"/>
+<polygon fill="#000000" stroke="#000000" points="225.339,-179.342 231.871,-171.001 221.563,-173.448 225.339,-179.342"/>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~time_string~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~time_string~~CalledByGraph_node4"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-192 0,-192 0,-168 54,-168 54,-192"/>
+<text text-anchor="middle" x="27" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M30.9696,-192.267C37.2962,-215.351 54.5165,-264.744 90,-285 125.51,-305.271 146.886,-305.951 182,-285 219.833,-262.427 237.874,-210.716 245.394,-181.033"/>
+<polygon fill="#000000" stroke="#000000" points="248.827,-181.724 247.706,-171.188 242.012,-180.124 248.827,-181.724"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~cfpd_f -->
+<g id="proc~~time_string~~CalledByGraph_edge9" class="edge"><title>program~fidasim&#45;&gt;proc~cfpd_f</title>
+<path fill="none" stroke="#000000" d="M37.6808,-192.188C49.0618,-205.909 69.0685,-228.214 90,-243 93.0675,-245.167 96.3941,-247.204 99.8027,-249.094"/>
+<polygon fill="#000000" stroke="#000000" points="98.3979,-252.306 108.896,-253.737 101.581,-246.072 98.3979,-252.306"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
+<g id="proc~~time_string~~CalledByGraph_edge10" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-190.274C66.3228,-195.043 81.0397,-200.819 94.5689,-206.13"/>
+<polygon fill="#000000" stroke="#000000" points="93.5692,-209.497 104.157,-209.893 96.1269,-202.981 93.5692,-209.497"/>
+</g>
+<!-- proc~fida_weights_los -->
+<g id="proc~~time_string~~CalledByGraph_node5" class="node"><title>proc~fida_weights_los</title>
+<g id="a_proc~~time_string~~CalledByGraph_node5"><a xlink:href=".././proc/fida_weights_los.html" xlink:title="fida_weights_los">
+<polygon fill="#d9534f" stroke="#d9534f" points="181.5,-192 90.5,-192 90.5,-168 181.5,-168 181.5,-192"/>
+<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
+<g id="proc~~time_string~~CalledByGraph_edge11" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
+<path fill="none" stroke="#000000" d="M54.1751,-180C62.0867,-180 71.088,-180 80.1413,-180"/>
+<polygon fill="#000000" stroke="#000000" points="80.3295,-183.5 90.3294,-180 80.3294,-176.5 80.3295,-183.5"/>
+</g>
+<!-- proc~npa_weights -->
+<g id="proc~~time_string~~CalledByGraph_node6" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~time_string~~CalledByGraph_node6"><a xlink:href=".././proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="172.5,-150 99.5,-150 99.5,-126 172.5,-126 172.5,-150"/>
+<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_weights -->
+<g id="proc~~time_string~~CalledByGraph_edge12" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M54.1751,-169.726C66.3228,-164.957 81.0397,-159.181 94.5689,-153.87"/>
+<polygon fill="#000000" stroke="#000000" points="96.1269,-157.019 104.157,-150.107 93.5692,-150.503 96.1269,-157.019"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="proc~~time_string~~CalledByGraph_node8" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~time_string~~CalledByGraph_node8"><a xlink:href=".././proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-108 90,-108 90,-84 182,-84 182,-108"/>
+<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
+<g id="proc~~time_string~~CalledByGraph_edge13" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M37.6808,-167.812C49.0618,-154.091 69.0685,-131.786 90,-117 91.888,-115.666 93.8742,-114.382 95.9173,-113.15"/>
+<polygon fill="#000000" stroke="#000000" points="98.0267,-115.985 105.111,-108.107 94.66,-109.848 98.0267,-115.985"/>
+</g>
+<!-- proc~neutron_f -->
+<g id="proc~~time_string~~CalledByGraph_node9" class="node"><title>proc~neutron_f</title>
+<g id="a_proc~~time_string~~CalledByGraph_node9"><a xlink:href=".././proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="165,-66 107,-66 107,-42 165,-42 165,-66"/>
+<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_f -->
+<g id="proc~~time_string~~CalledByGraph_edge14" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M32.4294,-167.714C40.6983,-146.307 60.3728,-101.891 90,-75 92.4259,-72.7982 95.1231,-70.7873 97.9576,-68.9593"/>
+<polygon fill="#000000" stroke="#000000" points="99.7424,-71.971 106.739,-64.0152 96.3082,-65.8713 99.7424,-71.971"/>
+</g>
+<!-- proc~fida_weights_los&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge4" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M181.661,-171.7C190.44,-170.069 199.619,-168.363 208.296,-166.75"/>
+<polygon fill="#000000" stroke="#000000" points="209.007,-170.178 218.199,-164.91 207.728,-163.296 209.007,-170.178"/>
+</g>
+<!-- proc~npa_weights&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge5" class="edge"><title>proc~npa_weights&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M172.754,-144.645C184.056,-146.745 196.645,-149.084 208.324,-151.255"/>
+<polygon fill="#000000" stroke="#000000" points="207.827,-154.722 218.298,-153.108 209.106,-147.84 207.827,-154.722"/>
+</g>
+<!-- program~generate_tables -->
+<g id="proc~~time_string~~CalledByGraph_node7" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~time_string~~CalledByGraph_node7"><a xlink:href=".././program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="181,-24 91,-24 91,-0 181,-0 181,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+</a>
+</g>
+</g>
+<!-- program~generate_tables&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge6" class="edge"><title>program~generate_tables&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M169.59,-24.0967C174.064,-26.6142 178.363,-29.5687 182,-33 213.286,-62.5146 233.345,-109.694 243.061,-137.175"/>
+<polygon fill="#000000" stroke="#000000" points="239.862,-138.641 246.385,-146.99 246.492,-136.395 239.862,-138.641"/>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge7" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M164.381,-108.155C170.257,-110.936 176.386,-113.97 182,-117 195.952,-124.531 210.997,-133.707 223.379,-141.559"/>
+<polygon fill="#000000" stroke="#000000" points="221.563,-144.552 231.871,-146.999 225.339,-138.658 221.563,-144.552"/>
+</g>
+<!-- proc~neutron_f&#45;&gt;proc~time_string -->
+<g id="proc~~time_string~~CalledByGraph_edge8" class="edge"><title>proc~neutron_f&#45;&gt;proc~time_string</title>
+<path fill="none" stroke="#000000" d="M165.272,-64.7929C171.093,-67.6589 176.974,-71.0711 182,-75 204.89,-92.8916 224.967,-119.87 237.26,-138.398"/>
+<polygon fill="#000000" stroke="#000000" points="234.436,-140.477 242.8,-146.98 240.317,-136.681 234.436,-140.477"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/time_string.html#src">time_string</a>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">time_string</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="w"> </span><span class="p">(</span><span class="n">time_str</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Returns time string</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_start</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Optional start time</span>
+<span class="w">    </span><span class="kt">character</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">time_str</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Time string</span>
+
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ts</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="n">ta</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="n">hour</span><span class="p">,</span><span class="w"> </span><span class="n">minu</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time_start</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
+
+<span class="k">    call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ta</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">hour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ts</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">minu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ts</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">sec</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ts</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">minu</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">minu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">minu</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="w">        </span><span class="n">hour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hour</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
+<span class="k">    if</span><span class="w"> </span><span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">sec</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">sec</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="w">        </span><span class="n">minu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">minu</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
+
+<span class="k">    if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">time_start</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2,&quot; --- elapsed:&quot;,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span><span class="w"> </span><span class="n">hour</span><span class="p">,</span><span class="n">minu</span><span class="p">,</span><span class="n">sec</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">        write</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span><span class="s1">&#39;(I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ta</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">ta</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
+
+<span class="k">end function </span><span class="n">time_string</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+          </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

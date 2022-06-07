@@ -9,7 +9,7 @@ module utilities
 use iso_c_binding
 implicit none
 private
-public :: ind2sub, sub2ind, time, cumsum
+public :: ind2sub, sub2ind, time_string, cumsum
 public :: rng_type, rng_init, rng_seed, get_rng, rng, randind_cdf
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
@@ -1583,7 +1583,7 @@ end subroutine interpol3D_2D_arr
 !============================================================================
 !------------------------------ Misc. Routines ------------------------------
 !============================================================================
-function time(time_start) result (time_str)
+function time_string(time_start) result (time_str)
     !+ Returns time string
     integer, dimension(8), intent(in), optional :: time_start
         !+ Optional start time
@@ -1618,7 +1618,7 @@ function time(time_start) result (time_str)
             ta(5),ta(6),ta(7)
     endif
 
-end function time
+end function time_string
 
 #ifdef _DEF_INTR
 ! define missing intrinsics

@@ -7031,7 +7031,7 @@ program generate_tables
 
     !! Calculate cross sections
     if(verbose) then
-        write(*,*) 'Cross Sections:   ',time(time_start)
+        write(*,*) 'Cross Sections:   ',time_string(time_start)
         write(*,*) ''
     endif
     call write_bb_H_H(gid, namelist_file, n_max, m_max)
@@ -7050,7 +7050,7 @@ program generate_tables
 
     !! Calculate reaction rates
     if(verbose) then
-        write(*,*) 'Reaction Rates:   ',time(time_start)
+        write(*,*) 'Reaction Rates:   ',time_string(time_start)
         write(*,*) ''
     endif
     call write_bt_H_H(gid, namelist_file, n_max, m_max)
@@ -7085,7 +7085,7 @@ program generate_tables
 #endif
 
     if(verbose) then
-        write(*,*) 'END: hour:minute:second ', time(time_start)
+        write(*,*) 'END: hour:minute:second ', time_string(time_start)
     endif
 
 end program

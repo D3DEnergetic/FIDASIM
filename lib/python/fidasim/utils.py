@@ -865,15 +865,19 @@ def transform_COCOS_from_geqdsk(g, **COCOS_kw):
         ccw_phi = COCOS_kw['ccw_phi']
     else:
         ccw_phi = True
-    cc_in = identify_COCOS(g, ccw_phi=ccw_phi)
+    if 'exp_Bp' in COCOS_kw:
+        exp_Bp = COCOS_kw['exp_Bp']
+    else:
+        exp_Bp = 0
+    cc_in = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
     
     new_g = g.copy()
     if cc_in.cocos != cc_out.cocos:
-        new_g = convert_COCOS(new_g, cc_in, cc_out, {key:COCOS_kw[key] for key in COCOS_kw if key != 'ccw_phi'})
+        new_g = convert_COCOS(new_g, cc_in, cc_out, {key:COCOS_kw[key] for key in COCOS_kw if (key != 'ccw_phi' and key != 'exp_Bp')})
 
     return new_g
 
-def identify_COCOS(g, ccw_phi=True):
+def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     '''
     #+#identify_COCOS
     #+Identifies the COCOS index of a GEQDSK dictionary object
@@ -887,6 +891,8 @@ def identify_COCOS(g, ccw_phi=True):
     #+##Keyword Arguments
     #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
     #+
+    #+    **exp_Bp**: 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
     #+##Return Value
     #+COCOS object
     #+
@@ -897,9 +903,9 @@ def identify_COCOS(g, ccw_phi=True):
     #+```
     '''
     # Sauter, eq. 22    
-    sigma_Bp_in = -1 * np.sign(g['pprime'][0] / g['current'])
+    sigma_Bp_in = -1 * np.sign(g['pprime'][0] * g['current'])
     sigma_RphZ_in = 1 if ccw_phi else -1
-    sigma_rhothph_in = np.sign(g['qpsi'][0] / (g['current'] * g['bcentr']))
+    sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
     
     sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
     
@@ -922,9 +928,9 @@ def identify_COCOS(g, ccw_phi=True):
     else:
         index = FIDASIM_default_COCOS
     
-    return COCOS(index)
+    return COCOS(index+(10**exp_Bp))
 
-def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[1,1]):
+def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
     '''
     #+#convert_COCOS
     #+Converts a GEQDSK dictionary according to cc_in --> cc_out
@@ -947,6 +953,8 @@ def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B
     #+    **l_d**: Tuple of length scale, (in, out)
     #+
     #+    **l_B**: Tuple of field magnitude scale, (in, out)
+    #+
+    #+    **exp_mu0**: Tuple of exponents for mu0, (in, out)
     #+
     #+##Return Value
     #+GEQDSK dictionary object

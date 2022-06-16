@@ -153,6 +153,9 @@ FUNCTION read_geqdsk,filename,grid,rho=rho,g=g,btipsign=btipsign, poloidal = pol
     equil={err:1}
     ;; Get eqdsk
     g=readg(filename)
+    cc_in = identify_cocos(g)
+    cc_out = cocos_struct(5)
+    convert_cocos,g,cc_in,cc_out
     btipsign = signum(g.bcentr*g.cpasma)
     time = double(g.time)
     if not keyword_set(poloidal) then begin

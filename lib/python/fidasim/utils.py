@@ -802,7 +802,7 @@ def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = read_COCOS_from_geqdsk(efit.readg(filename), **COCOS_kw)
+    g = transform_COCOS_from_geqdsk(efit.readg(filename), **COCOS_kw)
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -836,9 +836,9 @@ def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
 
     return equil, rhogrid, btipsign
 
-def read_COCOS_from_geqdsk(g, **COCOS_kw):
+def transform_COCOS_from_geqdsk(g, **COCOS_kw):
     '''
-    #+#read_COCOS_from_geqdsk
+    #+#transform_COCOS_from_geqdsk
     #+Identifies the COCOS index of a GEQDSK dictionary object and converts to fidasim COCOS
     #+Reference:
     #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 

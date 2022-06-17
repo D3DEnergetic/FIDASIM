@@ -873,7 +873,7 @@ def transform_COCOS_from_geqdsk(g, **COCOS_kw):
     
     new_g = g.copy()
     if cc_in.cocos != cc_out.cocos:
-        new_g = convert_COCOS(new_g, cc_in, cc_out, {key:COCOS_kw[key] for key in COCOS_kw if (key != 'ccw_phi' and key != 'exp_Bp')})
+        new_g = convert_COCOS(new_g, cc_in, cc_out, **{key:COCOS_kw[key] for key in COCOS_kw if (key != 'ccw_phi' and key != 'exp_Bp')})
 
     return new_g
 

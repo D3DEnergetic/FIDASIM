@@ -860,6 +860,14 @@ type Spectra
         !+ Passive FIDA emission stark components: pfidastokes(n_stark,4,lambda,chan,orbit_type)
 end type Spectra
 
+type SpatialSpectra
+    !+ Spatial Storage of photon neutral birth
+    type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
+    type(NeutralParticleReservoir), dimension(:), allocatable :: halo
+    type(NeutralParticleReservoir), dimension(:), allocatable :: fida
+    type(NeutralParticleReservoir), dimension(:), allocatable :: pfida
+end type SpatialSpectra
+
 type NeutronRate
     !+ Neutron storage structure
     real(Float64), dimension(:), allocatable :: rate
@@ -886,7 +894,7 @@ type NeutralParticle
     real(Float64) :: w = 1.d0
         !+ Neutral particle weight
     real(Float64), dimension(3)  :: v = 0.d0
-        !+ Neutral particle velocity
+        !+ Neutral particle position/velocity
 end type NeutralParticle
 
 type NeutralParticleReservoir
@@ -903,7 +911,7 @@ type NeutralParticleReservoir
         !+ Size of the reservoir
     real(Float64)  :: W = 0.d0
         !+ Sampling weight
-    type(NeutralParticle) :: R(reservoir_size)
+    type(NeutralParticle), dimension(reservoir_size) :: R
         !+ Neutral Particle Reservoir
 end type NeutralParticleReservoir
 
@@ -1044,6 +1052,8 @@ type SimulationInputs
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_cfpd
         !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
+    integer(Int32) :: calc_res
+        !+ Calculate spatial resolution of LOS
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1220,14 +1230,16 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(CFPDRate), save          :: cfpd
+type(CFPDRate), save            :: cfpd
     !+ Variable for storing the Charged Fusion Product rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
-type(CFPDTable), save       :: ctable
+type(CFPDTable), save           :: ctable
     !+ Variable for storing the calculated Charged Fusion Product orbits
+type(SpatialSpectra), save      :: spatres
+    !+ Variable for storing birth neutral for spatial resolution
 
 contains
 
@@ -1355,7 +1367,7 @@ subroutine npr_assign(r1,r2)
     type(NeutralParticleReservoir), intent(inout) :: r1
 
     if(r2%k.eq.0) return
-    call init_reservoir(r1,r2%k)
+    call init_reservoir(r1) !r2%k)
     r1%n = r2%n
     r1%k = r2%k
     r1%i = r2%i
@@ -1960,7 +1972,7 @@ subroutine read_inputs
     integer            :: pathlen, calc_neutron, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
-    integer            :: calc_birth,calc_fida_wght,calc_npa_wght
+    integer            :: calc_birth,calc_fida_wght,calc_npa_wght, calc_res
     integer            :: load_neutrals,verbose,flr,split,stark_components
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
@@ -1978,7 +1990,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, calc_res, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
@@ -2017,6 +2029,7 @@ subroutine read_inputs
     calc_npa=0
     calc_pnpa=0
     calc_birth=0
+    calc_res=0
     flr=2
     stark_components=0
     split=1
@@ -2138,6 +2151,7 @@ subroutine read_inputs
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
     inputs%calc_cfpd=calc_cfpd
+    inputs%calc_res = calc_res
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -5187,14 +5201,14 @@ end subroutine write_npa
 
 subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
-    integer(HID_T) :: fid
+    integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(5) :: dims_stokes
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
     character(charlim) :: filename
-    integer :: i
+    integer :: i, ir, ic
     real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
 
@@ -5204,6 +5218,9 @@ subroutine write_spectra
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,n_thermal) :: dcxstokes, halostokes, coldstokes
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,particles%nclass) :: fidastokes, pfidastokes
+
+    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
+    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -5595,6 +5612,91 @@ subroutine write_spectra
        endif
        call h5ltset_attribute_string_f(fid,"/pfida","units","Ph/(s*nm*sr*m^2)",error )
        call h5ltset_attribute_string_f(fid,"/pfidastokes","units","Ph/(s*nm*sr*m^2)",error )
+    endif
+
+    if(inputs%calc_res.ge.1) then 
+       !Create spatial group
+       call h5gcreate_f(fid, "spatial", gid, error)
+       call h5ltset_attribute_string_f(fid,"spatial","description", &
+            "Spatial Resolution",error)
+       dims(1) = 3
+       dims(2) = reservoir_size
+       dims(3) = spec_chords%nchan
+       if(inputs%calc_dcx.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   dcx_photons(ir,ic) = spatres%dcx(ic)%R(ir)%w
+                   dcx_spat(:,ir,ic) = spatres%dcx(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "dcx_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"dcx_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"dcx_spatial","description",&
+                "Birth position of neutral that produced a photon: dcx_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "dcx_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"dcx_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"dcx_photons","description",&
+                "Number of photons produced by neutral: dcx_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_halo.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   halo_photons(ir,ic) = spatres%halo(ic)%R(ir)%w
+                   halo_spat(:,ir,ic) = spatres%halo(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "halo_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"halo_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"halo_spatial","description",&
+                "Birth position of neutral that produced a photon: halo_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "halo_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"halo_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"halo_photons","description",&
+                "Number of photons produced by neutral: halo_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_fida.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   fida_photons(ir,ic) = spatres%fida(ic)%R(ir)%w
+                   fida_spat(:,ir,ic) = spatres%fida(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "fida_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"fida_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"fida_spatial","description",&
+                "Birth position of neutral that produced a photon: fida_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "fida_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"fida_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"fida_photons","description",&
+                "Number of photons produced by neutral: fida_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_pfida.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   pfida_photons(ir,ic) = spatres%pfida(ic)%R(ir)%w
+                   pfida_spat(:,ir,ic) = spatres%pfida(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "pfida_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"pfida_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"pfida_spatial","description",&
+                "Birth position of neutral that produced a photon: pfida_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "pfida_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"pfida_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"pfida_photons","description",&
+                "Number of photons produced by neutral: pfida_photons(sample,channel)",error)
+       endif
+
+       !Close spatial group
+       call h5gclose_f(gid, error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -6108,6 +6210,12 @@ subroutine read_neutral_population(id, pop, error)
     call h5gopen_f(id, "reservoir", gid, error)
     k = reservoir_size
     call h5ltread_dataset_int_scalar_f(gid, "k", k, error)
+    if (k.ne.reservoir_size) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NEUTRAL_POPULATION: Unsupported reservoir size: ',k, reservoir_size
+        endif
+        stop
+    endif
 
     allocate(v(3,k,nx,ny,nz))
     allocate(w(k,nx,ny,nz))
@@ -6124,7 +6232,7 @@ subroutine read_neutral_population(id, pop, error)
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-        call init_reservoir(pop%res(ii,jj,kk), k)
+        call init_reservoir(pop%res(ii,jj,kk))
         pop%res(ii,jj,kk)%n = n(ii,jj,kk)
         do ir=1,min(k,pop%res(ii,jj,kk)%n)
             pop%res(ii,jj,kk)%R(ir) = NeutralParticle(w(ir,ii,jj,kk), v(:,ir,ii,jj,kk))
@@ -8458,23 +8566,21 @@ end subroutine get_ep_denf
 !=============================================================================
 !--------------------------Result Storage Routines----------------------------
 !=============================================================================
-subroutine init_reservoir(res, k)
+subroutine init_reservoir(res)
     !+ Initialize reservoir
     type(NeutralParticleReservoir), intent(inout) :: res
         !+ Neutral Particle Reservoir
-    integer, intent(in) :: k
+    !integer, intent(in) :: k
         !+ Size of reservoir
 
     real(Float64) :: randomu(2)
 
-    if(k.le.0) return
-
-    if (res%n.ne.1) then
+    if (res%n.lt.1) then
         res%n = 1
-        res%k = k
+        res%k = reservoir_size
         call randu(randomu)
-        res%W = exp(log(randomu(1))/k)
-        res%i = k + floor(log(randomu(2))/log(1.0-res%W)) + 1
+        res%W = exp(log(randomu(1))/res%k)
+        res%i = res%k + floor(log(randomu(2))/log(1.0-res%W)) + 1
     endif
 
 end subroutine init_reservoir
@@ -8491,28 +8597,23 @@ subroutine update_reservoir(res, vn, wght)
     integer, dimension(1) :: randomi
     real(Float64), dimension(2) :: randomu
 
+    !print*, res%n, res%k, res%i
+    !$OMP CRITICAL(update_reservoir_1)
     if (res%n.le.res%k) then
-        !$OMP CRITICAL(update_reservoir_1)
-        if (res%n.eq.0) then
-            call init_reservoir(res,reservoir_size)
+        if (res%n.le.0) then
+            call init_reservoir(res)
         endif
-        res%R(res%n) = NeutralParticle(wght, vn)
-        res%n = res%n + 1
-        !$OMP END CRITICAL(update_reservoir_1)
-        return
-    endif
-
-    if (res%n.eq.res%i) then
-        !$OMP CRITICAL(update_reservoir_2)
+        res%R(res%n)%w = wght
+        res%R(res%n)%v = vn
+    elseif (res%n.eq.res%i) then
         call randind(res%k, randomi)
         res%R(randomi(1)) = NeutralParticle(wght, vn)
         call randu(randomu)
         res%W = res%W*exp(log(randomu(1))/res%k)
         res%i = res%i + floor(log(randomu(2))/log(1.0-res%W)) + 1
-        !$OMP END CRITICAL(update_reservoir_2)
     endif
-
     res%n = res%n + 1
+    !$OMP END CRITICAL(update_reservoir_1)
 
 end subroutine update_reservoir
 
@@ -8527,10 +8628,10 @@ subroutine merge_reservoirs(res1,res2)
     type(NeutralParticleReservoir) :: res3
     real(Float64) :: p, randomu(1)
 
-    if(res2%n.eq.0) return
-    if(res1%n.eq.0) then
-        call init_reservoir(res1,res2%k)
+    if(res1%n.le.0) then
+        call init_reservoir(res1) !res2%k)
     endif
+    if(res2%n.le.0) return
 
     !! If neither reservoir is full just fill res1 from res2 normally
     if ((res1%n.le.res1%k).and.(res2%n.le.res2%k)) then
@@ -8576,6 +8677,8 @@ subroutine init_neutral_population(pop)
 
     if(.not.allocated(pop%dens)) then
         allocate(pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    if(.not.allocated(pop%res)) then
         allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     endif
     pop%dens = 0.d0
@@ -8715,14 +8818,14 @@ subroutine parallel_merge_reservoirs(res)
     call parallel_sum(vels)
     call parallel_sum(wghts)
 
-    call init_reservoir(res1,k)
+    call init_reservoir(res1)
     res1%n = nums(1)
     res1%i = inds(1)
     res1%W = Ws(1)
     do i=1,min(k,res1%n)
         res1%R(i) = NeutralParticle(wghts(i,1),vels(:,i,1))
     enddo
-    call init_reservoir(res2,k)
+    call init_reservoir(res2)
     do i=2,num_procs
         res2%n = nums(i)
         res2%i = inds(i)
@@ -9928,7 +10031,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
-    type(LOSInters) :: inter
+    type(LOSinters) :: inter
     integer :: ichan,i,j,bin,nchan, k
     logical :: pas = .False.
 
@@ -10023,6 +10126,7 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
 
     integer :: iclass = 1
     logical :: pas = .False.
+    type(LOSinters) :: inter
 
     if(present(orbit_class)) then
         iclass = min(orbit_class,particles%nclass)
@@ -10037,6 +10141,45 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
     endif
 
 end subroutine store_fida_photons
+
+subroutine store_photon_birth(pos, photons, res, passive)
+    !+ Store neutral birth location of the photon source
+    real(Float64), dimension(3), intent(in)       :: pos
+        !+ Birth location of the photon source neutral
+    real(Float64), intent(in)                     :: photons
+        !+ Number of photons
+    type(NeutralParticleReservoir), dimension(:), intent(inout) :: res
+        !+ reservoir of neutral particles
+    logical, intent(in), optional                 :: passive
+
+    integer :: i = 1, ichan
+    logical :: pas = .False.
+    real(Float64) :: cyl(3), pos_xyz(3)
+    integer(Int32) :: ind(3), nchan
+    type(LOSinters) :: inter
+
+    if(present(passive)) pas = passive
+
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = atan2(pos(2), pos(1))
+        call get_passive_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    endif
+
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
+    loop_over_channels: do i=1,nchan
+        ichan = inter%los_elem(i)%id
+        call update_reservoir(res(ichan), pos, photons)
+    enddo loop_over_channels
+
+end subroutine store_photon_birth
 
 subroutine store_neutrons(rate, orbit_class)
     !+ Store neutron rate in [[libfida:neutron]]
@@ -10973,10 +11116,15 @@ subroutine dcx
                     call colrad(plasma,thermal_mass(is),vihalo,tracks(jj)%time,states,denn,photons)
                     call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
 
+                    photons = fi_correction*photons !! Correct for including fast-ions in states
+
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                        photons = fi_correction*photons !! Correct for including fast-ions in states
                         call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),&
                             &spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
+                    endif
+
+                    if((photons.gt.0.d0).and.(inputs%calc_res.ge.1)) then
+                        call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%dcx)
                     endif
                 enddo loop_along_track
             enddo loop_over_dcx
@@ -10989,6 +11137,11 @@ subroutine dcx
     call parallel_merge_populations(neut%dcx)
     if(inputs%calc_dcx.ge.1) then
         call parallel_sum(spec%dcx)
+    endif
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%dcx(jj))
+        enddo
     endif
 #endif
 
@@ -11123,10 +11276,15 @@ subroutine halo
                         !! Store Neutrals
                         call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
 
+                        photons = fi_correction*photons !! Correct for including fast-ions in states
+
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                            photons = fi_correction*photons !! Correct for including fast-ions in states
                             call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), &
                                                photons/nlaunch(i,j,k),spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
+                        endif
+
+                        if((photons.gt.0.d0).and.(inputs%calc_res.ge.1)) then
+                            call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%halo)
                         endif
                     enddo loop_along_track
                 enddo loop_over_halos
@@ -11169,6 +11327,11 @@ subroutine halo
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
         call parallel_sum(spec%halo)
+    endif
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%halo(jj)
+        enddo
     endif
 #endif
 
@@ -11577,6 +11740,8 @@ subroutine fida_f
                 call colrad(plasma, fbm%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons/nlaunch(i,j,k))
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%fida)
+
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -11584,6 +11749,11 @@ subroutine fida_f
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%fida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine fida_f
@@ -11686,6 +11856,9 @@ subroutine pfida_f
                 call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), passive=.True.)
+                if(inputs%calc_res.ge.1) then 
+                    call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%pfida, passive=.True.)
+                endif
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -11693,6 +11866,11 @@ subroutine pfida_f
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%pfida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine pfida_f
@@ -11788,6 +11966,7 @@ subroutine fida_mc
                 call colrad(plasma, fast_ion%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons, fast_ion%class)
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%fida)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -11795,6 +11974,11 @@ subroutine fida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%fida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine fida_mc
@@ -11896,6 +12080,7 @@ subroutine pfida_mc
                 call colrad(plasma, fast_ion%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons, fast_ion%class,passive=.True.)
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%pfida, passive = .True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -11903,6 +12088,11 @@ subroutine pfida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%pfida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine pfida_mc
@@ -13589,6 +13779,13 @@ program fidasim
             allocate(spec%pfidastokes(n_stark,4,inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%pfidastokes = 0.d0
         endif
+    endif
+
+    if(inputs%calc_res.ge.1) then
+        if(inputs%calc_dcx.ge.1) allocate(spatres%dcx(spec_chords%nchan))
+        if(inputs%calc_halo.ge.1) allocate(spatres%halo(spec_chords%nchan))
+        if(inputs%calc_fida.ge.1) allocate(spatres%fida(spec_chords%nchan))
+        if(inputs%calc_pfida.ge.1) allocate(spatres%pfida(spec_chords%nchan))
     endif
 
     if(inputs%calc_npa.ge.1)then

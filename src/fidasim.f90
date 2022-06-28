@@ -5648,12 +5648,12 @@ subroutine write_spectra
                enddo
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "halo_spatial", 3, dims(1:3),&
-                dcx_spat, error)
+                halo_spat, error)
            call h5ltset_attribute_string_f(gid,"halo_spatial","units","cm",error)
            call h5ltset_attribute_string_f(gid,"halo_spatial","description",&
                 "Birth position of neutral that produced a photon: halo_spatial([x,y,z],sample,channel)",error)
            call h5ltmake_compressed_dataset_double_f(gid, "halo_photons", 2, dims(2:3),&
-                dcx_photons, error)
+                halo_photons, error)
            call h5ltset_attribute_string_f(gid,"halo_photons","units","Ph",error)
            call h5ltset_attribute_string_f(gid,"halo_photons","description",&
                 "Number of photons produced by neutral: halo_photons(sample,channel)",error)
@@ -5666,12 +5666,12 @@ subroutine write_spectra
                enddo
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "fida_spatial", 3, dims(1:3),&
-                dcx_spat, error)
+                fida_spat, error)
            call h5ltset_attribute_string_f(gid,"fida_spatial","units","cm",error)
            call h5ltset_attribute_string_f(gid,"fida_spatial","description",&
                 "Birth position of neutral that produced a photon: fida_spatial([x,y,z],sample,channel)",error)
            call h5ltmake_compressed_dataset_double_f(gid, "fida_photons", 2, dims(2:3),&
-                dcx_photons, error)
+                fida_photons, error)
            call h5ltset_attribute_string_f(gid,"fida_photons","units","Ph",error)
            call h5ltset_attribute_string_f(gid,"fida_photons","description",&
                 "Number of photons produced by neutral: fida_photons(sample,channel)",error)
@@ -5684,12 +5684,12 @@ subroutine write_spectra
                enddo
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "pfida_spatial", 3, dims(1:3),&
-                dcx_spat, error)
+                pfida_spat, error)
            call h5ltset_attribute_string_f(gid,"pfida_spatial","units","cm",error)
            call h5ltset_attribute_string_f(gid,"pfida_spatial","description",&
                 "Birth position of neutral that produced a photon: pfida_spatial([x,y,z],sample,channel)",error)
            call h5ltmake_compressed_dataset_double_f(gid, "pfida_photons", 2, dims(2:3),&
-                dcx_photons, error)
+                pfida_photons, error)
            call h5ltset_attribute_string_f(gid,"pfida_photons","units","Ph",error)
            call h5ltset_attribute_string_f(gid,"pfida_photons","description",&
                 "Number of photons produced by neutral: pfida_photons(sample,channel)",error)

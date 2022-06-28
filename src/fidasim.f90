@@ -860,14 +860,6 @@ type Spectra
         !+ Passive FIDA emission stark components: pfidastokes(n_stark,4,lambda,chan,orbit_type)
 end type Spectra
 
-type SpatialSpectra
-    !+ Spatial Storage of photon neutral birth
-    type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
-    type(NeutralParticleReservoir), dimension(:), allocatable :: halo
-    type(NeutralParticleReservoir), dimension(:), allocatable :: fida
-    type(NeutralParticleReservoir), dimension(:), allocatable :: pfida
-end type SpatialSpectra
-
 type NeutronRate
     !+ Neutron storage structure
     real(Float64), dimension(:), allocatable :: rate
@@ -940,6 +932,14 @@ type Neutrals
 !    type(NeutralPopulation) :: fida_halo
 !        !+ FIDA-Halo neutral population
 end type Neutrals
+
+type SpatialSpectra
+    !+ Spatial Storage of photon neutral birth
+    type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
+    type(NeutralParticleReservoir), dimension(:), allocatable :: halo
+    type(NeutralParticleReservoir), dimension(:), allocatable :: fida
+    type(NeutralParticleReservoir), dimension(:), allocatable :: pfida
+end type SpatialSpectra
 
 type FIDAWeights
     !+ FIDA weights structure

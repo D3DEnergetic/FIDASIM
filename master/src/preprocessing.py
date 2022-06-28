@@ -176,6 +176,7 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int,
               'calc_cfpd': zero_int,
+              'calc_res': zero_int,
               'adaptive': zero_int,
               'split_tol': zero_double,
               'max_cell_splits': zero_int}
@@ -1333,6 +1334,7 @@ def write_namelist(filename, inputs):
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
+        f.write("calc_res = {:d}    !! Calculate spatial resolution\n".format(inputs['calc_res']))
 
         f.write("\n!! Advanced Settings\n")
         f.write("seed = {:d}    !! RNG Seed. If seed is negative a random seed is used\n".format(inputs['seed']))

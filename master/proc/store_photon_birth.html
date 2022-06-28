@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="description" content="">
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>store_photon_birth &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>3.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href='../page/index.html'>User Guide</a></li>
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="../lists/files.html">Source Files</a></li>
+            <li><a href="../lists/modules.html">Modules</a></li>
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+                   <li><a href="../lists/types.html">Derived Types</a></li>
+            <li><a href="../lists/programs.html">Programs</a></li>
+       
+            </ul>
+        
+            </li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+                             <li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+          </ul>
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+  <div class="row">
+    <h1>store_photon_birth
+      <small>Subroutine</small>
+    </h1>
+    <div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.2% of total for procedures.">28 statements</a>
+     </li> 
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+     <li><a href='../module/libfida.html'>libfida</a></li>
+     <li class="active">store_photon_birth</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    <div id="sidebar">
+  <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/store_photon_birth.html#src">store_photon_birth</a>
+  </div>
+</div>
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public subroutine store_photon_birth(pos, photons, res, passive)</h2>
+    
+
+    <p>Store neutral birth location of the photon source</p>
+
+    <h3>Arguments</h3>
+      <table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Intent</th><th>Optional</th><th>Attributes</th><th></th><th>Name</th><th></th></thead>
+<tbody>
+<tr>
+  <td><span class="anchor" id="variable-pos%7E17"></span>real(kind=Float64),</td>
+<td>intent(in),</td>
+  <td></td>  <td>dimension(3)</td><td>::</td>
+  <td><strong>pos</strong></td><td><p>Birth location of the photon source neutral</p></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-photons%7E6"></span>real(kind=Float64),</td>
+<td>intent(in)</td>
+  <td></td>  <td></td><td>::</td>
+  <td><strong>photons</strong></td><td><p>Number of photons</p></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-res%7E6"></span>type(<a href='../type/neutralparticlereservoir.html'>NeutralParticleReservoir</a>),</td>
+<td>intent(inout),</td>
+  <td></td>  <td>dimension(:)</td><td>::</td>
+  <td><strong>res</strong></td><td><p>reservoir of neutral particles</p></td>
+</tr>
+<tr>
+  <td><span class="anchor" id="variable-passive%7E5"></span>logical,</td>
+<td>intent(in),</td>
+  <td>optional</td>  <td></td><td>::</td>
+  <td><strong>passive</strong></td><td></td>
+</tr>
+</tbody>
+</table>
+
+    <br>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~store_photon_birth~~CallsGraph Pages: 1 -->
+<svg id="procstore_photon_birthCallsGraph" width="496pt" height="186pt"
+ viewBox="0.00 0.00 496.00 186.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~store_photon_birth~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 182)">
+<title>proc~~store_photon_birth~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-182 492,-182 492,4 -4,4"/>
+<!-- proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CallsGraph_node1" class="node"><title>proc~store_photon_birth</title>
+<polygon fill="none" stroke="black" points="103.5,-66 0.5,-66 0.5,-42 103.5,-42 103.5,-66"/>
+<text text-anchor="middle" x="52" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">store_photon_birth</text>
+</g>
+<!-- proc~update_reservoir -->
+<g id="proc~~store_photon_birth~~CallsGraph_node2" class="node"><title>proc~update_reservoir</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node2"><a xlink:href=".././proc/update_reservoir.html" xlink:title="update_reservoir">
+<polygon fill="#d9534f" stroke="#d9534f" points="254,-118 160,-118 160,-94 254,-94 254,-118"/>
+<text text-anchor="middle" x="207" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_reservoir</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photon_birth&#45;&gt;proc~update_reservoir -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge1" class="edge"><title>proc~store_photon_birth&#45;&gt;proc~update_reservoir</title>
+<path fill="none" stroke="#000000" d="M88.4858,-66.0605C110.036,-73.3849 137.752,-82.8047 160.855,-90.6565"/>
+<polygon fill="#000000" stroke="#000000" points="159.848,-94.0108 170.442,-93.9149 162.1,-87.3831 159.848,-94.0108"/>
+</g>
+<!-- proc~get_passive_grid_indices -->
+<g id="proc~~store_photon_birth~~CallsGraph_node3" class="node"><title>proc~get_passive_grid_indices</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node3"><a xlink:href=".././proc/get_passive_grid_indices.html" xlink:title="get_passive_grid_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="273.5,-66 140.5,-66 140.5,-42 273.5,-42 273.5,-66"/>
+<text text-anchor="middle" x="207" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_passive_grid_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photon_birth&#45;&gt;proc~get_passive_grid_indices -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge2" class="edge"><title>proc~store_photon_birth&#45;&gt;proc~get_passive_grid_indices</title>
+<path fill="none" stroke="#000000" d="M103.522,-54C112.06,-54 121.087,-54 130.103,-54"/>
+<polygon fill="#000000" stroke="#000000" points="130.251,-57.5001 140.251,-54 130.251,-50.5001 130.251,-57.5001"/>
+</g>
+<!-- proc~get_indices -->
+<g id="proc~~store_photon_birth~~CallsGraph_node4" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node4"><a xlink:href=".././proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="240.5,-24 173.5,-24 173.5,-0 240.5,-0 240.5,-24"/>
+<text text-anchor="middle" x="207" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photon_birth&#45;&gt;proc~get_indices -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge3" class="edge"><title>proc~store_photon_birth&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M96.8437,-41.9645C117.788,-36.215 142.753,-29.362 163.518,-23.6616"/>
+<polygon fill="#000000" stroke="#000000" points="164.622,-26.9882 173.339,-20.9658 162.769,-20.2379 164.622,-26.9882"/>
+</g>
+<!-- interface~randind -->
+<g id="proc~~store_photon_birth~~CallsGraph_node6" class="node"><title>interface~randind</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node6"><a xlink:href=".././interface/randind.html" xlink:title="randind">
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-178 320,-178 320,-154 374,-154 374,-178"/>
+<text text-anchor="middle" x="347" y="-163.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randind</text>
+</a>
+</g>
+</g>
+<!-- proc~update_reservoir&#45;&gt;interface~randind -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge4" class="edge"><title>proc~update_reservoir&#45;&gt;interface~randind</title>
+<path fill="none" stroke="#000000" d="M235.926,-118.142C257.523,-127.532 287.561,-140.592 310.803,-150.697"/>
+<polygon fill="#000000" stroke="#000000" points="309.416,-153.91 319.982,-154.688 312.207,-147.491 309.416,-153.91"/>
+</g>
+<!-- interface~randu -->
+<g id="proc~~store_photon_birth~~CallsGraph_node7" class="node"><title>interface~randu</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node7"><a xlink:href=".././interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="481,-118 427,-118 427,-94 481,-94 481,-118"/>
+<text text-anchor="middle" x="454" y="-103.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~update_reservoir&#45;&gt;interface~randu -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge5" class="edge"><title>proc~update_reservoir&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M254.321,-106.59C289.813,-106.963 340,-107.319 384,-107 394.602,-106.923 406.12,-106.78 416.654,-106.625"/>
+<polygon fill="#000000" stroke="#000000" points="416.844,-110.123 426.789,-106.469 416.736,-103.124 416.844,-110.123"/>
+</g>
+<!-- proc~init_reservoir -->
+<g id="proc~~store_photon_birth~~CallsGraph_node8" class="node"><title>proc~init_reservoir</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node8"><a xlink:href=".././proc/init_reservoir.html" xlink:title="init_reservoir">
+<polygon fill="#d9534f" stroke="#d9534f" points="384,-98 310,-98 310,-74 384,-74 384,-98"/>
+<text text-anchor="middle" x="347" y="-83.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">init_reservoir</text>
+</a>
+</g>
+</g>
+<!-- proc~update_reservoir&#45;&gt;proc~init_reservoir -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge6" class="edge"><title>proc~update_reservoir&#45;&gt;proc~init_reservoir</title>
+<path fill="none" stroke="#000000" d="M254.336,-99.2847C268.828,-97.1844 284.82,-94.8666 299.335,-92.7631"/>
+<polygon fill="#000000" stroke="#000000" points="300.205,-96.1736 309.6,-91.2754 299.201,-89.246 300.205,-96.1736"/>
+</g>
+<!-- proc~xyz_to_cyl -->
+<g id="proc~~store_photon_birth~~CallsGraph_node5" class="node"><title>proc~xyz_to_cyl</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node5"><a xlink:href=".././proc/xyz_to_cyl.html" xlink:title="xyz_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="378,-56 316,-56 316,-32 378,-32 378,-56"/>
+<text text-anchor="middle" x="347" y="-41.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~get_passive_grid_indices&#45;&gt;proc~xyz_to_cyl -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge7" class="edge"><title>proc~get_passive_grid_indices&#45;&gt;proc~xyz_to_cyl</title>
+<path fill="none" stroke="#000000" d="M273.767,-49.2343C284.69,-48.4428 295.721,-47.6434 305.762,-46.9158"/>
+<polygon fill="#000000" stroke="#000000" points="306.101,-50.4005 315.822,-46.1868 305.595,-43.4188 306.101,-50.4005"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~store_photon_birth~~CallsGraph_node9" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node9"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="488,-66 420,-66 420,-42 488,-42 488,-66"/>
+<text text-anchor="middle" x="454" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge8" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M378.089,-46.8656C388.008,-47.8103 399.242,-48.8802 409.935,-49.8986"/>
+<polygon fill="#000000" stroke="#000000" points="409.675,-53.3896 419.962,-50.8535 410.339,-46.4211 409.675,-53.3896"/>
+</g>
+<!-- proc~uvw_to_cyl -->
+<g id="proc~~store_photon_birth~~CallsGraph_node10" class="node"><title>proc~uvw_to_cyl</title>
+<g id="a_proc~~store_photon_birth~~CallsGraph_node10"><a xlink:href=".././proc/uvw_to_cyl.html" xlink:title="uvw_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="486.5,-24 421.5,-24 421.5,-0 486.5,-0 486.5,-24"/>
+<text text-anchor="middle" x="454" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge9" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M378.089,-34.8301C388.588,-31.6304 400.559,-27.9821 411.804,-24.5551"/>
+<polygon fill="#000000" stroke="#000000" points="412.898,-27.8806 421.443,-21.6173 410.857,-21.1847 412.898,-27.8806"/>
+</g>
+<!-- proc~init_reservoir&#45;&gt;interface~randu -->
+<g id="proc~~store_photon_birth~~CallsGraph_edge10" class="edge"><title>proc~init_reservoir&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M384.135,-92.8829C394.635,-94.8829 406.105,-97.0677 416.62,-99.0705"/>
+<polygon fill="#000000" stroke="#000000" points="416.267,-102.566 426.745,-100.999 417.577,-95.6897 416.267,-102.566"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~store_photon_birth~~CalledByGraph Pages: 1 -->
+<svg id="procstore_photon_birthCalledByGraph" width="294pt" height="242pt"
+ viewBox="0.00 0.00 294.00 242.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~store_photon_birth~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 238)">
+<title>proc~~store_photon_birth~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-238 290,-238 290,4 -4,4"/>
+<!-- proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node1" class="node"><title>proc~store_photon_birth</title>
+<polygon fill="none" stroke="black" points="285.5,-129 182.5,-129 182.5,-105 285.5,-105 285.5,-129"/>
+<text text-anchor="middle" x="234" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50">store_photon_birth</text>
+</g>
+<!-- proc~fida_mc -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node2" class="node"><title>proc~fida_mc</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node2"><a xlink:href=".././proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="145,-234 91,-234 91,-210 145,-210 145,-234"/>
+<text text-anchor="middle" x="118" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge1" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M135.217,-209.839C138.826,-207.009 142.59,-203.957 146,-201 170.346,-179.885 196.773,-153.893 214.034,-136.462"/>
+<polygon fill="#000000" stroke="#000000" points="216.756,-138.686 221.279,-129.105 211.769,-133.774 216.756,-138.686"/>
+</g>
+<!-- proc~fida_f -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node3" class="node"><title>proc~fida_f</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node3"><a xlink:href=".././proc/fida_f.html" xlink:title="fida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="145,-192 91,-192 91,-168 145,-168 145,-192"/>
+<text text-anchor="middle" x="118" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_f&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge2" class="edge"><title>proc~fida_f&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M140.98,-167.853C158.407,-158.222 182.965,-144.651 202.327,-133.951"/>
+<polygon fill="#000000" stroke="#000000" points="204.028,-137.01 211.087,-129.11 200.642,-130.883 204.028,-137.01"/>
+</g>
+<!-- proc~pfida_mc -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node4" class="node"><title>proc~pfida_mc</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node4"><a xlink:href=".././proc/pfida_mc.html" xlink:title="pfida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="146,-150 90,-150 90,-126 146,-126 146,-150"/>
+<text text-anchor="middle" x="118" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_mc</text>
+</a>
+</g>
+</g>
+<!-- proc~pfida_mc&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge3" class="edge"><title>proc~pfida_mc&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M146.016,-133.023C154.043,-131.545 163.179,-129.862 172.44,-128.156"/>
+<polygon fill="#000000" stroke="#000000" points="173.292,-131.558 182.492,-126.304 172.024,-124.674 173.292,-131.558"/>
+</g>
+<!-- proc~pfida_f -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node5" class="node"><title>proc~pfida_f</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node5"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="145,-108 91,-108 91,-84 145,-84 145,-108"/>
+<text text-anchor="middle" x="118" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
+</a>
+</g>
+</g>
+<!-- proc~pfida_f&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge4" class="edge"><title>proc~pfida_f&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M145.154,-100.818C153.35,-102.328 162.764,-104.062 172.317,-105.822"/>
+<polygon fill="#000000" stroke="#000000" points="171.808,-109.287 182.277,-107.656 173.077,-102.402 171.808,-109.287"/>
+</g>
+<!-- proc~dcx -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node6" class="node"><title>proc~dcx</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node6"><a xlink:href=".././proc/dcx.html" xlink:title="dcx">
+<polygon fill="#d9534f" stroke="#d9534f" points="145,-66 91,-66 91,-42 145,-42 145,-66"/>
+<text text-anchor="middle" x="118" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge5" class="edge"><title>proc~dcx&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M140.98,-66.147C158.407,-75.7777 182.965,-89.3488 202.327,-100.049"/>
+<polygon fill="#000000" stroke="#000000" points="200.642,-103.117 211.087,-104.89 204.028,-96.99 200.642,-103.117"/>
+</g>
+<!-- proc~halo -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node7" class="node"><title>proc~halo</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node7"><a xlink:href=".././proc/halo.html" xlink:title="halo">
+<polygon fill="#d9534f" stroke="#d9534f" points="145,-24 91,-24 91,-0 145,-0 145,-24"/>
+<text text-anchor="middle" x="118" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+</a>
+</g>
+</g>
+<!-- proc~halo&#45;&gt;proc~store_photon_birth -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge6" class="edge"><title>proc~halo&#45;&gt;proc~store_photon_birth</title>
+<path fill="none" stroke="#000000" d="M135.217,-24.1607C138.826,-26.9908 142.59,-30.0429 146,-33 170.346,-54.1148 196.773,-80.1072 214.034,-97.5375"/>
+<polygon fill="#000000" stroke="#000000" points="211.769,-100.226 221.279,-104.895 216.756,-95.3141 211.769,-100.226"/>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~store_photon_birth~~CalledByGraph_node8" class="node"><title>program~fidasim</title>
+<g id="a_proc~~store_photon_birth~~CalledByGraph_node8"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-129 0,-129 0,-105 54,-105 54,-129"/>
+<text text-anchor="middle" x="27" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge7" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M35.4867,-129.209C46.2997,-146.313 67.4756,-177.901 90,-201 90.653,-201.67 91.3278,-202.336 92.0193,-202.998"/>
+<polygon fill="#000000" stroke="#000000" points="89.9898,-205.871 99.832,-209.793 94.5837,-200.59 89.9898,-205.871"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_f -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M45.1601,-129.147C58.3344,-138.473 76.7283,-151.493 91.6055,-162.024"/>
+<polygon fill="#000000" stroke="#000000" points="89.7083,-164.969 99.8926,-167.89 93.7527,-159.256 89.7083,-164.969"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pfida_mc -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge9" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_mc</title>
+<path fill="none" stroke="#000000" d="M54.2216,-123.187C62.2557,-125.083 71.252,-127.206 79.869,-129.239"/>
+<polygon fill="#000000" stroke="#000000" points="79.1936,-132.675 89.7301,-131.566 80.8012,-125.863 79.1936,-132.675"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pfida_f -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge10" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<path fill="none" stroke="#000000" d="M54.2216,-110.813C62.6411,-108.826 72.1172,-106.59 81.1062,-104.469"/>
+<polygon fill="#000000" stroke="#000000" points="82.0369,-107.846 90.9659,-102.143 80.4293,-101.033 82.0369,-107.846"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~dcx -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge11" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="#000000" d="M45.1601,-104.853C58.3344,-95.5274 76.7283,-82.5069 91.6055,-71.9759"/>
+<polygon fill="#000000" stroke="#000000" points="93.7527,-74.7441 99.8926,-66.1097 89.7083,-69.0307 93.7527,-74.7441"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~halo -->
+<g id="proc~~store_photon_birth~~CalledByGraph_edge12" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
+<path fill="none" stroke="#000000" d="M35.4867,-104.791C46.2997,-87.6868 67.4756,-56.0994 90,-33 90.653,-32.3304 91.3278,-31.6636 92.0193,-31.002"/>
+<polygon fill="#000000" stroke="#000000" points="94.5837,-33.4103 99.832,-24.2067 89.9898,-28.1285 94.5837,-33.4103"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      <h3>Contents</h3>
+ 
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/store_photon_birth.html#src">store_photon_birth</a>
+  </div>
+</div>
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+
+    
+    
+
+    
+    
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_photon_birth</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">photons</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="n">passive</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c">!+ Store neutral birth location of the photon source</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">       </span><span class="kd">::</span><span class="w"> </span><span class="n">pos</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Birth location of the photon source neutral</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w">                     </span><span class="kd">::</span><span class="w"> </span><span class="n">photons</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Number of photons</span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">NeutralParticleReservoir</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ reservoir of neutral particles</span>
+<span class="w">    </span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w">                 </span><span class="kd">::</span><span class="w"> </span><span class="n">passive</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ichan</span><span class="w"></span>
+<span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">False</span><span class="p">.</span><span class="w"></span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">pos_xyz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">nchan</span><span class="w"></span>
+<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">LOSinters</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">inter</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">passive</span><span class="p">))</span><span class="w"> </span><span class="n">pas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">passive</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">pas</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        </span><span class="n">cyl</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">pos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pos</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">pos</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">cyl</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pos</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">pos</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">pos</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">call </span><span class="n">get_passive_grid_indices</span><span class="p">(</span><span class="n">cyl</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">inter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span>
+<span class="k">        call </span><span class="n">get_indices</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">inter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="k">endif</span>
+
+<span class="k">    </span><span class="n">nchan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inter</span><span class="p">%</span><span class="n">nchan</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">nchan</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+
+<span class="k">    </span><span class="n">loop_over_channels</span><span class="p">:</span><span class="w"> </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nchan</span><span class="w"></span>
+<span class="w">        </span><span class="n">ichan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inter</span><span class="p">%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">id</span><span class="w"></span>
+<span class="w">        </span><span class="k">call </span><span class="n">update_reservoir</span><span class="p">(</span><span class="n">res</span><span class="p">(</span><span class="n">ichan</span><span class="p">),</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">photons</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">enddo </span><span class="n">loop_over_channels</span><span class="w"></span>
+
+<span class="k">end subroutine </span><span class="n">store_photon_birth</span><span class="w"></span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-6"><p>FIDASIM was developed by Luke Stagner<br>&copy; 2022 
+</p>
+        </div>
+        <div class="col-xs-6 col-md-6">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+          </p>
+        </div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+  </body>
+</html>

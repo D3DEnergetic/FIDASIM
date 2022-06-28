@@ -89,7 +89,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>11.6% of total for derived types.</p>Including implementation: 61 statements, 11.6% of total for derived types.">61 statements</a>
+    title="<p>11.6% of total for derived types.</p>Including implementation: 62 statements, 11.6% of total for derived types.">62 statements</a>
      </li> 
     <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
   </ul>
@@ -158,6 +158,7 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_birth">calc_birth</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_neutron">calc_neutron</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_cfpd">calc_cfpd</a>
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_res">calc_res</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-flr">flr</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
@@ -243,6 +244,7 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_birth">calc_birth</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_neutron">calc_neutron</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_cfpd">calc_cfpd</a>
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_res">calc_res</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-flr">flr</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
@@ -482,6 +484,11 @@ Used when <a href="../type/simulationinputs.html#variable-load_neutrals">load_ne
   <td><strong>calc_cfpd</strong></td><td></td><td></td><td><p>Calculate Charged Fusion Product flux: 0 = off, 1=on</p></td>
 </tr>
 <tr>
+  <td><span class="anchor" id="variable-calc_res"></span>integer(kind=Int32),</td>
+<td>public</td>  <td></td><td>::</td>
+  <td><strong>calc_res</strong></td><td></td><td></td><td><p>Calculate spatial resolution of LOS</p></td>
+</tr>
+<tr>
   <td><span class="anchor" id="variable-flr"></span>integer(kind=Int32),</td>
 <td>public</td>  <td></td><td>::</td>
   <td><strong>flr</strong></td><td></td><td></td><td><p>FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction</p></td>
@@ -676,6 +683,8 @@ Used when <a href="../type/simulationinputs.html#variable-load_neutrals">load_ne
 <span class="w">        </span><span class="c">!+ Calculate neutron flux: 0 = off, 1=on, 2=on++</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_cfpd</span><span class="w"></span>
 <span class="w">        </span><span class="c">!+ Calculate Charged Fusion Product flux: 0 = off, 1=on</span>
+<span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">calc_res</span><span class="w"></span>
+<span class="w">        </span><span class="c">!+ Calculate spatial resolution of LOS</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">flr</span><span class="w"></span>
 <span class="w">        </span><span class="c">!+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction</span>
 <span class="w">    </span><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">split</span><span class="w"></span>

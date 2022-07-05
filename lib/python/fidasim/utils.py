@@ -19,7 +19,7 @@ from scipy.interpolate import interp1d, interp2d, NearestNDInterpolator
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 
-FIDASIM_default_COCOS = 5    
+FIDASIM_default_COCOS = 5 
 class COCOS:
     '''
     #+COCOS
@@ -776,7 +776,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         if key in units:
             ds.attrs['units'] = units[key]
 
-def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
+def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     """
     #+#read_geqdsk
     #+Reads an EFIT GEQDSK file
@@ -788,8 +788,12 @@ def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
     #+
     #+##Keyword Arguments
     #+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))
-    #+    
-    #+    **COCOS_kw**: Keyword arguments to pass to read_COCOS_from_geqdsk
+    #+
+    #+    **ccw_phi**: Argument for identify_COCOS. Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+
+    #+    **exp_Bp**: Argument for identify_COCOS. 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
+    #+    **convert_COCOS_kw**: Keyword arguments to pass to convert_COCOS via transform_COCOS_from_geqdsk
     #+
     #+##Return Value
     #+Electronmagnetic fields structure, rho, btipsign
@@ -802,7 +806,7 @@ def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = transform_COCOS_from_geqdsk(efit.readg(filename), **COCOS_kw)
+    g = transform_COCOS_from_geqdsk(efit.readg(filename), ccw_phi=ccw_phi, exp_Bp=exp_Bp, **convert_COCOS_kw)
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -836,7 +840,7 @@ def read_geqdsk(filename, grid, poloidal=False, **COCOS_kw):
 
     return equil, rhogrid, btipsign
 
-def transform_COCOS_from_geqdsk(g, **COCOS_kw):
+def transform_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     '''
     #+#transform_COCOS_from_geqdsk
     #+Identifies the COCOS index of a GEQDSK dictionary object and converts to fidasim COCOS
@@ -848,7 +852,11 @@ def transform_COCOS_from_geqdsk(g, **COCOS_kw):
     #+    **g**: GEQDSK dictionary object
     #+
     #+##Keyword Arguments
-    #+    **COCOS_kw**: Keyword arguments for identify_COCOS and convert_COCOS 
+    #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+
+    #+    **exp_Bp**: 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
+    #+    **conver_COCOS_kw**: Keyword arguments for convert_COCOS 
     #+
     #+##Return Value
     #+geqdsk dict with converted COCOS
@@ -861,21 +869,12 @@ def transform_COCOS_from_geqdsk(g, **COCOS_kw):
     '''
     cc_out = COCOS() # cc_out = FIDASIM COCOS
     
-    if 'ccw_phi' in COCOS_kw:
-        ccw_phi = COCOS_kw['ccw_phi']
-    else:
-        ccw_phi = True
-    if 'exp_Bp' in COCOS_kw:
-        exp_Bp = COCOS_kw['exp_Bp']
-    else:
-        exp_Bp = 0
     cc_in = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
     
-    new_g = g.copy()
     if cc_in.cocos != cc_out.cocos:
-        new_g = convert_COCOS(new_g, cc_in, cc_out, **{key:COCOS_kw[key] for key in COCOS_kw if (key != 'ccw_phi' and key != 'exp_Bp')})
-
-    return new_g
+        return convert_COCOS(g.copy(), cc_in, cc_out, **convert_COCOS_kw)
+    else:
+        return g.copy()
 
 def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     '''
@@ -908,7 +907,7 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
     
     sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
-    
+ 
     if sigmas == [1, 1, 1]:
         index = 1
     elif sigmas == [1, -1, 1]:
@@ -928,7 +927,7 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     else:
         index = FIDASIM_default_COCOS
     
-    return COCOS(index+(10**exp_Bp))
+    return COCOS(index+(10*exp_Bp))
 
 def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
     '''

@@ -299,6 +299,10 @@ def check_grid(grid):
         nphi =1
     else:
         nphi = grid['nphi']
+        if nphi < 3:
+            error('"phi" must have at least 3 elements')
+            error('Invalid interpolation grid. Exiting...', halt=True)
+
 
     nr = grid['nr']
     nz = grid['nz']

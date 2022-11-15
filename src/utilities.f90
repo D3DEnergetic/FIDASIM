@@ -1004,7 +1004,7 @@ subroutine deriv_3d(r,z,phi,f,frp,fzp,fphip)
 
     integer :: i,n
         !! temporary values for loops
-    if (size(phi) .gt. 1) then
+    if (size(phi) .gt. 2) then
 
         n = size(phi)
         do i = 1,n

@@ -32,6 +32,11 @@ PRO check_grid, grid
         nphi = 1
     endif else begin
         nphi = grid.nphi
+        if nphi lt 3 then begin
+            error, '"phi" must have at least 3 elements'
+            err_status = 1
+            goto, GET_OUT
+        endif
     endelse
 
     nr = grid.nr

@@ -412,10 +412,12 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
             'z2d': z2d,
             'r': r,
             'z': z,
-            'phi': phi,
             'nr': nr,
-            'nz': nz,
-            'nphi': nphi}
+            'nz': nz}
+
+    if nphi > 1:
+        grid.setdefault('nphi',nphi)
+        grid.setdefault('phi', phi)
 
     return grid
 

@@ -4,21 +4,21 @@ PRO check_grid, grid
     ;+***
     ;+##Input Arguments
     ;+     **grid**: Interpolation grid structure
-    ;+ 
+    ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> check_grid, grid
     ;+```
     err_status = 0
     info,'Checking interpolation grid...'
-  
+
     w = where("nr" eq strlowcase(TAG_NAMES(grid)),nw)
     if nw eq 0 then begin
         error,'"nr" is missing from the interpolation grid'
         err_status = 1
         goto, GET_OUT
     endif
-    
+
     w = where("nz" eq strlowcase(TAG_NAMES(grid)),nw)
     if nw eq 0 then begin
         error,'"nz" is missing from the interpolation grid'
@@ -42,12 +42,17 @@ PRO check_grid, grid
     nr = grid.nr
     nz = grid.nz
     zero_int = {dims:0,type:'INT'}
-    schema = {nr:zero_int, nz:zero_int, nphi:zero_int, $
+    schema = {nr:zero_int, nz:zero_int$
               r2d:{dims:[nr,nz], type:'DOUBLE'}, $
               z2d:{dims:[nr,nz], type:'DOUBLE'}, $
               r:{dims:[nr], type:'DOUBLE'}, $
-              z:{dims:[nz], type:'DOUBLE'}, $
-              phi:{dims:[nphi], type:'DOUBLE'} }
+              z:{dims:[nz], type:'DOUBLE'}}
+
+    w = where("nphi" eq strlowcase(TAG_NAMES(grid)),nw)
+    if nw ne 0 then begin
+        schema = create_struct(schema, 'nphi', zero_int, 'phi', $
+                 {dims:[nphi], type:'DOUBLE'})
+    endif
 
     check_struct_schema, schema, grid, err_status, desc="interpolation grid"
     if err_status eq 1 then begin

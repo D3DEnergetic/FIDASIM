@@ -42,7 +42,11 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     r2d = r # replicate(1,nz)
     z2d = replicate(1,nr) # z
 
-    grid = {r2d:r2d,z2d:z2d,r:r,z:z,phi:phi,nr:nr,nz:nz,nphi:nphi}
+    grid = {r2d:r2d,z2d:z2d,r:r,z:z,nr:nr,nz:nz}
+
+    if nphi gt 1 then begin
+        grid = create_struct(grid, 'nphi', nphi, 'phi', phi)
+    endif
 
     return, grid
 END

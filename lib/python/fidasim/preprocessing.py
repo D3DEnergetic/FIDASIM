@@ -299,6 +299,10 @@ def check_grid(grid):
         nphi =1
     else:
         nphi = grid['nphi']
+        if nphi < 3:
+            error('"phi" must have at least 3 elements')
+            error('Invalid interpolation grid. Exiting...', halt=True)
+
 
     nr = grid['nr']
     nz = grid['nz']
@@ -311,15 +315,17 @@ def check_grid(grid):
 
     schema = {'nr': zero_int,
               'nz': zero_int,
-              'nphi': zero_int,
               'r2d': nrnz_doub,
               'z2d': nrnz_doub,
               'r': {'dims': [nr],
                     'type': [float, np.float64]},
               'z': {'dims': [nz],
-                    'type': [float, np.float64]},
-              'phi': {'dims': [nphi],
                     'type': [float, np.float64]}}
+
+    if 'nphi' in grid:
+        schema.setdefault('nphi',zero_int)
+        schema.setdefault('phi', {'dims': [nphi],
+                                  'type': [float, np.float64]})
 
     err = check_dict_schema(schema, grid, desc="interpolation grid")
     if err:

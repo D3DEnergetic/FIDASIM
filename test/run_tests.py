@@ -202,7 +202,7 @@ def run_test(args):
 
     grid = fs.utils.rz_grid(100.0, 240.0, 70, -100.0, 100.0, 100)
 
-    equil, rho, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid)
+    equil, rho, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid, ccw_phi=True, exp_Bp=0)
     fbm = fs.utils.read_nubeam(test_dir+'/test_fi_1.cdf', grid, btipsign = btipsign)
 
     plasma = test_profiles(test_dir+'/test_profiles.cdf',grid,rho)

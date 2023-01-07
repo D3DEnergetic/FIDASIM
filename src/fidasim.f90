@@ -12679,9 +12679,9 @@ subroutine neutron_f
     rate = 0
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
     !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
-    phi_loop: do iphi = 1, fbm%nphi
-        z_loop: do iz = istart, fbm%nz, istep
-            r_loop: do ir=1, fbm%nr
+    z_loop: do iz = istart, fbm%nz, istep
+        r_loop: do ir=1, fbm%nr
+            phi_loop: do iphi = 1, fbm%nphi
                 !! Calculate position
                 if(fbm%nphi.eq.1) then
                     s = 0.d0
@@ -12734,9 +12734,9 @@ subroutine neutron_f
                         enddo gyro_loop
                     enddo energy_loop
                 enddo pitch_loop
-            enddo r_loop
-        enddo z_loop
-    enddo phi_loop
+            enddo phi_loop
+        enddo r_loop
+    enddo z_loop
     !$OMP END PARALLEL DO
 
 #ifdef _MPI

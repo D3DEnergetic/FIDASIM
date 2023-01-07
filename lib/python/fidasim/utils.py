@@ -19,6 +19,22 @@ from scipy.interpolate import interp1d, interp2d, NearestNDInterpolator
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 
+FIDASIM_default_COCOS = 5 
+class COCOS:
+    '''
+    #+COCOS
+    #+COCOS class object
+    #+***
+    '''
+    def __init__(self, index=FIDASIM_default_COCOS):
+        self.cocos = index
+        self.exp_Bp = 0 if index < 10 else 1
+        self.sigma_Bp = 1 if index in [1,2,5,6,11,12,15,16] else -1
+        self.sigma_RphZ = 1 if index%2 != 0 else -1
+        self.sigma_rhothph = 1 if index in [1,2,7,8,11,12,17,18] else -1
+        self.sign_q = self.sigma_rhothph
+        self.sign_pprime = -1*self.sigma_Bp 
+
 def get_fidasim_dir():
     """
     #+#get_fidasim_dir
@@ -396,10 +412,12 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
             'z2d': z2d,
             'r': r,
             'z': z,
-            'phi': phi,
             'nr': nr,
-            'nz': nz,
-            'nphi': nphi}
+            'nz': nz}
+
+    if nphi > 1:
+        grid.setdefault('nphi',nphi)
+        grid.setdefault('phi', phi)
 
     return grid
 
@@ -760,7 +778,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         if key in units:
             ds.attrs['units'] = units[key]
 
-def read_geqdsk(filename, grid, poloidal=False):
+def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     """
     #+#read_geqdsk
     #+Reads an EFIT GEQDSK file
@@ -773,6 +791,12 @@ def read_geqdsk(filename, grid, poloidal=False):
     #+##Keyword Arguments
     #+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))
     #+
+    #+    **ccw_phi**: Argument for identify_COCOS. Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+
+    #+    **exp_Bp**: Argument for identify_COCOS. 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
+    #+    **convert_COCOS_kw**: Keyword arguments to pass to convert_COCOS via transform_COCOS_from_geqdsk
+    #+
     #+##Return Value
     #+Electronmagnetic fields structure, rho, btipsign
     #+
@@ -784,7 +808,7 @@ def read_geqdsk(filename, grid, poloidal=False):
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = efit.readg(filename)
+    g = transform_COCOS_from_geqdsk(efit.readg(filename), ccw_phi=ccw_phi, exp_Bp=exp_Bp, **convert_COCOS_kw)
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -817,6 +841,178 @@ def read_geqdsk(filename, grid, poloidal=False):
              "br":br,"bt":bt,"bz":bz,"er":er,"et":et,"ez":ez}
 
     return equil, rhogrid, btipsign
+
+def transform_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
+    '''
+    #+#transform_COCOS_from_geqdsk
+    #+Identifies the COCOS index of a GEQDSK dictionary object and converts to fidasim COCOS
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **g**: GEQDSK dictionary object
+    #+
+    #+##Keyword Arguments
+    #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+
+    #+    **exp_Bp**: 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
+    #+    **conver_COCOS_kw**: Keyword arguments for convert_COCOS 
+    #+
+    #+##Return Value
+    #+geqdsk dict with converted COCOS
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> g = efit.readg(filename)
+    #+>>> g = read_COCOS_from_geqdsk(g)
+    #+```
+    '''
+    cc_out = COCOS() # cc_out = FIDASIM COCOS
+    
+    cc_in = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+    
+    if cc_in.cocos != cc_out.cocos:
+        return convert_COCOS(g.copy(), cc_in, cc_out, **convert_COCOS_kw)
+    else:
+        return g.copy()
+
+def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
+    '''
+    #+#identify_COCOS
+    #+Identifies the COCOS index of a GEQDSK dictionary object
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **g**: GEQDSK dictionary object
+    #+
+    #+##Keyword Arguments
+    #+    **ccw_phi**: Toroidal direction from top view, True if counter-clockwise, False if clockwise
+    #+
+    #+    **exp_Bp**: 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
+    #+
+    #+##Return Value
+    #+COCOS object
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> g = efit.readg(filename)
+    #+>>> g_cocos = identify_COCOS(g)
+    #+```
+    '''
+    # Sauter, eq. 22    
+    sigma_Bp_in = -1 * np.sign(g['pprime'][0] * g['current'])
+    sigma_RphZ_in = 1 if ccw_phi else -1
+    sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
+    
+    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
+ 
+    if sigmas == [1, 1, 1]:
+        index = 1
+    elif sigmas == [1, -1, 1]:
+        index = 2
+    elif sigmas == [-1, 1, -1]:
+        index = 3
+    elif sigmas == [-1, -1, -1]:
+        index = 4
+    elif sigmas == [1, 1, -1]:
+        index = 5
+    elif sigmas == [1, -1, -1]:
+        index = 6
+    elif sigmas == [-1, 1, 1]:
+        index = 7
+    elif sigmas == [-1, -1, 1]:
+        index = 8
+    else:
+        index = FIDASIM_default_COCOS
+    
+    return COCOS(index+(10*exp_Bp))
+
+def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
+    '''
+    #+#convert_COCOS
+    #+Converts a GEQDSK dictionary according to cc_in --> cc_out
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **g**: GEQDSK dictionary object
+    #+
+    #+    **cc_in**: COCOS object, input
+    #+
+    #+    **cc_out**: COCOS object, output
+    #+
+    #+##Keyword Arguments
+    #+    **sigma_Ip**: Tuple of current sign, (in, out)
+    #+
+    #+    **sigma_B0**: Tuple of toroidal field sign, (in, out)
+    #+
+    #+    **l_d**: Tuple of length scale, (in, out)
+    #+
+    #+    **l_B**: Tuple of field magnitude scale, (in, out)
+    #+
+    #+    **exp_mu0**: Tuple of exponents for mu0, (in, out)
+    #+
+    #+##Return Value
+    #+GEQDSK dictionary object
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> g = efit.readg(filename)
+    #+>>> cc_out = COCOS(3)
+    #+>>> cc_in = COCOS(1)
+    #+>>> converted_g = convert_COCOS(g, cc_in, cc_out)
+    #+```
+    '''
+    # Sauter, Appendix C
+    print(f'CONVERT_COCOS: cocos_in ({cc_in.cocos}) != cocos_out ({cc_out.cocos}), applying COCOS conversion.')
+    mu0 = 4*np.pi*1e-7
+        
+    l_d_eff = l_d[1]/l_d[0]
+    l_B_eff = l_B[1]/l_B[0]
+    exp_mu0_eff = exp_mu0[1] - exp_mu0[0]
+
+    exp_Bp_eff = cc_out.exp_Bp - cc_in.exp_Bp
+    sigma_Bp_eff = cc_out.sigma_Bp * cc_in.sigma_Bp
+    sigma_RphZ_eff = cc_out.sigma_RphZ * cc_in.sigma_RphZ
+    sigma_rhothph_eff = cc_out.sigma_rhothph * cc_in.sigma_rhothph
+
+    if sigma_Ip is None:
+        sigma_Ip_eff = sigma_RphZ_eff
+    else:
+        sigma_Ip_eff = np.prod(sigma_Ip)
+
+    if sigma_B0 is None:
+        sigma_B0_eff = sigma_RphZ_eff
+    else:
+        sigma_B0_eff = np.prod(sigma_B0)
+
+    for key, val in g.items():
+        if key in ['r', 'rdim', 'rleft', 'rbbbs', 'rlim', 'rcentr', 'rmaxis', 'z', 'zdim', 'zmid', 'zbbbz', 'zlim', 'zmaxis', 'nbdry', 'lim']:
+            g[key] = np.array(val) * l_d_eff
+        elif key == 'bcentr':
+            g[key] = np.array(val) * l_B_eff * sigma_B0_eff
+        elif key in ['simag', 'ssimag', 'sibry', 'ssibry', 'psi', 'psirz']:
+            g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff * ((2*np.pi)**exp_Bp_eff) * (l_d_eff**2) * (l_B_eff)
+        elif key == 'current':
+            g[key] = np.array(val) * sigma_Ip_eff * l_d_eff * l_B_eff / (mu0**exp_mu0_eff)
+        elif key == 'fpol':
+            g[key] = np.array(val) * sigma_B0_eff * l_d_eff * l_B_eff
+        elif key == 'pres':
+            # Sauter, end of Sec. 4
+            g[key] = np.array(val) * (l_d_eff**2) / (mu0**exp_mu0_eff)
+        elif key == 'ffprim':
+            g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff / ((2*np.pi)**exp_Bp_eff) * l_B_eff
+        elif key == 'pprime':
+            g[key] = np.array(val) * sigma_Ip_eff * sigma_Bp_eff / ((2*np.pi)**exp_Bp_eff) * l_B_eff / ((mu0**exp_mu0_eff) * (l_d_eff**2))
+        elif key == 'qpsi':
+            g[key] = np.array(val) * sigma_Ip_eff * sigma_B0_eff * sigma_rhothph_eff
+    
+    return g
 
 def read_ncdf(filename, vars=None):
     '''

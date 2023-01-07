@@ -11330,7 +11330,7 @@ subroutine halo
     endif
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%halo(jj)
+            call parallel_merge_reservoirs(spatres%halo(jj))
         enddo
     endif
 #endif

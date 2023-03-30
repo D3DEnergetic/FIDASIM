@@ -11617,7 +11617,9 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength ! move dlength
                 call get_plasma(plasma,pos=r0)
                 max_length = max_length + dlength
-                if(max_length.gt.300) cycle loop_over_los
+                ! If plasma is not within max_length [1000 cm] of LOS lens then no brems is calculated for the channel
+                ! 1000 cm is assumed to cover the limit for most devices simulated in FIDASIM as of March 2023
+                if(max_length.gt.1000) cycle loop_over_los
             enddo
 
             ! Calculate bremsstrahlung along los

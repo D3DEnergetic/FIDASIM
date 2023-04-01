@@ -58,9 +58,11 @@ real(Float64), parameter :: H3_amu = 3.01550071632d0
     !+ Atomic mass of Hydrogen-3 (tritium) [amu]
 real(Float64), parameter :: He3_amu = 3.01602931914d0
     !+ Atomic mass of Helium-3 [amu]
-real(Float64), parameter :: B5_amu = 10.81d0
+real(Float64), parameter :: He4_amu = 4.00260325413d0
+    !+ Atomic mass of Helium-4 [amu]
+real(Float64), parameter :: B10_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
-real(Float64), parameter :: C6_amu = 12.011d0
+real(Float64), parameter :: C12_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
 real(Float64), parameter :: mass_u    = 1.660539040d-27
     !+ Atomic mass unit [kg]
@@ -3374,10 +3376,12 @@ subroutine read_plasma
     enddo
 
     select case (impurity_charge)
+        case (2)
+            impurity_mass = He4_amu
         case (5)
-            impurity_mass = B5_amu
+            impurity_mass = B10_amu
         case (6)
-            impurity_mass = C6_amu
+            impurity_mass = C12_amu
         case DEFAULT
             impurity_mass = 2.d0*impurity_charge*H1_amu
     end select
@@ -4374,12 +4378,14 @@ subroutine read_tables
     !!Read Hydrogen-Impurity Transitions
     impname = ''
     select case (impurity_charge)
+        case (2)
+            impname = "He2"
         case (5)
             impname = "B5"
         case (6)
             impname = "C6"
         case DEFAULT
-            impname = "Aq"
+            write(impname,'("A",i1)') impurity_charge
     end select
 
     call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), tables%H_Aq)

@@ -14,7 +14,7 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
-PYTHON_EXEC = $(shell which python)
+PYTHON_EXEC = $(shell which python3)
 
 #Operating Systems
 OS := $(shell uname)
@@ -181,6 +181,7 @@ docs:
 
 .PHONY: python
 python:
+	@echo "Linking python executable: $(PYTHON_EXEC) --> $(DEPS_DIR)/python"
 	@ln -sf $(PYTHON_EXEC) $(DEPS_DIR)/python
 
 clean_all: clean clean_deps clean_docs

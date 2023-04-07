@@ -5227,6 +5227,8 @@ subroutine write_spectra
 
     real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
     real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
+    integer, dimension(n_stark) :: stark_sign
+    stark_sign = +1*stark_sigma - 1*stark_pi
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -5251,6 +5253,9 @@ subroutine write_spectra
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
     if(inputs%stark_components.ge.1) then
         call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
+        call h5ltmake_compressed_dataset_int_f(fid, "/stark_sign", 1, dims(1:1), stark_sign, error)
+        call h5ltset_attribute_string_f(fid,"/stark_sign", "description", &
+         "Stark line indicator: 1=sigma, -1=pi ", error)
     endif
     dims(1) = n_stark
     dims(2) = inputs%nlambda

@@ -53,6 +53,7 @@ PRO write_namelist, filename, inputs
     printf,55,'!! Advanced Settings'
     printf,55,f='("seed = ",i9,  "    !! RNG Seed. If seed is negative a random seed is used")',inputs.seed
     printf,55,f='("flr = ",i2,"    !! Turn on Finite Larmor Radius effects")',inputs.flr
+    printf,55,f='("write_neutrals = ",i2,"    !! Write neutrals to file")',inputs.write_neutrals
     printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
     printf,55,f='("output_neutral_reservoir = ",i2,"    !! Output neutral reservoir to neutrals file")',inputs.output_neutral_reservoir
     printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"

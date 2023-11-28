@@ -129,6 +129,7 @@ PRO check_inputs, inputs
                                   'equilibrium_file',equilibrium_file,$ 
                                   'geometry_file',geometry_file, $
                                   'distribution_file',distribution_file, $
+                                  'write_neutrals', 1, $
                                   'load_neutrals', 0, $
                                   'flr',2, $
                                   'verbose', 1, $

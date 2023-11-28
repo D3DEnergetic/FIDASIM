@@ -103,7 +103,7 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-integer, parameter :: reservoir_size = 50
+integer, parameter :: reservoir_size = 100
     !+ Size of Neutral Particle Reservoir
 
 !!Loop Parallization Settings
@@ -1039,6 +1039,8 @@ type SimulationInputs
         !+ Calculate Passive FIDA: 0 = off, 1=on
     integer(Int32) :: tot_spectra
         !+ Total number of spectral switches on
+    integer(Int32) :: write_neutrals
+        !+ Write neutrals to file: 0 = off, 1=on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
     integer(Int32) :: output_neutral_reservoir
@@ -1978,7 +1980,7 @@ subroutine read_inputs
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght, calc_res
-    integer            :: load_neutrals,verbose,flr,split,stark_components
+    integer            :: write_neutrals,load_neutrals,verbose,flr,split,stark_components
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
@@ -1996,7 +1998,7 @@ subroutine read_inputs
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, calc_res, seed, flr, split, &
-        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
+        calc_fida_wght, calc_npa_wght, write_neutrals, load_neutrals, verbose, stark_components, &
         calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
@@ -2040,6 +2042,7 @@ subroutine read_inputs
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
+    write_neutrals=1
     load_neutrals=0
     output_neutral_reservoir=1
     verbose=0
@@ -2159,6 +2162,7 @@ subroutine read_inputs
     inputs%calc_res = calc_res
 
     !! Misc. Settings
+    inputs%write_neutrals=write_neutrals
     inputs%load_neutrals=load_neutrals
     inputs%output_neutral_reservoir=output_neutral_reservoir
 
@@ -5210,7 +5214,7 @@ end subroutine write_npa
 
 subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
-    integer(HID_T) :: fid, gid
+    integer(HID_T) :: fid, gid, sid
     integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(5) :: dims_stokes
     integer(HSIZE_T), dimension(1) :: d
@@ -5228,10 +5232,10 @@ subroutine write_spectra
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,particles%nclass) :: fidastokes, pfidastokes
 
-    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: full_spat, half_spat, third_spat
-    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
-    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: full_photons, half_photons, third_photons
-    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
+    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: spat
+    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: photons
+    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: distance
+    real(Float64) :: src(3),axis(3),pos(3)
     integer, dimension(n_stark) :: stark_sign
     stark_sign = +1*stark_sigma - 1*stark_pi
 
@@ -5632,7 +5636,7 @@ subroutine write_spectra
 
     if(inputs%calc_res.ge.1) then 
        !Create spatial group
-       call h5gcreate_f(fid, "spatial", gid, error)
+       call h5gcreate_f(fid, "spatial", sid, error)
        call h5ltset_attribute_string_f(fid,"spatial","description", &
             "Spatial Resolution",error)
        dims(1) = 3
@@ -5640,135 +5644,251 @@ subroutine write_spectra
        dims(3) = spec_chords%nchan
        if(inputs%calc_bes.ge.1) then
            !! Full
+           call h5gcreate_f(sid,"full", gid, error)
+           call h5ltset_attribute_string_f(sid,"full","description","Full Energy Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   full_photons(ir,ic) = spatres%full(ic)%R(ir)%w
-                   full_spat(:,ir,ic) = spatres%full(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%full(ic)%R(ir)%w
+                   pos = spatres%full(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "full_spatial", 3, dims(1:3),&
-                dcx_spat, error)
-           call h5ltset_attribute_string_f(gid,"full_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"full_spatial","description",&
-                "Birth position of neutral that produced a photon: full_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "full_photons", 2, dims(2:3),&
-                dcx_photons, error)
-           call h5ltset_attribute_string_f(gid,"full_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"full_photons","description",&
-                "Number of photons produced by neutral: full_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
 
            !! Half 
+           call h5gcreate_f(sid,"half", gid, error)
+           call h5ltset_attribute_string_f(sid,"half","description","Half Energy Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   half_photons(ir,ic) = spatres%half(ic)%R(ir)%w
-                   half_spat(:,ir,ic) = spatres%half(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%half(ic)%R(ir)%w
+                   pos = spatres%half(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "half_spatial", 3, dims(1:3),&
-                dcx_spat, error)
-           call h5ltset_attribute_string_f(gid,"half_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"half_spatial","description",&
-                "Birth position of neutral that produced a photon: half_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "half_photons", 2, dims(2:3),&
-                dcx_photons, error)
-           call h5ltset_attribute_string_f(gid,"half_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"half_photons","description",&
-                "Number of photons produced by neutral: half_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
 
            !! Third
+           call h5gcreate_f(sid,"third", gid, error)
+           call h5ltset_attribute_string_f(sid,"third","description","Third Energy Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   third_photons(ir,ic) = spatres%third(ic)%R(ir)%w
-                   third_spat(:,ir,ic) = spatres%third(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%third(ic)%R(ir)%w
+                   pos = spatres%third(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "third_spatial", 3, dims(1:3),&
-                dcx_spat, error)
-           call h5ltset_attribute_string_f(gid,"third_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"third_spatial","description",&
-                "Birth position of neutral that produced a photon: third_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "third_photons", 2, dims(2:3),&
-                dcx_photons, error)
-           call h5ltset_attribute_string_f(gid,"third_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"third_photons","description",&
-                "Number of photons produced by neutral: third_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
+       endif
+
+       if(inputs%calc_dcx.ge.1) then
+           call h5gcreate_f(sid,"dcx", gid, error)
+           call h5ltset_attribute_string_f(sid,"dcx","description","DCX Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
+           do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
+               do ir=1,reservoir_size
+                   photons(ir,ic) = spatres%dcx(ic)%R(ir)%w
+                   pos = spatres%dcx(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
 
        endif
-       if(inputs%calc_dcx.ge.1) then
-           do ic=1,spec_chords%nchan
-               do ir=1,reservoir_size
-                   dcx_photons(ir,ic) = spatres%dcx(ic)%R(ir)%w
-                   dcx_spat(:,ir,ic) = spatres%dcx(ic)%R(ir)%v
-               enddo
-           enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "dcx_spatial", 3, dims(1:3),&
-                dcx_spat, error)
-           call h5ltset_attribute_string_f(gid,"dcx_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"dcx_spatial","description",&
-                "Birth position of neutral that produced a photon: dcx_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "dcx_photons", 2, dims(2:3),&
-                dcx_photons, error)
-           call h5ltset_attribute_string_f(gid,"dcx_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"dcx_photons","description",&
-                "Number of photons produced by neutral: dcx_photons(sample,channel)",error)
-       endif
+
        if(inputs%calc_halo.ge.1) then
+           call h5gcreate_f(sid,"halo", gid, error)
+           call h5ltset_attribute_string_f(sid,"halo","description","Halo Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   halo_photons(ir,ic) = spatres%halo(ic)%R(ir)%w
-                   halo_spat(:,ir,ic) = spatres%halo(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%halo(ic)%R(ir)%w
+                   pos = spatres%halo(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "halo_spatial", 3, dims(1:3),&
-                halo_spat, error)
-           call h5ltset_attribute_string_f(gid,"halo_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"halo_spatial","description",&
-                "Birth position of neutral that produced a photon: halo_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "halo_photons", 2, dims(2:3),&
-                halo_photons, error)
-           call h5ltset_attribute_string_f(gid,"halo_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"halo_photons","description",&
-                "Number of photons produced by neutral: halo_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
        endif
+
        if(inputs%calc_fida.ge.1) then
+           call h5gcreate_f(sid,"fida", gid, error)
+           call h5ltset_attribute_string_f(sid,"fida","description","FIDA Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   fida_photons(ir,ic) = spatres%fida(ic)%R(ir)%w
-                   fida_spat(:,ir,ic) = spatres%fida(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%fida(ic)%R(ir)%w
+                   pos = spatres%fida(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "fida_spatial", 3, dims(1:3),&
-                fida_spat, error)
-           call h5ltset_attribute_string_f(gid,"fida_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"fida_spatial","description",&
-                "Birth position of neutral that produced a photon: fida_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "fida_photons", 2, dims(2:3),&
-                fida_photons, error)
-           call h5ltset_attribute_string_f(gid,"fida_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"fida_photons","description",&
-                "Number of photons produced by neutral: fida_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
        endif
+
        if(inputs%calc_pfida.ge.1) then
+           call h5gcreate_f(sid,"pfida", gid, error)
+           call h5ltset_attribute_string_f(sid,"pfida","description","Passive FIDA Spatial Resolution",error)
+           photons = 0.0
+           spat = 0.0
+           distance = 0.0
            do ic=1,spec_chords%nchan
+               axis = spec_chords%los(ic)%axis
+               axis = axis/norm2(axis)
+               src = spec_chords%los(ic)%lens
                do ir=1,reservoir_size
-                   pfida_photons(ir,ic) = spatres%pfida(ic)%R(ir)%w
-                   pfida_spat(:,ir,ic) = spatres%pfida(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%fida(ic)%R(ir)%w
+                   pos = spatres%fida(ic)%R(ir)%v
+                   spat(:,ir,ic) = pos
+                   distance(ir,ic) = dot_product((pos - src),axis)
                enddo
            enddo
-           call h5ltmake_compressed_dataset_double_f(gid, "pfida_spatial", 3, dims(1:3),&
-                pfida_spat, error)
-           call h5ltset_attribute_string_f(gid,"pfida_spatial","units","cm",error)
-           call h5ltset_attribute_string_f(gid,"pfida_spatial","description",&
-                "Birth position of neutral that produced a photon: pfida_spatial([x,y,z],sample,channel)",error)
-           call h5ltmake_compressed_dataset_double_f(gid, "pfida_photons", 2, dims(2:3),&
-                pfida_photons, error)
-           call h5ltset_attribute_string_f(gid,"pfida_photons","units","Ph",error)
-           call h5ltset_attribute_string_f(gid,"pfida_photons","description",&
-                "Number of photons produced by neutral: pfida_photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
+                spat, error)
+           call h5ltset_attribute_string_f(gid,"ri","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"ri","description",&
+                "Birth position of neutral that produced a photon: ri([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "photons", 2, dims(2:3),&
+                photons, error)
+           call h5ltset_attribute_string_f(gid,"photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"photons","description",&
+                "Number of photons produced by neutral: photons(sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "distance", 2, dims(2:3),&
+                distance, error)
+           call h5ltset_attribute_string_f(gid,"distance","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"distance","description",&
+                "Distance from lens such that lens + distance*axis = point on LOS closest to ri: distance(sample,channel)",error)
+           call h5gclose_f(gid, error)
        endif
 
        !Close spatial group
-       call h5gclose_f(gid, error)
+       call h5gclose_f(sid, error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -13997,13 +14117,13 @@ program fidasim
             endif
 
             !! ---------- WRITE NEUTRALS ---------- !!
-            if(inputs%verbose.ge.1) then
+            if(inputs%verbose.ge.1.and.inputs%write_neutrals.ge.1) then
                 write(*,*) 'write neutrals:    ' , time_string(time_start)
             endif
 #ifdef _MPI
-            if(my_rank().eq.0) call write_neutrals()
+            if(my_rank().eq.0.and.(inputs%write_neutrals.eq.1)) call write_neutrals()
 #else
-            call write_neutrals()
+            if(inputs%write_neutrals.eq.1) call write_neutrals()
 #endif
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
         endif

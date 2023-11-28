@@ -78,7 +78,7 @@ endif
 
 ifneq ($(findstring gfortran, $(FC)),)
         L_FLAGS = -lm
-        COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp -Wfatal-errors
+        COMMON_CFLAGS = -Ofast -fbacktrace -cpp -Wfatal-errors
         DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
         OPENMP_FLAGS = -fopenmp -D_OMP
         MPI_FLAGS = -D_MPI
@@ -100,7 +100,7 @@ endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
         L_FLAGS = -lm -mkl
-        COMMON_CFLAGS = -Ofast -g -traceback -fpp -D_USE_BLAS
+        COMMON_CFLAGS = -Ofast -traceback -fpp -D_USE_BLAS
         DEBUG_CFLAGS = -O0 -g -fpp -traceback -check all -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI

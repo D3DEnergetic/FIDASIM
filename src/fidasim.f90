@@ -937,6 +937,9 @@ end type Neutrals
 
 type SpatialSpectra
     !+ Spatial Storage of photon neutral birth
+    type(NeutralParticleReservoir), dimension(:), allocatable :: full
+    type(NeutralParticleReservoir), dimension(:), allocatable :: half
+    type(NeutralParticleReservoir), dimension(:), allocatable :: third
     type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
     type(NeutralParticleReservoir), dimension(:), allocatable :: halo
     type(NeutralParticleReservoir), dimension(:), allocatable :: fida
@@ -5225,7 +5228,9 @@ subroutine write_spectra
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,particles%nclass) :: fidastokes, pfidastokes
 
+    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: full_spat, half_spat, third_spat
     real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
+    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: full_photons, half_photons, third_photons
     real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
     integer, dimension(n_stark) :: stark_sign
     stark_sign = +1*stark_sigma - 1*stark_pi
@@ -5633,6 +5638,62 @@ subroutine write_spectra
        dims(1) = 3
        dims(2) = reservoir_size
        dims(3) = spec_chords%nchan
+       if(inputs%calc_bes.ge.1) then
+           !! Full
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   full_photons(ir,ic) = spatres%full(ic)%R(ir)%w
+                   full_spat(:,ir,ic) = spatres%full(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "full_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"full_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"full_spatial","description",&
+                "Birth position of neutral that produced a photon: full_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "full_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"full_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"full_photons","description",&
+                "Number of photons produced by neutral: full_photons(sample,channel)",error)
+
+           !! Half 
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   half_photons(ir,ic) = spatres%half(ic)%R(ir)%w
+                   half_spat(:,ir,ic) = spatres%half(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "half_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"half_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"half_spatial","description",&
+                "Birth position of neutral that produced a photon: half_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "half_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"half_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"half_photons","description",&
+                "Number of photons produced by neutral: half_photons(sample,channel)",error)
+
+           !! Third
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   third_photons(ir,ic) = spatres%third(ic)%R(ir)%w
+                   third_spat(:,ir,ic) = spatres%third(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "third_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"third_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"third_spatial","description",&
+                "Birth position of neutral that produced a photon: third_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "third_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"third_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"third_photons","description",&
+                "Number of photons produced by neutral: third_photons(sample,channel)",error)
+
+       endif
        if(inputs%calc_dcx.ge.1) then
            do ic=1,spec_chords%nchan
                do ir=1,reservoir_size
@@ -10091,7 +10152,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
     enddo loop_over_channels
 end subroutine store_photons
 
-subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
+subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type, store_spatial)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
@@ -10103,14 +10164,31 @@ subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     integer,intent(in)                      :: neut_type
         !+ Neutral type (full,half,third,halo)
+    logical, intent(in), optional           :: store_spatial
+        !+ Store neutral position and photons in reservoir
+
+    logical :: store_spat = .False.
+
+    if(present(store_spatial)) then
+        store_spat = store_spatial
+    endif
 
     select case (neut_type)
            case (nbif_type)
                call store_photons(pos,vi,lambda0,photons,spec%full,spec%fullstokes)
+               if(store_spat) then
+                   call store_photon_birth(pos, photons, spatres%full)
+               endif
            case (nbih_type)
                call store_photons(pos,vi,lambda0,photons,spec%half, spec%halfstokes)
+               if(store_spat) then
+                   call store_photon_birth(pos, photons, spatres%half)
+               endif
            case (nbit_type)
                call store_photons(pos,vi,lambda0,photons,spec%third,spec%thirdstokes)
+               if(store_spat) then
+                   call store_photon_birth(pos, photons, spatres%third)
+               endif
            case default
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_NBI_PHOTONS: Unknown neutral type: ",i2)') neut_type
@@ -10977,7 +11055,7 @@ subroutine ndmc
                 endif
 
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
-                    call store_nbi_photons(tracks(jj)%pos,vnbi,beam_lambda0, photons/nlaunch,neut_type)
+                    call store_nbi_photons(tracks(jj)%pos,vnbi,beam_lambda0, photons/nlaunch, neut_type, inputs%calc_res.eq.1)
                 endif
             enddo loop_along_track
             if((inputs%calc_birth.ge.1).and.(flux_tot.gt.0.d0)) then
@@ -11021,6 +11099,13 @@ subroutine ndmc
         call parallel_sum(spec%full)
         call parallel_sum(spec%half)
         call parallel_sum(spec%third)
+        if(inputs%calc_res.ge.1) then
+            do jj=1,spec_chords%nchan
+                call parallel_merge_reservoirs(spatres%full(jj))
+                call parallel_merge_reservoirs(spatres%half(jj))
+                call parallel_merge_reservoirs(spatres%third(jj))
+            enddo
+        endif
     endif
 #endif
 
@@ -13795,6 +13880,11 @@ program fidasim
     endif
 
     if(inputs%calc_res.ge.1) then
+        if(inputs%calc_bes.ge.1) then
+            allocate(spatres%full(spec_chords%nchan))
+            allocate(spatres%half(spec_chords%nchan))
+            allocate(spatres%third(spec_chords%nchan))
+        endif
         if(inputs%calc_dcx.ge.1) allocate(spatres%dcx(spec_chords%nchan))
         if(inputs%calc_halo.ge.1) allocate(spatres%halo(spec_chords%nchan))
         if(inputs%calc_fida.ge.1) allocate(spatres%fida(spec_chords%nchan))

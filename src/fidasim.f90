@@ -935,15 +935,22 @@ type Neutrals
 !        !+ FIDA-Halo neutral population
 end type Neutrals
 
+type PhotonPopulation
+    real(Float64) :: photons = 0.0
+        !+ Photons per line of sight: photons(nchan)
+    type(NeutralParticleReservoir) :: res
+        !+ Photon particle reservoir
+end type PhotonPopulation
+
 type SpatialSpectra
     !+ Spatial Storage of photon neutral birth
-    type(NeutralParticleReservoir), dimension(:), allocatable :: full
-    type(NeutralParticleReservoir), dimension(:), allocatable :: half
-    type(NeutralParticleReservoir), dimension(:), allocatable :: third
-    type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
-    type(NeutralParticleReservoir), dimension(:), allocatable :: halo
-    type(NeutralParticleReservoir), dimension(:), allocatable :: fida
-    type(NeutralParticleReservoir), dimension(:), allocatable :: pfida
+    type(PhotonPopulation), dimension(:), allocatable :: full
+    type(PhotonPopulation), dimension(:), allocatable :: half
+    type(PhotonPopulation), dimension(:), allocatable :: third
+    type(PhotonPopulation), dimension(:), allocatable :: dcx
+    type(PhotonPopulation), dimension(:), allocatable :: halo
+    type(PhotonPopulation), dimension(:), allocatable :: fida
+    type(PhotonPopulation), dimension(:), allocatable :: pfida
 end type SpatialSpectra
 
 type FIDAWeights
@@ -5235,7 +5242,7 @@ subroutine write_spectra
     real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: spat
     real(Float64), dimension(reservoir_size,spec_chords%nchan) :: photons
     real(Float64), dimension(reservoir_size,spec_chords%nchan) :: distance
-    real(Float64) :: src(3),axis(3),pos(3)
+    real(Float64) :: photon_tot, src(3),axis(3),pos(3)
     integer, dimension(n_stark) :: stark_sign
     stark_sign = +1*stark_sigma - 1*stark_pi
 
@@ -5692,6 +5699,7 @@ subroutine write_spectra
            !! Full
            call h5gcreate_f(sid,"full", gid, error)
            call h5ltset_attribute_string_f(sid,"full","description","Full Energy Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5699,12 +5707,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%full(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%full(ic)%R(ir)%w
-                   pos = spatres%full(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%full(ic)%res%R(ir)%w
+                   pos = spatres%full(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5726,6 +5736,7 @@ subroutine write_spectra
            !! Half 
            call h5gcreate_f(sid,"half", gid, error)
            call h5ltset_attribute_string_f(sid,"half","description","Half Energy Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5733,12 +5744,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%half(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%half(ic)%R(ir)%w
-                   pos = spatres%half(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%half(ic)%res%R(ir)%w
+                   pos = spatres%half(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5760,6 +5773,7 @@ subroutine write_spectra
            !! Third
            call h5gcreate_f(sid,"third", gid, error)
            call h5ltset_attribute_string_f(sid,"third","description","Third Energy Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5767,12 +5781,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%third(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%third(ic)%R(ir)%w
-                   pos = spatres%third(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%third(ic)%res%R(ir)%w
+                   pos = spatres%third(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5795,6 +5811,7 @@ subroutine write_spectra
        if(inputs%calc_dcx.ge.1) then
            call h5gcreate_f(sid,"dcx", gid, error)
            call h5ltset_attribute_string_f(sid,"dcx","description","DCX Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5802,12 +5819,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%dcx(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%dcx(ic)%R(ir)%w
-                   pos = spatres%dcx(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%dcx(ic)%res%R(ir)%w
+                   pos = spatres%dcx(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5831,6 +5850,7 @@ subroutine write_spectra
        if(inputs%calc_halo.ge.1) then
            call h5gcreate_f(sid,"halo", gid, error)
            call h5ltset_attribute_string_f(sid,"halo","description","Halo Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5838,12 +5858,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%halo(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%halo(ic)%R(ir)%w
-                   pos = spatres%halo(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%halo(ic)%res%R(ir)%w
+                   pos = spatres%halo(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5866,6 +5888,7 @@ subroutine write_spectra
        if(inputs%calc_fida.ge.1) then
            call h5gcreate_f(sid,"fida", gid, error)
            call h5ltset_attribute_string_f(sid,"fida","description","FIDA Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5873,12 +5896,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%fida(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%fida(ic)%R(ir)%w
-                   pos = spatres%fida(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%fida(ic)%res%R(ir)%w
+                   pos = spatres%fida(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -5901,6 +5926,7 @@ subroutine write_spectra
        if(inputs%calc_pfida.ge.1) then
            call h5gcreate_f(sid,"pfida", gid, error)
            call h5ltset_attribute_string_f(sid,"pfida","description","Passive FIDA Spatial Resolution",error)
+           photon_tot = 0.0
            photons = 0.0
            spat = 0.0
            distance = 0.0
@@ -5908,12 +5934,14 @@ subroutine write_spectra
                axis = spec_chords%los(ic)%axis
                axis = axis/norm2(axis)
                src = spec_chords%los(ic)%lens
+               photon_tot = spatres%pfida(ic)%photons
                do ir=1,reservoir_size
-                   photons(ir,ic) = spatres%fida(ic)%R(ir)%w
-                   pos = spatres%fida(ic)%R(ir)%v
+                   photons(ir,ic) = spatres%pfida(ic)%res%R(ir)%w
+                   pos = spatres%pfida(ic)%res%R(ir)%v
                    spat(:,ir,ic) = pos
                    distance(ir,ic) = dot_product((pos - src),axis)
                enddo
+               photons(:,ic) = photon_tot*photons(:,ic)/sum(photons(:,ic))
            enddo
            call h5ltmake_compressed_dataset_double_f(gid, "ri", 3, dims(1:3),&
                 spat, error)
@@ -10397,15 +10425,15 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
 
 end subroutine store_fida_photons
 
-subroutine store_photon_birth(pos, photons, res, passive)
+subroutine store_photon_birth(pos, photons, pop, passive)
     !+ Store neutral birth location of the photon source
-    real(Float64), dimension(3), intent(in)       :: pos
+    real(Float64), dimension(3), intent(in)             :: pos
         !+ Birth location of the photon source neutral
-    real(Float64), intent(in)                     :: photons
+    real(Float64), intent(in)                           :: photons
         !+ Number of photons
-    type(NeutralParticleReservoir), dimension(:), intent(inout) :: res
-        !+ reservoir of neutral particles
-    logical, intent(in), optional                 :: passive
+    type(PhotonPopulation), dimension(:), intent(inout) :: pop
+        !+ Photon Population
+    logical, intent(in), optional                       :: passive
 
     integer :: i = 1, ichan
     logical :: pas = .False.
@@ -10431,7 +10459,8 @@ subroutine store_photon_birth(pos, photons, res, passive)
 
     loop_over_channels: do i=1,nchan
         ichan = inter%los_elem(i)%id
-        call update_reservoir(res(ichan), pos, photons)
+        pop(ichan)%photons = pop(ichan)%photons + photons
+        call update_reservoir(pop(ichan)%res, pos, photons)
     enddo loop_over_channels
 
 end subroutine store_photon_birth
@@ -11267,9 +11296,9 @@ subroutine ndmc
         call parallel_sum(spec%third)
         if(inputs%calc_res.ge.1) then
             do jj=1,spec_chords%nchan
-                call parallel_merge_reservoirs(spatres%full(jj))
-                call parallel_merge_reservoirs(spatres%half(jj))
-                call parallel_merge_reservoirs(spatres%third(jj))
+                call parallel_merge_reservoirs(spatres%full(jj)%res)
+                call parallel_merge_reservoirs(spatres%half(jj)%res)
+                call parallel_merge_reservoirs(spatres%third(jj)%res)
             enddo
         endif
     endif
@@ -11402,7 +11431,7 @@ subroutine dcx
     endif
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%dcx(jj))
+            call parallel_merge_reservoirs(spatres%dcx(jj)%res)
         enddo
     endif
 #endif
@@ -11592,7 +11621,7 @@ subroutine halo
     endif
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%halo(jj))
+            call parallel_merge_reservoirs(spatres%halo(jj)%res)
         enddo
     endif
 #endif
@@ -12015,7 +12044,7 @@ subroutine fida_f
     call parallel_sum(spec%fida)
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%fida(jj))
+            call parallel_merge_reservoirs(spatres%fida(jj)%res)
         enddo
     endif
 #endif
@@ -12132,7 +12161,7 @@ subroutine pfida_f
     call parallel_sum(spec%pfida)
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%pfida(jj))
+            call parallel_merge_reservoirs(spatres%pfida(jj)%res)
         enddo
     endif
 #endif
@@ -12240,7 +12269,7 @@ subroutine fida_mc
     call parallel_sum(spec%fida)
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%fida(jj))
+            call parallel_merge_reservoirs(spatres%fida(jj)%res)
         enddo
     endif
 #endif
@@ -12354,7 +12383,7 @@ subroutine pfida_mc
     call parallel_sum(spec%pfida)
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
-            call parallel_merge_reservoirs(spatres%pfida(jj))
+            call parallel_merge_reservoirs(spatres%pfida(jj)%res)
         enddo
     endif
 #endif

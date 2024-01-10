@@ -3628,7 +3628,6 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: deni_tot
     integer :: ir,is
     logical :: path_valid
 
@@ -3714,23 +3713,6 @@ subroutine read_f(fid, error)
     fbm%phimax = maxval(fbm%phi,1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
-    deni_tot = 0.0
-    do ir=1,fbm%nr
-        fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
-        do is=1,n_thermal
-            deni_tot = deni_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%deni(is))*fbm%r(ir)
-        enddo
-    enddo
-
-    if(fbm%n_tot.ge.deni_tot) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
-                "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
-                 fbm%n_tot, deni_tot
-            write(*,'(a)') "This is usually caused by zeff being incorrect."
-        endif
-        stop
-    endif
 
     if(inputs%verbose.ge.1) then
         if(fbm%nphi.gt.1) then
@@ -9182,6 +9164,9 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
         rate = 0.d0
     else
         rate = 0.d0
+        if (beam_mass.eq.H2_amu) then
+            rate = plasma%denf * exp(lograte*log_10)
+        endif
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
                 rate = rate + plasma%deni(is) * exp(lograte*log_10)
@@ -9545,7 +9530,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     real(Float64) :: logTmin, dlogT, logti, logti_amu, logte
     integer :: neb, nt, i
     type(InterpolCoeffs2D) :: c
-    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp
+    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp, denf, deni_i
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop_i, H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop_i, H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
@@ -9560,6 +9545,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     deni = plasma%deni
     dene = plasma%dene
     denimp = plasma%denimp
+    denf = plasma%denf
     logeb_amu = log10(eb/ab)
     logti = log10(plasma%ti)
     logte = log10(plasma%te)
@@ -9575,6 +9561,10 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     do i=1, n_thermal
         H_H_pop_i = 0.d0
         H_H_depop_i = 0.d0
+        deni_i = deni(i)
+        if(beam_mass.eq.thermal_mass(i)) then
+            deni_i = deni(i) + denf
+        endif
         logti_amu = log10(plasma%ti/thermal_mass(i))
         call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
                             logeb_amu, logti_amu, c, err_status)
@@ -9598,7 +9588,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_pop_i.lt.tables%H_H%minlog_pop)
                 H_H_pop_i = 0.d0
             elsewhere
-                H_H_pop_i = deni(i) * exp(H_H_pop_i*log_10)
+                H_H_pop_i = deni_i * exp(H_H_pop_i*log_10)
             end where
 
             H_H_depop_i = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
@@ -9608,7 +9598,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_depop_i.lt.tables%H_H%minlog_depop)
                 H_H_depop_i = 0.d0
             elsewhere
-                H_H_depop_i = deni(i) * exp(H_H_depop_i*log_10)
+                H_H_depop_i = deni_i * exp(H_H_depop_i*log_10)
             end where
         endif
         H_H_pop = H_H_pop + H_H_pop_i

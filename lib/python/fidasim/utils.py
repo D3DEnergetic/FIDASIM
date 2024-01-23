@@ -18,6 +18,9 @@ from scipy.io import netcdf
 from scipy.interpolate import interp1d, interp2d, NearestNDInterpolator
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
+import matplotlib.path as mplPath
+
+is_sorted = lambda a: np.all(a[:-1] <= a[1:])
 
 FIDASIM_default_COCOS = 5 
 class COCOS:
@@ -103,6 +106,11 @@ def get_version(fidasim_dir):
                 version = f.read()
 
     return version
+
+def point_in_polygon(poly,points):
+    path = mplPath.Path(poly)
+    inside = path.contains_points(points)
+    return inside
 
 def aabb_intersect(rc, dr, r0, d0):
     """
@@ -1504,3 +1512,161 @@ def nubeam_geometry(nubeam, angle=0.0, verbose=False):
            "adist":nubeam["XLBAPA"] }
 
     return nbi
+
+def read_imas_nbi(imas_file, beam_index, time_index):
+    g = h5py.File(imas_file,'r')
+
+    path = 'nbi/unit/{}/'.format(beam_index)
+
+    ab = g[path+'species/a'][()]
+    Zb = g[path+'species/z_n'][()]
+    einj = g[path+'energy/data'][()][time_index]*1e-3 #keV
+    pinj = g[path+'power_launched/data'][()][time_index]*1e-6 #MW
+    cfracs = g[path+'beam_current_fraction/data'][()][:,time_index]
+
+    shape = g[path+'source/geometry_type'][()]
+    if shape == 3:
+        shape = 1
+    elif shape == 2
+        shape == 2
+    else
+        shape = 1
+
+    src_r = g[path+'source/centre/r'][()]
+    src_z = g[path+'source/centre/z'][()]
+    src_phi = g[path+'source/centre/phi'][()]
+
+    src_u = src_r*np.cos(src_phi)
+    src_v = src_r*np.sin(src_phi)
+    uvw_src = np.array([src_u,src_v,src_z])
+    uvw_axis = np.array([g[path+'source/x3_unit_vector/{}'.format(i)][()] for i in ['x','y','z'])
+
+    # FIDASIM doesnt support beamlets yet so just average
+    nbeamlets = len(g[path+'beamlets_group'].keys())
+    widz = np.mean([g[path+'beamlets_group/{}/width_vertical'.format(i)][()] for i in range(nbeamlets)])
+    widy = np.mean([g[path+'beamlets_group/{}/width_horizontal'.format(i)][()] for i in range(nbeamlets)])
+
+    focz = np.mean([g[path+'beamlets_group/{}/focus/focal_length_vertical'.format(i)][()] for i in range(nbeamlets)])
+    focy = np.mean([g[path+'beamlets_group/{}/focus/focal_length_horizontal'.format(i)][()] for i in range(nbeamlets)])
+
+    divy = np.array([np.mean([g[path+'beamlets_group/{}/divergence_component/{}/horizontal'.format(i,j)][()] for i in range(nbeamlets)]) for j in range(3)])
+    divz = np.array([np.mean([g[path+'beamlets_group/{}/divergence_component/{}/vertical'.format(i,j)][()] for i in range(nbeamlets)]) for j in range(3)])
+
+
+    naper = len(g[path+'aperture'].keys())
+    aper_shape = [g[path+'aperture/{}/geometry_type'.format(i)][()] for i in range(naper)]
+    ashape = np.array([1 if a == 3 else 2 for a in aper_shape]) # ignores outline shape
+
+    aper_rs = [g[path+'aperture/{}/centre/r'.format(i)][()] for i in range(naper)]
+    aper_zs = [g[path+'aperture/{}/centre/z'.format(i)][()] for i in range(naper)]
+    aper_phis = [g[path+'aperture/{}/centre/phi'.format(i)][()] for i in range(naper)]
+
+    aper_xs = [r*np.cos(p) for (r,p) in zip(aper_rs,aper_phis)]
+    aper_ys = [r*np.sin(p) for (r,p) in zip(aper_rs,aper_phis)]
+
+    sx = src_u
+    sy = src_v
+    sz = src_z
+    adist = np.array([np.sqrt((ax - sx)**2 + (ay - sy)**2 + (az - sz)**2) for (ax,ay,az) in zip(aper_xs,aper_ys,aper_zs)])
+
+    #assume zero offset
+    aoffz = np.zeros(naper)
+    aoffy = np.zeros(naper)
+
+    awidy = np.array([g[path+'aperture/{}/x1_width'.format(i)][()] for i in range(naper)]
+    awidz = np.array([g[path+'aperture/{}/x2_width'.format(i)][()] for i in range(naper)]
+
+    nbi = {"name":"beam: {}".format(beam_index),"shape":shape,"data_source":imas_file,
+           "src":uvw_src, "axis":uvw_axis, "widy":widy, "widz":widz,
+           "divy":divy, "divz":divz, "focy":focy, "focz":focz,
+           "naperture":naper, "ashape":ashape, "adist":adist,
+           "awidy":awidy, "awidz":awidz, "aoffy":aoffy, "aoffz":aoffz}
+
+    g.close()
+
+    return nbi, {"ab":ab,"Zb":Zb,"einj":einj,"pinj":pinj,"current_fractions":cfracs}
+
+def read_imas_equilbrium(imas_file, time_index; impurity_charge=None):
+    g = h5py.File(imas_file)
+
+    path = "core_profiles/profiles_1d/{}/".format(time_index)
+
+    psi = g[path+"grid/psi"][()]
+    te = g[path+"electrons/temperature"][()]/1000 #keV
+    dene = g[path+"electrons/density"][()]*1e-6 # cm-3
+    zeff = g[path+"zeff"][()]
+    denn = g[path+"neutral/0/density"][()]*1e-6 # cm-3
+    vtor = g[path+"ion/0/velocity/toroidal"][()]*100 #cm/s
+
+    # different number of ions
+    ti = [g[path+"ion/{}/temperature".format(i)][()]/1000 for i in g[path+"ion"].keys()]#keV
+    deni = [g[path+"ion/{}/density".format(i)][()]*1e-6 for i in g[path+"ion"].keys()]#keV
+    species_mass = np.array([g[path+"ion/{}/element/0/a".format(i)][()]*1.007 for i in g[path+"ion"].keys()]#keV
+    species_charge = np.array([g[path+"ion/{}/element/0/z_n".format(i)][()] for i in g[path+"ion"].keys()]#keV
+    nthermal = len(species_mass)
+
+    # get fields
+    path = "equilibrium/time_slice/{}/profiles_2d/0/".format(time_index)
+
+    r = g[path+"grid/dim1"][()]*100
+    nr = len(r)
+    z = g[path+"grid/dim2"][()]*100
+    nz = len(z)
+    r2d = np.tile(r, (nz, 1)).T
+    z2d = np.tile(z, (nr, 1))
+    br = g[path+"b_field_r"][()]
+    bz = g[path+"b_field_z"][()]
+    bt = g[path+"b_field_tor"][()]
+    psi_rz = g[path+"psi"][()]
+    bdry_r = g[path+"boundary/outline/r"][()][:-1]*100
+    bdry_z = g[path+"boundary/outline/z"][()][:-1]*100
+    bdry_points = [(r,z) for (r,z) in zip(bdry_r,bdry_z)]
+    mask = np.zeros(psi_rz.shape,dtype='int')
+    r2d_flat = r2d.flatten()
+    z2d_flat = z2d.flatten()
+    points = np.concatenate([r2d_flat.reshape(1,len(r2d_flat)),z2d_flat.reshape(1,len(z2d_flat))],axis=0)
+    w = point_in_polygon(bdry_points,points)
+    mask[w] = 1
+
+    if !is_sorted(psi):
+        psi = psi[::-1]
+        te = te[::-1]
+        dene = dene[::-1]
+        zeff = zeff[::-1]
+        denn = denn[::-1]
+        ti = [ti_i[::-1] for ti_i in ti]
+        deni = [deni_i[::-1] for deni_i in deni]
+        vtor = vtor[::-1]
+
+    te_rz = interp1d(psi,te,'cubic',fill_value='extrapolate')(psi_rz)
+    dene_rz = interp1d(psi,dene,'cubic',fill_value='extrapolate')(psi_rz)
+    zeff_rz = interp1d(psi,zeff,'cubic',fill_value='extrapolate')(psi_rz)
+    denn_rz = interp1d(psi,denn,'cubic',fill_value='extrapolate')(psi_rz)
+    vtor_rz = interp1d(psi,vtor,'cubic',fill_value='extrapolate')(psi_rz)
+
+    # for ti assume the same temperature (using average over all ions)
+    ti_rz = np.mean(np.concatenate([interp1d(psi,ti_i,'cubic',fill_value='extrapolate')(psi_rz).reshape((1,) + psi_rz.shape) for ti_i in ti],axis=0),axis=0)
+    deni_rz = np.concatenate([interp1d(psi,deni_i,'cubic',fill_value='extrapolate')(psi_rz).reshape((1,) + psi_rz.shape) for deni_i in deni],axis=0)
+
+    vt_rz = r2d*vtor_rz
+    vr_rz = 0*vt_rz
+    vz_rz = 0*vt_rz
+
+    if impurity_charge is None:
+        impurity_charge = np.max(species_charge) # assume impurity charge is largest 
+
+    denimp_rz = dene_rz * (zeff_rz - 1.0) / (impurity_charge*(impurity_charge-1))
+
+    plasma = {"nr":nr, "nz":nz,"r":r,"z":z,"time":0.0,"r2d":r2d,"z2d":z2d,
+              "data_source":imas_file, impurity_charge:impurity_charge,"nthermal":nthermal, "species_mass":species_mass,"mask":mask,
+              "te":te_rz,"ti":ti_rz,"dene":dene_rz,"denn":denn_rz,"zeff":zeff_rz,"deni":deni_rz,"denimp":denimp_rz,
+              "vr":vr_rz,"vz":vz_rz,"vt":vt_rz,"description":"plasma parameters","coordinate_system":"cylindrical"}
+    
+    equil = {"nr":nr,"nz":nz,"r":r,"z":z,"time":0.0,"r2d":r2d,"z2d":z2d,
+             "data_source":imas_file, "mask":mask, "br":br, "bz":bz, "bt":bt, "er":0*bt, "ez":0*bt, "et":0*bt,
+             "description":"fields","coordinate_system":"cylindrical"}
+
+    g.close()
+
+    return plasma, equil
+

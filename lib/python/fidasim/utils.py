@@ -808,7 +808,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = transform_COCOS_from_geqdsk(efit.readg(filename), ccw_phi=ccw_phi, exp_Bp=exp_Bp, **convert_COCOS_kw)
+
+    g = efit.readg(filename)
+    cc = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+
+    cc_factor = cc.sigma_RphZ*cc.sigma_Bp/((2*np.pi)**cc.exp_Bp)
+
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -827,8 +832,8 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     else:
         rhogrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
 
-    br = np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
-    bz = np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    br = cc_factor*np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    bz = cc_factor*np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
     bt = np.array([fpol_itp(psirz_itp(rr,zz))/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
 
     er = br*0

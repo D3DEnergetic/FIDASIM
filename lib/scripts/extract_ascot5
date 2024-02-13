@@ -1,0 +1,315 @@
+#!/bin/sh
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
+
+"""
+Create FIDASIM input from ASCOT5 output. 
+Works with FIDASIM version 2.0.0.
+
+Based on the script a5fidasim.py (in ascot5 Git) developed by
+Jari Varje <jari.varje@tokamakenergy.co.uk>
+
+and adapted to TCV by
+Marcelo Baquero-Ruiz <marcelo.baquero@epfl.ch>
+
+generalized by
+Luke Stagner <stagnerl@fusion.gat.com>
+"""
+
+import argparse
+import os, getpass
+import numpy as np
+import fidasim as fs
+from a5py.ascot5io.ascot5 import Ascot
+from a5py.ascotpy import Ascotpy
+
+def write(a5fn, do_write=True, inputs=None, grid=None, nbi=None, plasma=None, fields=None, dist=None, spec=None, npa=None, E_edges=None, xi_edges=None):
+    """
+    Create FIDASIM input from ASCOT5 output.
+    Returns result_dir, runid.
+
+    do_write=False to avoid writing FIDASIM inputs.
+    """
+
+    fidasim_source_dir = fs.utils.get_fidasim_dir()
+    user = getpass.getuser()
+
+    apy = Ascotpy(a5fn)
+    apy.init(bfield=True, plasma=True, neutral=True)
+
+    a5 = Ascot(a5fn)
+
+    # Read some parameters from a5
+    shot = int(a5.plasma.active.get_desc().split(',')[0].split(' ')[1])
+    time = float(a5.plasma.active.get_desc().split(' ')[3])
+    opts = a5.options.active.read()
+    nbi_dat = a5.nbi.active.read()
+    mass_ions = 2.0141 # float(a5.plasma.active.read()["mass"][0]) [amu]
+
+    # Read distribution and dist. parameters form a5
+    dist_vpa_vpe = a5.active.dist5d.read()
+    if E_edges is None:
+        E_edges=dist_vpa_vpe["nppar"]+1
+    if xi_edges is None:
+        xi_edges=dist_vpa_vpe["npperp"]+1
+
+    # M.B-R, Jul. 2021: Modified scaling from results of my tests.
+    # I start by changing variables to E, pitch AND integrating the distribution function over the quantities that are not needed.
+    int_coord = {"phi" : 0, "time" : 0, "charge" : 0}
+    dist_E_xi = a5.active.dist5d.get_E_xi_dist(E_edges=E_edges, xi_edges=xi_edges, **int_coord)
+
+    # To go from the ASCOT5 distribution to the FIDASIM distribution, one must multiply f_a5(r,z,E,p) by the ratio vol_a5/vol_fs where vol_a5 and vol_fs are the volume elements for ASCOT5 and FIDASIM, respectively.
+    # For vol_a5, remember that dist_E_xi is already integrated over phi, time and charge (from above). I follow the procedure in the code of the method histogram2distribution in a5py/dist/basic.py
+    vol_a5 = 1
+    for coord in dist_E_xi["abscissae"]:
+        edges = dist_E_xi[coord + "_edges"]
+        dv    = (edges[1:] - edges[:-1])
+        vol_a5   = np.multiply.outer(vol_a5, dv)
+
+    # For an axisymmetric distribution, FIDASIM requires an extra factor of 2pi*r in such a way as to make the integral Int[ f_fs(E, p, r, z) * 2pi*r*dr*dz*dE*dpitch ], i.e. the total number of particles, yield the same result as Int[ f_a5(r, z, E, p) * dr*dz*dE*dpitch ].
+    dr_fs = 1e2*(dist_E_xi["r_edges"][1:]-dist_E_xi["r_edges"][:-1])            # Multiplication by 1e2 is done to change units to cm.
+    r_fs = 1e2*dist_E_xi["r"]                                                   # Multiplication by 1e2 is done to change units to cm.
+    tpirdr_fs = 2*np.pi*(r_fs*dr_fs)                                            # Notice that the "*" yields element-by-element multiplication for the arrays r_fs and dr_fs
+    dz_fs = 1e2*(dist_E_xi["z_edges"][1:]-dist_E_xi["z_edges"][:-1])
+    dE_fs = 1e-3*(dist_E_xi["energy_edges"][1:]-dist_E_xi["energy_edges"][:-1]) # The factor of 1e-3 changes the units to keV
+    dpitch_fs = dist_E_xi["pitch_edges"][1:]-dist_E_xi["pitch_edges"][:-1]
+
+    vol_fs = 1
+    vol_fs = np.multiply.outer(vol_fs, tpirdr_fs)
+    vol_fs = np.multiply.outer(vol_fs, dz_fs)
+    vol_fs = np.multiply.outer(vol_fs, dE_fs)
+    vol_fs = np.multiply.outer(vol_fs, dpitch_fs)
+
+
+
+    if inputs is None:
+        inputs = dict()
+
+        # Shot Info and Input Files
+        inputs["device"] = "TCV"
+        inputs["shot"] = shot
+        inputs["time"] = time
+        inputs["runid"] = opts["qid"]
+        inputs["comment"] = "Fast-ion distribution generated with ASCOT5"
+        inputs["result_dir"] = f'/home/{user}/NoTivoli/FIDASIM/{shot}_{time:.3f}'
+        inputs["tables_file"] = f'{fidasim_source_dir}/tables/atomic_tables.h5'
+
+
+        # Simulation Switches
+        inputs["calc_bes"] = 1           # Calculate Beam Spectra
+        inputs["calc_dcx"] = 1           # Calculate Direct CX Spectra
+        inputs["calc_halo"] = 1          # Calculate Halo Spectra
+        inputs["calc_cold"] = 1          # Calculate Cold D-alpha Spectra
+        inputs["calc_brems"] = 1         # Calculate Bremsstrahlung
+        inputs["calc_fida"] = 1          # Calculate Active FIDA Spectra
+        inputs["calc_npa"] = 0           # Calculate Active NPA
+        inputs["calc_pfida"] = 1         # Calculate Passive FIDA Spectra
+        inputs["calc_pnpa"] = 0          # Calculate Passive NPA
+        inputs["calc_neutron"] = 0       # Calculate B-T Neutron Rate
+        inputs["calc_birth"] = 0         # Calculate Birth Profile
+        inputs["calc_fida_wght"] = 0     # Calculate FIDA weights. Generates very large files!
+        inputs["calc_npa_wght"] = 0      # Calculate NPA weights
+
+        # Monte Carlo Settings 
+        inputs["n_fida"] = 1000000       # Number of Active FIDA mc particles
+        inputs["n_pfida"] = 1000000      # Number of Passive FIDA mc particles
+        inputs["n_npa"] = 2000000        # Number of Active NPA mc particles
+        inputs["n_pnpa"] = 1000000       # Number of Passive NPA mc particles
+        inputs["n_nbi"] = 100000         # Number of NBI mc particles
+        inputs["n_halo"] = 1000000       # Number of HALO mc particles
+        inputs["n_dcx"] = 1000000        # Number of DCX mc particles
+        inputs["n_birth"] = 100000       # Number of BIRTH mc particles
+
+        # Neutral Beam Settings
+        inputs["ab"] = 2.0141   #(1/1.6605391e-27)*float(nbi_dat[1]["mass"])     # Beam Species mass [amu]
+        inputs["pinj"] = 1.0e-6*float(nbi_dat[1]["power"])                       # Beam Power [MW]
+        inputs["einj"] = 1.0e-3*(1/1.602176634e-19)*float(nbi_dat[1]["energy"])  # Beam Energy [keV]
+        inputs["current_fractions"] = nbi_dat[1]["efrac"]                        # Current Fractions (Full, Half, Third)
+
+        # Plasma Settings
+        inputs["ai"] = mass_ions         # Ion Species mass [amu]
+        inputs["impurity_charge"] = 6    # Impurity Charge
+
+        # Beam Grid Settings
+        inputs["nx"] = 95                # Number of cells in X direction (Into Plasma)
+        inputs["ny"] = 30                # Number of cells in Y direction
+        inputs["nz"] = 20                # Number of cells in Z direction
+        inputs["xmin"] = -10.0      #0.0    # Minimum X value [cm]
+        inputs["xmax"] = 150.0      #190.0  # Maximum X value [cm]
+        inputs["ymin"] = -30.0           # Minimum Y value [cm]
+        inputs["ymax"] = 30.0            # Maximum Y value [cm]
+        inputs["zmin"] = -20.0           # Minimum Z value [cm]
+        inputs["zmax"] = 20.0            # Maximum Z value [cm]
+        # Tait-Bryan Angles for z-y`-x`` rotation
+        inputs["alpha"] = 0.71881        # Rotation about z-axis [rad]
+        inputs["beta"] = 0.0             # Rotation about y`-axis [rad]
+        inputs["gamma"] = 0.0            # Rotation about x``-axis [rad]
+        inputs["origin"] = np.array([-119.795, -7.010, 0.0])  # Beam Grid origin in machine coordinates (cartesian), (U, V, W) values [cm]  
+
+        # Wavelength Grid Settings
+        inputs["nlambda"] = 2000         # Number of Wavelengths
+        inputs["lambdamin"] = 647.0      # Minimum Wavelength [nm]
+        inputs["lambdamax"] = 667.0      # Maximum Wavelength [nm]
+
+        # Weight Function Settings
+        inputs["ne_wght"] = 50           # Number of Energies for Weights
+        inputs["np_wght"] = 30           # Number of Pitches for Weights
+        inputs["nphi_wght"] = 100        # Number of Gyro-angles for Weights
+        inputs["emax_wght"] = 30.0       # Maximum Energy for Weights [keV]
+        inputs["nlambda_wght"] = 240     # Number of Wavelengths for Weights
+        inputs["lambdamin_wght"] = 652.0 # Minimum Wavelength for Weights [nm]
+        inputs["lambdamax_wght"] = 660.0 # Maximum Wavelength for Weights [nm]
+
+
+    if grid is None:
+        grid = fidasim.utils.rz_grid(1e2*dist_vpa_vpe["r"][0],
+                                     1e2*dist_vpa_vpe["r"][-1],
+                                     dist_vpa_vpe["nr"],
+                                     1e2*dist_vpa_vpe["z"][0],
+                                     1e2*dist_vpa_vpe["z"][-1],
+                                     dist_vpa_vpe["nz"])
+
+
+    # Neutral Beam geometry, from Ben Geiger's parameters (verified/used by W. Heidbrink, 2018)
+    if nbi is None:
+        nbi = dict()
+        nbi["name"] = "NBH"                                    # Name of the neutral beam
+        nbi["shape"] = 1                                       # Shape of the beam source grid (1 or 2)
+        nbi["data_source"] = "2018 Ben Geiger's parameters"    # Source of the neutral beam geometry
+        nbi["src"] = np.array([-389.3546, -242.8642, 0.0])     # Position of the source grid in machine coordinates [cm]
+        nbi["axis"] = np.array([0.752602416188643, 0.658475210730834, 0.0])          # Direction of the beam center line
+        nbi["widy"] = 12.5                                     # Source grid half-width in the horizontal direction [cm]
+        nbi["widz"] = 12.5                                     # Source grid half-height in the vertical direction [cm]
+        nbi["divy"] = np.array([0.0244, 0.0244, 0.0244])       # Horizontal beam divergence [rad]
+        nbi["divz"] = np.array([0.0103, 0.0103, 0.0103])       # Vertical beam divergence [rad]
+        nbi["focy"] = 376.0                                    # Horizontal focal length [cm]
+        nbi["focz"] = 398.0                                    # Vertical focal length [cm]
+        nbi["naperture"] = 1                                   # Number of apertures
+        nbi["ashape"] = 1                                      # Shape of the aperture(s) (1 or 2)
+        nbi["awidy"] = 16.0                                    # Half-width of the aperture(s) [cm]
+        nbi["awidz"] = 8.5                                     # Half-height of the aperture(s) [cm]
+        nbi["aoffy"] = 5.0                                     # Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline [cm]
+        nbi["aoffz"] = 0.0                                     # Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline [cm]
+        nbi["adist"] = 320.0                                   # Distance from the center of the beam source grid to the aperture(s) plane
+
+
+    if fields is None:
+        fields = dict()
+        fields["time"] = time
+        fields["data_source"] = a5fn
+        fields["br"] = np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                               1e-2*grid["z"], [0],
+                                               "br",grid=True))       # Radial component of the magnetic field [T]
+        fields["bt"] = np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                               1e-2*grid["z"], [0],
+                                               "bphi",grid=True))     # Torodial/Phi component of the magnetic field [T]
+        fields["bz"] = np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                               1e-2*grid["z"], [0],
+                                               "bz",grid=True))       # Z component of the magnetic field [T]
+        fields["er"] = np.zeros([grid["nr"],grid["nz"]])              # Radial component of the electric field [V/m]
+        fields["et"] = np.zeros([grid["nr"],grid["nz"]])              # Torodial/Phi component of the electric field [V/m]
+        fields["ez"] = np.zeros([grid["nr"],grid["nz"]])              # Z component of the electric field [V/m]
+        fields["mask"] = (1*(~np.isnan(fields["br"]) & ~np.isnan(fields["bt"]) & ~np.isnan(fields["bz"]))).astype(np.int32)
+        fields["br"][np.isnan(fields["br"])] = 0.0
+        fields["bt"][np.isnan(fields["bt"])] = 0.0
+        fields["bz"][np.isnan(fields["bz"])] = 0.0
+
+
+    if plasma is None:
+        plasma = dict()
+        plasma["time"] = time
+        plasma["data_source"] = a5fn
+        plasma["te"] = 1e-3*np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                                    1e-2*grid["z"], [0],
+                                                    "te",grid=True))        # Electron temperature [keV]
+        plasma["ti"] = 1e-3*np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                                    1e-2*grid["z"], [0],
+                                                    "ti1",grid=True))       # Ion temperature [keV]
+        plasma["dene"] = 1e-6*np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                                      1e-2*grid["z"], [0],
+                                                      "ne",grid=True))      # Electron density [cm^-3]
+        plasma["denn"] = 1e-6*np.squeeze(apy.evaluate(1e-2*grid["r"], [0],
+                                                      1e-2*grid["z"], [0],
+                                                      "density",grid=True)) # Neutral density
+        plasma["zeff"] = 1.5*np.ones([grid["nr"], grid["nz"]])              # Z-effective (the multiplicative factor of 1.5 was added ad-hoc by M.B-R., 10.09.2020)
+        plasma["vr"] = np.zeros([grid["nr"], grid["nz"]])                   # Radial component of the bulk plasma rotation/flow [cm/s]
+        plasma["vt"] = np.zeros([grid["nr"], grid["nz"]])                   # Torodial/Phi component of the bulk plasma rotation/flow [cm/s]
+        plasma["vz"] = np.zeros([grid["nr"], grid["nz"]])                   # Z component of the bulk plasma rotation/flow [cm/s]
+        plasma["mask"] = 1*(~np.isnan(plasma["te"]) & ~np.isnan(plasma["ti"]) & ~np.isnan(plasma["dene"]) & ~np.isnan(plasma["denn"]))
+        plasma["te"][np.isnan(plasma["te"])] = 0.0
+        plasma["ti"][np.isnan(plasma["ti"])] = 0.0
+        plasma["dene"][np.isnan(plasma["dene"])] = 0.0
+        plasma["denn"][np.isnan(plasma["denn"])] = 0.0
+
+
+    if dist is None:
+        dist = dict()
+        dist["type"] = 1                                               # Distribution type (1): Guiding Center Distribution Function: F(E,p,R,Z[,Phi])
+        dist["time"] = time
+        dist["data_source"] = a5fn 
+        dist["nenergy"] = dist_E_xi["nenergy"]                         # Number of energy values 
+        dist["npitch"] = dist_E_xi["npitch"]                           # Number of pitch values
+        dist["energy"] = 1e-3*dist_E_xi["energy"]                      # Energy array [keV]
+        dist["pitch"] = dist_E_xi["pitch"]                             # Pitch array w.r.t magnetic field
+        # To go from the ASCOT5 distribution to the FIDASIM distribution, one multiplies by the ratio vol_a5/vol_fs and reorganizes the entries.
+        dist["f"] = np.transpose(dist_E_xi["distribution"]*(vol_a5/vol_fs),[2,3,0,1])  # Fast-ion distribution F(E,p,R,Z[,Phi]) [fast-ions/(dE dP cm^3)]
+        # For the distribution on r, z ONLY, I integrate over E and pitch.
+        dv_int = 1
+        dv_int = np.multiply.outer(dv_int, dE_fs)
+        dv_int = np.multiply.outer(dv_int, dpitch_fs)
+        dv_int = np.multiply.outer(dv_int, np.ones(dist_E_xi["nr"]))
+        dv_int = np.multiply.outer(dv_int, np.ones(dist_E_xi["nz"]))
+        dist["denf"] = np.sum(dist["f"]*dv_int,(0,1))   # Fast-ion density [cm^-3]
+        # The lines that follow are just for a quick test:
+        #dist["f"] = np.ones([dist_E_xi["nenergy"], dist_E_xi["npitch"], dist_E_xi["nr"], dist_E_xi["nz"]], dtype='float64')
+        #dist["denf"] = np.ones([dist_E_xi["nr"], dist_E_xi["nz"]], dtype='float64')
+
+
+    # Spectral Geometry - FIDA Lines of Sight, dummy config for one horizontal LOS.
+    if spec is None:
+        spec = dict()
+        spec["nchan"] = 2                                               # Number of channels
+        spec["system"] = "TCV FIDA"                                     # Name of the spectrocopic system(s)
+        spec["data_source"] = "Dummy 2019 LOS"                          # Source of the spectral geometry data
+        spec["id"] = np.array(["hor10", "ver10"]).astype(np.bytes_)     # Channel ID
+        spec["radius"] = np.array([80.7000, 92.0])                      # Line of sight radius at midplane or tangency point [cm]
+        spec["lens"] = np.array([[-110.3246, 75.7029, -0.2500], [-92.0899, -16.1771, 78.0047]]).T    # Lens location in machine coordinates [cm] 
+        spec["axis"] = np.array([[0.66036, -0.75094, 0.0], [0.0285, 0.4282, -0.9033]]).T             # Optical axis/direction of the lines of sight
+        spec["spot_size"] = np.array([1.0, 1.0])                        # Radius of the collecting volume [cm]
+        spec["sigma_pi"] = np.array([1.0, 1.0])                         # Ratio of the intensities of the sigma and pi stark lines
+
+
+    # NPA Geometry, config for shot 62124 (ran by Maksim using Matlab scripts by A. Karpushov, 2019)
+    if npa is None:
+        npa = dict()
+        npa["nchan"] = 1                                               # Number of channels
+        npa["system"] = "TCV CNPA"                                     # Name of the NPA system(s)
+        npa["data_source"] = "Config for shot 62124"                   # Source of the NPA geometry data
+        npa["id"] = np.array(["cnpa1"]).astype(np.bytes_)              # Channel ID
+        npa["radius"] = np.array([57.8393])                            # Line of sight radius at midplane or tangency point [cm]
+        npa["a_shape"] = np.array([2])                                 # Shape of the aperture 
+        npa["a_cent"] = np.array([[46.8073, 178.6677, 0.0]]).T         # Position of the center of the aperture [cm]
+        npa["a_redge"] = np.array([[48.4859, 177.5805, 0.0]]).T        # Position of the apertures right edge [cm]
+        npa["a_tedge"] = np.array([[46.8073, 178.6677, 2.0]]).T        # Position of the apertures top edge [cm]
+        npa["d_shape"] = np.array([2])                                 # Shape of the detector
+        npa["d_cent"] = np.array([[65.8338, 208.0444, 0.0]]).T         # Position of the center of the detector [cm]
+        npa["d_redge"] = np.array([[66.6311, 207.5280, 0.0]]).T        # Position of the detectors right edge [cm]
+        npa["d_tedge"] = np.array([[65.8338, 208.0444, 0.950]]).T      # Position of the detectors top edge [cm]
+
+
+
+    if do_write:
+        fs.preprocessing.prefida(inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa)
+
+    #return inputs, grid, nbi, plasma, fields, dist, spec, npa
+    return inputs["result_dir"], inputs["runid"]
+
+def main():
+    parser = argparse.ArgumentParser(description="Creates a FIDASIM input files from an ASCOT5 run")
+
+    parser.add_argument('ascot5_output',
+                        help='ASCOT5 output')
+
+    args = parser.parse_args()
+    
+if __name__=='__main__':
+    main()

@@ -161,7 +161,7 @@ export L_FLAGS
 export I_FLAGS
 export NTHREADS
 
-fidasim: deps src tables python
+fidasim: deps src tables python cx_helper
 
 .PHONY: deps
 deps:
@@ -174,6 +174,10 @@ src:
 .PHONY: tables
 tables: src
 	@cd $(TABLES_DIR); make
+
+.PHONY: cx_helper
+cx_helper:
+	@cd $(SRC_DIR);make cx_helper.so
 
 .PHONY: docs
 docs:

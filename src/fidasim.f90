@@ -4776,7 +4776,7 @@ subroutine read_tables
     endif
 
     !!Read nuclear Deuterium-Helium 3 rates
-    if(inputs%calc_cfpd.eq.2) then
+    if(inputs%calc_cfpd.ge.2) then
         call read_nuclear_rates(fid, "/rates/D_He3", tables%D_He3)
     endif
 
@@ -11462,7 +11462,7 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
     JkeV = 1.60218d-16 ! Conversion factor from keV to Joules
     mp = H1_amu*mass_u  ![kg]
     if (inputs%calc_cfpd.eq.1) Q = 4.04*JMeV ![J]
-    if (inputs%calc_cfpd.eq.2) Q = 18.3*JMeV ![J]
+    if (inputs%calc_cfpd.ge.2) Q = 18.3*JMeV ![J]
     q = 2*Q/m4 ![J/kg]
     norm_v3 = sqrt(E3/(m3/mass_u*v2_to_E_per_amu)) / 100 ![m/s]
     norm_v1 = sqrt(E1/(beam_mass*v2_to_E_per_amu)) / 100 ![m/s]
@@ -15035,9 +15035,11 @@ subroutine cfpd_f
 
     mamu(1) = beam_mass  ![kg]
     mamu(2) = H2_amu  ![kg]
-    mamu(3) = H1_amu  ![kg]
+    if (inputs%calc_cfpd.le.2) mamu(3) = H1_amu  ![kg]
+    if (inputs%calc_cfpd.eq.3) mamu(3) = He4_amu  ![kg]
     if (inputs%calc_cfpd.eq.1) mamu(4) = H3_amu  ![kg]
     if (inputs%calc_cfpd.eq.2) mamu(4) = He4_amu  ![kg]
+    if (inputs%calc_cfpd.eq.3) mamu(4) = H1_amu  ![kg]
 
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
@@ -15099,7 +15101,7 @@ subroutine cfpd_f
                             !! Get the cfpd production rate and anisotropy term
                             call get_bt_rate(plasma, erel, rate, branch=1)
                             if (inputs%calc_cfpd.eq.1) call get_ddpt_anisotropy(plasma, vi, v3_xyz, kappa)
-                            if (inputs%calc_cfpd.eq.2) call get_dhe3_anisotropy(plasma, vi, v3_xyz, fields, kappa)
+                            if (inputs%calc_cfpd.ge.2) call get_dhe3_anisotropy(plasma, vi, v3_xyz, fields, kappa)
 
                             !$OMP CRITICAL(cfpd_weight)
                             cfpd%weight(ie3,ich,ie,ip) = cfpd%weight(ie3,ich,ie,ip) &

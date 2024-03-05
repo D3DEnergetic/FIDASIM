@@ -39,7 +39,7 @@ PRO plot_cfpd_orbits, orb, g
     nrays = orb[0].nrays
     for ich=0,nch-1 do for iray=0,nrays-1 do if daomega[iray,ich] gt 0. then begin
         nact=nactual[iray,ich]-1
-        oplot,sightline[3,0:nact,iray,ich],sightline[5,0:nact,iray,ich],psym=3,color=colors[ich]
+        oplot,sightline[3,0:nact,iray,ich],sightline[5,0:nact,iray,ich],psym=0,color=colors[ich]
     end
 
     ; (R,phi) plan

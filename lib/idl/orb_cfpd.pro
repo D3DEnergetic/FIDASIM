@@ -326,11 +326,14 @@ FUNCTION orb_cfpd, g, rdist, zdist, v, d, rc, e0=e0, amu=amu, z=z, nrays=nrays, 
 
   ;TRANSMISSION FACTORS
   ; collimator
-  for ich=0,(nch-1) do begin
-    orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d[ich],rc[ich],nrays,vsave,frac,norm, $
-      e0=e0
-    initial_velocities[*,*,ich]=vsave
-    daomega[*,ich]=norm*frac ;use 1.d-4 to turn off
+  for ich=0,(nch-2) do begin ;;;Change to nch-1 for the fourth ray
+    ;Turn ON collimator
+   ;orb_collimator,g,[rdist[ich],0,zdist[ich]],-reform(v[*,ich]),d[ich],rc[ich],nrays,vsave,frac,norm, $
+   ;  e0=e0
+   ;initial_velocities[*,*,ich]=vsave
+    ;Turn OFF collimator
+    initial_velocities[*,*,ich]=-reform(v[*,ich])/norm(-reform(v[*,ich]))
+    daomega[*,ich]=1.d-4 ;ON norm*frac or OFF 1.d-4
   end
 
   ;---------------

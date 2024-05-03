@@ -5899,7 +5899,7 @@ subroutine write_fida_weights
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
     real(Float64), dimension(:,:), allocatable :: jacobian,e_grid,p_grid
     real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
-    real(Float64) :: dlambda, wtot, dE, dP
+    real(Float64) :: dlambda, dE, dP
 
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     allocate(lambda_arr(inputs%nlambda_wght))
@@ -5944,18 +5944,6 @@ subroutine write_fida_weights
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
     jacobian = ((beam_mass*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
-
-    !! normalize mean_f
-    do ic=1,spec_chords%nchan
-        do ip=1,inputs%np_wght
-            do ie=1,inputs%ne_wght
-                wtot = sum(fweight%weight(:,ie,ip,ic))
-                if((wtot.gt.0.d0)) then
-                    fweight%mean_f(ie,ip,ic) = fweight%mean_f(ie,ip,ic)/wtot
-                endif
-            enddo
-        enddo
-    enddo
 
     !! Calculate FIDA estimate
     allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
@@ -10223,7 +10211,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         !+ LOS intersection length with [[libfida:beam_grid]] cell particle is in
     real(Float64), intent(in)               :: sigma_pi
         !+ Sigma-pi ratio for channel
-    real(Float64), intent(in)               :: denf
+    real(Float64), optional, intent(in)               :: denf
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
@@ -10244,15 +10232,13 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
         if (bin.gt.inputs%nlambda_wght) cycle loop_over_stark
-        !fida(bin,ichan)= fida(bin,ichan) + &
-        !  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
         fweight%weight(bin,eind,pind,ichan) = &
           fweight%weight(bin,eind,pind,ichan) + intensity(i)*intens_fac !(ph*cm)/(s*nm*sr*fast-ion*dE*dp)
+        if(present(denf)) then
+           fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
+                                             denf*intensity(i)*intens_fac
+        endif       
     enddo loop_over_stark
-    if(denf.gt.0.d0) then
-        fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
-                                          (denf*intens_fac)*sum(intensity)
-    endif
     !$OMP END CRITICAL(fida_wght)
 
 end subroutine store_fw_photons_at_chan
@@ -13057,6 +13043,9 @@ subroutine fida_weights_mc
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
+    !! For Normalization of mean_f:
+    real(Float64), allocatable :: wtot(:,:,:)
+
     nwav = inputs%nlambda_wght
 
     !! define arrays
@@ -13177,6 +13166,11 @@ subroutine fida_weights_mc
 
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
+    !! normalize mean_f
+    wtot = sum(fweight%weight, dim=1)   ! sum over wavelengths
+    where(wtot.gt.0.d0) 
+       fweight%mean_f = fweight%mean_f / wtot
+    endwhere
 
     if(inputs%verbose.ge.1) then
         write(*,*) 'write fida weights:    ' , time_string(time_start)
@@ -13397,10 +13391,10 @@ subroutine fida_weights_los
 
                     call colrad(plasma,beam_mass,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
+                    fweight%mean_f(ienergy,ipitch,ichan) = denf
                     photons = photons/real(inputs%nphi_wght)
                     call store_fw_photons_at_chan(ichan, ienergy, ipitch, &
-                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, denf, photons)
-
+                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, photons=photons)
                 enddo
             enddo
         enddo

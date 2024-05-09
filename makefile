@@ -133,6 +133,12 @@ ifeq ($(USE_MPI),y)
 	USE_OPENMP = n
 	MPI_FC = mpif90
 	C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS) $(MPI_FLAGS)
+	# >>>>>> JFCM 2024_04_16:
+	# To allow debugging with MPI enabled:
+	ifeq ($(DEBUG),y)
+	 C_FLAGS = $(DEBUG_CFLAGS) $(U_FLAGS) $(MPI_FLAGS)
+	endif
+	# <<<<<< JFCM 2024_04_16:
 endif
 
 ifeq ($(USE_OPENMP),y)

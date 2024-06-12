@@ -24,9 +24,9 @@ endif
 OS := $(shell uname)
 
 #Compilers
-SUPPORTED_FC = gfortran pgf90 ifort
-SUPPORTED_CC = gcc pgcc
-SUPPORTED_CXX = g++ pgc++
+SUPPORTED_FC = gfortran pgf90 ifort flang
+SUPPORTED_CC = gcc pgcc clang
+SUPPORTED_CXX = g++ pgc++ clang 
 
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
@@ -107,6 +107,17 @@ ifneq ($(findstring ifort, $(FC)),)
         PROF_FLAGS = -p -D_PROF
 ifneq ($(ARCH),n)
         COMMON_CFLAGS := $(COMMON_CFLAGS) -x$(ARCH)
+endif
+endif
+ifneq ($(findstring flang, $(FC)),)
+        L_FLAGS = -lm
+        COMMON_CFLAGS = -O3 -mfma -fvectorize -mfma -mavx2 -m3dnow -floop-unswitch-aggressive -Mpreprocess
+        DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+        OPENMP_FLAGS = -fopenmp -D_OMP
+        MPI_FLAGS = -D_MPI
+        PROF_FLAGS = -pg -D_PROF
+ifneq ($(ARCH),n)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(ARCH)
 endif
 endif
 

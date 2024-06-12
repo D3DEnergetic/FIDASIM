@@ -96,3 +96,5 @@ This will build the documentation website in the `docs/html` directory.
 
 The above command will also check the website for dead links which requires [linkchecker](https://wummel.github.io/linkchecker/) to be installed.
 This functionality can be disabled by passing the `CHECK_LINKS=n` build option to the `make docs` command. 
+
+test

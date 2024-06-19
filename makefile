@@ -136,7 +136,7 @@ ifeq ($(USE_MPI),y)
 	# >>>>>> JFCM 2024_04_16:
 	# To allow debugging with MPI enabled:
 	ifeq ($(DEBUG),y)
-	 C_FLAGS = $(DEBUG_CFLAGS) $(U_FLAGS) $(MPI_FLAGS)
+		C_FLAGS = $(DEBUG_CFLAGS) $(U_FLAGS) $(MPI_FLAGS)
 	endif
 	# <<<<<< JFCM 2024_04_16:
 endif

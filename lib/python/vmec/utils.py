@@ -2,6 +2,11 @@
 "exe" "$FIDASIM_DIR/deps/python" "$0" "$@"
 # -*- coding: utf-8 -*-
 
+"""
+fourier_transform_3D and Brzp_transform adapted from pyFIDASIM/vmec_read.py
+    @author: micha
+"""
+
 import numpy as np
 
 def fourier_transform_3D(vmec, ntheta=5, nphi=10, thetamin=0, thetamax=2*np.pi, phimin=0, phimax=2*np.pi):

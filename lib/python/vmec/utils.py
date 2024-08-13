@@ -112,7 +112,7 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=61, nzgrid=25):
     #+```python
     #+>>> wout = read_vmec(file_name)
     #+>>> new_wout = fourier_transform_3D(wout)
-    #+>>> new_new_wout = Brzp_transform(wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
     #+```
     """
     new_wout = wout.copy()
@@ -181,7 +181,8 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=61, nzgrid=25):
 
     new_wout.update({
         'rho_grid':rho_grid,
-        'R':rarr, 'Z':zarr
+        'R':rarr, 'Z':zarr,
+        'nr':rarr.size, 'nz':zarr.size
         })
 
     return new_wout
@@ -219,9 +220,9 @@ def convert_COCOS_VMEC(wout, cc_in_out):
 
     return new_wout
 
-def wout_to_fields(wout, time=None, er=None, ez=None, et=None):
+def fields_from_wout(wout, time=None, er=None, ez=None, et=None):
     """
-    #+#wout_to_fields
+    #+#fields_from_wout
     #+ Extracts field components from `wout` into FIDASIM-readable fields object
     #+***
     #+##Input Arguments
@@ -237,12 +238,14 @@ def wout_to_fields(wout, time=None, er=None, ez=None, et=None):
     #+    **et**: E-field toroidal component
     #+
     #+##Output Arguments
-    #+    **new_wout**: VMEC dictionary
+    #+    **fields**: FIDASIM fields dictionary
     #+
     #+##Example Usage
     #+```python
     #+>>> wout = read_vmec(file_name)
-    #+>>> new_wout = convert_COCOS_VMEC(wout, cc_in_out=(3,5))
+    #+>>> new_wout = fourier_transform_3D(wout)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+>>> fields = fields_from_wout(new_new_wout, time=0, er=None, ez=None, et=None)
     #+```
     """
     if time is None:
@@ -269,3 +272,29 @@ def wout_to_fields(wout, time=None, er=None, ez=None, et=None):
             'data_source':data_source,
             'br':br, 'bz':bz, 'bt':bt,
             'er':er, 'ez':ez, 'et':et}
+
+def grid_from_wout(wout):
+    """
+    #+#grid_from_wout
+    #+ Extracts interpolation grid from `wout` into FIDASIM-readable igrid object
+    #+***
+    #+##Input Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Output Arguments
+    #+    **igrid**: FIDASIM igrid dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+>>> new_wout = fourier_transform_3D(wout)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+>>> igrid = grid_from_wout(new_new_wout)
+    #+```
+    """
+    r, z, phi = wout['R'], wout['Z'], wout['phi']
+    nr, nz, nphi = wout['nr'], wout['nz'], wout['nphi']
+    z2d, r2d = np.mesgrid(z, r)
+    return {'r':r, 'z':z, 'phi':phi,
+            'nr':nr, 'nz':nz, 'nphi':nphi,
+            'r2d':r2d, 'z2d':z2d}

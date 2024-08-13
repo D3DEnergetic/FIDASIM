@@ -50,9 +50,6 @@ def read_vmec(file_name):
     if 'mnmax_nyq' not in f:
         f['mnmax_nyq'] = f['mnmax']
 
-    f['xn'] = -1 * f['xn']
-    f['xn_nyq'] = -1 * f['xn_nyq']
-
     for key in ['buco', 'bvco', 'vp', 'overr', 'specw']:
         f[key] = h2f(f[key])
     

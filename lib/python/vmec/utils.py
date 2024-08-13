@@ -90,7 +90,7 @@ def fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=None, thetamax=None,
 
     return new_wout
 
-def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
+def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25, convert_m=True):
     """
     #+#Brzp_transform
     #+ Converts B(s,v,u) to B(R,Z,tor)
@@ -105,6 +105,7 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
     #+
     #+    **nzgrid**: Number of Z points
     #+
+    #+    **convert_m**: If true, convert meters to cm
     #+##Output Arguments
     #+    **new_wout**: VMEC dictionary
     #+
@@ -112,7 +113,7 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
     #+```python
     #+>>> wout = read_vmec(file_name)
     #+>>> new_wout = fourier_transform_3D(wout)
-    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25, convert_m=True)
     #+```
     """
     new_wout = wout.copy()
@@ -171,7 +172,7 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
         idx = np.arange(1, ns, 1)
         rzdata = np.array([R[idx, iphi, :].flatten(), Z[idx, iphi, :].flatten()]).T
         for bkey in ['Br', 'Bz', 'Bt']:
-            new_wout[key][:, :, iphi] = griddata(rzdata, new_wout[bkey][idx, iphi, :].flatten(), (rgrid, zgrid), fill_value=0)
+            new_wout[bkey][:, :, iphi] = griddata(rzdata, new_wout[bkey+'_svu'][idx, iphi, :].flatten(), (rgrid, zgrid), fill_value=0)
 
     if cc_in_out:
         if isinstance(cc_in_out, (tuple, list, np.ndarray)) and len(cc_in_out) == 2:
@@ -181,7 +182,8 @@ def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
 
     new_wout.update({
         'rho_grid':rho_grid,
-        'R':rarr, 'Z':zarr,
+        'R':rarr * (100 if convert_m else 1),
+        'Z':zarr * (100 if convert_m else 1),
         'nr':rarr.size, 'nz':zarr.size
         })
 
@@ -204,14 +206,16 @@ def convert_COCOS_VMEC(wout, cc_in_out):
     #+##Example Usage
     #+```python
     #+>>> wout = read_vmec(file_name)
-    #+>>> new_wout = convert_COCOS_VMEC(wout, cc_in_out=(3,5))
+    #+>>> new_wout = fourier_transform_3D(wout)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25, convert_m=True)
+    #+>>> cc_wout = convert_COCOS_VMEC(new_new_wout, cc_in_out=(3,5))
     #+```
     """
     new_wout = {key:val for key, val in wout.items() if key not in ['Br', 'Bz', 'Bt']}
 
     cc_in, cc_out = cc_in_out
     sigma_RphZ_out = -1 if cc_in % 2 == 0 else 1
-    sigma_RphZ_in = -1 if cc_in % 2 == 0 else 1
+    sigma_RphZ_in = -1 if cc_out % 2 == 0 else 1
     sigma_RphZ_eff = sigma_RphZ_out * sigma_RphZ_in
 
     new_wout['Br'] = wout['Br'] * sigma_RphZ_eff
@@ -220,7 +224,7 @@ def convert_COCOS_VMEC(wout, cc_in_out):
 
     return new_wout
 
-def fields_from_wout(wout, time=None, er=None, ez=None, et=None):
+def fields_from_wout(wout, time=0.0, er=None, ez=None, et=None):
     """
     #+#fields_from_wout
     #+ Extracts field components from `wout` into FIDASIM-readable fields object
@@ -244,22 +248,20 @@ def fields_from_wout(wout, time=None, er=None, ez=None, et=None):
     #+```python
     #+>>> wout = read_vmec(file_name)
     #+>>> new_wout = fourier_transform_3D(wout)
-    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
-    #+>>> fields = fields_from_wout(new_new_wout, time=0, er=None, ez=None, et=None)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25, convert_m=True)
+    #+>>> fields = fields_from_wout(new_new_wout, time=0.0, er=None, ez=None, et=None)
     #+```
     """
-    if time is None:
-        time = 0
     if 'data_source' not in wout:
         data_source = ''
     else:
         data_source = wout['data_source']
 
-    br, bz, bt = wout['br'], wout['bz'], wout['bt']
+    br, bz, bt = wout['Br'], wout['Bz'], wout['Bt']
     btot =  np.sqrt(br**2 + bz**2 + bt**2)
-    zeros = np.where(btot == 0)
-    bmask = np.zeros(btot.shape)
-    bmask[zeros] = 1
+    ones = np.where(btot != 0)
+    bmask = np.zeros(btot.shape, dtype=int)
+    bmask[ones] = 1
 
     if er is None:
         er = np.zeros(btot.shape)
@@ -288,13 +290,13 @@ def grid_from_wout(wout):
     #+```python
     #+>>> wout = read_vmec(file_name)
     #+>>> new_wout = fourier_transform_3D(wout)
-    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+>>> new_new_wout = Brzp_transform(new_wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25, convert_m=True)
     #+>>> igrid = grid_from_wout(new_new_wout)
     #+```
     """
     r, z, phi = wout['R'], wout['Z'], wout['phi']
     nr, nz, nphi = wout['nr'], wout['nz'], wout['nphi']
-    z2d, r2d = np.mesgrid(z, r)
+    z2d, r2d = np.meshgrid(z, r)
     return {'r':r, 'z':z, 'phi':phi,
             'nr':nr, 'nz':nz, 'nphi':nphi,
             'r2d':r2d, 'z2d':z2d}

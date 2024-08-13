@@ -122,6 +122,7 @@ FIDASIM reads the fast-ion distribution from an HDF5 file that has the following
 | `pitch`             | Float64 | 1    | [`npitch`]                              | NA                     | Pitch array w.r.t magnetic field       |
 | `denf`              | Float64 | 3    | [`nr`,`nz`[,`nphi`]]                      | cm^-3                  | Fast-ion density                       |
 | `f`                 | Float64 | 5    | [`nenergy`,`npitch`,`nr`,`nz`[,`nphi`]] | fast-ions/(dE dP cm^3) | Fast-ion distribution F(E,p,R,Z[,Phi]) |
+| `A`                 | Float64 | 0    | NA                                      | amu                    | Fast-ion species mass                  |
 
 The Guiding Center Distribution Function is a function of Energy, pitch, R, Z and Phi.
 The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, where the plasma parameters and fields are defined.
@@ -142,6 +143,7 @@ The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, wher
 | `phi`               | Float64 | 1    | [`nparticle`]| rad   | Phi positions of the MC particle (Optional)       |
 | `energy`            | Float64 | 1    | [`nparticle`]| keV   | Energy of the MC particle                         |
 | `pitch`             | Float64 | 1    | [`nparticle`]| NA    | Pitch w.r.t the magnetic field of the MC particle |
+| `A`                 | Float64 | 0    | NA           | amu   | Fast-ion species mass                             |
 
 The sum(`weight`) = # of Fast-ions in phase space sampled by the MC particles.
 
@@ -165,6 +167,7 @@ If there are multiple classes of particles the FIDA signal for each class will b
 | `vr`                | Float64 | 1    | [`nparticle`]| cm/s  | Radial component of the MC particle velocity |
 | `vt`                | Float64 | 1    | [`nparticle`]| cm/s  | Torodial/Phi component of the MC particle velocity |
 | `vz`                | Float64 | 1    | [`nparticle`]| cm/s  | Z component of the MC particle velocity |
+| `A`                 | Float64 | 0    | NA           | amu   | Fast-ion species mass                   |
 
 The sum(`weight`) = # of Fast-ions in phase space sampled by the MC particles.
 
@@ -172,7 +175,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 If there are multiple classes of particles the FIDA signal for each class will be calculated.
 
 # Relevent Namelist Settings
-* `ai`: Ion mass [amu]
+* `ai`: Thermal Ion mass [amu]
 * `impurity_charge`: Impurity charge number 5=Boron, 6=Carbon, ...
 * `ab`: Fast/Beam-ion mass [amu]
 * `equilibrium_file`: Equilibrium file location

@@ -3682,8 +3682,16 @@ subroutine read_f(fid, error)
     else
         fbm%phi=0.d0
     endif
-    !call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
-    fbm%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        fbm%A = beam_mass
+    endif
 
     equil%plasma%denf = fbm%denf
 
@@ -3768,8 +3776,17 @@ subroutine read_mc(fid, error)
     allocate(weight(particles%nparticle))
 
     dims(1) = particles%nparticle
-    !call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
-    particles%fast_ion%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_MC: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        particles%fast_ion%A = beam_mass
+    endif
+
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)

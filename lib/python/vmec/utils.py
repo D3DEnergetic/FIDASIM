@@ -13,6 +13,33 @@ from scipy.interpolate import griddata
 
 def fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=None, thetamax=None, phimin=None, phimax=None):
     """
+    #+#fourier_transform_3D
+    #+ Performs 3D Fourier transform on objects with key in `wout['keys']`
+    #+***
+    #+##Input Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Keyword Arguments
+    #+    **ntheta**: Number of theta points
+    #+
+    #+    **nphi**: Number of phi points
+    #+
+    #+    **thetamin**: Minimum theta value
+    #+
+    #+    **thetamax**: Maximum theta value
+    #+
+    #+    **phimin**: Minimum phi value
+    #+
+    #+    **phimax**: Maximum phi value
+    #+
+    #+##Output Arguments
+    #+    **new_wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+>>> new_wout = fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=0, thetamax=2*pi, phimin=0, phimax=2*pi)
+    #+```
     """
     new_wout = wout.copy()
     if (thetamin is None and thetamax is None) or np.isclose([thetamin, thetamax], [0, 2*np.pi], atol=0.5*np.pi/180).all():
@@ -63,16 +90,32 @@ def fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=None, thetamax=None,
 
     return new_wout
 
-def Brzp_transform(wout, cc_in_out=None):
+def Brzp_transform(wout, cc_in_out=None, nrgrid=61, nzgrid=25):
     """
+    #+#Brzp_transform
+    #+ Converts B(s,v,u) to B(R,Z,tor)
+    #+***
+    #+##Input Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Keyword Arguments
+    #+    **cc_in_out**: Pair of COCOS indices for field coordinate conversion
+    #+
+    #+    **nrgrid**: Number of R points
+    #+
+    #+    **nzgrid**: Number of Z points
+    #+
+    #+##Output Arguments
+    #+    **new_wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+>>> new_wout = fourier_transform_3D(wout)
+    #+>>> new_new_wout = Brzp_transform(wout, cc_in_out=(3,5), nrgrid=61, nzgrid=25)
+    #+```
     """
     new_wout = wout.copy()
-    if cc_in_out:
-        if isinstance(cc_in_out, (tuple, list, np.ndarray)) and len(cc_in_out) == 2:
-            new_wout = convert_COCOS_VMEC(new_wout, cc_in_out)
-        else:
-            raise ValueError(f'cc_in_out must be a list-like object of length 2\n{cc_in_out=}')
-        
     inverse_fourier_amps = new_wout['inverse_fourier_amps']
 
     Bs = inverse_fourier_amps['Bs']
@@ -93,25 +136,17 @@ def Brzp_transform(wout, cc_in_out=None):
     nz = np.where(denom != 0)
     B_norm[nz] = 1. / denom[nz]
 
-    Br = (dZ_du * Bs - dZ_ds * Bu) * B_norm
-    Bz = (dR_ds * Bu - dR_du * Bs) * B_norm
-    Bt = ( ( ( Bs * (dR_du * dZ_dv - dR_dv * dZ_du) + Bu * (dR_dv * dZ_ds - dR_ds * dZ_dv) ) * B_norm ) + Bv ) / R
+    # Calculates Br, Bz, Btor in (s,v,u) domain
+    Br_svu = (dZ_du * Bs - dZ_ds * Bu) * B_norm
+    Bz_svu = (dR_ds * Bu - dR_du * Bs) * B_norm
+    Bt_svu = ( ( ( Bs * (dR_du * dZ_dv - dR_dv * dZ_du) + Bu * (dR_dv * dZ_ds - dR_ds * dZ_dv) ) * B_norm ) + Bv ) / R
 
     new_wout.update({
-        'Br':Br,
-        'Bz':Bz,
-        'Bt':Bt
+        'Br_svu':Br_svu,
+        'Bz_svu':Bz_svu,
+        'Bt_svu':Bt_svu
         })
 
-    return new_wout
-
-def map_B_and_rho(wout, nrgrid=41, nzgrid=25):
-    """
-    """
-    new_wout = wout.copy()
-    inverse_fourier_amps = new_wout['inverse_fourier_amps']
-
-    R = inverse_fourier_amps['R']
     Z = inverse_fourier_amps['Z']
     ns = new_wout['ns']
 
@@ -120,60 +155,117 @@ def map_B_and_rho(wout, nrgrid=41, nzgrid=25):
         S[:, i] = new_wout['s_dom']
 
     idx = np.arange(0, ns-1)
-    brzphi_grid = np.zeros([nrgrid, nzgrid, 3, new_wout['nphi']])
+
+    for key in ['Br', 'Bz', 'Bt']:
+        new_wout[key] = np.zeros([nrgrid, nzgrid, new_wout['nphi']])
     rho_grid = np.zeros([nrgrid, nzgrid, new_wout['nphi']])
 
-    rmin = R.min()
-    rmax = R.max()
-    zmin = Z.min()
-    zmax = Z.max()
+    rmin, rmax = R.min(), R.max()
+    zmin, zmax = Z.min(), Z.max()
     rgrid, zgrid = np.mgrid[rmin:rmax:complex(nrgrid), zmin:zmax:complex(nzgrid)]
     rarr, zarr = rgrid[:, 0], zgrid[0, :]
-    #rarr, zarr = np.zeros((nrgrid, new_wout['nphi'])), np.zeros((nzgrid, new_wout['nphi']))
-
-
     for iphi in range(new_wout['nphi']):
-        """
-        rmin = R[:, iphi, :].min()
-        rmax = R[:, iphi, :].max()
-        zmin = Z[:, iphi, :].min()
-        zmax = Z[:, iphi, :].max()
-        rgrid, zgrid = np.mgrid[rmin:rmax:complex(nrgrid), zmin:zmax:complex(nzgrid)]
-        rarr[:, iphi] = rgrid[:, 0]
-        zarr[:, iphi] = zgrid[0, :]
-        """
-
         rzdata = np.array([R[:, iphi, :].flatten(), Z[:, iphi, :].flatten()]).T
         rho_grid[:, :, iphi] = np.sqrt(griddata(rzdata, S.flatten(), (rgrid, zgrid), fill_value=0))
 
         idx = np.arange(1, ns, 1)
         rzdata = np.array([R[idx, iphi, :].flatten(), Z[idx, iphi, :].flatten()]).T
-        for ib, bkey in enumerate(['Br', 'Bz', 'Bt']):
-            brzphi_grid[:, :, ib, iphi] = griddata(rzdata, new_wout[bkey][idx, iphi, :].flatten(), (rgrid, zgrid), fill_value=0)
+        for bkey in ['Br', 'Bz', 'Bt']:
+            new_wout[key][:, :, iphi] = griddata(rzdata, new_wout[bkey][idx, iphi, :].flatten(), (rgrid, zgrid), fill_value=0)
+
+    if cc_in_out:
+        if isinstance(cc_in_out, (tuple, list, np.ndarray)) and len(cc_in_out) == 2:
+            new_wout = convert_COCOS_VMEC(new_wout, cc_in_out)
+        else:
+            raise ValueError(f'cc_in_out must be a list-like object of length 2\n{cc_in_out=}')
 
     new_wout.update({
-        'brzphi_grid':brzphi_grid,
         'rho_grid':rho_grid,
-        'rarr':rarr, 'zarr':zarr
+        'R':rarr, 'Z':zarr
         })
 
     return new_wout
 
 def convert_COCOS_VMEC(wout, cc_in_out):
     """
+    #+#convert_COCOS_VMEC
+    #+ Converts wout COCOS cc_in_out[0] to COCOS cc_in_out[1]
+    #+***
+    #+##Input Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Keyword Arguments
+    #+    **cc_in_out**: Pair of COCOS indices for field coordinate conversion
+    #+
+    #+##Output Arguments
+    #+    **new_wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+>>> new_wout = convert_COCOS_VMEC(wout, cc_in_out=(3,5))
+    #+```
     """
-    inverse_fourier_amps = wout['inverse_fourier_amps']
-    new_inverse_fourier_amps = {key:val for key, val in inverse_fourier_amps.items() if key not in ['Bs', 'Bv', 'Bu']}
-    new_wout = {key:val for key, val in wout.items() if key != 'inverse_fourier_amps'}
+    new_wout = {key:val for key, val in wout.items() if key not in ['Br', 'Bz', 'Bt']}
 
     cc_in, cc_out = cc_in_out
     sigma_RphZ_out = -1 if cc_in % 2 == 0 else 1
     sigma_RphZ_in = -1 if cc_in % 2 == 0 else 1
     sigma_RphZ_eff = sigma_RphZ_out * sigma_RphZ_in
 
-    new_inverse_fourier_amps['Bs'] = inverse_fourier_amps['Bs'] * sigma_RphZ_eff # B_rho, radial-like component
-    new_inverse_fourier_amps['Bv'] = inverse_fourier_amps['Bv'] * sigma_RphZ_eff # B_phi, toroidal-like component
-    new_inverse_fourier_amps['Bu'] = inverse_fourier_amps['Bu'] * sigma_RphZ_eff # B_theta, poloidal-like component
+    new_wout['Br'] = wout['Br'] * sigma_RphZ_eff
+    new_wout['Bz'] = wout['Bz'] * sigma_RphZ_eff
+    new_wout['Bt'] = wout['Bt'] * sigma_RphZ_eff
 
-    new_wout['inverse_fourier_amps'] = new_inverse_fourier_amps
     return new_wout
+
+def wout_to_fields(wout, time=None, er=None, ez=None, et=None):
+    """
+    #+#wout_to_fields
+    #+ Extracts field components from `wout` into FIDASIM-readable fields object
+    #+***
+    #+##Input Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Keyword Arguments
+    #+    **time**: Experiment time
+    #+
+    #+    **er**: E-field radial component
+    #+
+    #+    **ez**: E-field vertical component
+    #+
+    #+    **et**: E-field toroidal component
+    #+
+    #+##Output Arguments
+    #+    **new_wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+>>> new_wout = convert_COCOS_VMEC(wout, cc_in_out=(3,5))
+    #+```
+    """
+    if time is None:
+        time = 0
+    if 'data_source' not in wout:
+        data_source = ''
+    else:
+        data_source = wout['data_source']
+
+    br, bz, bt = wout['br'], wout['bz'], wout['bt']
+    btot =  np.sqrt(br**2 + bz**2 + bt**2)
+    zeros = np.where(btot == 0)
+    bmask = np.zeros(btot.shape)
+    bmask[zeros] = 1
+
+    if er is None:
+        er = np.zeros(btot.shape)
+    if ez is None:
+        ez = np.zeros(btot.shape)
+    if et is None:
+        et = np.zeros(btot.shape)
+
+    return {'time':time, 'mask':bmask,
+            'data_source':data_source,
+            'br':br, 'bz':bz, 'bt':bt,
+            'er':er, 'ez':ez, 'et':et}

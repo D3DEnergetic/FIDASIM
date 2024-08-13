@@ -17,6 +17,19 @@ from scipy.io import netcdf_file
 
 def read_vmec(file_name):
     """
+    #+#read_vmec
+    #+ Read in vmec data from `file_name`
+    #+***
+    #+##Input Arguments
+    #+    **file_name**: Name of the VMEC .wout file
+    #+
+    #+##Output Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec(file_name)
+    #+```
     """
     if file_name[-3:] == '.nc': # netCDF file
         f = read_vmec_nc(file_name)
@@ -119,11 +132,24 @@ def read_vmec(file_name):
             'xm_nyq':xm_nyq, 'xn_nyq':xn_nyq, 'md_nyq':md_nyq,
             'nyq_limit':nyq_limit, 'cos_keys':cos_keys, 'sin_keys':sin_keys,
             'cos_nyq_keys':cos_nyq_keys, 'sin_nyq_keys':sin_nyq_keys,
+            'data_source':os.path.abspath(file_name),
             'keys':['R', 'Z', 'Bs', 'Bv', 'Bu', 'dR_ds', 'dR_dv', 'dR_du', 'dZ_ds', 'dZ_dv', 'dZ_du']}
-
 
 def read_vmec_nc(file_name):
     """
+    #+#read_vmec_nc
+    #+ Read in vmec data from `file_name` NETCDF file
+    #+***
+    #+##Input Arguments
+    #+    **file_name**: Name of the VMEC .wout NETCDF file
+    #+
+    #+##Output Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec_nc(file_name)
+    #+```
     """
     wout_netcdf = netcdf_file(file_name, mode='r', version=4)
     f = {}
@@ -154,6 +180,19 @@ def read_vmec_nc(file_name):
 
 def read_vmec_txt(file_name):
     """
+    #+#read_vmec_txt
+    #+ Read in vmec data from `file_name` text file
+    #+***
+    #+##Input Arguments
+    #+    **file_name**: Name of the VMEC .wout text file
+    #+
+    #+##Output Arguments
+    #+    **wout**: VMEC dictionary
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> wout = read_vmec_txt(file_name)
+    #+```
     """
     print(f'Reading VMEC data from text file {os.path.abspath(file_name)}')
     data = read_vmec_txt_data(file_name)
@@ -529,9 +568,25 @@ def read_vmec_txt(file_name):
         
     return dict(sorted(f.items(), key=lambda x:x[0]))
 
-
 def read_vmec_txt_data(file_name, decode_bytes='utf-8'):
     """
+    #+#read_vmec_txt_data
+    #+ Helper function for `read_vmec_txt`
+    #+ Reads data from file_name into list object
+    #+***
+    #+##Input Arguments
+    #+    **file_name**: Name of the VMEC .wout text file
+    #+
+    #+##Keyword Arguments
+    #+     **decode_bytes**: Encoding standard
+    #+
+    #+##Output Arguments
+    #+    **data**: 1-D list object
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> data = read_vmec_txt_data(file_name, decode_bytes='utf-8')
+    #+```
     """
     with open(file_name, 'r') as file:
         flines = file.readlines()
@@ -556,10 +611,22 @@ def read_vmec_txt_data(file_name, decode_bytes='utf-8'):
 
     return data
 
-
 def h2f(var_half):
     """
-    Half to full grid
+    #+#h2f
+    #+ Helper function for `read_vmec`
+    #+ Converts half mesh objects to full mesh objects
+    #+***
+    #+##Input Arguments
+    #+    **var_half**: Half mesh data array
+    #+
+    #+##Output Arguments
+    #+    **temp**: Full mesh data array
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> temp = h2f(var_half)
+    #+```
     """
     temp = np.zeros(var_half.size)
     temp[0] = 1.5 * var_half[1] - 0.5 * var_half[2]

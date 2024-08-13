@@ -90,7 +90,7 @@ def fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=None, thetamax=None,
 
     return new_wout
 
-def Brzp_transform(wout, cc_in_out=None, nrgrid=61, nzgrid=25):
+def Brzp_transform(wout, cc_in_out=None, nrgrid=41, nzgrid=25):
     """
     #+#Brzp_transform
     #+ Converts B(s,v,u) to B(R,Z,tor)

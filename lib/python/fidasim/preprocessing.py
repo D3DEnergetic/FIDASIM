@@ -1342,6 +1342,9 @@ def write_namelist(filename, inputs):
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
         f.write("calc_res = {:d}    !! Calculate spatial resolution\n".format(inputs['calc_res']))
 
+        f.write("\n!! Non-thermal beam deposition switches\n")
+        f.write("enable_nonthermal_calc = {:d} !! Enable the use of f4d to calculate beam deposition\n".format(inputs['enable_nonthermal_calc']))
+
         f.write("\n!! Advanced Settings\n")
         f.write("seed = {:d}    !! RNG Seed. If seed is negative a random seed is used\n".format(inputs['seed']))
         f.write("flr = {:d}    !! Turn on Finite Larmor Radius corrections\n".format(inputs['flr']))

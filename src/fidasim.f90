@@ -773,6 +773,12 @@ type NPAParticle
         !+ Birth Energy [keV]
     real(Float64) :: pitch = 0.d0
         !+ Birth Pitch
+    real(Float64) :: xgci = 0.d0
+        !+ Initial x position of the gyrocenter
+    real(Float64) :: ygci = 0.d0
+        !+ Initial y position of the gyrocenter
+    real(Float64) :: zgci = 0.d0
+        !+ Initial z position of the gyrocenter
 end type NPAParticle
 
 type NPAResults
@@ -997,7 +1003,7 @@ type SimulationInputs
     integer(Int64) :: n_pfida
         !+ Number of Passive FIDA mc markers
     integer(Int64) :: n_npa
-        !+ Number of Passiv NPA mc markers
+        !+ Number of Active NPA mc markers
     integer(Int64) :: n_pnpa
         !+ Number of Passive NPA mc markers
     integer(Int64) :: n_nbi
@@ -1334,6 +1340,9 @@ subroutine npa_part_assign(p1, p2)
     p1%energy = p2%energy
     p1%pitch = p2%pitch
     p1%detector = p2%detector
+    p1%xgci = p2%xgci
+    p1%ygci = p2%ygci
+    p1%zgci = p2%zgci
 
 end subroutine npa_part_assign
 
@@ -4830,7 +4839,7 @@ subroutine write_npa
     integer :: error
 
     integer, dimension(:), allocatable :: dcount
-    real(Float64), dimension(:,:), allocatable :: ri, rf
+    real(Float64), dimension(:,:), allocatable :: ri, rf, gci
     real(Float64), dimension(:), allocatable :: weight, energy, pitch
     integer, dimension(:), allocatable :: det, orbit_type
     integer :: i, npart, c, start_index, end_index
@@ -4889,7 +4898,7 @@ subroutine write_npa
     end_index = npa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3,npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -4904,6 +4913,10 @@ subroutine write_npa
             rf(1,i) = npa%part(c)%xf
             rf(2,i) = npa%part(c)%yf
             rf(3,i) = npa%part(c)%zf
+            gci(1,i) = npa%part(c)%xgci
+            gci(2,i) = npa%part(c)%ygci
+            gci(3,i) = npa%part(c)%zgci
+
             weight(i) = npa%part(c)%weight
             energy(i) = npa%part(c)%energy
             pitch(i) = npa%part(c)%pitch
@@ -4914,6 +4927,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -4973,6 +4987,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -4987,7 +5002,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
-            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)            
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -5013,7 +5031,7 @@ subroutine write_npa
 
     deallocate(dcount)
     if(npart.gt.0) then
-        deallocate(ri,rf)
+        deallocate(ri,rf, gci)
         deallocate(energy,pitch,weight,det,orbit_type)
     endif
 
@@ -5047,7 +5065,7 @@ subroutine write_npa
     end_index = pnpa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3, npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -5062,6 +5080,10 @@ subroutine write_npa
             rf(1,i) = pnpa%part(c)%xf
             rf(2,i) = pnpa%part(c)%yf
             rf(3,i) = pnpa%part(c)%zf
+            gci(1,i) = pnpa%part(c)%xgci
+            gci(2,i) = pnpa%part(c)%ygci
+            gci(3,i) = pnpa%part(c)%zgci
+            
             weight(i) = pnpa%part(c)%weight
             energy(i) = pnpa%part(c)%energy
             pitch(i) = pnpa%part(c)%pitch
@@ -5072,6 +5094,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -5131,6 +5154,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -5146,6 +5170,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
             call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
+
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -8855,7 +8883,7 @@ subroutine store_births(ind, neut_type, dflux)
     !$OMP END ATOMIC
 end subroutine store_births
 
-subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
+subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive, gs)
     !+ Store NPA particles in [[libfida:npa]]
     integer, intent(in)                     :: det
         !+ Detector/Channel Number
@@ -8871,10 +8899,12 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         !+ Orbit class ID
     logical, intent(in), optional           :: passive
         !+ Indicates whether npa particle is passive
+    type(GyroSurface), optional, intent(in)  :: gs
+        !+ Gyro-surface
 
     integer :: iclass, oclass
     type(LocalEMFields) :: fields
-    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
+    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm, uvw_gc
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
@@ -8893,6 +8923,9 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     ! Convert to machine coordinates
     call xyz_to_uvw(ri,uvw_ri)
     call xyz_to_uvw(rf,uvw_rf)
+    if (present(gs)) then
+        call xyz_to_uvw(gs%center, uvw_gc)
+    endif
 
     ! Calculate energy
     energy = beam_mass*v2_to_E_per_amu*dot_product(vn,vn)
@@ -8930,6 +8963,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         pnpa%part(pnpa%npart)%xf = uvw_rf(1)
         pnpa%part(pnpa%npart)%yf = uvw_rf(2)
         pnpa%part(pnpa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            pnpa%part(pnpa%npart)%xgci = uvw_gc(1)
+            pnpa%part(pnpa%npart)%ygci = uvw_gc(2)
+            pnpa%part(pnpa%npart)%zgci = uvw_gc(3)
+        endif
         pnpa%part(pnpa%npart)%energy = energy
         pnpa%part(pnpa%npart)%pitch = pitch
         pnpa%part(pnpa%npart)%weight = flux
@@ -8955,6 +8993,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         npa%part(npa%npart)%xf = uvw_rf(1)
         npa%part(npa%npart)%yf = uvw_rf(2)
         npa%part(npa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            npa%part(npa%npart)%xgci = uvw_gc(1)
+            npa%part(npa%npart)%ygci = uvw_gc(2)
+            npa%part(npa%npart)%zgci = uvw_gc(3)
+        endif
         npa%part(npa%npart)%energy = energy
         npa%part(npa%npart)%pitch = pitch
         npa%part(npa%npart)%weight = flux
@@ -10294,13 +10337,13 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
 
     logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
     real(Float64), dimension(beam_grid%ngrid) :: cdf
-    integer  :: c, i, j, k, nc, nm, ind(3)
-    integer  :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
     real(Float64), pointer :: papprox_ptr(:)
@@ -10329,6 +10372,11 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             nlaunch(i,j,k) = nlaunch(i,j,k) + 1
         enddo
+        !! Safety check, we should be close to the desired number of markers
+        if ((abs(nr_markers - sum(nlaunch))/nr_markers).gt.0.1) then
+            write(*,*) 'The number of markers is off my more than 10%'
+            stop
+        endif
     endif
 
 end subroutine get_nlaunch
@@ -10339,15 +10387,15 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), intent(in)   :: papprox
         !+ [[libfida:pass_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
 
     logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
     real(Float64), dimension(pass_grid%ngrid) :: cdf
     integer, dimension(1) :: randomi
     type(rng_type) :: r
-    integer :: c, i, j, k, nc, nm, ind(3)
-    integer :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -11030,7 +11078,7 @@ subroutine dcx
     real(Float64):: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
 
     !! Initialized Neutral Population
@@ -11159,7 +11207,7 @@ subroutine halo
     real(Float64) :: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: local_iter_dens
 
     type(NeutralPopulation) :: cur_pop, prev_pop
@@ -11664,7 +11712,7 @@ subroutine fida_f
     real(Float64) :: eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -11775,7 +11823,7 @@ subroutine pfida_f
     real(Float64) :: max_papprox, eb, ptch
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -12105,7 +12153,7 @@ subroutine npa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
     do ic=1,beam_grid%ngrid
@@ -12120,7 +12168,7 @@ subroutine npa_f
                         sum(neut%halo%dens(:,i,j,k)))* &
                         plasma%denf
     enddo
-
+    
     ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -12181,7 +12229,7 @@ subroutine npa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux)
+                    call store_npa(det,ri,rf,vi,flux, gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -12218,7 +12266,7 @@ subroutine pnpa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell, is
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     papprox=0.d0
     do ic=1,pass_grid%ngrid
@@ -12295,7 +12343,7 @@ subroutine pnpa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*pass_grid%r(i)*pass_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux,passive=.True.)
+                    call store_npa(det,ri,rf,vi,flux,passive=.True., gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -13041,7 +13089,7 @@ subroutine fida_weights_mc
     real(Float64) :: fbm_denf,phase_area
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! For Normalization of mean_f:
     real(Float64), allocatable :: wtot(:,:,:)

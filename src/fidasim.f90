@@ -1065,6 +1065,10 @@ type SimulationInputs
     integer(Int32) :: stark_components
         !+ Output spectral stark components : 0=off, 1=on
 
+    !! Non-thermal beam deposition switches
+    integer(Int32) :: enable_nonthermal_calc
+    !+ Enable the use of the fast ion distribution for beam deposition calculations
+
     !! Distribution settings
     integer(Int32) :: dist_type
         !+ Type of fast-ion distribution
@@ -1094,7 +1098,7 @@ type SimulationInputs
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
         !+ Maximum wavelength in weight functions [nm]
-        
+
     !! Adaptive time step settings
     integer(Int32) :: adaptive
         !+ Simulation switch for adaptive time step, 0:split off, 1:dene, 2:avg(denn(1,:)), 3:denf, 4:avg(deni), 5:denimp, 6:te, 7:ti
@@ -1988,6 +1992,7 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
+    integer            :: enable_nonthermal_calc
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2001,7 +2006,8 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        adaptive, max_cell_splits, split_tol, &
+        enable_nonthermal_calc
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2080,6 +2086,7 @@ subroutine read_inputs
     adaptive=0
     max_cell_splits=1
     split_tol=0
+    enable_nonthermal_calc=0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2154,6 +2161,9 @@ subroutine read_inputs
     inputs%calc_neutron=calc_neutron
     inputs%calc_cfpd=calc_cfpd
     inputs%calc_res = calc_res
+
+    !! Non-thermal beam deposition switches
+    inputs%enable_nonthermal_calc = enable_nonthermal_calc
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -5624,7 +5634,7 @@ subroutine write_spectra
        call h5ltset_attribute_string_f(fid,"/pfidastokes","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
-    if(inputs%calc_res.ge.1) then 
+    if(inputs%calc_res.ge.1) then
        !Create spatial group
        call h5gcreate_f(fid, "spatial", gid, error)
        call h5ltset_attribute_string_f(fid,"spatial","description", &
@@ -9567,9 +9577,19 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
         H_H_pop_i = 0.d0
         H_H_depop_i = 0.d0
         deni_i = deni(i)
-        if(beam_mass.eq.thermal_mass(i)) then
-            deni_i = deni(i) + denf
+
+        if (inputs%enable_nonthermal_calc .eq. 1) then
+          !! In a non-thermal calculation, we no longer distinguish between fast and thermal ion.
+          !! The thermal ion density is equivalent to the moments of ion distribution function [fbm]
+          !! At present, we are using [[libfida::fbm]] to store the main ion species's 4D distribution Function
+          !! In future developments, we might need to create separate containers for the various distribution functions needed: (1) electron f4ds and (2) possibly multi-species ion f4ds.
+          !! This separation has the advantage that [[libfida::fbm]] would continue to be used as intended in FIDASIM and we can use the beam-deposition related distribution functions as needed without compromising the diagnostics part of the code.
+        else
+          if(beam_mass.eq.thermal_mass(i)) then
+              deni_i = deni(i) + denf
+          endif
         endif
+
         logti_amu = log10(plasma%ti/thermal_mass(i))
         call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
                             logeb_amu, logti_amu, c, err_status)
@@ -10254,7 +10274,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         if(present(denf)) then
            fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
                                              denf*intensity(i)*intens_fac
-        endif       
+        endif
     enddo loop_over_stark
     !$OMP END CRITICAL(fida_wght)
 
@@ -11049,6 +11069,10 @@ subroutine dcx
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
+    integer(Int32) :: non_thermal_calc
+
+    !! Check if non-thermal beam deposition calculations are enabled:
+    non_thermal_calc = inputs%enable_nonthermal_calc
 
     !! Initialized Neutral Population
     call init_neutral_population(neut%dcx)
@@ -11104,7 +11128,7 @@ subroutine dcx
                 call get_plasma(plasma,pos=tracks(1)%pos)
 
                 !! Weight CX rates by ion source density
-                if(beam_mass.eq.thermal_mass(is)) then
+                if( (non_thermal_calc .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
                     states = rates*(plasma%deni(is) + plasma%denf)
                     if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
@@ -11178,6 +11202,7 @@ subroutine halo
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: local_iter_dens
+    integer(Int32) :: non_thermal_calc
 
     type(NeutralPopulation) :: cur_pop, prev_pop
     !! Halo iteration
@@ -11186,6 +11211,9 @@ subroutine halo
     integer :: prev_type = 1  ! previous iteration
     integer :: cur_type = 2 ! current iteration
     real(Float64) :: fi_correction
+
+    !! Check if non-thermal beam deposition calculations are enabled:
+    non_thermal_calc = inputs%enable_nonthermal_calc
 
     !! Initialize Neutral Population
     call init_neutral_population(neut%halo)
@@ -11262,7 +11290,7 @@ subroutine halo
                     call get_plasma(plasma, pos=tracks(1)%pos)
 
                     !! Weight CX rates by ion source density
-                    if(beam_mass.eq.thermal_mass(is)) then
+                    if( (non_thermal_calc .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
                         states = rates*(plasma%deni(is) + plasma%denf)
                         if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
@@ -11862,7 +11890,7 @@ subroutine pfida_f
                 call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), passive=.True.)
-                if(inputs%calc_res.ge.1) then 
+                if(inputs%calc_res.ge.1) then
                     call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%pfida, passive=.True.)
                 endif
             enddo loop_along_track
@@ -13185,7 +13213,7 @@ subroutine fida_weights_mc
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
     !! normalize mean_f
     wtot = sum(fweight%weight, dim=1)   ! sum over wavelengths
-    where(wtot.gt.0.d0) 
+    where(wtot.gt.0.d0)
        fweight%mean_f = fweight%mean_f / wtot
     endwhere
 

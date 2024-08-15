@@ -3955,6 +3955,14 @@ subroutine quasineutrality_check
     real(Float64) :: tol = 0.01
     real(Float64), dimension(:,:,:), allocatable :: quasi, deni
     integer :: i, quasi_cnt
+    integer(Int32) :: non_thermal_calc
+    real(FLoat64) :: fi_factor = 1.d0
+
+    !! Check if non-thermal beam deposition calculations are enabled:
+    non_thermal_calc = inputs%enable_nonthermal_calc
+    if (non_thermal_calc .GE. 1) then
+      fi_factor = 0.d0
+    endif
 
     allocate(deni(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     deni = 0.d0
@@ -3965,7 +3973,7 @@ subroutine quasineutrality_check
     !! Quasi-neutrality check
     allocate(quasi(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     where(equil%mask.ge.0.5)
-        quasi = equil%plasma%dene - (deni + impurity_charge*equil%plasma%denimp + equil%plasma%denf)
+        quasi = equil%plasma%dene - (deni + impurity_charge*equil%plasma%denimp + fi_factor*equil%plasma%denf)
     end where
 
     quasi_cnt = count(abs(quasi).gt.(tol*equil%plasma%dene))

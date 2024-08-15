@@ -823,6 +823,38 @@ type BirthProfile
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
+type SinkParticle
+    !+ Defines an ion Sink particle
+    integer :: neut_type = 0
+        !+ Sink type (1=Full, 2=Half, 3=Third)
+    integer(Int32) :: atomic_mass = 0
+        !+ Sink atomic mass [AMU]
+    integer(Int32), dimension(3) :: ind = 0
+        !+ Initial [[libfida:beam_grid]] indices
+    real(Float64), dimension(3) :: ri = 0.d0
+        !+ Initial position in beam grid coordinates [cm]
+    real(Float64), dimension(3) :: vi = 0.d0
+        !+ Initial velocity in beam grid coordinates [cm/s]
+    real(Float64), dimension(3) :: ri_gc = 0.d0
+        !+ Initial guiding-center position in beam grid coordinates [cm]
+    real(Float64) :: weight = 0.d0
+        !+ Particle weight [fast-ions/s]
+    real(Float64) :: energy = 0.d0
+        !+ Sink Energy [keV]
+    real(Float64) :: pitch = 0.d0
+        !+ Sink Pitch w.r.t. the magnetic field
+end type SinkParticle
+
+type SinkProfile
+    !+ Sink profile structure
+    integer :: cnt = 1
+        !+ Particle counter
+    type(SinkParticle), dimension(:), allocatable :: part
+        !+ Array of Sink particles
+    real(Float64), dimension(:,:,:,:), allocatable :: dens
+        !+ Sink density: dens(species,x,y,z) [fast-ions/(s*cm^3)]
+end type SinkProfile
+
 type Spectra
     !+ Spectra storage structure
     real(Float64), dimension(:,:), allocatable   :: brems
@@ -1230,6 +1262,8 @@ type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
     !+ Variable for storing the calculated birth profile
+type(SinkProfile), save        :: sink
+    !+ Variable for storing the calculated sink profile
 type(Neutrals), save            :: neut
     !+ Variable for storing the calculated beam density
 type(Spectra), save             :: spec

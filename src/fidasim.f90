@@ -823,26 +823,10 @@ type BirthProfile
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
-type SinkParticle
+type, extends(BirthParticle) :: SinkParticle
     !+ Defines an ion Sink particle
-    integer :: neut_type = 0
-        !+ Sink type (1=Full, 2=Half, 3=Third)
     integer(Int32) :: atomic_mass = 0
         !+ Sink atomic mass [AMU]
-    integer(Int32), dimension(3) :: ind = 0
-        !+ Initial [[libfida:beam_grid]] indices
-    real(Float64), dimension(3) :: ri = 0.d0
-        !+ Initial position in beam grid coordinates [cm]
-    real(Float64), dimension(3) :: vi = 0.d0
-        !+ Initial velocity in beam grid coordinates [cm/s]
-    real(Float64), dimension(3) :: ri_gc = 0.d0
-        !+ Initial guiding-center position in beam grid coordinates [cm]
-    real(Float64) :: weight = 0.d0
-        !+ Particle weight [fast-ions/s]
-    real(Float64) :: energy = 0.d0
-        !+ Sink Energy [keV]
-    real(Float64) :: pitch = 0.d0
-        !+ Sink Pitch w.r.t. the magnetic field
 end type SinkParticle
 
 type SinkProfile
@@ -1099,7 +1083,9 @@ type SimulationInputs
 
     !! Non-thermal beam deposition switches
     integer(Int32) :: enable_nonthermal_calc
-    !+ Enable the use of the fast ion distribution for beam deposition calculations
+        !+ Enable the use of the fast ion distribution for beam deposition calculations
+    Integer(Int32) :: calc_sink
+        !+ Calculate ion sink profile: 0 = off, 1=on
 
     !! Distribution settings
     integer(Int32) :: dist_type
@@ -2026,7 +2012,7 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
-    integer            :: enable_nonthermal_calc
+    integer            :: enable_nonthermal_calc, calc_sink
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2041,7 +2027,7 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
-        enable_nonthermal_calc
+        enable_nonthermal_calc, calc_sink
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2120,7 +2106,10 @@ subroutine read_inputs
     adaptive=0
     max_cell_splits=1
     split_tol=0
+
+    ! Default values for non-thermal calculation if not included in namelist:
     enable_nonthermal_calc=0
+    calc_sink=0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2198,6 +2187,7 @@ subroutine read_inputs
 
     !! Non-thermal beam deposition switches
     inputs%enable_nonthermal_calc = enable_nonthermal_calc
+    inputs%calc_sink = calc_sink
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -13813,6 +13803,14 @@ program fidasim
         allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
     endif
 
+    if (inputs%calc_sink.ge.1) then
+      allocate(sink%dens(n_thermal, &
+                          beam_grid%nx, &
+                          beam_grid%ny, &
+                          beam_grid%nz))
+      allocate(sink%part(inputs%n_dcx))
+    endif
+
     !! Spectra
     if(inputs%calc_spec.ge.1) then
         if(inputs%calc_brems.ge.1) then
@@ -13950,11 +13948,26 @@ program fidasim
                 call ndmc()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
+                if (inputs%calc_sink.ge.1) then
+                  if(inputs%verbose.ge.1) then
+                      write(*,*) 'calculation ion sink profile:    ' , time_string(time_start)
+                  endif
+                  !! call calculate_ion_sink_profile
+                endif
+
                 if(inputs%calc_birth.eq.1)then
                     if(inputs%verbose.ge.1) then
                         write(*,*) 'write birth:    ' , time_string(time_start)
                     endif
                     call write_birth_profile()
+                    if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+                endif
+
+                if(inputs%calc_sink.eq.1)then
+                    if(inputs%verbose.ge.1) then
+                        write(*,*) 'write ion sink profile:    ' , time_string(time_start)
+                    endif
+                    !! call write_ion_sink_profile()
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
             endif

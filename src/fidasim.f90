@@ -10402,6 +10402,51 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch
 
+subroutine get_nlaunch_no_fill_min(nr_markers,papprox, nlaunch)
+    !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell without filling in cells with minimum number of markers
+    integer(Int64), intent(in)                    :: nr_markers
+        !+ Approximate total number of markers to launch
+    real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
+        !+ [[libfida:beam_grid]] cell weights
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+        !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
+
+    logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
+    real(Float64), dimension(beam_grid%ngrid) :: cdf
+    integer  :: c, i, j, k, nc, nm, ind(3)
+    integer  :: nmin = 0
+    integer, dimension(1) :: randomi
+    type(rng_type) :: r
+    real(Float64), pointer :: papprox_ptr(:)
+
+    !! Fill in minimum number of markers per cell
+    nlaunch = 0
+    mask = papprox.gt.0.0
+    where(mask)
+        nlaunch = nmin
+    endwhere
+
+    !! If there are any left over distribute according to papprox
+    nc = count(mask)
+    if(nr_markers.gt.(nmin*nc)) then
+        nm = nr_markers - nmin*nc
+
+        !! precalculate cdf to save time
+        call c_f_pointer(c_loc(papprox), papprox_ptr, [beam_grid%ngrid])
+        call cumsum(papprox_ptr, cdf)
+
+        !! use the same seed for all processes
+        call rng_init(r, 932117)
+        do c=1, nm
+            call randind_cdf(r, cdf, randomi)
+            call ind2sub(beam_grid%dims, randomi(1), ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+        enddo
+    endif
+
+end subroutine get_nlaunch_no_fill_min
+
 subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
@@ -13664,6 +13709,125 @@ subroutine npa_weights
 
 end subroutine npa_weights
 
+subroutine calculate_ion_sink_profile
+  !+ Calculates ion sink profile caused by CX of plasma ions with beam neutrals
+  integer :: ic,i,j,k,ncell,is
+  integer(Int64) :: idcx !! counter
+  real(Float64), dimension(3) :: ri    !! start position
+  real(Float64), dimension(3) :: vihalo
+  integer,dimension(3) :: ind
+  integer,dimension(3) :: neut_types = [1,2,3]
+  !! Determination of the CX probability
+  type(LocalProfiles) :: plasma
+  real(Float64), dimension(nlevs) :: rates    !!  CX rates
+  !! Collisiional radiative model along track
+  real(Float64), dimension(nlevs) :: states  ! Density of n-states
+  real(Float64):: tot_denn
+  integer, dimension(beam_grid%ngrid) :: cell_ind
+  real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+  integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+  integer(Int32) :: non_thermal_calc
+  type(LocalEMFields) :: fields
+  real(Float64), dimension(3) :: ri_gc, r_gyro
+  real(Float64) :: tot_deni
+
+  !! Check if non-thermal beam deposition calculations are enabled:
+  non_thermal_calc = inputs%enable_nonthermal_calc
+
+  !! Calculate the product of n_beam*n_ion over all the beam grid:
+  papprox=0.d0
+  tot_denn=0.d0
+  do ic=1,beam_grid%ngrid
+      call ind2sub(beam_grid%dims,ic,ind)
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      call get_plasma(plasma,ind=ind)
+      if(.not.plasma%in_plasma) cycle
+      tot_denn = sum(neut%full%dens(:,i,j,k)) + &
+                 sum(neut%half%dens(:,i,j,k)) + &
+                 sum(neut%third%dens(:,i,j,k))
+      tot_deni = sum(plasma%deni)
+      if (tot_deni < 1e12) tot_deni = 0.d0 !! Reject regions with very low plasma density:
+      papprox(i,j,k)= tot_denn*tot_deni
+  enddo
+
+  !! Convert the 3D field of n_neutral*n_ion (papprox) into a histogram using n_dcx markers:
+  call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
+
+  !! Identify those cells in nlaunch with particles:
+  ncell = 0
+  do ic=1,beam_grid%ngrid
+      call ind2sub(beam_grid%dims,ic,ind)
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      if(nlaunch(i,j,k).gt.0.0) then
+          ncell = ncell + 1
+          cell_ind(ncell) = ic
+      endif
+  enddo
+
+  if(inputs%verbose.ge.1) then
+     write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+  endif
+
+  !! Compute sink particles:
+  !! 1- loop over cells in cell_ind (Only those which have finite papprox)
+  !! 2- Loop over thermal species
+  !! 3- loop over all markers to be launched in that cell
+
+  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
+  !$OMP& ri,rates,states,plasma)
+  loop_over_cells: do ic = istart, ncell, istep
+      call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      loop_over_species: do is=1, n_thermal !This loop has to come first
+          !! Loop over the markers
+          loop_over_dcx: do idcx=1, nlaunch(i,j,k)
+              !! Calculate ri,vhalo and track
+              call mc_beam_grid(ind, ri)
+              call get_plasma(plasma, pos=ri)
+              call mc_halo(plasma, thermal_mass(is), vihalo)
+
+              !! Calculate CX (ion to neutral) reaction rate [s^1]:
+              call get_total_cx_rate(ind, ri, vihalo, neut_types, rates)
+              if(sum(rates).le.0.) then
+                cycle loop_over_dcx
+              endif
+
+              !! Calculate the CX neutral flux (ion to neutral) per unit volume for the idcx ion marker:
+              !! Represents the rate at which ions are CXd into neutrals per unit volume:
+              states = rates*plasma%deni(is)/nlaunch(i,j,k)
+              if(sum(states).eq.0) then
+                cycle loop_over_dcx
+              endif
+
+              !! Store ion sink flux per unit volume in grid:
+              !!call store_sinks(ind,neut_type,atomic_mass,states)
+
+              if (sink%cnt.eq.inputs%n_dcx) then
+                write (*,*) "breakpoint"
+              endif
+
+              !! Record sink particle:
+              !$OMP CRITICAL
+              sink%part(sink%cnt)%neut_type = -1
+              sink%part(sink%cnt)%atomic_mass = thermal_mass(is)
+              sink%part(sink%cnt)%energy = dot_product(vihalo,vihalo)*v2_to_E_per_amu*thermal_mass(is)
+              sink%part(sink%cnt)%weight = sum(states)*beam_grid%dv
+              sink%part(sink%cnt)%ind = ind
+              sink%part(sink%cnt)%vi = vihalo
+              sink%part(sink%cnt)%ri = ri
+              call get_fields(fields,pos=ri)
+              sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vihalo/norm2(vihalo))
+              call gyro_step(vihalo,fields,thermal_mass(is),r_gyro)
+              sink%part(sink%cnt)%ri_gc = ri + r_gyro
+              sink%cnt = sink%cnt + 1
+              !$OMP END CRITICAL
+
+          enddo loop_over_dcx
+      enddo loop_over_species
+  enddo loop_over_cells
+  !$OMP END PARALLEL DO
+end subroutine calculate_ion_sink_profile
+
 end module libfida
 
 !=============================================================================
@@ -13952,7 +14116,7 @@ program fidasim
                   if(inputs%verbose.ge.1) then
                       write(*,*) 'calculation ion sink profile:    ' , time_string(time_start)
                   endif
-                  !! call calculate_ion_sink_profile
+                  call calculate_ion_sink_profile
                 endif
 
                 if(inputs%calc_birth.eq.1)then

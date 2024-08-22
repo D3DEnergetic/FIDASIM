@@ -4723,6 +4723,195 @@ subroutine write_birth_profile
 
 end subroutine write_birth_profile
 
+subroutine write_ion_sink_profile
+  !+ Writes [[libfida:sink]] to a HDF5 file
+  integer(HID_T) :: fid
+  integer(HSIZE_T), dimension(4) :: dim4
+  integer(HSIZE_T), dimension(2) :: dim2
+  integer(HSIZE_T), dimension(1) :: d
+  integer :: error, i, c, npart, start_index, end_index
+
+  character(charlim) :: filename
+  type(LocalEMFields) :: fields
+  type(SinkParticle) :: part
+  real(Float64), dimension(:,:), allocatable :: ri, ri_gc
+  real(Float64), dimension(:,:), allocatable :: vi
+  real(Float64), dimension(:), allocatable :: energy, pitch, weight
+  integer, dimension(:,:), allocatable :: inds
+  integer, dimension(:), allocatable :: neut_types
+  real(Float64), dimension(3) :: xyz,v_xyz,uvw,v_uvw,r_gyro,uvw_gc
+  logical :: do_write
+  real(Float64), dimension(:), allocatable :: atomic_mass
+
+#ifdef _MPI
+  integer :: rank
+  integer, dimension(:), allocatable :: npart_image
+#endif
+
+  npart = sink%cnt-1
+#ifdef _MPI
+  call parallel_sum(npart)
+#endif
+
+  allocate(ri(3,npart))
+  allocate(vi(3,npart))
+  allocate(ri_gc(3,npart))
+  allocate(energy(npart),pitch(npart),weight(npart))
+  allocate(inds(3,npart))
+  allocate(neut_types(npart))
+  allocate(atomic_mass(npart))
+  ri = 0.d0
+  vi = 0.d0
+  ri_gc = 0.d0
+  energy = 0.d0
+  pitch = 0.d0
+  weight = 0.d0
+  inds = 0
+  neut_types = 0
+  atomic_mass = 0.d0
+
+  c = 0
+#ifdef _MPI
+  rank = my_rank()
+  allocate(npart_image(0:num_ranks()-1))
+  npart_image(:) = 0
+  npart_image(rank) = sink%cnt - 1
+  call parallel_sum(npart_image)
+
+  do i=0,rank-1
+      c = c +  npart_image(i)
+  enddo
+  deallocate(npart_image)
+#endif
+  start_index = 1 + c
+  end_index = sink%cnt - 1 + c
+
+  c = 1
+  do i=start_index, end_index
+      part = sink%part(c)
+      ! Convert position to rzphi
+      xyz = part%ri
+      v_xyz = part%vi
+
+      inds(:,i) = part%ind
+      neut_types(i) = part%neut_type
+      energy(i) = part%energy
+      weight(i) = part%weight
+      atomic_mass(i) = part%atomic_mass
+
+      ! Get guiding center positions
+      pitch(i) = part%pitch
+      call xyz_to_uvw(part%ri_gc, uvw_gc)
+      ri_gc(1,i) = sqrt(uvw_gc(1)*uvw_gc(1) + uvw_gc(2)*uvw_gc(2))
+      ri_gc(2,i) = uvw_gc(3)
+      ri_gc(3,i) = atan2(uvw_gc(2),uvw_gc(1))
+
+      ! Get position in cylindrical
+      call xyz_to_uvw(xyz,uvw)
+      ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+      ri(2,i) = uvw(3)
+      ri(3,i) = atan2(uvw(2),uvw(1))
+
+      ! Convert velocity to cylindrical
+      v_uvw = matmul(beam_grid%basis, v_xyz)
+      vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
+      vi(2,i) = v_uvw(3)
+      vi(3,i) = -v_uvw(1)*sin(ri(3,i)) + v_uvw(2)*cos(ri(3,i))
+      c = c + 1
+  enddo
+
+  filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_sink.h5"
+
+  do_write = .True.
+#ifdef _MPI
+  call parallel_sum(ri_gc)
+  call parallel_sum(energy)
+  call parallel_sum(pitch)
+  call parallel_sum(weight)
+  call parallel_sum(ri)
+  call parallel_sum(vi)
+  call parallel_sum(inds)
+  call parallel_sum(neut_types)
+  call parallel_sum(atomic_mass)
+  if(my_rank().ne.0) do_write = .False.
+#endif
+
+  if(do_write) then
+      !Open HDF5 interface
+      call h5open_f(error)
+
+      !Create file overwriting any existing file
+      call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+      !Write variables
+      call write_beam_grid(fid, error)
+      d(1) = 1
+      call h5ltmake_dataset_int_f(fid, "/n_sink", 0, d, [npart], error)
+      dim4 = shape(sink%dens)
+      call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, sink%dens, error)
+      dim2 = [3, npart]
+      call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
+      call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, inds, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim2(2:2), energy, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim2(2:2), pitch, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/weight", 1, dim2(2:2), weight, error)
+      call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), neut_types, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/atomic_mass", 1, dim2(2:2), atomic_mass, error)
+
+      !Add attributes
+      call h5ltset_attribute_string_f(fid, "/n_sink","description", &
+             "Number of ion sink mc particles removed from ion distribution function with mass = atomic_mass", error)
+      call h5ltset_attribute_string_f(fid, "/dens", "description", &
+           "Ion sink density: dens(beam_component,x,y,z)", error)
+      call h5ltset_attribute_string_f(fid, "/dens", "units", &
+           "Ions/(s*cm^3)", error)
+      call h5ltset_attribute_string_f(fid, "/ri_gc", "description", &
+           "Ion guiding-center birth position in R-Z-Phi: ri_gc([r,z,phi],particle)", error)
+      call h5ltset_attribute_string_f(fid, "/ri_gc", "units", "cm, radians", error)
+      call h5ltset_attribute_string_f(fid, "/ri", "description", &
+           "Ion birth position in R-Z-Phi: ri([r,z,phi],particle)", error)
+      call h5ltset_attribute_string_f(fid, "/ri", "units", "cm, radians", error)
+      call h5ltset_attribute_string_f(fid, "/vi", "description", &
+           "Ion birth velocity in R-Z-Phi: vi([r,z,phi],particle)", error)
+      call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
+      call h5ltset_attribute_string_f(fid, "/energy", "description", &
+           "Ion birth energy: energy(particle)", error)
+      call h5ltset_attribute_string_f(fid, "/energy", "units", "keV", error)
+      call h5ltset_attribute_string_f(fid, "/weight", "description", &
+           "Ion sink weight: weight(particle)", error)
+      call h5ltset_attribute_string_f(fid, "/weight", "units", "fast-ions/s", error)
+      call h5ltset_attribute_string_f(fid, "/pitch", "description", &
+           "Ion sink pitch w.r.t. the magnetic field: pitch(particle)", error)
+      call h5ltset_attribute_string_f(fid, "/ind", "description", &
+           "Ion sink beam grid indices: ind([i,j,k],particle)", error)
+      call h5ltset_attribute_string_f(fid, "/type", "description", &
+           "Ion sink type (1=Full, 2=Half, 3=Third)", error)
+
+      call h5ltset_attribute_string_f(fid, "/", "coordinate_system", &
+           "Cylindrical (R,Z,Phi)",error)
+      call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+      call h5ltset_attribute_string_f(fid, "/", "description", &
+           "Ion sink density and particles calculated by FIDASIM", error)
+
+      !!Close file
+      call h5fclose_f(fid, error)
+
+      !!Close HDF5 interface
+      call h5close_f(error)
+  endif
+
+  ! Deallocate arrays since they aren't needed anymore
+  deallocate(ri,vi,ri_gc,energy,pitch,neut_types,inds,atomic_mass)
+  deallocate(sink%dens,sink%part)
+
+  if(inputs%verbose.ge.1) then
+      write(*,'(T4,a,a)') 'Ion sink profile written to: ',trim(filename)
+  endif
+
+end subroutine write_ion_sink_profile
+
 subroutine write_neutral_population(id, pop, error)
     !+ Writes Neutral Population to HDF5 group
     integer(HID_T), intent(inout)       :: id
@@ -14131,7 +14320,7 @@ program fidasim
                     if(inputs%verbose.ge.1) then
                         write(*,*) 'write ion sink profile:    ' , time_string(time_start)
                     endif
-                    !! call write_ion_sink_profile()
+                    call write_ion_sink_profile()
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
             endif

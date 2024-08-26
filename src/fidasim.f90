@@ -13902,14 +13902,13 @@ subroutine calculate_ion_sink_profile
   !+ Calculates ion sink profile caused by CX of plasma ions with beam neutrals
   integer :: ic,i,j,k,ncell,is
   integer(Int64) :: idcx !! counter
-  real(Float64), dimension(3) :: ri    !! start position
-  real(Float64), dimension(3) :: vihalo
+  real(Float64), dimension(3) :: ri    !! ion start position vector
+  real(Float64), dimension(3) :: vion  !! ion start velocity vector
   integer,dimension(3) :: ind
   integer,dimension(3) :: neut_types = [1,2,3]
   !! Determination of the CX probability
   type(LocalProfiles) :: plasma
   real(Float64), dimension(nlevs) :: rates    !!  CX rates
-  !! Collisiional radiative model along track
   real(Float64), dimension(nlevs) :: states  ! Density of n-states
   real(Float64):: tot_denn
   integer, dimension(beam_grid%ngrid) :: cell_ind
@@ -13919,6 +13918,9 @@ subroutine calculate_ion_sink_profile
   type(LocalEMFields) :: fields
   real(Float64), dimension(3) :: ri_gc, r_gyro
   real(Float64) :: tot_deni
+  real(Float64) :: eb, ptch
+  real(Float64) :: deni !! ion density
+  real(Float64), dimension(3) :: ri_corr
 
   !! Check if non-thermal beam deposition calculations are enabled:
   non_thermal_calc = inputs%enable_nonthermal_calc
@@ -13935,7 +13937,7 @@ subroutine calculate_ion_sink_profile
                  sum(neut%half%dens(:,i,j,k)) + &
                  sum(neut%third%dens(:,i,j,k))
       tot_deni = sum(plasma%deni)
-      if (tot_deni < 1e12) tot_deni = 0.d0 !! Reject regions with very low plasma density:
+      if (tot_deni < 1e11) tot_deni = 0.d0 !! Reject regions with very low plasma density:
       papprox(i,j,k)= tot_denn*tot_deni
   enddo
 
@@ -13962,28 +13964,47 @@ subroutine calculate_ion_sink_profile
   !! 2- Loop over thermal species
   !! 3- loop over all markers to be launched in that cell
 
-  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
-  !$OMP& ri,rates,states,plasma)
+  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion, &
+  !$OMP& ri,rates,states,plasma,fields,deni,eb,ptch,ri_corr)
   loop_over_cells: do ic = istart, ncell, istep
       call ind2sub(beam_grid%dims,cell_ind(ic),ind)
       i = ind(1) ; j = ind(2) ; k = ind(3)
       loop_over_species: do is=1, n_thermal !This loop has to come first
-          !! Loop over the markers
-          loop_over_dcx: do idcx=1, nlaunch(i,j,k)
-              !! Calculate ri,vhalo and track
+          loop_over_dcx: do idcx=1, nlaunch(i,j,k) !! Loop over the markers
+
+              !! Get ion starting postion vector:
               call mc_beam_grid(ind, ri)
-              call get_plasma(plasma, pos=ri)
-              call mc_halo(plasma, thermal_mass(is), vihalo)
+
+              !! Get ion velocity vector (vion) and ion density (deni):
+              if (non_thermal_calc.ge.1) then
+                !! Get ion velocity vector from distribution function: (single species case:)
+                call mc_fastion(ind, fields, eb, ptch, deni)
+
+                !! Convert pitch and energy into vector in beam_grid coords:
+                call gyro_correction(fields, eb, ptch, thermal_mass(is), ri_corr, vion)
+                if(deni.le.0.0) cycle loop_over_dcx
+
+                !! Diagnostic:
+                if(dot_product(vion,vion).eq.0.) then
+                  cycle loop_over_dcx
+                endif
+
+              else
+                !! Get velocity vector from thermal distribution:
+                call get_plasma(plasma, pos=ri)
+                call mc_halo(plasma,thermal_mass(is),vion)
+                deni = plasma%deni(is)
+              endif
 
               !! Calculate CX (ion to neutral) reaction rate [s^1]:
-              call get_total_cx_rate(ind, ri, vihalo, neut_types, rates)
+              call get_total_cx_rate(ind, ri, vion, neut_types, rates)
               if(sum(rates).le.0.) then
                 cycle loop_over_dcx
               endif
 
               !! Calculate the CX neutral flux (ion to neutral) per unit volume for the idcx ion marker:
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-              states = rates*plasma%deni(is)/nlaunch(i,j,k)
+              states = rates*deni/nlaunch(i,j,k)
               if(sum(states).eq.0) then
                 cycle loop_over_dcx
               endif
@@ -13999,14 +14020,14 @@ subroutine calculate_ion_sink_profile
               !$OMP CRITICAL
               sink%part(sink%cnt)%neut_type = -1
               sink%part(sink%cnt)%atomic_mass = thermal_mass(is)
-              sink%part(sink%cnt)%energy = dot_product(vihalo,vihalo)*v2_to_E_per_amu*thermal_mass(is)
+              sink%part(sink%cnt)%energy = dot_product(vion,vion)*v2_to_E_per_amu*thermal_mass(is)
               sink%part(sink%cnt)%weight = sum(states)*beam_grid%dv
               sink%part(sink%cnt)%ind = ind
-              sink%part(sink%cnt)%vi = vihalo
+              sink%part(sink%cnt)%vi = vion
               sink%part(sink%cnt)%ri = ri
               call get_fields(fields,pos=ri)
-              sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vihalo/norm2(vihalo))
-              call gyro_step(vihalo,fields,thermal_mass(is),r_gyro)
+              sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
+              call gyro_step(vion,fields,thermal_mass(is),r_gyro)
               sink%part(sink%cnt)%ri_gc = ri + r_gyro
               sink%cnt = sink%cnt + 1
               !$OMP END CRITICAL

@@ -106,7 +106,7 @@ def main():
 
     for time in times:
         if not args.gfile:
-            time_str = str(long(round(time*1000.)))
+            time_str = str(int(round(time*1000.)))
             gfile = 'g'+re.match('^\d+',args.runid).group(0)+'.'+('0'*(5-len(time_str)))+time_str
         else:
             gfile = args.gfile

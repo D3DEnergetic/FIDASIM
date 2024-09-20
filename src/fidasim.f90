@@ -4886,6 +4886,8 @@ subroutine write_ion_sink_profile
            "Ion sink pitch w.r.t. the magnetic field: pitch(particle)", error)
       call h5ltset_attribute_string_f(fid, "/ind", "description", &
            "Ion sink beam grid indices: ind([i,j,k],particle)", error)
+
+      ! Need to change this description to ion species
       call h5ltset_attribute_string_f(fid, "/type", "description", &
            "Ion sink type (1=Full, 2=Half, 3=Third)", error)
 
@@ -9102,6 +9104,21 @@ subroutine store_births(ind, neut_type, dflux)
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
     !$OMP END ATOMIC
 end subroutine store_births
+
+subroutine store_sinks(ind, ion_species_type, flux)
+    !+ Store sink particles/density in [[libfida:sink]]
+    integer(Int32), dimension(3), intent(in) :: ind
+        !+ [[libfida:beam_grid]] indices
+    integer(Int32), intent(in)               :: ion_species_type
+        !+ Ion species type
+    real(Float64), intent(in)                :: flux
+        !+ Particle flux [p/s /m3]
+
+    !$OMP ATOMIC UPDATE
+    sink%dens(ion_species_type,ind(1),ind(2),ind(3))= &
+     sink%dens(ion_species_type,ind(1),ind(2),ind(3)) + flux
+    !$OMP END ATOMIC
+end subroutine store_sinks
 
 subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     !+ Store NPA particles in [[libfida:npa]]
@@ -13900,7 +13917,7 @@ end subroutine npa_weights
 
 subroutine calculate_ion_sink_profile
   !+ Calculates ion sink profile caused by CX of plasma ions with beam neutrals
-  integer :: ic,i,j,k,ncell,is
+  integer :: ic,i,j,k,ncell,is,ib
   integer(Int64) :: idcx !! counter
   real(Float64), dimension(3) :: ri    !! ion start position vector
   real(Float64), dimension(3) :: vion  !! ion start velocity vector
@@ -13925,24 +13942,33 @@ subroutine calculate_ion_sink_profile
   !! Check if non-thermal beam deposition calculations are enabled:
   non_thermal_calc = inputs%enable_nonthermal_calc
 
-  !! Calculate the product of n_beam*n_ion over all the beam grid:
-  papprox=0.d0
-  tot_denn=0.d0
-  do ic=1,beam_grid%ngrid
-      call ind2sub(beam_grid%dims,ic,ind)
-      i = ind(1) ; j = ind(2) ; k = ind(3)
-      call get_plasma(plasma,ind=ind)
-      if(.not.plasma%in_plasma) cycle
-      tot_denn = sum(neut%full%dens(:,i,j,k)) + &
-                 sum(neut%half%dens(:,i,j,k)) + &
-                 sum(neut%third%dens(:,i,j,k))
-      tot_deni = sum(plasma%deni)
-      if (tot_deni < 1e11) tot_deni = 0.d0 !! Reject regions with very low plasma density:
-      papprox(i,j,k)= tot_denn*tot_deni
-  enddo
+  if (.FALSE.) then
+    !! Calculate the product of n_beam*n_ion over all the beam grid:
+    papprox=0.d0
+    tot_denn=0.d0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        call get_plasma(plasma,ind=ind)
+        if(.not.plasma%in_plasma) cycle
+        tot_denn = sum(neut%full%dens(:,i,j,k)) + &
+                   sum(neut%half%dens(:,i,j,k)) + &
+                   sum(neut%third%dens(:,i,j,k))
+        tot_deni = sum(plasma%deni)
+        if (tot_deni < 1e11) tot_deni = 0.d0 !! Reject regions with very low plasma density:
+        papprox(i,j,k)= tot_denn*tot_deni
+    enddo
 
-  !! Convert the 3D field of n_neutral*n_ion (papprox) into a histogram using n_dcx markers:
-  call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
+    !! Convert the 3D field of n_neutral*n_ion (papprox) into a histogram using n_dcx markers:
+    call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
+  else
+    WRITE (*,*) "birth%cnt; ", birth%cnt
+    do ib=1,(birth%cnt-1)
+      ind = birth%part(ib)%ind
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+    enddo
+  endif
 
   !! Identify those cells in nlaunch with particles:
   ncell = 0
@@ -13982,12 +14008,6 @@ subroutine calculate_ion_sink_profile
 
                 !! Convert pitch and energy into vector in beam_grid coords:
                 call gyro_correction(fields, eb, ptch, thermal_mass(is), ri_corr, vion)
-                if(deni.le.0.0) cycle loop_over_dcx
-
-                !! Diagnostic:
-                if(dot_product(vion,vion).eq.0.) then
-                  cycle loop_over_dcx
-                endif
 
               else
                 !! Get velocity vector from thermal distribution:
@@ -13996,40 +14016,38 @@ subroutine calculate_ion_sink_profile
                 deni = plasma%deni(is)
               endif
 
+              if(deni.le.0.0) then
+                cycle loop_over_dcx
+              endif
+
+              if(dot_product(vion,vion).eq.0.) then
+                write (*,*) "dot_product(vion,vion).eq.0."
+                write (*,*) "eb [eV]: ", eb*1e3
+                write (*,*) "ptch: ", ptch
+                cycle loop_over_dcx
+              endif
+
               !! Calculate CX (ion to neutral) reaction rate [s^1]:
               call get_total_cx_rate(ind, ri, vion, neut_types, rates)
               if(sum(rates).le.0.) then
+                write (*,*) "sum(rates) .le. 0"
                 cycle loop_over_dcx
               endif
 
               !! Calculate the CX neutral flux (ion to neutral) per unit volume for the idcx ion marker:
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-              states = rates*deni/nlaunch(i,j,k)
-              if(sum(states).eq.0) then
-                cycle loop_over_dcx
-              endif
+              states = rates*deni/nlaunch(i,j,k) ! [p/s 1/m3]
 
               !! Store ion sink flux per unit volume in grid:
-              !!call store_sinks(ind,neut_type,atomic_mass,states)
+              call store_sinks(ind,is,sum(states))
 
               if (sink%cnt.eq.inputs%n_dcx) then
                 write (*,*) "breakpoint"
               endif
 
-              !! Record sink particle:
+              !! Record sink particle: record_ion_sink_particle(ind, ri, vion, is, states, fields)
               !$OMP CRITICAL
-              sink%part(sink%cnt)%neut_type = -1
-              sink%part(sink%cnt)%atomic_mass = thermal_mass(is)
-              sink%part(sink%cnt)%energy = dot_product(vion,vion)*v2_to_E_per_amu*thermal_mass(is)
-              sink%part(sink%cnt)%weight = sum(states)*beam_grid%dv
-              sink%part(sink%cnt)%ind = ind
-              sink%part(sink%cnt)%vi = vion
-              sink%part(sink%cnt)%ri = ri
-              call get_fields(fields,pos=ri)
-              sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
-              call gyro_step(vion,fields,thermal_mass(is),r_gyro)
-              sink%part(sink%cnt)%ri_gc = ri + r_gyro
-              sink%cnt = sink%cnt + 1
+              call record_ion_sink_particle(ind,ri,vion,is,states,fields)
               !$OMP END CRITICAL
 
           enddo loop_over_dcx
@@ -14037,6 +14055,31 @@ subroutine calculate_ion_sink_profile
   enddo loop_over_cells
   !$OMP END PARALLEL DO
 end subroutine calculate_ion_sink_profile
+
+subroutine record_ion_sink_particle(ind,ri,vion,is,states,fields)
+  !+ Records an ion sink particle into [[libfida::sink]]
+  integer(Int32) :: is
+  real(Float64), dimension(3) :: ri    !! ion start position vector
+  real(Float64), dimension(3) :: vion  !! ion start velocity vector
+  integer,dimension(3) :: ind
+  real(Float64), dimension(nlevs) :: states  ! Density of n-states in single marker [ions/s-cm^{-3}]
+  type(LocalEMFields) :: fields
+  real(Float64), dimension(3) :: r_gyro
+
+  sink%part(sink%cnt)%neut_type = -1
+  sink%part(sink%cnt)%atomic_mass = thermal_mass(is)
+  sink%part(sink%cnt)%energy = dot_product(vion,vion)*v2_to_E_per_amu*thermal_mass(is)
+  sink%part(sink%cnt)%weight = sum(states)*beam_grid%dv
+  sink%part(sink%cnt)%ind = ind
+  sink%part(sink%cnt)%vi = vion
+  sink%part(sink%cnt)%ri = ri
+  call get_fields(fields,pos=ri)
+  sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
+  call gyro_step(vion,fields,thermal_mass(is),r_gyro)
+  sink%part(sink%cnt)%ri_gc = ri + r_gyro
+  sink%cnt = sink%cnt + 1
+
+end subroutine record_ion_sink_particle
 
 end module libfida
 

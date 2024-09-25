@@ -42,11 +42,20 @@ def fourier_transform_3D(wout, ntheta=16, nphi=20, thetamin=None, thetamax=None,
     #+```
     """
     new_wout = wout.copy()
-    if (thetamin is None and thetamax is None) or np.isclose([thetamin, thetamax], [0, 2*np.pi], atol=0.5*np.pi/180).all():
+    if (thetamin is None and thetamax is None) or (thetamin < 0 and thetamax > 2*np.pi) or (thetamin > thetamax):
         thetamin = 0
-        thetamax = 2*np.pi # Removes double counting 0 (2*pi)
-    if (phimin is None and phimax is None) or np.isclose([phimin, phimax], [0, 2*np.pi], atol=0.5*np.pi/180).all():
+        thetamax = 2*np.pi
+    if thetamin is None or thetamin < 0:
+        thetamin = 0
+    if thetamax is None or thetamax > 2*np.pi:
+        thetamax = 2*np.pi
+
+    if (phimin is None and phimax is None) or (phimin < 0 and phimax < 2*np.pi) or (phimin > phimax):
         phimin = 0
+        phimax = 2*np.pi
+    if phimin is None or phimin < 0:
+        phimin = 0
+    if phimax is None or phimax > 2*np.pi:
         phimax = 2*np.pi
 
     theta = np.linspace(thetamin, thetamax, ntheta)

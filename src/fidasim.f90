@@ -11383,7 +11383,8 @@ subroutine dcx
         endif
     enddo
 
-    call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
+    ! call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
+    call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
 
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
@@ -11539,7 +11540,8 @@ subroutine halo
                 cell_ind(ncell) = ic
             endif
         enddo
-        call get_nlaunch(n_halo, papprox, nlaunch)
+        ! call get_nlaunch(n_halo, papprox, nlaunch)
+        call get_nlaunch_no_fill_min(n_halo, papprox, nlaunch)
 
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
@@ -13950,29 +13952,6 @@ subroutine calculate_ion_sink_profile
     nlaunch(i,j,k) = nlaunch(i,j,k) + 1
   enddo
 
-  ! if (.FALSE.) then
-  !   !! Calculate the product of n_beam*n_ion over all the beam grid:
-  !   papprox=0.d0
-  !   tot_denn=0.d0
-  !   do ic=1,beam_grid%ngrid
-  !       call ind2sub(beam_grid%dims,ic,ind)
-  !       i = ind(1) ; j = ind(2) ; k = ind(3)
-  !       call get_plasma(plasma,ind=ind)
-  !       if(.not.plasma%in_plasma) cycle
-  !       tot_denn = sum(neut%full%dens(:,i,j,k)) + &
-  !                  sum(neut%half%dens(:,i,j,k)) + &
-  !                  sum(neut%third%dens(:,i,j,k))
-  !       tot_deni = sum(plasma%deni)
-  !       if (tot_deni < 1e11) tot_deni = 0.d0 !! Reject regions with very low plasma density:
-  !       papprox(i,j,k)= tot_denn*tot_deni
-  !   enddo
-  !
-  !   !! Convert the 3D field of n_neutral*n_ion (papprox) into a histogram using n_dcx markers:
-  !   call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
-  ! else
-  !
-  ! endif
-
   !! Identify those cells in nlaunch with particles:
   ncell = 0
   do ic=1,beam_grid%ngrid
@@ -13989,7 +13968,7 @@ subroutine calculate_ion_sink_profile
   endif
 
   !! Compute sink particles:
-  !! 1- loop over cells in cell_ind (Only those which have finite papprox)
+  !! 1- loop over cells in cell_ind (Only those which have birth particles)
   !! 2- Loop over thermal species
   !! 3- loop over all markers to be launched in that cell
 
@@ -14001,8 +13980,14 @@ subroutine calculate_ion_sink_profile
       loop_over_species: do is=1, n_thermal !This loop has to come first
           loop_over_dcx: do idcx=1, nlaunch(i,j,k) !! Loop over the markers
 
+              !! Get particle position:
+              !! input: ind (in beam grid)
+              !! output: ri in XYZ coords
+              call mc_beam_grid(ind, ri)
+
               !! Get ion velocity vector (vion) and ion density (deni):
               if (non_thermal_calc.ge.1) then
+
                 !! Get ion velocity vector from distribution function: (single species case:):
                 !! input: ind (cell index)
                 !! output: fields, eb, pitch, denf (at the GC position)
@@ -14013,18 +13998,13 @@ subroutine calculate_ion_sink_profile
                 !! outputs: ri_corr, vion
                 !! ri_corr corresponds to the actual particle position of the ion under consideration
                 call gyro_correction(fields, eb, ptch, thermal_mass(is), ri_corr, vion)
-                ri = ri_corr
+                ! ri = ri_corr
 
                 !! Get beam grid index at new position ri:
                 !! input: ri
                 !! output: ind
-                call get_indices(ri,ind)
+                ! call get_indices(ri,ind)
               else
-                !! Get actual particle position (not GC)
-                !! input: ind (in beam grid)
-                !! output: ri in XYZ coords
-                call mc_beam_grid(ind, ri)
-
                 !! Get thermal plasma profiles at ion position:
                 !! input: ri in XYZ
                 !! output: plasma
@@ -14059,19 +14039,16 @@ subroutine calculate_ion_sink_profile
                 cycle loop_over_dcx
               endif
 
-              !! Calculate the CX neutral flux (ion to neutral) per unit volume for the idcx ion marker:
+              !! CX neutral flux (ion to neutral) per unit volume for the idcx ion marker:
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
               states = rates*deni/nlaunch(i,j,k) ! [p/s 1/m3]
               if(sum(states).le.0.) then
                 write (*,*) "sum(rates) .le. 0"
                 cycle loop_over_dcx
               endif
+
               !! Store ion sink flux per unit volume in grid:
               call store_sinks(ind,is,sum(states))
-
-              if (sink%cnt.eq.inputs%n_dcx) then
-                write (*,*) "breakpoint"
-              endif
 
               !! Record sink particle: record_ion_sink_particle(ind, ri, vion, is, states, fields)
               !$OMP CRITICAL
@@ -14264,7 +14241,8 @@ program fidasim
                           beam_grid%nx, &
                           beam_grid%ny, &
                           beam_grid%nz))
-      allocate(sink%part(inputs%n_dcx))
+      ! allocate(sink%part(inputs%n_dcx))
+      allocate(sink%part(size(birth%part)))
     endif
 
     !! Spectra

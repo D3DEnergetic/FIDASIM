@@ -13214,10 +13214,11 @@ subroutine cfpd_f
                             call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu,gammaplus=gammaplus,gammaminus=gammaminus)
 
                             !! Compute effects of spin polarization for D-D reactions
-                            if (inputs%calc_cfpd.eq.1) then
-                                call get_dd_weight(pitch,chi3,gammaplus,gammaminus,pgyro_dd_spf)
-                                pgyro = pgyro_dd_spf
-                            endif
+                            !!! Add SPF logical
+                         !!!if (inputs%calc_cfpd.eq.1) then
+                         !!!    call get_dd_weight(pitch,chi3,gammaplus,gammaminus,pgyro_dd_spf)
+                         !!!    pgyro = pgyro_dd_spf
+                         !!!endif
 
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1

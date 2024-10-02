@@ -9374,7 +9374,7 @@ subroutine get_dhe3_anisotropy(plasma, v1, v3, fields, kappa)
 
 end subroutine get_dhe3_anisotropy
 
-subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
+subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu,gammaplus,gammaminus)
     !+ Returns fraction of gyroangles that can produce a reaction with
     !+ given inputs for 2(1,3)4 reaction
     type(LocalEMFields), intent(in) :: fields
@@ -9395,11 +9395,15 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
         !+ Gyro angle of fast ion [rad]
     real(Float64), dimension(4), intent(in), optional :: mass_amu
         !+ Mass of reactants and products (1,2,3,4) [amu]
+    real(Float64), intent(out), optional :: gammaplus
+        !+ Maximum fast-ion gyroangle that satisfies kinematic equations [rad]
+    real(Float64), intent(out), optional :: gammaminus
+        !+ Minimum fast-ion gyroangle that satisfies kinematic equations [rad]
 
     real(Float64), dimension(3) :: a_hat, vrot
     real(Float64), dimension(3) :: c_hat
     real(Float64) :: JMeV,JkeV,mp,Q,norm_v3,norm_v1,vpar,vperp,vb,va,E3max,E3min
-    real(Float64) :: phip,cosphip,cosphib,cosphia,rhs,gammaplus,gammaminus
+    real(Float64) :: phip,cosphip,cosphib,cosphia,rhs
     real(Float64) :: eps,bracket,ccminus,ccplus,bbminus,bbplus,v3minus,v3plus
     real(Float64) :: E3minus,E3plus,v3plusmag,v3minusmag,v3maxmag,v3minmag
     real(Float64) :: DeltaE3
@@ -9423,6 +9427,8 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
 
     pgyro = 0.d0
     gam0 = 0.d0
+    gammaplus = 0.d0
+    gammaminus = 0.d0
 
     ! Preliminaries [SI units]
     JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
@@ -9579,8 +9585,211 @@ subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0,mass_amu)
         endif
     endif
 
-
 endsubroutine get_pgyro
+
+subroutine dsigmadomega(bpitch, gamma, ppitch, pvector, ptensor, dsdo)
+    real(Float64), intent(in)   :: bpitch
+        !+ v_parallel/v of incident beam ion
+    real(Float64), intent(in)   :: gamma
+        !+ gyroangle of incident beam ion
+    real(Float64), intent(in)   :: ppitch
+        !+ v_parallel/v of emitted proton in center-of-mass frame
+    real(Float64), intent(in)   :: pvector
+        !+ D vector polarization P_z
+    real(Float64), intent(in)   :: ptensor
+        !+ D tensor polarization p_zz
+    real(Float64), intent(out)  :: dsdo
+        !+ angular factor of the differential cross section
+
+    real(Float64), dimension(3) :: cay
+    real(Float64), dimension(5) :: cazz, caxxyy, caxz
+    real(Float64) :: vpar, vperp, pperp, cosphi, sinphi, x
+    real(Float64) :: a2, a4, w0, ay, azz, axz, axxyy
+    real(Float64) :: py, pxz, pcross, pzz
+    real(Float64) :: denom, arg_denom, eps
+    integer :: i
+
+    ! Table 3 of Becker et al. (used in the A coefficients below)
+    cay = [0.0, 0.183, -0.027]
+    cazz = [-0.13, 0.005, -0.777, 0.121, -0.03]
+    caxxyy = [0.0, 0.0, -0.282, 0.021, -0.006]
+    caxz = [0.0, -0.007, -0.383, 0.050, -0.005]
+
+    ! Eq. (10) of Becker
+    a2 = 0.150
+    a4 = 0.001
+
+    ! Ohlsen geometry 
+    ! cos(beta) is the fast-ion pitch, i.e. vpar = bpitch
+    ! Beam normalized velocity components relative to the B field
+    vpar = bpitch
+    vperp = sqrt(1.0 - vpar**2)
+
+    ! ppitch is proton pitch, i.e. cos(varphi) and cos(chi) in the prior and new formalism, respectively.
+    pperp = sqrt(1.0 - ppitch**2)
+
+    arg_denom = vperp**2 * sin(gamma)**2 + (vpar * pperp - vperp * cos(gamma) * ppitch)**2
+
+    eps = 1.d-6 ! Tolerance for singularity
+    if (arg_denom.le.eps) then
+        cosphi = -1.d0
+        sinphi = 0.d0
+    else
+        denom = sqrt(arg_denom)
+        cosphi = -sin(gamma) * pperp / denom
+        sinphi = (vpar*pperp*cos(gamma) - vperp*ppitch) / denom
+        ! Below checks for floating point errors
+        if (abs(cosphi) .gt. (1.0+1.0e-6)) then
+            print*, "STOPPING... cosphi significantly out of range:", cosphi
+            stop
+        else if (abs(cosphi).gt.1.0) then
+            ! Clamp cosphi to [-1, 1]
+            cosphi = sign(1.0_Float64, cosphi)
+        end if
+    endif
+
+        x = vpar*ppitch + vperp*cos(gamma)*pperp
+
+        ! Get upper case A coefficients
+
+        w0 = 1.0 + a2 * legendre(x, 2, 0) + a4 * legendre(x, 4, 0)
+
+        ! Eq. (9)
+        ay = 0.0
+        azz = 0.0
+        axz = 0.0
+        axxyy = 0.0
+        do i = 1, 2
+            ay = ay + cay(i) * legendre(x, i, 1)
+        enddo
+        do i = 0, 4
+            azz = azz + cazz(i) * legendre(x, i, 0)
+        enddo
+        do i = 1, 4
+            axz = axz + caxz(i) * legendre(x, i, 1)
+        enddo
+        do i = 2, 4
+            axxyy = axxyy + caxxyy(i) * legendre(x, i, 2)
+        enddo
+        ay = ay / w0
+        azz = azz / w0
+        axz = axz / w0
+        axxyy = axxyy / w0
+
+        ! Polarization components in terms of pvector and ptensor
+        ! Eqs. (37-38) of Ohlsen & Keaton
+        py = pvector * vperp * cosphi
+        pxz = -1.5 * ptensor * vperp * vpar * sinphi
+        pcross = -0.25 * ptensor * vperp**2 * cos(2 * acos(cosphi))
+        pzz = 0.5 * ptensor * (3 * vpar**2 - 1)
+
+    ! Eq. (1) of Becker et al.
+    dsdo = 1.0 + 1.5 * py * ay + 0.667 * pxz * axz + pcross * axxyy + 0.5 * pzz * azz
+
+end subroutine dsigmadomega
+
+function legendre(x, l, m) result(plm)
+    !+ Associated Legendre polynomial of order `l` and degree `m` for l = {0,1,2,3,4} and m = {0,1,2}
+    real(Float64), intent(in) :: x
+        !+ Cos(theta)
+    integer, intent(in) :: l
+        !+ Order
+    integer, intent(in) :: m
+        !+ Degree
+    real(Float64) :: plm
+        !+ Plm(x)
+    !+ Reference: Table is located at https://en.wikipedia.org/wiki/Associated_Legendre_polynomials
+
+    plm = 0.0d0
+
+    if (l == 0) then
+        if (m == 0) then
+            plm = 1.0d0
+        else
+            plm = 0.0d0
+        end if
+    elseif (l == 1) then
+        if (m == 0) then
+            plm = x
+        elseif (m == 1) then
+            plm = -sqrt(1.0d0 - x**2)
+        else
+            plm = 0.0d0
+        end if
+    elseif (l == 2) then
+        if (m == 0) then
+            plm = 0.5d0 * (3.0d0 * x**2 - 1.0d0)
+        elseif (m == 1) then
+            plm = -3.0d0 * x * sqrt(1.0d0 - x**2)
+        elseif (m == 2) then
+            plm = 3.0d0 * (1.0d0 - x**2)
+        end if
+    elseif (l == 3) then
+        if (m == 0) then
+            plm = 0.5d0 * (5.0d0 * x**3 - 3.0d0 * x)
+        elseif (m == 1) then
+            plm = -1.5d0 * (5.0d0 * x**2 - 1.0d0) * sqrt(1.0d0 - x**2)
+        elseif (m == 2) then
+            plm = 15.0d0 * x * (1.0d0 - x**2)
+        end if
+    elseif (l == 4) then
+        if (m == 0) then
+            plm = 0.125d0 * (35.0d0 * x**4 - 30.0d0 * x**2 + 3.0d0)
+        elseif (m == 1) then
+            plm = -2.5d0 * (7.0d0 * x**3 - 3.0d0 * x) * sqrt(1.0d0 - x**2)
+        elseif (m == 2) then
+            plm = 7.5d0 * (7.0d0 * x**2 - 1.0d0) * (1.0d0 - x**2)
+        end if
+    end if
+
+end function legendre
+
+subroutine get_dd_weight(pitch,protonpitch,gammaplus,gammaminus,weight)
+    !+ Velocity-space weight factor for D-D beam-plasma reactions
+    real(Float64), intent(in) :: pitch
+        !+ pitch  fast ion pitch relative to the field
+    real(Float64), intent(in)       :: protonpitch
+        !+ 3-MeV proton pitch
+    real(Float64), intent(in) :: gammaplus
+        !+ Maximum fast-ion gyroangle that satisfies kinematic equations [rad]
+    real(Float64), intent(in) :: gammaminus
+        !+ Minimum fast-ion gyroangle that satisfies kinematic equations [rad]
+    real(Float64), intent(out) :: weight
+        !+ Probability factor
+
+    real(Float64), dimension(:), allocatable :: gyroangles
+    real(Float64) :: pgyro, gyro
+    real(Float64) :: gyroangle, ds
+    real(Float64) :: pdvector ! Vector Polarization, P(z)
+    real(Float64) :: pdtensor ! Tensor Polarization, P(zz)
+    integer :: i, ngyro
+    real(Float64), dimension(1) :: randomu
+    integer, dimension(1) :: randomi
+    real(Float64), dimension(3) :: vi_norm
+
+    !!!TODO For now turn off the polarization
+    pdvector =  0.00
+    pdtensor =  0.00
+
+    ngyro = 181
+    allocate(gyroangles(ngyro))
+
+    ! Generate gyroangles
+    call randu(randomu)
+    do i=1, ngyro
+      gyroangles(i) = pi * ((i-1) + randomu(1)) / ngyro
+    enddo
+
+    weight = 0.0
+    do i = 1, ngyro
+        gyroangle = gyroangles(i)
+        if ((gyroangle.gt.gammaplus).and.(gyroangle.lt.gammaminus)) then
+            call dsigmadomega(pitch, gyroangle, protonpitch, pdvector, pdtensor, ds)
+            weight = weight + ds / ngyro
+        endif
+    enddo
+
+endsubroutine get_dd_weight
 
 subroutine neutral_cx_rate(denn, res, v_ion, rates)
     !+ Get probability of a thermal ion charge exchanging with neutral
@@ -12928,6 +13137,7 @@ subroutine cfpd_f
     type(LocalEMFields) :: fields
     real(Float64) :: pgyro, vnet_square, factor, vabs
     real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf, tol
+    real(Float64) :: gammaplus, gammaminus, pgyro_dd_spf
     integer :: ie, ip, ich, ie3, iray, ist, cnt
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
@@ -12972,7 +13182,8 @@ subroutine cfpd_f
     rate = 0.d0
     factor = 0.5d0*fbm%dE*fbm%dp*ctable%dl !0.5 for TRANSP-pitch (E,p) space factor
     !$OMP PARALLEL DO schedule(guided) private(vi,vi_norm,v3_xyz,xyz,r_gyro,plasma,fields,pgyro,&
-    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3,proj_13,ip13)
+    !$OMP& vnet_square,vabs,eb,pitch,erel,rate,kappa,gyro,fbm_denf,ie,ip,ich,ie3,iray,ist,cnt,ip3,chi3,proj_13,ip13,&
+    !$OMP& gammaplus,gammaminus,pgyro_dd_spf)
     channel_loop: do ich=1, ctable%nchan
         E3_loop: do ie3=1, ctable%nenergy
             cnt = 0
@@ -13000,7 +13211,14 @@ subroutine cfpd_f
                             eb = fbm%energy(ie)
 
                             !! Get the probability factor
-                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu)
+                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu,gammaplus=gammaplus,gammaminus=gammaminus)
+
+                            !! Compute effects of spin polarization for D-D reactions
+                            if (inputs%calc_cfpd.eq.1) then
+                                call get_dd_weight(pitch,chi3,gammaplus,gammaminus,pgyro_dd_spf)
+                                pgyro = pgyro_dd_spf
+                            endif
+
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1
 
@@ -13082,50 +13300,6 @@ subroutine cfpd_f
 #endif
 
 end subroutine cfpd_f
-
-subroutine check_pitch
-    !+ Calculate charged fusion product count rate and weight function using a fast-ion distribution function F(E,p,r,z)
-    real(Float64), dimension(3) :: vi, vi_norm, v3_xyz, v3_rpz, xyz, r_gyro
-    real(Float64) :: proj_13
-    real(Float64), dimension(21) :: ptcharr
-    integer, dimension(1) :: ip3,ip13
-    integer :: i
-    type(LocalProfiles) :: plasma
-    type(LocalEMFields) :: fields
-    real(Float64) :: pgyro, vnet_square, factor, vabs
-    real(Float64) :: eb, pitch, erel, rate, kappa, gyro, fbm_denf
-    integer :: ie, ip, ich, ie3, iray, ist, cnt
-
-    !!! Hardcoded
-    ich = 3
-    ie3 = 10
-    iray = 1
-
-    allocate(cfpd%vphi(ctable%nsteps))
-    allocate(cfpd%chi3(ctable%nsteps))
-    cfpd%vphi = 0.d0
-    cfpd%chi3 = 0.d0
-
-    !$OMP PARALLEL DO schedule(guided) private(v3_xyz,v3_rpz,xyz,fields)
-    step_loop: do ist=1, ctable%nsteps
-        if (ist.gt.ctable%nactual(ie3,iray,ich)) cycle step_loop
-
-        !! Calculate position and velocity in beam coordinates
-        call convert_sightline_to_xyz(ie3, ist, iray, ich, xyz, v3_xyz, v3_rpz)
-        call get_fields(fields, pos=xyz)
-        if(.not.fields%in_plasma) cycle step_loop
-        cfpd%chi3(ist) = dot_product(v3_xyz, fields%b_norm)
-        cfpd%vphi(ist) = v3_rpz(2)
-
-    enddo step_loop
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    call parallel_sum(cfpd%vphi)
-    call parallel_sum(cfpd%chi3)
-#endif
-
-end subroutine check_pitch
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
@@ -14265,7 +14439,6 @@ program fidasim
         if(inputs%verbose.ge.1) then
             write(*,*) 'charged fusion products:    ', time_string(time_start)
         endif
-        call check_pitch()
         call cfpd_f()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

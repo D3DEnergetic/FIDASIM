@@ -3743,7 +3743,10 @@ subroutine read_f(fid, error)
         if(fbm%nphi.gt.1) then
             write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         endif
-        write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
+        ! This fbm%n_tot is never caalculated not used, so it just print 0 in
+        ! the output file, which is quite confusing for the user, just comment 
+        ! this to avoid confusion
+        ! write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
 

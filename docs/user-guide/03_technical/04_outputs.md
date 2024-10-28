@@ -31,9 +31,9 @@ If the NPA switch is greater than 1, the `particle` or `passive_particle` struct
 | `class`             | `n_(p)npa > 1`| Int32   | 1    | nMarker    | NA    | Class of the neutral particle |
 | `detector`          | `n_(p)npa > 1`| Int32   | 1    | nMarker    | NA    | Detector (channel) the marker hit|
 | `energy`            | `n_(p)npa > 1`| Float64 | 1    | nMarker    | keV   | Energy of the particle |
-| `gci`               | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | m     | Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)|
-| `ri`                | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | m     | Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)|
-| `rf`                | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | m     | Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)|
+| `gci`               | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | cm     | Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)|
+| `ri`                | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | cm     | Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)|
+| `rf`                | `n_(p)npa > 1`| Float64 | 2    | 3, nMarker | cm     | Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)|
 | `pitch`             | `n_(p)npa > 1`| Float64 | 1    | nMarker    | NA    | Pitch value of the neutral particle: p = v_parallel/v w.r.t. the magnetic field   |
 | `weight`            | `n_(p)npa > 1`| Float64 | 1    | nMarker    | #/s   | Neutral particle's contribution to the flux |
 

@@ -13933,7 +13933,7 @@ subroutine calculate_ion_sink_profile
   integer, dimension(beam_grid%ngrid) :: cell_ind
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-  integer(Int32) :: non_thermal_calc
+  integer(Int32) :: non_thermal_calc, nlaunch_cnt
   type(LocalEMFields) :: fields
   real(Float64), dimension(3) :: ri_gc, r_gyro
   real(Float64) :: tot_deni
@@ -13946,10 +13946,13 @@ subroutine calculate_ion_sink_profile
 
   !! Calculate histogram of ions to launch (nlaunch):
   WRITE (*,*) "birth%cnt; ", birth%cnt
+  nlaunch = 0
+  nlaunch_cnt = 0
   do ib=1,(birth%cnt-1)
     ind = birth%part(ib)%ind
     i = ind(1) ; j = ind(2) ; k = ind(3)
     nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+    nlaunch_cnt = nlaunch_cnt + 1
   enddo
 
   !! Identify those cells in nlaunch with particles:
@@ -14025,6 +14028,7 @@ subroutine calculate_ion_sink_profile
 
               if(dot_product(vion,vion).eq.0.) then
                 write (*,*) "dot_product(vion,vion).eq.0., eb [eV]: ", eb*1e3
+                write (*,*) "deni:", deni
                 cycle loop_over_dcx
               endif
 
@@ -14035,7 +14039,11 @@ subroutine calculate_ion_sink_profile
               !! if at "ind" there are no neutrals in reservoir, then rates besomes zero
               call get_total_cx_rate(ind, ri, vion, neut_types, rates)
               if(sum(rates).le.0.) then
-                write (*,*) "sum(rates) .le. 0"
+                write (*,*) "sum(rates) .le. 0 (get_total_cx_rate)"
+                write (*,*) "ind: ", ind
+                write (*,*) "ri: ", ri
+                write (*,*) "vion: ", vion
+                write (*,*) "rates: ", rates
                 cycle loop_over_dcx
               endif
 
@@ -14043,7 +14051,7 @@ subroutine calculate_ion_sink_profile
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
               states = rates*deni/nlaunch(i,j,k) ! [p/s 1/m3]
               if(sum(states).le.0.) then
-                write (*,*) "sum(rates) .le. 0"
+                write (*,*) "sum(rates) .le. 0 (states)"
                 cycle loop_over_dcx
               endif
 

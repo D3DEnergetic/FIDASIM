@@ -144,6 +144,14 @@ endif
 ifeq ($(USE_OPENMP),y)
 	MPI_FC = $(FC)
 	C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS) $(OPENMP_FLAGS)
+	# >>>>>> JFCM 2024_11_21:
+	# To allow debugging with openMP enabled:
+	# USAGE:
+	# make USE_OPENMP=y DEBUG=y
+	ifeq ($(DEBUG),y)
+		C_FLAGS = $(DEBUG_CFLAGS) $(U_FLAGS) $(OPENMP_FLAGS)
+	endif
+	# <<<<<< JFCM 2024_11_21:
 endif
 
 L_FLAGS := $(L_FLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)

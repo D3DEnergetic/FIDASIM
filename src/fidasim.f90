@@ -10653,6 +10653,50 @@ subroutine get_nlaunch_no_fill_min(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch_no_fill_min
 
+! >>>>>> [JFCM 2024-11-22] >>>>>>>>>
+subroutine get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
+    !+ nlaunch represents a 3D histogram which determines the number of MC markers to be launched from each [[libfida:beam_grid]] cell. nlaunch is produced using the birth%parts(:)%ind locations. When carrying out the multistep CX calculation, this subroutine uses the current state of the birth object
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
+    integer, dimension(beam_grid%ngrid) :: cell_ind
+        !+ Stores beam_grid linear indices (ic) which have mc particles to launch
+    integer :: ncell
+        !+ Total number of cells in beam_grid which have mc particles to launch
+
+    integer :: i,j,k,is,ib,ncnt
+    integer :: ic !! Linear index
+    integer,dimension(3) :: ind !! 3D index
+
+    !! Calculate histogram of ions to launch (nlaunch):
+    WRITE (*,*) "In get_nlaunch_from_birth_points: birth%cnt = ", birth%cnt
+    nlaunch = 0
+    loop_over_births: do ib=1,(birth%cnt-1)
+      ind = birth%part(ib)%ind ! 3D index
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+    enddo loop_over_births
+
+    !! Identify those cells in nlaunch with particles:
+    ncell = 0
+    loop_over_beamgrid: do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        if(nlaunch(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic ! Linear index
+        endif
+    enddo loop_over_beamgrid
+
+    !! Diagnostic:
+    if(inputs%verbose.ge.1) then
+      ncnt = sum(nlaunch)
+      write(*,'(T6,"# of markers: ",i10)') ncnt
+      write(*,*) ''
+    endif
+
+end subroutine get_nlaunch_from_birth_points
+! <<<<< [JFCM 2024-11-22] <<<<<<<<<
+
 subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
@@ -13933,7 +13977,7 @@ subroutine calculate_ion_sink_profile
   integer, dimension(beam_grid%ngrid) :: cell_ind
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-  integer(Int32) :: non_thermal_calc, nlaunch_cnt
+  integer(Int32) :: non_thermal_calc
   type(LocalEMFields) :: fields
   real(Float64), dimension(3) :: ri_gc, r_gyro
   real(Float64) :: tot_deni
@@ -13945,30 +13989,7 @@ subroutine calculate_ion_sink_profile
   non_thermal_calc = inputs%enable_nonthermal_calc
 
   !! Calculate histogram of ions to launch (nlaunch):
-  WRITE (*,*) "birth%cnt; ", birth%cnt
-  nlaunch = 0
-  nlaunch_cnt = 0
-  do ib=1,(birth%cnt-1)
-    ind = birth%part(ib)%ind
-    i = ind(1) ; j = ind(2) ; k = ind(3)
-    nlaunch(i,j,k) = nlaunch(i,j,k) + 1
-    nlaunch_cnt = nlaunch_cnt + 1
-  enddo
-
-  !! Identify those cells in nlaunch with particles:
-  ncell = 0
-  do ic=1,beam_grid%ngrid
-      call ind2sub(beam_grid%dims,ic,ind)
-      i = ind(1) ; j = ind(2) ; k = ind(3)
-      if(nlaunch(i,j,k).gt.0.0) then
-          ncell = ncell + 1
-          cell_ind(ncell) = ic
-      endif
-  enddo
-
-  if(inputs%verbose.ge.1) then
-     write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
-  endif
+  call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
 
   !! Compute sink particles:
   !! 1- loop over cells in cell_ind (Only those which have birth particles)

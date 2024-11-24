@@ -4540,8 +4540,12 @@ subroutine write_beam_grid(id, error)
 
 end subroutine write_beam_grid
 
-subroutine write_birth_profile
+subroutine write_birth_profile(gen)
     !+ Writes [[libfida:birth]] to a HDF5 file
+    !! >>>>>>>>>> [jfcm, 2024-11-24] >>>>>>>>>>>>>
+    integer, intent(in), optional :: gen
+    !! <<<<<<<<<< [jfcm, 2024-11-24] <<<<<<<<<<<<<
+
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(2) :: dim2
@@ -4558,6 +4562,10 @@ subroutine write_birth_profile
     integer, dimension(:), allocatable :: neut_types
     real(Float64), dimension(3) :: xyz,v_xyz,uvw,v_uvw,r_gyro,uvw_gc
     logical :: do_write
+    !! >>>>>>>>>>> [jfcm, 2024-11-24] >>>>>>>>>>>
+    character(charlim) :: base_filename
+    integer :: generation
+    !! <<<<<<<<<<<< [jfcm, 2024-11-24] <<<<<<<<<<<<
 
 #ifdef _MPI
     integer :: rank
@@ -4633,7 +4641,30 @@ subroutine write_birth_profile
         c = c + 1
     enddo
 
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.h5"
+    !! >>>>>>>>>>>>> [jfcm 2024-11-24] >>>>>>>>>>>>
+    ! filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.h5"
+    base_filename = trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth"
+
+    !! Determine the generation value
+    if (present(gen)) then
+      generation = gen
+    else
+      generation = 0
+    end if
+
+    ! Construct the filename based on the generation value
+    if (generation == 0) then
+      ! Use the base filename without modification
+      filename = trim(adjustl(base_filename)) // ".h5"
+    else
+      ! Append the generation index to the filename
+      write(filename, '(A, "_", I0, ".h5")') trim(adjustl(base_filename)), generation
+    end if
+
+    ! Debug output (Optional)
+    print *, "Writing birth profile to file: ", filename
+
+    !! <<<<<<<<<<<<<< [jfcm 2024-11-24] <<<<<<<<<<<<<<
 
     do_write = .True.
 #ifdef _MPI
@@ -4725,7 +4756,7 @@ subroutine write_birth_profile
 
 end subroutine write_birth_profile
 
-subroutine write_ion_sink_profile
+subroutine write_sink_profile
   !+ Writes [[libfida:sink]] to a HDF5 file
   integer(HID_T) :: fid
   integer(HSIZE_T), dimension(4) :: dim4
@@ -4917,7 +4948,7 @@ subroutine write_ion_sink_profile
       write(*,'(T4,a,a)') 'Ion sink profile written to: ',trim(filename)
   endif
 
-end subroutine write_ion_sink_profile
+end subroutine write_sink_profile
 
 subroutine write_neutral_population(id, pop, error)
     !+ Writes Neutral Population to HDF5 group
@@ -14000,7 +14031,7 @@ subroutine calculate_ion_sink_profile
   call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
 
   !! Clear birth points to make space for new birth points:
-  call reset_birth_particles
+  call reset_birth_data
 
   !! Compute sink particles:
   !! 1- loop over cells in cell_ind (Only those which have birth particles)
@@ -14066,7 +14097,7 @@ subroutine calculate_ion_sink_profile
               !! ion sink flux per unit volume in [[beam_grid]]:
               flux_per_volume = sum(states)
               call store_sinks(ind,is,flux_per_volume/nlaunch(i,j,k))
-              call record_ion_sink_particle(ind,ri,vion,is,flux_per_volume/nlaunch(i,j,k),fields)
+              call store_sink_particle(ind,ri,vion,is,flux_per_volume/nlaunch(i,j,k),fields)
 
           enddo loop_over_dcx
       enddo loop_over_species
@@ -14074,7 +14105,7 @@ subroutine calculate_ion_sink_profile
   !$OMP END PARALLEL DO
 end subroutine calculate_ion_sink_profile
 
-subroutine record_ion_sink_particle(ind,ri,vion,is,flux_per_volume,fields)
+subroutine store_sink_particle(ind,ri,vion,is,flux_per_volume,fields)
   !+ Records an ion sink particle into [[libfida::sink]]
   integer(Int32) :: is
   real(Float64), dimension(3) :: ri    !! ion start position vector (actual position not GC)
@@ -14111,7 +14142,7 @@ subroutine record_ion_sink_particle(ind,ri,vion,is,flux_per_volume,fields)
   sink%cnt = sink%cnt + 1
   !$OMP END CRITICAL
 
-end subroutine record_ion_sink_particle
+end subroutine store_sink_particle
 
 !! >>>>>>>>>>> [jfcm, 2024_11_22] >>>>>>>>>>>>
 subroutine get_neutral_velocity_from_ion_distribution(ind,is,rn,vn,f4d_defined)
@@ -14185,24 +14216,30 @@ end subroutine get_neutral_velocity_from_ion_distribution
 !! <<<<<<<<<<< [jfcm, 2024_11_22] <<<<<<<<<<<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
-subroutine reset_birth_particles
-  !+ Subroutine to reset birth particles
-  type(BirthParticle) :: default_part
-  integer :: i
+subroutine reset_birth_data
+    !+ Subroutine to reset birth particles and birth density
+    type(BirthParticle) :: default_part
+    integer :: i
 
-  ! Reset the particle counter
-  birth%cnt = 0
+    ! Reset the particle counter
+    birth%cnt = 1
 
-  ! Reset the particle array if it is allocated
-  if (allocated(birth%part)) then
-      do i = 1, size(birth%part)
-          birth%part(i) = default_part
-      end do
-  end if
+    ! Reset the particle array if it is allocated
+    if (allocated(birth%part)) then
+        do i = 1, size(birth%part)
+            birth%part(i) = default_part
+        end do
+    end if
 
-end subroutine reset_birth_particles
+    ! Zero out the birth density array if it is allocated
+    if (allocated(birth%dens)) then
+        birth%dens = 0.d0
+    end if
+
+end subroutine reset_birth_data
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
+!! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
 subroutine calculate_dcx_process
   !+ Calculates the DCX process by initiating neutrals from the NBI brith points and then creates sink points and new birth points from the DCX neutrals.
   integer :: ic,i,j,k,ncell,is,ib,ntrack,jj
@@ -14222,7 +14259,7 @@ subroutine calculate_dcx_process
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
   real(Float64) :: flux_per_volume
   real(Float64) :: tot_flux_dep, initial_flux, final_flux
-  real(Float64):: photons
+  real(Float64):: photons, weight
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -14230,8 +14267,8 @@ subroutine calculate_dcx_process
   !! Calculate histogram of neutrals to launch (nlaunch):
   call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
 
-  !! Clear birth points to make space for new birth points:
-  call reset_birth_particles
+  !! Clear birth structure to make space for new generation birth data:
+  call reset_birth_data
 
   !! Compute sink particles:
   !! 1- loop over cells in cell_ind (Only those which have birth particles)
@@ -14240,7 +14277,7 @@ subroutine calculate_dcx_process
 
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
   !$OMP& ri,rates,states,plasma,fields,eb,ptch,f4d_defined,denn,denn_per_marker, &
-  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux_per_volume)
+  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux_per_volume,weight)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -14297,7 +14334,7 @@ subroutine calculate_dcx_process
               !! ion sink flux per unit volume in [[beam_grid]]:
               flux_per_volume = sum(states)
               call store_sinks(ind,is,flux_per_volume/nlaunch(i,j,k))
-              call record_ion_sink_particle(ind,ri,vion,is,flux_per_volume/nlaunch(i,j,k),fields)
+              call store_sink_particle(ind,ri,vion,is,flux_per_volume/nlaunch(i,j,k),fields)
 
               ! Initialize deposition accumulator for current marker:
               tot_flux_dep = 0.d0
@@ -14340,7 +14377,9 @@ subroutine calculate_dcx_process
 
               ! Record ion birth particle:
               !$OMP CRITICAL
-              !call record_ion_birth_particle(tracks,tot_flux_dep,dcx_type,is,vion)
+              weight = tot_flux_dep/nlaunch(i,j,k)
+              !                        (tracks,ntrack,mass            ,vi  ,weight,neut_type)
+              call store_birth_particle(tracks,ntrack,thermal_mass(is),vion,weight,dcx_type)
               !$OMP END CRITICAL
 
           enddo loop_over_dcx
@@ -14348,6 +14387,54 @@ subroutine calculate_dcx_process
   enddo loop_over_cells
   !$OMP END PARALLEL DO
 end subroutine calculate_dcx_process
+!! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
+
+!! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
+subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
+  !+ Record an ion birth particle into [[libfida::birth]]
+  type(ParticleTrack), dimension(:), intent(in) :: tracks
+    !+ Array of [[ParticleTrack]] type
+  integer, intent(in) :: ntrack
+    !+ Number of cells that a neutral marker crosses
+  real(Float64), intent(in) :: mass
+    !+ Mass of newly created ion:
+  real(Float64), dimension(3), intent(in) :: vi
+    !+ Marker velocity vector in [[beam_grid]] coordinates
+  real(Float64), intent(in) :: weight
+    !+ Weight of neutral marker in [p/s]
+  integer, intent(in) :: neut_type
+    !+ (1) full, (2) half, (3) third, (4) dcx and (5) halo neutral particle type
+
+    !! To define the weight, consider the following previous equivalent definitions:
+    !! weight = flux_tot/inputs%n_birth ! [p/s]
+    !! OR
+    !! weight = tot_flux_dep/nlaunch(i,j,k) ! [p/s]
+
+    integer, dimension(1) :: randi
+    real(Float64), dimension(1) :: randomu
+    type(LocalEMFields) :: fields
+    real(Float64), dimension(3) :: ri, r_gyro
+
+    call randind(tracks(1:ntrack)%flux,randi)
+    call randu(randomu)
+    birth%part(birth%cnt)%neut_type = neut_type
+    ! birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
+    birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
+    ! birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
+    birth%part(birth%cnt)%weight = weight ! [p/s]
+    birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+    birth%part(birth%cnt)%vi = vi
+    ri = tracks(randi(1))%pos + vi*(tracks(randi(1))%time*(randomu(1)-0.5))
+    birth%part(birth%cnt)%ri = ri
+
+    call get_fields(fields,pos=ri)
+    birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vi/norm2(vi))
+    call gyro_step(vi,fields,mass,r_gyro)
+    birth%part(birth%cnt)%ri_gc = ri + r_gyro
+    birth%cnt = birth%cnt + 1
+
+end subroutine store_birth_particle
+!! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
 end module libfida
 
@@ -14642,7 +14729,7 @@ program fidasim
 
                 if(inputs%calc_birth.eq.1)then
                     if(inputs%verbose.ge.1) then
-                        write(*,*) 'write birth:    ' , time_string(time_start)
+                        write(*,*) 'write 0th gen birth:    ' , time_string(time_start)
                     endif
                     call write_birth_profile()
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -14650,17 +14737,17 @@ program fidasim
 
                 if (inputs%calc_sink.ge.1) then
                   if(inputs%verbose.ge.1) then
-                      write(*,*) 'calculation ion sink profile:    ' , time_string(time_start)
+                      write(*,*) 'calculation of dcx process:    ' , time_string(time_start)
                   endif
-                  !call calculate_ion_sink_profile
                   call calculate_dcx_process
                 endif
 
                 if(inputs%calc_sink.eq.1)then
                     if(inputs%verbose.ge.1) then
-                        write(*,*) 'write ion sink profile:    ' , time_string(time_start)
+                        write(*,*) 'write 0th gen sink and 1st gen birth:    ' , time_string(time_start)
                     endif
-                    call write_ion_sink_profile()
+                    call write_sink_profile()
+                    call write_birth_profile(gen=1)
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
             endif

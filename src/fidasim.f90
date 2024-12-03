@@ -10785,6 +10785,50 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch_pass_grid
 
+! >>>>>>>>>> [jfcm, 2024-11-26] >>>>>>>>>>
+subroutine get_nlaunch_pass_grid_no_fill_min(nr_markers,papprox, nlaunch)
+    !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
+    integer(Int64), intent(in)                    :: nr_markers
+        !+ Approximate total number of markers to launch
+    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+        !+ [[libfida:pass_grid]] cell weights
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
+
+    logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
+    real(Float64), dimension(pass_grid%ngrid) :: cdf
+    integer, dimension(1) :: randomi
+    type(rng_type) :: r
+    integer :: c, i, j, k, nc, nm, ind(3)
+    integer :: nmin = 0
+
+    !! Fill in minimum number of markers per cell
+    nlaunch = 0
+    mask = papprox.gt.0.0
+    where(mask)
+        nlaunch = nmin
+    endwhere
+
+    !! If there are any left over distribute according to papprox
+    nc = count(mask)
+    if(nr_markers.gt.(nmin*nc)) then
+        nm = nr_markers - nmin*nc
+
+        !! precalculate cdf to save time
+        call cumsum(reshape(papprox,[pass_grid%ngrid]), cdf)
+        !! use the same seed for all processes
+        call rng_init(r, 932117)
+        do c=1, nm
+            call randind_cdf(r, cdf, randomi)
+            call ind2sub(pass_grid%dims, randomi(1), ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+        enddo
+    endif
+
+end subroutine get_nlaunch_pass_grid_no_fill_min
+! <<<<<<<<<< [jfcm, 2024-11-26] <<<<<<<<<<
+
 subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
     !+ Calculates velocity vector from pitch, gyroangle and fields
     real(Float64), intent(in)                :: pitch
@@ -14270,11 +14314,6 @@ subroutine calculate_dcx_process
   !! Clear birth structure to make space for new generation birth data:
   call reset_birth_data
 
-  !! Compute sink particles:
-  !! 1- loop over cells in cell_ind (Only those which have birth particles)
-  !! 2- Loop over thermal species
-  !! 3- loop over all markers to be launched in that cell
-
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
   !$OMP& ri,rates,states,plasma,fields,eb,ptch,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux_per_volume,weight)
@@ -14435,6 +14474,123 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
 
 end subroutine store_birth_particle
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
+
+!! >>>>>>>>>>> [jfcm, 2024_11_26] >>>>>>>>>>>
+subroutine ndmc_edge_neutrals()
+    !+ Calculates the neutral deposition via CX, IZ. EX, DEX on plasma due to th presence of an edge neutral profile as defined in plasma%denn
+    integer :: i,j,k,ic,ncell,is
+    integer(Int64) :: ii, kk ! Index for neutral particles
+    integer, dimension(3) :: ind, ind_xyz
+    real(Float64), dimension(3) :: ri, rn, vn, xyz_vn, xyz_rn
+    integer :: neut_type = 1 !! full energy
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
+    real(Float64), dimension(nlevs) :: rates    !!  CX rates
+    real(Float64), dimension(nlevs) :: states  ! Density of n-states
+    real(Float64) :: max_papprox, eb, ptch
+    integer, dimension(pass_grid%ngrid) :: cell_ind
+    real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
+    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    real(Float64) :: photons, dt, initial_flux, final_flux, dflux
+    real(Float64), dimension(3) :: random3
+    real(Float64) :: T_neutral = 1*1e-3 ! [keV]
+    real(Float64), dimension(1) :: randomu
+    real(Float64), dimension(3) :: ri_gc,r_gyro
+
+    !! Initialize Neutral Population
+    call init_neutral_population(neut%full)
+    call init_neutral_population(neut%half)
+    call init_neutral_population(neut%third)
+
+    !! Estimate how many particles to launch in each cell
+    papprox=0.d0
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        call get_plasma(plasma,ind=ind,input_coords=2)
+        if(.not.plasma%in_plasma) cycle
+        papprox(i,j,k) = sum(plasma%denn)*plasma%dene
+    enddo
+
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox/30))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
+    enddo
+
+    call get_nlaunch_pass_grid_no_fill_min(inputs%n_nbi, papprox, nlaunch)
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers for edge neutral calculation: ",i10)') sum(nlaunch)
+    endif
+
+ !! Loop over all cells that have neutrals
+ !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,ii,fields,rn,vn,xyz_vn,ri,ind_xyz, &
+ !$OMP plasma,rates,is,denn,states,photons,random3,dt,initial_flux,xyz_rn,dflux,randomu,ri_gc,r_gyro)
+ loop_over_cells: do ic = istart, ncell, istep
+   call ind2sub(pass_grid%dims,cell_ind(ic),ind)
+   i = ind(1) ; j = ind(2) ; k = ind(3)
+   loop_over_neutrals: do ii = 1,nlaunch(i,j,k)
+
+     ! Get neutral particle position in UVW:
+     call mc_passive_grid(ind, rn)
+     call uvw_to_xyz(rn,xyz_rn)
+
+     ! Get neutral particle velocity in UVW:
+     call randn(random3)
+     !! TODO: the edge neutral atomic mass needs to be a user input!
+     !! TODO: the edge neutral temperature needs to be a user input!
+     vn = sqrt(T_neutral*0.5/(v2_to_E_per_amu*supported_masses(2)))*random3
+     xyz_vn = matmul(beam_grid%inv_basis,vn)
+
+     ! Collisional radiative model:
+     dt = beam_grid%drmin/sqrt(dot_product(vn,vn))
+     dt = 1e-9
+     call get_plasma(plasma, pos=rn, input_coords=1)
+     states = plasma%denn(:,1)/dt
+     initial_flux = sum(states) ! [p/s cm^-3]
+     call colrad(plasma,supported_masses(2),xyz_vn,dt,states,denn,photons)
+     final_flux = sum(states)
+     dflux = (initial_flux - final_flux)/nlaunch(i,j,k) !  [p/s cm^-3]
+
+     ! Store neutrals:
+     call get_indices(xyz_rn,ind_xyz) ! Neutral 3D index in beam_grid
+     call store_neutrals(ind_xyz,xyz_rn,xyz_vn,neut_type,denn/nlaunch(i,j,k))
+     call store_births(ind_xyz,neut_type,dflux)
+
+     !$OMP CRITICAL(ndmc_birth)
+      do kk=1,inputs%n_birth
+          call randu(randomu)
+          birth%part(birth%cnt)%neut_type = neut_type
+          birth%part(birth%cnt)%energy = dot_product(vn,vn)*v2_to_E_per_amu*supported_masses(2)
+          birth%part(birth%cnt)%weight = dflux/inputs%n_birth
+          birth%part(birth%cnt)%ind = ind_xyz
+          birth%part(birth%cnt)%vi = xyz_vn
+          ri = xyz_rn + xyz_vn*dt*(randomu(1)-0.5)
+          birth%part(birth%cnt)%ri = ri
+
+          call get_fields(fields,pos=ri)
+          birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,xyz_vn/norm2(xyz_vn))
+          call gyro_step(xyz_vn,fields,supported_masses(2),r_gyro)
+          birth%part(birth%cnt)%ri_gc = ri + r_gyro
+          birth%cnt = birth%cnt + 1
+      enddo
+      !$OMP END CRITICAL(ndmc_birth)
+   enddo loop_over_neutrals
+ enddo loop_over_cells
+ !$OMP END PARALLEL DO
+
+end subroutine ndmc_edge_neutrals
+!! <<<<<<<<<<< [jfcm, 2024_11_26] <<<<<<<<<<<<
 
 end module libfida
 
@@ -14724,7 +14880,12 @@ program fidasim
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
-                call ndmc()
+                ! call ndmc()
+
+                ! Edge neutral deposition:
+                pass_grid = inter_grid
+                call ndmc_edge_neutrals()
+
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
                 if(inputs%calc_birth.eq.1)then

@@ -25,7 +25,10 @@ integer, parameter, private   :: Float32 = 4
     !+ Defines a 32 bit floating point real
 integer, parameter, private   :: Float64 = 8
     !+ Defines a 64 bit floating point real
-integer, parameter :: charlim = 150
+! >>>>>>>>>>>>>>> [JFCM, 2024-12-18] >>>>>>>>>>>>>>>>>
+! integer, parameter :: charlim = 150
+integer, parameter :: charlim = 200
+! <<<<<<<<<<<<<<<< [JFCM, 2024-12-18] <<<<<<<<<<<<<<<
     !+ Defines character limit for files and directories
 
 character(charlim) :: namelist_file
@@ -823,6 +826,7 @@ type BirthProfile
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
+!! >>>>>>>>> [JFCM. 2024-??-??] >>>>>>>>>
 type, extends(BirthParticle) :: SinkParticle
     !+ Defines an ion Sink particle
     integer(Int32) :: atomic_mass = 0
@@ -838,6 +842,7 @@ type SinkProfile
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Sink density: dens(species,x,y,z) [fast-ions/(s*cm^3)]
 end type SinkProfile
+!! <<<<<<<<< [JFCM. 2024-??-??] <<<<<<<<<<<<<
 
 type Spectra
     !+ Spectra storage structure
@@ -1185,6 +1190,18 @@ type CFPDTable
         !+ sightline(E3,:,step,ray,channel)
 end type CFPDTable
 
+!! >>>>>>>>>>>>>>>> [JFCM, 2024-12-03] >>>>>>>>>>>>>>>>>>>
+type Surface
+  real(Float64), dimension(:), allocatable :: R
+  real(Float64), dimension(:), allocatable :: Z
+  integer, dimension(:), allocatable :: nlaunch
+  real(Float64), dimension(:), allocatable :: areas
+  real(Float64) :: phi_min
+  real(Float64) :: phi_max
+  integer :: surface_type = 0 !! 0: vacuum wall, 1: limiter, 2: gas puffer
+end type Surface
+!! <<<<<<<<<<<<<<<<< [JFCM, 2024-12-03] <<<<<<<<<<<<<<<<<<<
+
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
     !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], [[NPAParticle]], and [[BirthParticle]]
@@ -1266,7 +1283,8 @@ type(CFPDTable), save           :: ctable
     !+ Variable for storing the calculated Charged Fusion Product orbits
 type(SpatialSpectra), save      :: spatres
     !+ Variable for storing birth neutral for spatial resolution
-
+type(Surface), dimension(:), allocatable, save :: surfaces
+    !+ Variable for storing details and geometry of neutral gas emitting surfaces
 contains
 
 subroutine print_banner()
@@ -4748,6 +4766,7 @@ subroutine write_birth_profile(gen)
     deallocate(ri,vi,ri_gc,energy,pitch,neut_types,inds)
     ! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>>
     !deallocate(birth%dens,birth%part)
+    ! Commented this as in new development for DCX, we need to use birth points as spawn points for new neutrals
     ! <<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<<<<<
 
     if(inputs%verbose.ge.1) then
@@ -5075,12 +5094,14 @@ subroutine write_neutrals
              "Third Energy Neutral Population", error)
 
         !! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>
-        !! Need to add input namelist to enable this case or write my own subroutine:
-        call h5gcreate_f(fid, "/dcx", gid, error)
-        call write_neutral_population(gid, neut%dcx, error)
-        call h5gclose_f(gid, error)
-        call h5ltset_attribute_string_f(fid,"/dcx","description", &
-             "Direct Charge Exchange (DCX) Neutral Population", error)
+        if (inputs%calc_sink.ge.1) then          
+          !! Need to add input namelist to enable this case or write my own subroutine:
+          call h5gcreate_f(fid, "/dcx", gid, error)
+          call write_neutral_population(gid, neut%dcx, error)
+          call h5gclose_f(gid, error)
+          call h5ltset_attribute_string_f(fid,"/dcx","description", &
+               "Direct Charge Exchange (DCX) Neutral Population", error)
+        endif
        !! <<<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<
 
     endif
@@ -8686,7 +8707,14 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
         ocs = 0
     endif
 
-    if(present(ind)) call get_position(ind,xyz)
+    ! if(present(ind)) call get_position(ind,xyz)
+
+    ! <<<<<<<< [JFCM, 2024-12-04] <<<<<<<<<<
+    if(present(ind)) then
+      call get_position(ind,xyz)
+      call xyz_to_uvw(xyz, uvw)
+    endif
+    ! >>>>>>>> [JFCM, 2024-12-04] >>>>>>>>>>
 
     if(present(pos)) then
         if(ics.eq.0) then
@@ -11219,7 +11247,14 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
             write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
             write(*,'(a)') "Move the beam grid closer to the source to fix"
         endif
-        stop
+        ! >>>>>>>>>> [JFCM, 2024-12-18] >>>>>>>>>>>
+        ! stop
+        write(*,*) "rnbi: ", rnbi
+        call in_plasma(rnbi,inp)
+        stop 1
+        ! I added the exit code 1 so that when this happens, the error can be caught by the OS
+        ! This is important when running in coupled mode with CQL3D so that execution is stopped completely
+        ! <<<<<<<<<< [JFCM, 2024-12-18] <<<<<<<<<<
     endif
 
     !! Determine velocity of neutrals corrected by efrac
@@ -14377,6 +14412,7 @@ subroutine calculate_dcx_process
 
               ! Initialize deposition accumulator for current marker:
               tot_flux_dep = 0.d0
+              !! cycle loop_over_dcx
 
               ! Attenuate neutral marker long track trajectory:
               loop_along_track: do jj = 1,ntrack
@@ -14418,6 +14454,7 @@ subroutine calculate_dcx_process
               !$OMP CRITICAL
               weight = tot_flux_dep/nlaunch(i,j,k)
               !                        (tracks,ntrack,mass            ,vi  ,weight,neut_type)
+              ntrack = jj - 1
               call store_birth_particle(tracks,ntrack,thermal_mass(is),vion,weight,dcx_type)
               !$OMP END CRITICAL
 
@@ -14465,6 +14502,15 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     birth%part(birth%cnt)%vi = vi
     ri = tracks(randi(1))%pos + vi*(tracks(randi(1))%time*(randomu(1)-0.5))
     birth%part(birth%cnt)%ri = ri
+
+    !! To catch cases which sample just outside the plasma region:
+    !! Maybe consider randi(1)-1?
+    call get_fields(fields,pos=ri)
+    if (fields%in_plasma .eqv. .FALSE.) then
+      ri = tracks(randi(1))%pos
+      birth%part(birth%cnt)%ri = ri
+      call get_fields(fields,pos=ri)
+    endif
 
     call get_fields(fields,pos=ri)
     birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vi/norm2(vi))
@@ -14591,6 +14637,334 @@ subroutine ndmc_edge_neutrals()
 
 end subroutine ndmc_edge_neutrals
 !! <<<<<<<<<<< [jfcm, 2024_11_26] <<<<<<<<<<<<
+
+!! >>>>>>>>>>> [jfcm, 2024_12_03] >>>>>>>>>>>
+subroutine ndmc_surfaces()
+  integer :: neut_type = 1 !! full energy
+  real(Float64) :: rmin, rmax, zmin, zmax, pmin, pmax, Tn, length, vth, denn_wall,nneutrals
+  real(Float64) :: flux_tot, iflux, eflux, photons
+  integer :: ss, qq, n_segments, n_markers, ntrack, jj, kk, n_surfaces
+  real(Float64), dimension(3) :: rn_uvw, vn_uvw, rn_xyz, vn_xyz, r_enter, r_exit, r_gyro, ri
+  real(float64), dimension(3,3) :: surface_basis
+  integer(Int64) :: ii
+  type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+  real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
+  real(Float64), dimension(nlevs) :: rates    !!  CX rates
+  real(Float64), dimension(nlevs) :: states ! Density of n-states
+  integer(Int32), dimension(3) :: ind
+  type(LocalProfiles) :: plasma
+  type(LocalEMFields) :: fields
+  real(Float64), dimension(1) :: randomu
+  integer, dimension(1) :: randi
+
+  !! Initialize the surface variable:
+  allocate(surfaces(1))
+  allocate(surfaces(1)%R(4),surfaces(1)%Z(4))
+  allocate(surfaces(1)%nlaunch(3))
+  allocate(surfaces(1)%areas(3))
+
+  !! Populate surfaces: The following needs to be read from a namelist file
+  zmin = -100.d0
+  zmax = +100.d0
+  rmin = 5.d0
+  rmax = 30.d0
+  pmin = 0.d0
+  pmax = 2*pi
+  surfaces(1)%R = [rmin, rmax, rmax, rmin]
+  surfaces(1)%Z = [zmin, zmin, zmax, zmax]
+  surfaces(1)%surface_type = 0
+  surfaces(1)%phi_min = pmin
+  surfaces(1)%phi_max = pmax
+
+  !! Define neutral gas conditions at the wall:
+  Tn = 1e-3 !! [keV]
+  denn_wall = 1e10 !! [cm^{}-3}]
+  vth = sqrt(Tn*0.5/(v2_to_E_per_amu*thermal_mass(1))) !! [cm/s]
+
+  !! Determine number of markers per surface per segment:
+  call get_nlaunch_surface(inputs%n_nbi)
+
+  !! Initialize Neutral Population: May need to use another type like neut%surface
+  call init_neutral_population(neut%full)
+  call init_neutral_population(neut%half)
+  call init_neutral_population(neut%third)
+
+  n_surfaces = size(surfaces)
+  nbi_outside = 0
+  !$OMP PARALLEL DO schedule(dynamic,1) private(ss,qq,ii,n_segments,n_markers,rn_uvw, &
+  !$OMP surface_basis,vn_uvw,rn_xyz,vn_xyz,length,r_enter,r_exit,tracks,ntrack,denn,ri, &
+  !$OMP states,rates,nneutrals,flux_tot,iflux,eflux,ind,plasma,fields,photons,randomu,randi,r_gyro)
+  loop_over_surfaces: do ss = 1,n_surfaces
+      n_segments = size(surfaces(ss)%nlaunch)
+      loop_over_segments: do qq = 1,n_segments
+          n_markers = surfaces(ss)%nlaunch(qq)
+          loop_over_markers: do ii = 1,n_markers
+
+            !! Get position of neutral marker coming of surface:
+            call mc_surface_position(ss,qq,rn_uvw,surface_basis)
+
+            !! Get velocity vector of neutral coming of the surface:
+            !! ASSUME WALL neutral at this stage. NO model for limiter yet
+            !! also ASSUME single thernal species
+            call mc_surface_velocity(Tn,thermal_mass(1),surface_basis,vn_uvw)
+
+            ! Compute particle position and velocity in beam_grid coords XYZ:
+            call uvw_to_xyz(rn_uvw,rn_xyz)
+            vn_xyz = matmul(beam_grid%inv_basis,vn_uvw)
+
+            ! Determine position where neutral intersects the beam_grid:
+            call grid_intersect(rn_xyz,vn_xyz,length,r_enter,r_exit)
+            if (length .le. 0.d0) then
+              nbi_outside = nbi_outside + 1
+              cycle loop_over_markers
+            else
+              WRITE(*,*) "In beam grid"
+            endif
+
+            ! Compute particle track:
+            call track(r_enter,vn_xyz,tracks,ntrack)
+            if (ntrack .eq. 0) then
+              cycle loop_over_markers
+            endif
+
+            ! Define initial states [p/s cm^{}-3}]: denn*vth*area_segment/beam_grid%dv
+            nneutrals = denn_wall*vth*surfaces(ss)%areas(qq) !  [p/s]
+            states = 0.d0
+            states(1) = nneutrals/beam_grid%dv ! [p/s cm^{-3}]
+            flux_tot = 0.d0
+
+            loop_along_track: do jj = 1,ntrack
+              !! Record starting neutral flux density:
+              iflux = sum(states)
+
+              !! Get plasma condtions at current position:
+              ind = tracks(jj)%ind
+              call get_plasma(plasma,pos=tracks(jj)%pos)
+
+              !! Attenuate neutral:
+              call colrad(plasma,thermal_mass(1),vn_xyz,tracks(jj)%time,states,denn,photons)
+
+              !! Store neutral particle density and velocity vectors in reservoir:
+              call store_neutrals(ind,tracks(jj)%pos,vn_xyz,neut_type,denn/n_markers)
+
+              !! Record final flux density:
+              eflux = sum(states)
+              tracks(jj)%flux = (iflux - eflux)/n_markers
+              flux_tot = flux_tot + tracks(jj)%flux*beam_grid%dv
+
+              !! Store birth profile:
+              call store_births(ind,1,tracks(jj)%flux)
+
+              !! Store photons:
+              !! Some code
+            enddo loop_along_track
+
+            if (flux_tot .gt. 0.d0) then
+              !$OMP CRITICAL(ndmc_birth)
+               do kk=1,inputs%n_birth
+                   call randind(tracks(1:ntrack)%flux,randi)
+                   call randu(randomu)
+                   birth%part(birth%cnt)%neut_type = neut_type
+                   birth%part(birth%cnt)%energy = dot_product(vn_xyz,vn_xyz)*v2_to_E_per_amu*thermal_mass(1)
+                   birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
+                   birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+                   birth%part(birth%cnt)%vi = vn_xyz
+                   ri = tracks(randi(1))%pos
+                   ri = ri + vn_xyz*(tracks(randi(1))%time)*(randomu(1)-0.5)
+                   birth%part(birth%cnt)%ri = ri
+
+                   !! To catch cases which sample just outside the plasma region:
+                   !! Maybe consider randi(1)-1?
+                   call get_fields(fields,pos=ri)
+                   if (fields%in_plasma .eqv. .FALSE.) then
+                     ri = tracks(randi(1))%pos
+                     birth%part(birth%cnt)%ri = ri
+                     call get_fields(fields,pos=ri)
+                   endif
+
+                   birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vn_xyz/norm2(vn_xyz))
+                   call gyro_step(vn_xyz,fields,thermal_mass(1),r_gyro)
+                   birth%part(birth%cnt)%ri_gc = ri + r_gyro
+                   birth%cnt = birth%cnt + 1
+               enddo
+               !$OMP END CRITICAL(ndmc_birth)
+           endif
+          enddo loop_over_markers
+      enddo loop_over_segments
+  enddo loop_over_surfaces
+  !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine beam neutrals
+    call parallel_merge_populations(neut%full)
+    call parallel_merge_populations(neut%half)
+    call parallel_merge_populations(neut%third)
+
+    call parallel_sum(nbi_outside)
+    if(inputs%calc_birth.ge.1) then
+        call parallel_sum(birth%dens)
+    endif
+    !! Combine spectra
+    if(inputs%calc_bes.ge.1) then
+        call parallel_sum(spec%full)
+        call parallel_sum(spec%half)
+        call parallel_sum(spec%third)
+    endif
+#endif
+
+      if(nbi_outside.gt.0)then
+          if(inputs%verbose.ge.1) then
+              write(*,'(T4,a, f6.2,a)') 'Percent of markers outside the grid: ', &
+                                    100.*nbi_outside/(n_surfaces*inputs%n_nbi),'%'
+          endif
+          if(sum(neut%full%dens).eq.0) stop 'Beam does not intersect the grid!'
+      endif
+
+end subroutine ndmc_surfaces
+
+subroutine get_nlaunch_surface(N)
+  !+ Calculates the number of particles to launch on each segment of each surface [[libfida::Surfaces]]
+  !+ This calculation is based on the relative areas of each segment
+  integer(Int64), intent(in) :: N
+
+  integer :: n_segments, difference, max_area_idx
+  real(Float64), dimension(:), allocatable :: areas
+  integer :: ss,ii,jj
+  real(float64) :: r1, r2, z1, z2
+  real(float64) :: segment_length, mean_radius, max_area
+
+  loop_over_surfaces: do ss = 1,size(surfaces)
+      n_segments = size(surfaces(ss)%R) - 1
+      allocate(areas(n_segments))
+      loop_over_segments: do ii = 1,n_segments
+          r1 = surfaces(ss)%R(ii)
+          z1 = surfaces(ss)%Z(ii)
+          r2 = surfaces(ss)%R(ii+1)
+          z2 = surfaces(ss)%Z(ii+1)
+
+          !! Calculate segment area:
+          segment_length = sqrt((r2 - r1)**2 + (z2 - z1)**2)
+          mean_radius = (r1 + r2)/2
+          areas(ii) = 2*pi*mean_radius*segment_length
+      enddo loop_over_segments
+
+      !! Store the surface area of the segments:
+      surfaces(ss)%areas = areas
+
+      !! Compute the number of markers to launch per segment:
+      surfaces(ss)%nlaunch = nint(N*areas/sum(areas))
+
+      ! Compute the difference
+      difference = N - sum(surfaces(ss)%nlaunch)
+
+      ! Find the index of the maximum value in 'areas'
+      max_area = areas(1)
+      max_area_idx = 1
+
+      do ii = 2, n_segments
+          if (areas(ii) > max_area) then
+              max_area = areas(ii)
+              max_area_idx = ii
+          end if
+      end do
+
+      ! Adjust the 'nlaunch' array
+      surfaces(ss)%nlaunch(max_area_idx) = surfaces(ss)%nlaunch(max_area_idx) + difference
+
+      deallocate(areas)
+  enddo loop_over_surfaces
+end subroutine get_nlaunch_surface
+
+subroutine mc_surface_position(ss,qq,rn_uvw,surface_basis)
+  !+ Calculates the position of neutral to be emiited from surface.
+  !+ The surface used is the segment qq of surface ss from [[libfida::Surfaces]]
+  !+ It returns the position vector in machine coordinates UVW and also returns the unit vectors tangent and normal to the local surface
+  integer, intent(in) :: ss
+    !+ Surface index
+  integer, intent(in) :: qq
+    !+ segment Index
+  real(float64), dimension(3), intent(out) :: rn_uvw
+    !+ Particle uniformely random position on Surface(ss) and segment "qq"
+  real(float64), dimension(3,3), intent(out) :: surface_basis
+    !+ Basis matrix containing the 2 tagent vectos and the normral vector to the surface at the positon of the neutral particle. It is needed to convert velocity vector in local coordianates to UVW
+
+  real(float64) :: z1, z2, r1, r2, pmin, pmax, phii, zi, ri
+  real(float64), dimension(3) :: p1, p2, T1, T2, N1
+  real(Float64), dimension(2) :: u
+
+  ! Get segment endpoints:
+  z1 = surfaces(ss)%Z(qq)
+  z2 = surfaces(ss)%Z(qq+1)
+  r1 = surfaces(ss)%R(qq)
+  r2 = surfaces(ss)%R(qq+1)
+  pmin = surfaces(ss)%phi_min
+  pmax = surfaces(ss)%phi_max
+
+  ! Sample uniformely from segment: TODO: might need a rework to sample uniformly along R
+  call randu(u)
+  ri = sqrt( r1**2 + u(1)*(r2**2 - r1**2) )
+  zi = z1 + u(1)*(z2 - z1)
+  phii = pmin + u(2)*(pmax - pmin)
+
+  ! Convert to UWV vector:
+  rn_uvw(1) = ri*cos(phii)
+  rn_uvw(2) = ri*sin(phii)
+  rn_uvw(3) = zi
+
+  ! Compute tangent basis vectors:
+  p1 = rn_uvw
+  p2 = [r2*cos(phii),r2*sin(phii),z2]
+  T1 = p2 - p1
+  T1 = T1/sqrt(sum(T1**2))
+  T2 = [-sin(phii), cos(phii), 0.d0]
+
+  ! Compute normal basis vector:
+  N1 = cross_product(T1,T2)
+
+  ! Flip normal:
+  ! Code
+
+  ! Compute basis vectors at location of partile for local surface:
+  surface_basis(:,1) = T1
+  surface_basis(:,2) = T2
+  surface_basis(:,3) = N1
+end subroutine mc_surface_position
+
+subroutine mc_surface_velocity(Tn,mass,surface_basis,vn_uvw)
+  !+ Given the wall surface, particle mass and local surface basis vectors, this sub computes a velocity vector whose direction is sampled from a cosine distribution in polar coordinates and the velocity magnitude is sample from a Maxwell-Boltzmann distribution at temperature Tn
+  real(Float64), intent(in) :: Tn
+    !+ Surface temperature in [keV]
+  real(Float64), intent(in) :: mass
+    !+ Neutral particle mass in [g]
+  real(Float64), dimension(3,3), intent(in) :: surface_basis
+    !+ Matrix with basis vectors defining the orientation of the surface in UVW coords
+  real(Float64), dimension(3), intent(out) :: vn_uvw
+    !+ Velocity of neutral particle in [cm/s] emitted from surface samples from Maxwell-Bolzmann and cosine distribution and converted into UVW coordinate system
+
+  real(Float64) :: vth, vmaxwell, z1, z2, z3, theta, phi
+  real(Float64), dimension(3) :: v_ttn
+  real(Float64), dimension(5) :: u
+
+  ! Compute particle speed from Maxwell-Boltzmann distribution:
+  vth = sqrt(Tn*0.5/(v2_to_E_per_amu*mass))
+  call randu(u)
+  z1 = sqrt(-2*log(u(1)))*cos(2*pi*u(2))
+  z2 = sqrt(-2*log(u(1)))*sin(2*pi*u(2))
+  z3 = sqrt(-2*log(u(3)))*cos(2*pi*u(3))
+  vmaxwell = vth*sqrt(z1**2 + z2**2 + z3**2)
+
+  ! Compute unit vector sampled from a cosine distribution:
+  theta = asin(u(4))**1.2 ! Polar angle (between normal vector and horizontal plane)
+  phi = 2*pi*u(5) ! Azimuthal angle
+  v_ttn(1) = sin(theta)*cos(phi)
+  v_ttn(2) = sin(theta)*sin(phi)
+  v_ttn(3) = cos(theta)
+
+  ! Convert velocity vector to UVW and scale to include Maxwell-Boltzmann speed
+  vn_uvw = vmaxwell*matmul(surface_basis,v_ttn)
+
+end subroutine mc_surface_velocity
+!! <<<<<<<<<<< [jfcm, 2024_12_03] <<<<<<<<<<<
 
 end module libfida
 
@@ -14880,11 +15254,13 @@ program fidasim
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
-                ! call ndmc()
+                call ndmc()
 
                 ! Edge neutral deposition:
-                pass_grid = inter_grid
-                call ndmc_edge_neutrals()
+                !pass_grid = inter_grid
+                !call ndmc_edge_neutrals()
+
+                !call ndmc_surfaces()
 
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
@@ -14944,8 +15320,9 @@ program fidasim
 
             !! Deallocating birth and sink:
             ! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>>
-            deallocate(birth%dens,birth%part)
-            deallocate(sink%dens,sink%part)
+            if (inputs%calc_birth.ge.1) deallocate(birth%dens,birth%part)
+            if (inputs%calc_sink.ge.1) deallocate(sink%dens,sink%part)
+            ! Since we disabled the deallocation step in write_birth_profile(), we need to deallocate here
             ! <<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<<<<<
         endif
     endif

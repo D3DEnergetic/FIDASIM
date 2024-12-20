@@ -913,7 +913,8 @@ def identify_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0):
     sigma_RphZ_in = 1 if ccw_phi else -1
     sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
 
-    index = identify_COCOS_index
+    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
+    index = identify_COCOS_index(sigmas)
 
     return COCOS(index+(10*exp_Bp))
 
@@ -937,9 +938,7 @@ def identify_COCOS_index(sigmas):
     #+>>> cocos = COCOS(index)
     #+```
 
-    """
-    sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
- 
+    """ 
     if sigmas == [1, 1, 1]:
         index = 1
     elif sigmas == [1, -1, 1]:

@@ -5094,7 +5094,7 @@ subroutine write_neutrals
              "Third Energy Neutral Population", error)
 
         !! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>
-        if (inputs%calc_sink.ge.1) then          
+        if (inputs%calc_sink.ge.1) then
           !! Need to add input namelist to enable this case or write my own subroutine:
           call h5gcreate_f(fid, "/dcx", gid, error)
           call write_neutral_population(gid, neut%dcx, error)
@@ -15254,6 +15254,7 @@ program fidasim
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
+                ! NBI calculation:
                 call ndmc()
 
                 ! Edge neutral deposition:

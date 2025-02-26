@@ -12455,7 +12455,7 @@ subroutine npa_mc
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
                             if (inputs%verbose.ge.0)then
-                                write(*,*) "NPA_MC: Missed Detector ",ichan
+                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan
                             endif
                             cycle gyro_range_loop
                         endif
@@ -12481,7 +12481,7 @@ subroutine npa_mc
                             call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                             if(det.ne.ichan) then
                                 if (inputs%verbose.ge.0)then
-                                    write(*,*) "NPA_MC: Missed Detector ",ichan
+                                    write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
                                 endif
                                 cycle spread_loop
                             endif

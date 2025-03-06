@@ -4999,7 +4999,7 @@ subroutine write_npa
              "Number of particles that hit the detector: count(chan)", error)
 
 
-        if((npart.gt.0).and.(inputs%calc_npa.ge.2)) then
+        if((npart.gt.0).and.(inputs%calc_npa.eq.2)) then
             !Create Group
             call h5gcreate_f(fid,"/particles",gid, error)
             call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npart], error)
@@ -6998,6 +6998,7 @@ subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     real(Float64), dimension(3) :: d, a
     real(Float64) :: t_a,t_d
     integer :: i, s, ndet
+    logical :: inb_d, inb_a
 
     if(present(det)) then
         s = det
@@ -7019,12 +7020,17 @@ subroutine hit_npa_detector(r0, v0, d_index, rd, det)
 
         !! If both points are in plane boundaries and the
         !! particle is heading toward the detector then its a hit
-        if(in_boundary(npa_chords%det(i)%aperture,a) .and. &
-           in_boundary(npa_chords%det(i)%detector,d) .and. &
-           (t_d.gt.0.0) ) then
+        inb_a = in_boundary(npa_chords%det(i)%aperture,a)
+        inb_d = in_boundary(npa_chords%det(i)%detector,d)
+        if(inb_a .and. inb_d .and. (t_d.gt.0.0) ) then
             d_index = i
             exit detector_loop
         endif
+        !if(present(det).and.d_index.eq.0) then
+        !    write(*,*) "inb_a = ", inb_a
+        !    write(*,*) "inb_d = ", inb_d
+        !    write(*,*) "t > 0 = ", (t_d.gt.0.0)
+        !endif
     enddo detector_loop
     if(present(rd)) rd = d
 
@@ -12215,21 +12221,35 @@ subroutine npa_f
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.le.0.0) cycle loop_over_fast_ions
 
-            call gyro_surface(fields, eb, ptch, fbm%A, gs)
+            if(inputs%calc_npa.ne.3) then
+                call gyro_surface(fields, eb, ptch, fbm%A, gs)
+            else
+                call gyro_correction(fields, eb, ptch, fbm%A, ri, vi)
+            endif
 
             detector_loop: do ichan=1,npa_chords%nchan
-                call npa_gyro_range(ichan, gs, gyrange, nrange)
-                if(nrange.eq.0) cycle detector_loop
+                if(inputs%calc_npa.ne.3) then
+                    call npa_gyro_range(ichan, gs, gyrange, nrange)
+                    if(nrange.eq.0) cycle detector_loop
+                else
+                    nrange = 1
+                endif
+
                 gyro_range_loop: do ir=1,nrange
-                    dtheta = gyrange(2,ir)
-                    theta = gyrange(1,ir) + 0.5*dtheta
-                    call gyro_trajectory(gs, theta, ri, vi)
+                    if(inputs%calc_npa.ne.3) then
+                        dtheta = gyrange(2,ir)
+                        theta = gyrange(1,ir) + 0.5*dtheta
+                        call gyro_trajectory(gs, theta, ri, vi)
+                    else
+                        dtheta=2*pi
+                        theta=0.d0
+                    endif
 
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
-                        if (inputs%verbose.ge.0)then
-                            write(*,*) "NPA_F: Missed Detector ",ichan
+                        if ((inputs%verbose.ge.0).and.(inputs%calc_npa.ne.3)) then
+                            write(*,*) "NPA_F: Central Trajectory Missed Detector ",ichan, det, theta, dtheta
                         endif
                         cycle gyro_range_loop
                     endif
@@ -12341,7 +12361,7 @@ subroutine pnpa_f
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
                         if (inputs%verbose.ge.0)then
-                            write(*,*) "PNPA_F: Missed Detector ",ichan
+                            write(*,*) "PNPA_F: Central Trajectory Missed Detector ",ichan, det
                         endif
                         cycle gyro_range_loop
                     endif
@@ -12440,22 +12460,34 @@ subroutine npa_mc
                 call get_fields(fields, pos=rg)
 
                 !! Correct for gyro motion and get position and velocity
-                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
+                if(inputs%calc_npa.eq.3) then
+                    call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, ri, vi)
+                else
+                    call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
+                endif
 
                 detector_loop: do ichan=1,npa_chords%nchan
-                    call npa_gyro_range(ichan, gs, gyrange, nrange)
-                    if(nrange.eq.0) cycle detector_loop
+                    if(inputs%calc_npa.ne.3) then
+                        call npa_gyro_range(ichan, gs, gyrange, nrange)
+                        if(nrange.eq.0) cycle detector_loop
+                    else
+                        nrange = 1
+                    endif
 
                     gyro_range_loop: do ir=1,nrange
-                        dtheta = gyrange(2,ir)
-                        theta = gyrange(1,ir) + 0.5*dtheta
-                        call gyro_trajectory(gs, theta, ri, vi)
+                        if(inputs%calc_npa.ne.3) then
+                            dtheta = gyrange(2,ir)
+                            theta = gyrange(1,ir) + 0.5*dtheta
+                            call gyro_trajectory(gs, theta, ri, vi)
+                        else
+                            dtheta = 2*pi
+                        endif
 
                         !! Check if particle hits a NPA detector
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
                             if (inputs%verbose.ge.0)then
-                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan
+                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan, det
                             endif
                             cycle gyro_range_loop
                         endif
@@ -12475,18 +12507,22 @@ subroutine npa_mc
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
-                        spread_loop: do it=1,25
-                            theta = gyrange(1,ir) + (it-0.5)*dtheta/25
-                            call gyro_trajectory(gs, theta, ri, vi)
-                            call hit_npa_detector(ri, vi ,det, rf, det=ichan)
-                            if(det.ne.ichan) then
-                                if (inputs%verbose.ge.0)then
-                                    write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
+                        if(inputs%calc_npa.ne.3) then
+                            spread_loop: do it=1,25
+                                theta = gyrange(1,ir) + (it-0.5)*dtheta/25
+                                call gyro_trajectory(gs, theta, ri, vi)
+                                call hit_npa_detector(ri, vi ,det, rf, det=ichan)
+                                if(det.ne.ichan) then
+                                    if (inputs%verbose.ge.0)then
+                                        write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
+                                    endif
+                                    cycle spread_loop
                                 endif
-                                cycle spread_loop
-                            endif
-                            call store_npa(det,ri,rf,vi,flux/25,fast_ion%class)
-                        enddo spread_loop
+                                call store_npa(det,ri,rf,vi,flux/25,fast_ion%class)
+                            enddo spread_loop
+                        else
+                            call store_npa(det, ri, rf, vi, flux, fast_ion%class)
+                        endif
                     enddo gyro_range_loop
                 enddo detector_loop
             else !! Full Orbit

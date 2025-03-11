@@ -2071,10 +2071,45 @@ function p_excit(eb, n_max, m_max) result(sigma)
     real(Float64), dimension(12,12) :: sigma_full
 
     integer :: n, m
+    ! >>> [JFCM, 2025-03-03] >>>
+    real(Float64) :: dE, E, E_prime, sigma_nm, sigma_mn, ared, am, ab
+    ! <<< [JFCM, 2025-03-03] <<<
 
     do n=1,12
         sigma_full(n,:) = p_excit_n(eb, n, 12)
     enddo
+
+    ! >>> [JFCM, 2025-03-03] >>>
+    ! Compute the deexcitation cross sections for the proton-hydrogen system (H-H):
+
+    ! Reduced mass in amu:
+    am = H1_amu
+    ab = H1_amu
+    ared = am*ab/(am+ab)
+
+    ! Convert the relative collision energy eb [keV/amu] to [keV]
+    E = eb*ared
+
+    do n=1,12
+      do m=1,12
+        if (m .gt. n) then ! Excitation reaction (initial state n < final state m)
+
+          ! Excitation threshold energy from state n to m in [eV]:
+          dE = (13.6e-3)*( ((1.d0/n)**2) - ((1.d0/m)**2) )
+
+          ! Forward cross section at new relative energy:
+          E_prime = E + dE ! [eV]
+          sigma_nm = p_excit_n_m(E_prime/ared,n,m)
+
+          ! Reverse (deexcitation) reaction cross section:
+          sigma_mn = sigma_nm*(E_prime/E)*((real(n)/real(m))**2)
+
+          ! Assign deecxitation cros section to lower triangular region of sigma:
+          sigma_full(m,n) = sigma_mn
+        endif
+      enddo
+    enddo
+    ! <<< [JFCM, 2025-03-03] <<<
 
     sigma = sigma_full(1:n_max,1:m_max)
 
@@ -2676,10 +2711,44 @@ function e_excit(eb, n_max, m_max) result(sigma)
     real(Float64), dimension(12,12) :: sigma_full
 
     integer :: n
+    ! >>> [JFCM, 2025-03-03] >>>
+    real(Float64) :: dE, E, E_prime, sigma_nm, sigma_mn, ared
+    integer :: m
+    ! <<< [JFCM, 2025-03-03] <<<
 
     do n=1,12
         sigma_full(n,:) = e_excit_n(eb, n, 12)
     enddo
+
+    ! >>> [JFCM, 2025-03-03] >>>
+    ! Compute the deexcitation cross sections for the hydrogen-electron system (H-e):
+
+    ! Reduced mass in amu for electron interactions:
+    ared = 1.0
+
+    ! Convert the relative collision energy eb [keV/amu] to [keV]
+    E = eb*ared
+
+    do n=1,12
+      do m=1,12
+        if (m .gt. n) then ! Excitation reaction (initial state n < final state m)
+
+          ! Excitation threshold energy from state n to m in [eV]:
+          dE = (13.6e-3)*( ((1.d0/n)**2) - ((1.d0/m)**2) )
+
+          ! Forward cross section at new relative energy:
+          E_prime = E + dE ! [eV]
+          sigma_nm = e_excit_n_m(E_prime,n,m)
+
+          ! Reverse (deexcitation) reaction cross section:
+          sigma_mn = sigma_nm*(E_prime/E)*((real(n)/real(m))**2)
+
+          ! Assign deecxitation cros section to lower triangular region of sigma:
+          sigma_full(m,n) = sigma_mn
+        endif
+      enddo
+    enddo
+    ! <<< [JFCM, 2025-03-03] <<<
 
     sigma = sigma_full(1:n_max,1:m_max)
 

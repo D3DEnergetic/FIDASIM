@@ -644,6 +644,24 @@ type AtomicTables
         !+ Einstein coefficients for spontaneous emission
     type(NuclearRates)       :: D_D
         !+ Deuterium-Deuterium reaction rates
+
+    ! >>> [JFCM 2025-03-12] >>>
+    ! Adding additional cross sections neeeded for non-thermal rate calculations
+    type(AtomicCrossSection) :: H_H_ex_cross
+        !+ Hydrogen-Hydrogen impact excitations n/m-resolved cross sections
+    type(AtomicCrossSection) :: H_H_iz_cross
+        !+ Hydrogen-Hydrogen impact ionization n-resolved cross sections
+    type(AtomicCrossSection) :: H_e_ex_cross
+        !+ Hydrogen-Electron impact excitation n/m-resolved cross sections
+    type(AtomicCrossSection) :: H_e_iz_cross
+        !+ Hydrogen-Electron impact ionization n-resolved cross sections
+    type(AtomicCrossSection) :: H_Aq_cx_cross
+        !+ Hydrogen-Impurity charge exchange n/m-resolved cross sections
+    type(AtomicCrossSection) :: H_Aq_ex_cross
+        !+ Hydrogen-Impurity impact excitation n/m-resolved cross sections
+    type(AtomicCrossSection) :: H_Aq_iz_cross
+        !+ Hydrogen-Impurity impact ionization n-resolved cross sections
+    ! <<< [JFCM 2025-03-12] <<<
 end type AtomicTables
 
 type LineOfSight
@@ -4428,9 +4446,13 @@ subroutine read_tables
     !!Open HDF5 file
     call h5fopen_f(inputs%tables_file, H5F_ACC_RDONLY_F, fid, error)
 
-    !!Read Hydrogen-Hydrogen CX Cross Sections
-    call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx_cross)
-
+    if (inputs%enable_nonthermal_calc .ge. 1) then
+      !! Read All cross sections:
+      call read_all_atomic_cross(fid)
+    else
+      !!Read Hydrogen-Hydrogen CX Cross Sections
+      call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx_cross)
+    endif
     !!Read Hydrogen-Hydrogen CX Rates
     call read_atomic_rate(fid,"/rates/H_H", tables%H_H_cx_rate)
 
@@ -15029,6 +15051,178 @@ subroutine mc_surface_velocity(Tn,mass,surface_basis,vn_uvw)
 
 end subroutine mc_surface_velocity
 !! <<<<<<<<<<< [jfcm, 2024_12_03] <<<<<<<<<<<
+
+!! >>> [JFCM, 2025-03-12] >>>
+subroutine read_all_atomic_cross(fid)
+  !+ Reads in all cross section tables (CX, EX, IZ) from file and populates
+  !+ all the [[AtomicCrossSection]] types in [[AtomicTable]] "table"
+  integer(HID_T), intent(in) :: fid
+    !+ HDF5 file ID
+
+  ! Define local variables:
+  integer(HSIZE_T), dimension(3) :: dim3
+  integer(HSIZE_T), dimension(2) :: dim2
+  integer(SIZE_T) :: type_size
+  integer :: type_class
+  logical :: path_valid
+  integer :: error, i
+  character(50) :: grp
+  integer :: n_max, m_max, nenergy
+  real(Float64) :: emin, emax, dlogE, rmin
+  real(Float64), dimension(:,:,:), allocatable :: dummy3
+  real(Float64), dimension(:,:), allocatable :: dummy2
+  type(AtomicCrossSection) :: cross
+
+  ! H_H cross sections:
+  ! ---------------------------------------------------------------------------------------------------
+  ! Check that cross section group exists:
+  grp = "/cross/H_H"
+  call h5ltpath_valid_f(fid,grp,.True.,path_valid,error)
+  if (.not. path_valid) then
+    if (inputs%verbose.ge.0) then
+      write(*,'(a,a)') 'READ_ALL_ATOMIC_CROSS: Could not read cross section data from: ', trim(grp)
+    endif
+    stop
+  endif
+
+  ! Extract scalar data:
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/n_max"  ,n_max,error)
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/m_max"  ,m_max,error)
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/nenergy",nenergy,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/emin"   ,emin,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/emax"   ,emax,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/dlogE"  ,dlogE,error)
+
+  cross%nenergy = nenergy
+  cross%logemin = log10(emin)
+  cross%logemax = log10(emax)
+  cross%dlogE = dlogE
+
+  ! Allocate space for cross sections:
+  allocate(tables%H_H_cx_cross%log_cross(nlevs,nlevs,nenergy))
+  allocate(tables%H_H_iz_cross%log_cross(1    ,nlevs,nenergy))
+  allocate(tables%H_H_ex_cross%log_cross(nlevs,nlevs,nenergy))
+  allocate(dummy3(n_max,m_max,nenergy))
+  allocate(dummy2(n_max,nenergy))
+  dim3 = [n_max,m_max,nenergy]
+  dim2 = [n_max,nenergy]
+
+  ! CX:
+  allocate(cross%log_cross(nlevs,nlevs,nenergy))
+  call h5ltread_dataset_double_f(fid,trim(grp)//"/cx",dummy3,dim3,error)
+  rmin = minval(dummy3,dummy3.gt.0.d0)
+  where (dummy3.le.0.0)
+      dummy3 = 0.9*rmin
+  end where
+  cross%minlog_cross = log10(rmin)
+  do i=1, nenergy
+        cross%log_cross(:,:,i) = log10(transpose(dummy3(1:nlevs,1:nlevs,i)))
+  enddo
+  tables%H_H_cx_cross = cross
+  deallocate(cross%log_cross)
+
+  ! IZ:
+  allocate(cross%log_cross(1,nlevs,nenergy))
+  call h5ltread_dataset_double_f(fid,trim(grp)//"/ionization",dummy2,dim2,error)
+  rmin = minval(dummy2,dummy2.gt.0.d0)
+  where (dummy2.le.0.0)
+      dummy2 = 0.9*rmin
+  end where
+  cross%minlog_cross = log10(rmin)
+  do i=1, nenergy
+        cross%log_cross(1,:,i) = log10(dummy2(1:nlevs,i))
+  enddo
+  tables%H_H_iz_cross = cross
+  deallocate(cross%log_cross)
+
+  ! EX:
+  allocate(cross%log_cross(nlevs,nlevs,nenergy))
+  call h5ltread_dataset_double_f(fid,trim(grp)//"/excitation",dummy3,dim3,error)
+  rmin = minval(dummy3,dummy3.gt.0.d0)
+  where (dummy3.le.0.0)
+      dummy3 = 0.9*rmin
+  end where
+  cross%minlog_cross = log10(rmin)
+  do i=1, nenergy
+        cross%log_cross(:,:,i) = log10(transpose(dummy3(1:nlevs,1:nlevs,i)))
+  enddo
+  tables%H_H_ex_cross = cross
+  deallocate(cross%log_cross)
+
+  deallocate(dummy2)
+  deallocate(dummy3)
+
+  ! H_e cross sections:
+  ! ---------------------------------------------------------------------------------------------------
+  ! Check that cross section group exists:
+  grp = "/cross/H_e"
+  call h5ltpath_valid_f(fid,grp,.True.,path_valid,error)
+  if (.not. path_valid) then
+    if (inputs%verbose.ge.0) then
+      write(*,'(a,a)') 'READ_ALL_ATOMIC_CROSS: Could not read cross section data from: ', trim(grp)
+    endif
+    stop
+  endif
+
+  ! Extract scalar data:
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/n_max"  ,n_max,error)
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/m_max"  ,m_max,error)
+  call h5ltread_dataset_int_scalar_f(fid,   trim(grp)//"/nenergy",nenergy,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/emin"   ,emin,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/emax"   ,emax,error)
+  call h5ltread_dataset_double_scalar_f(fid,trim(grp)//"/dlogE"  ,dlogE,error)
+
+  cross%nenergy = nenergy
+  cross%logemin = log10(emin)
+  cross%logemax = log10(emax)
+  cross%dlogE = dlogE
+
+  ! Allocate space for cross sections:
+  allocate(tables%H_e_iz_cross%log_cross(1    ,nlevs,nenergy))
+  allocate(tables%H_e_ex_cross%log_cross(nlevs,nlevs,nenergy))
+  allocate(dummy3(n_max,m_max,nenergy))
+  allocate(dummy2(n_max,nenergy))
+  dim3 = [n_max,m_max,nenergy]
+  dim2 = [n_max,nenergy]
+
+  ! IZ:
+  allocate(cross%log_cross(1,nlevs,nenergy))
+  call h5ltread_dataset_double_f(fid,trim(grp)//"/ionization",dummy2,dim2,error)
+  rmin = minval(dummy2,dummy2.gt.0.d0)
+  where (dummy2.le.0.0)
+      dummy2 = 0.9*rmin
+  end where
+  cross%minlog_cross = log10(rmin)
+  do i=1, nenergy
+        cross%log_cross(1,:,i) = log10(dummy2(1:nlevs,i))
+  enddo
+  tables%H_e_iz_cross = cross
+  deallocate(cross%log_cross)
+
+  ! EX:
+  allocate(cross%log_cross(nlevs,nlevs,nenergy))
+  call h5ltread_dataset_double_f(fid,trim(grp)//"/excitation",dummy3,dim3,error)
+  rmin = minval(dummy3,dummy3.gt.0.d0)
+  where (dummy3.le.0.0)
+      dummy3 = 0.9*rmin
+  end where
+  cross%minlog_cross = log10(rmin)
+  do i=1, nenergy
+        cross%log_cross(:,:,i) = log10(transpose(dummy3(1:nlevs,1:nlevs,i)))
+  enddo
+  tables%H_e_ex_cross = cross
+  deallocate(cross%log_cross)
+
+  ! Release memory no longer used:
+  deallocate(dummy2)
+  deallocate(dummy3)
+
+  ! H_Aq cross sections:
+  ! ---------------------------------------------------------------------------------------------------
+  ! Add code to read the required impurity data
+  
+end subroutine read_all_atomic_cross
+!! <<< [JFCM, 2025-03-12] <<<
 
 end module libfida
 

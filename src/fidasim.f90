@@ -4194,7 +4194,10 @@ subroutine read_atomic_rate(fid, grp, rates)
 
 end subroutine read_atomic_rate
 
-subroutine read_atomic_transitions(fid, grp,rates)
+! >>> [JFCM, 2025_03_13] >>>
+! Addded new argument optional "include_loss"
+subroutine read_atomic_transitions(fid, grp,rates,include_loss)
+! <<< [JFCM, 2025_03_13] <<<
     !+ Reads in a atomic transitions table from file
     !+ and puts it into a [[AtomicTransitions]] type
     integer(HID_T), intent(in)              :: fid
@@ -4203,6 +4206,11 @@ subroutine read_atomic_transitions(fid, grp,rates)
         !+ HDF5 group to read from
     type(AtomicTransitions), intent(inout)  :: rates
         !+ Atomic transitions
+
+    ! >>> [JFCM, 2025_03_13] >>>
+    logical, optional :: include_loss
+        !+ Flag to include or not include the thermal CX and IZ rate coefficient terms from log_depop
+    ! <<< [JFCM, 2025_03_13] <<<
 
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(3) :: dim3
@@ -4216,6 +4224,18 @@ subroutine read_atomic_transitions(fid, grp,rates)
     real(Float64), dimension(:,:,:), allocatable :: dummy3
     real(Float64), dimension(:,:,:,:), allocatable :: dummy4
     real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
+    ! >>> [JFCM, 2025_03_13] >>>
+    logical :: incloss
+    ! <<< [JFCM, 2025_03_13] <<<
+
+    ! >>> [JFCM, 2025_03_13] >>>
+    ! Added this term as part of the effort to compute non-thermal beam stopping
+    if (present(include_loss)) then
+      incloss = include_loss
+    else
+      incloss = .true.
+    endif
+    ! <<< [JFCM, 2025_03_13] <<<
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
@@ -4251,6 +4271,12 @@ subroutine read_atomic_transitions(fid, grp,rates)
                     rates%ntemp))
     rates%log_pop = 0.d0
     rates%log_depop = 0.d0
+
+    ! >>> [JFCM, 2025_03_13] >>>
+    ! Skip adding the thermal CX and IZ terms to log_depop
+    ! Recall that log_pop terms only appear for the EX term
+    if (incloss) then
+    ! <<< [JFCM, 2025_03_13] <<<
 
     !!Read CX
     call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
@@ -4306,6 +4332,10 @@ subroutine read_atomic_transitions(fid, grp,rates)
         enddo
         deallocate(dummy3)
     endif
+
+    ! >>> [JFCM, 2025_03_13] >>>
+    endif ! include_loss
+    ! <<< [JFCM, 2025_03_13] <<<
 
     !!Read excitation
     call h5ltpath_valid_f(fid, grp//"/excitation", .True., path_valid, error)
@@ -4439,6 +4469,9 @@ subroutine read_tables
     character(len=4) :: impname
     real(Float64), dimension(2) :: b_amu
     real(Float64), dimension(:,:), allocatable :: dummy2
+    ! >>> [JFCM 2025-03-13] >>>
+    logical :: include_loss
+    ! <<< [JFCM 2025-03-13] <<<
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -4457,7 +4490,16 @@ subroutine read_tables
     call read_atomic_rate(fid,"/rates/H_H", tables%H_H_cx_rate)
 
     !!Read Hydrogen-Hydrogen Transitions
-    call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
+    ! >>> [JFCM 2025-03-13] >>>
+    ! Exclude the thermal CX and IZ loss terms so we can add the nonthermal version in get_rate_matrix
+    ! call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
+    if (inputs%enable_nonthermal_calc .ge. 1) then
+      include_loss = .false.
+      call read_atomic_transitions(fid,"/rates/H_H", tables%H_H, include_loss)
+    else
+      call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
+    end if
+    ! <<< [JFCM 2025-03-13] <<<
 
     !!Read Hydrogen-Electron Transitions
     call read_atomic_transitions(fid,"/rates/H_e", tables%H_e)
@@ -15220,7 +15262,7 @@ subroutine read_all_atomic_cross(fid)
   ! H_Aq cross sections:
   ! ---------------------------------------------------------------------------------------------------
   ! Add code to read the required impurity data
-  
+
 end subroutine read_all_atomic_cross
 !! <<< [JFCM, 2025-03-12] <<<
 

@@ -4491,7 +4491,7 @@ subroutine read_tables
 
     !!Read Hydrogen-Hydrogen Transitions
     ! >>> [JFCM 2025-03-13] >>>
-    ! Exclude the thermal CX and IZ loss terms so we can add the nonthermal version in get_rate_matrix
+    ! Exclude the thermal CX and IZ loss terms so we can add the nonthermal version in "get_rate_matrix"
     ! call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
     if (inputs%enable_nonthermal_calc .ge. 1) then
       include_loss = .false.
@@ -9932,7 +9932,9 @@ subroutine get_total_cx_rate(ind, pos, v_ion, types, rate_tot)
 
 end subroutine get_total_cx_rate
 
-subroutine get_rate_matrix(plasma, ab, eb, rmat)
+! >>> [JFCM, 2025-03-13] >>>
+! Add new argument vn to get_rate_matrix:
+subroutine get_rate_matrix(plasma, ab, eb, rmat, vn)
     !+ Gets rate matrix for use in [[libfida:colrad]]
     type(LocalProfiles), intent(in)                    :: plasma
         !+ Plasma parameters
@@ -9942,6 +9944,10 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
         !+ "Beam" ion energy [keV]
     real(Float64), dimension(nlevs,nlevs), intent(out) :: rmat
         !+ Rate matrix
+    ! >>> [JFCM, 2025-03-13] >>>
+    real(Float64), dimension(3)                        :: vn
+        !+ Neutral particle velocity vector (for non-thermal calculation)
+    ! <<< [JFCM, 2025-03-13] <<<
 
     real(Float64) :: ai
     real(Float64) :: logEmin, dlogE, logeb, logeb_amu
@@ -10031,6 +10037,15 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
         endif
         H_H_pop = H_H_pop + H_H_pop_i
         H_H_depop = H_H_depop + H_H_depop_i
+
+        ! >>> [JFCM, 2025-03-13] >>>
+        if (inputs%enable_nonthermal_calc .eq. 1) then
+          ! Add the missing CX and IZ loss term when non-thermal calculation enabled (see read_atomic_transitions)
+          ! Non-thermal loss rate term calculated using f4d where defined
+          call mc_ion_loss_rate(plasma,i,ab,vn,H_H_depop)
+        endif
+        ! <<< [JFCM, 2025-03-13] <<<
+
     enddo
 
     !!H_e
@@ -10168,7 +10183,12 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
 
     vnet_square=dot_product(vn-plasma%vrot,vn-plasma%vrot)  ![cm/s]
     eb = v2_to_E_per_amu*ab*vnet_square ![kev]
-    call get_rate_matrix(plasma, ab, eb, matrix)
+
+    ! >>> [2025-03-13] >>>
+    ! Passing extra argument to get_rate_matrix for non-thermal calculations
+    ! call get_rate_matrix(plasma, ab, eb, matrix)
+    call get_rate_matrix(plasma, ab, eb, matrix, vn-plasma%vrot)
+    ! <<< [2025-03-13] <<<
 
     call eigen(nlevs,matrix, eigvec, eigval)
     call linsolve(eigvec,states,coef) !coeffs determined from states at t=0
@@ -14226,7 +14246,7 @@ end subroutine npa_weights
 !               call mc_beam_grid(ind, ri)
 !
 !               ! Get neutral particle velocity vector:
-!               call get_neutral_velocity_from_ion_distribution(ind,is,ri,vion,denf4d,f4d_defined)
+!               call mc_ion_velocity_f4d(ind,is,ri,vion,denf4d,f4d_defined)
 !               if(dot_product(vion,vion).eq.0.) then
 !                 write (*,*) "vion .eq. 0 skipping marker ..."
 !                 write (*,*) "vion:", vion
@@ -14328,7 +14348,7 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
 end subroutine store_sink_particle
 
 !! >>>>>>>>>>> [jfcm, 2024_11_22] >>>>>>>>>>>>
-subroutine get_neutral_velocity_from_ion_distribution(ind,is,rn,vn,denf4d,f4d_defined)
+subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
   !+ Samples an ion velocity vector from the ion distribution function (thermal or nonthermal)
   !+ Given an input beam_grid 3D index "ind", neutral species index "is" and the inputs%enable_nonthermal_calc flag, this subroutine calculates the neutral marker position "rn" on the beam_grid and produces a neutral particle velocity vector "vn" in XYZ beam_grid coordinates sampled from either a maxwellian ion distirbution or the non_thermal ion distribution stored in fbm interpolated at "rn" position. In addition, it returns a flag f4d_defined which is .True. the particle velocity is sampled from nonthermal ion distribution function. Generally, the nonthernal distribution function is defined only for rho < 1.
   !+ Need to consider effect of plasma rotation on the nonthermal f4d sampling.
@@ -14340,7 +14360,7 @@ subroutine get_neutral_velocity_from_ion_distribution(ind,is,rn,vn,denf4d,f4d_de
     !+ Neutral particle position in [[libfida:beam_grid]] XYZ coordinates
   real(Float64), dimension(3), intent(out) :: vn
     !+ Neutral particle velocity in XYZ coordinates
-  real(Float64), intent(out) :: denf4d
+  real(Float64), intent(out), optional :: denf4d
     !+ value of ion distribution at phase space position rn and velocity vn [ion cm^{-3} v^{-3}]
   logical, intent(out) :: f4d_defined
     !+ Flag that defines if f4d was used to sample ion velocity vector
@@ -14376,8 +14396,10 @@ subroutine get_neutral_velocity_from_ion_distribution(ind,is,rn,vn,denf4d,f4d_de
       !! Apply correction to neutral position to account for guiding center nature of fbm (f4d):
       ! rn = rp_corr
 
-      !! Get ion density in velocity space:
-      call get_ep_denf(eb,ptch,denf4d,pos=rn,coeffs=fields%b)
+      if (present(denf4d)) then
+        !! Get ion density in velocity space:
+        call get_ep_denf(eb,ptch,denf4d,pos=rn,coeffs=fields%b)
+      endif
 
     else
       ! f4d at location "ind" cannot be sampled
@@ -14399,24 +14421,26 @@ subroutine get_neutral_velocity_from_ion_distribution(ind,is,rn,vn,denf4d,f4d_de
     !! output: vion in XYZ
     call mc_halo(plasma,thermal_mass(is),vn)
 
-    !! Get the ion density in velocity space:
-    deni = plasma%deni(is)
-    ti = plasma%ti !! [keV]
-    vth2 = ti/(v2_to_E_per_amu*thermal_mass(is))
-    vn2 = sum(vn(:)**2)
-    prefactor = deni*(pi*vth2)**(-1.5)
-    exp_term = exp(-vn2/vth2)
-    denf4d = prefactor*exp_term !! [p (1/cm)^3 (s/cm)^3]
+    if (present(denf4d)) then
+      !! Get the ion density in velocity space:
+      deni = plasma%deni(is)
+      ti = plasma%ti !! [keV]
+      vth2 = ti/(v2_to_E_per_amu*thermal_mass(is))
+      vn2 = sum(vn(:)**2)
+      prefactor = deni*(pi*vth2)**(-1.5)
+      exp_term = exp(-vn2/vth2)
+      denf4d = prefactor*exp_term !! [p (1/cm)^3 (s/cm)^3]
 
-    !! The Maxwell-Boltzmann distribution is given by:
-    !! vth2 = e*T/m
-    !! f(v) = n*( (pi*vth2)^(-3/2) )*exp(-(v2/vth2))
-    !! where
-    !! n = S f(v)*d3v
+      !! The Maxwell-Boltzmann distribution is given by:
+      !! vth2 = e*T/m
+      !! f(v) = n*( (pi*vth2)^(-3/2) )*exp(-(v2/vth2))
+      !! where
+      !! n = S f(v)*d3v
+    endif
 
   endif !! thermal
 
-end subroutine get_neutral_velocity_from_ion_distribution
+end subroutine mc_ion_velocity_f4d
 !! <<<<<<<<<<< [jfcm, 2024_11_22] <<<<<<<<<<<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
@@ -14493,7 +14517,7 @@ subroutine calculate_dcx_process
               call mc_beam_grid(ind, ri)
 
               ! Get neutral particle velocity vector:
-              call get_neutral_velocity_from_ion_distribution(ind,is,ri,vion,denf4d,f4d_defined)
+              call mc_ion_velocity_f4d(ind,is,ri,vion,denf4d,f4d_defined)
               if(dot_product(vion,vion).eq.0.) then
                 write (*,*) "vion .eq. 0 skipping marker ..."
                 write (*,*) "vion:", vion
@@ -15266,6 +15290,120 @@ subroutine read_all_atomic_cross(fid)
 end subroutine read_all_atomic_cross
 !! <<< [JFCM, 2025-03-12] <<<
 
+! >>> [JFCM, 2025-03-13] >>>
+subroutine mc_ion_loss_rate(plasma,is,ab,vn,H_H_depop)
+  !+ Computes the ion loss rate due to CX and IZ using monte carlo methods and the non-thermal ion f4d
+  !+ In case of a not define f4d at local point, use a maxwellian PDF at the local ion temperature
+  type(LocalProfiles), intent(in) :: plasma
+    !+ Plasma parameters
+  integer, intent(in) :: is
+    !+ thermal species index
+  real(Float64), intent(in) :: ab
+    !+ Neutral particle atomic mass in [amu]
+  real(Float64), dimension(3), intent(in) :: vn
+    !+ Neutral particle velocity in the reference frame of the plasma (any rotation has been substracted)
+  real(Float64), dimension(nlevs), intent(inout) :: H_H_depop
+    !+ rate vector in [s^-1]
+
+  ! Local variables:
+  real(Float64) ::  am, deni, ared, vrel, erel, denf4d
+  integer :: num_ions, ii, neb, err, ebi
+  real(Float64), dimension(3) :: ri, vi
+  integer(Int32), dimension(3) :: ind
+  real(Float64), dimension(nlevs,nlevs) :: sigma_cx
+  real(Float64), dimension(nlevs) :: depop, sigma, sigma_iz
+  real(Float64) :: log_erel, logEmin, dLogE
+  logical :: f4d_defined
+  type(InterpolCoeffs1D) :: c
+
+  ! If beam_grid has not been allocated, then we cant do anything so exit subroutine
+  if(.not.allocated(beam_grid%xc)) then
+    return
+  endif
+
+  ! Get background plasma conditions:
+  ! --------------------------------
+  deni = plasma%deni(is) ! ion density of ith background "thermal" species
+  ri = plasma%pos
+  call get_indices(ri,ind)
+
+  ! Calculate reduced mass:
+  ! -----------------------
+  ! Needed for electron rates
+  ! am = thermal_mass(is) ! Thermal mass in [amu]
+  ! ared = ab*am/(ab+am) ! Reduced mass in [amu]
+
+  ! Get grid variables from cross section table:
+  ! Assumme both CX and IZ H_H cross sections have the same grid
+  logEmin = min(tables%H_H_cx_cross%logemin,tables%H_H_iz_cross%logemin)
+  dlogE = tables%H_H_cx_cross%dlogE
+  neb = tables%H_H_cx_cross%nenergy
+
+  ! Compute rate integral:
+  depop = 0.d0
+  num_ions = 30
+  loop_over_ions: do ii = 1, num_ions
+      ! Sample ion velocity vector from f4d:
+      ! input: ind, is
+      call mc_ion_velocity_f4d(ind,is,ri,vi,f4d_defined=f4d_defined)
+      if (.not.f4d_defined) then
+        ! If f4d is not defined, then skip entire loop
+        exit loop_over_ions
+      endif
+
+      ! Relative velocity betwen neutral and ion:
+      vrel = norm2(vn-vi)
+
+      ! Relative energy per amu (required for H_H):
+      erel = v2_to_E_per_amu*vrel**2 ! [keV]
+      log_erel = log10(erel)
+
+      ! Compute cross section vector at erel:
+      call interpol_coeff(logEmin,dlogE,neb,log_erel,c,err)
+      ebi = c%i
+      if(err.eq.1) then
+          if(inputs%verbose.ge.0) then
+              write(*,'(a)') "MC_ION_LOSS_RATE: Erel out of range of H_H_cx table. Using nearest energy value."
+              write(*,'("erel = ",ES10.3," [keV]")') erel
+          endif
+          if(ebi.lt.1) then
+              ebi=1
+              c%b1=1.0 ; c%b2=0.0
+          else
+              ebi=neb-1
+              c%b1=0.0 ; c%b2=1.0
+          endif
+      endif
+
+      sigma_cx(:,:) = (c%b1*tables%H_H_cx_cross%log_cross(:,:,ebi) + &
+                   c%b2*tables%H_H_cx_cross%log_cross(:,:,ebi+1))
+
+      where (sigma_cx.lt.tables%H_H_cx_cross%minlog_cross)
+          sigma_cx = 0.d0
+      elsewhere
+          sigma_cx = exp(sigma_cx*log_10)
+      end where
+
+      sigma_iz(:) = (c%b1*tables%H_H_iz_cross%log_cross(1,:,ebi) + &
+                   c%b2*tables%H_H_iz_cross%log_cross(1,:,ebi+1))
+
+      where (sigma_iz.lt.tables%H_H_iz_cross%minlog_cross)
+          sigma_iz = 0.d0
+      elsewhere
+          sigma_iz = exp(sigma_iz*log_10)
+      end where
+
+      ! Compute rate:
+      sigma = sigma_iz + sum(sigma_cx,dim=1)
+      depop = depop + sigma*vrel
+  enddo loop_over_ions
+
+  ! Compute final result:
+  H_H_depop = H_H_depop + depop*deni/num_ions
+
+end subroutine mc_ion_loss_rate
+! <<< [JFCM, 2025-03-13] <<<
+
 end module libfida
 
 !=============================================================================
@@ -15284,6 +15422,11 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer               :: i,narg,nthreads,max_threads,seed
+
+    ! >>> [JFCM, 2025-03-14] >>>
+    integer :: time_0, time_1, count_rate
+    real :: elapsed_time
+    ! <<< [JFCM, 2025-03-14] <<<
 
 #ifdef _VERSION
     version = _VERSION
@@ -15554,8 +15697,19 @@ program fidasim
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
+
+                ! >>> [JFCM, 2025-03-14] >>>
+                call SYSTEM_CLOCK(time_0,count_rate)
+                ! <<< [JFCM, 2025-03-14] <<<
+
                 ! NBI calculation:
                 call ndmc()
+
+                ! >>> [JFCM, 2025-03-14] >>>
+                call SYSTEM_CLOCK(time_1)
+                elapsed_time = real(time_1 - time_0) / real(count_rate)  ! Convert to seconds
+                print *, "NDMC elapsed time: ", elapsed_time, " seconds"
+                ! <<< [JFCM, 2025-03-14] <<<
 
                 ! Edge neutral deposition:
                 !pass_grid = inter_grid

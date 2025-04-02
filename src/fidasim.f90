@@ -4494,7 +4494,10 @@ subroutine read_tables
     ! Exclude the thermal CX and IZ loss terms so we can add the nonthermal version in "get_rate_matrix"
     ! call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
     if (inputs%enable_nonthermal_calc .ge. 1) then
-      include_loss = .false.
+      ! include_loss = .false.
+      ! >>> [JFCM, 2025_04_02] >>>
+      include_loss = .true.
+      ! <<< [JFCM, 2025_04_02] <<<
       call read_atomic_transitions(fid,"/rates/H_H", tables%H_H, include_loss)
     else
       call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
@@ -10042,7 +10045,9 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat, vn)
         if (inputs%enable_nonthermal_calc .eq. 1) then
           ! Add the missing CX and IZ loss term when non-thermal calculation enabled (see read_atomic_transitions)
           ! Non-thermal loss rate term calculated using f4d where defined
-          call mc_ion_loss_rate(plasma,i,ab,vn,H_H_depop)
+          ! >>> [JFCM, 2025_04_02] >>>
+          ! call mc_ion_loss_rate(plasma,i,ab,vn,H_H_depop)
+          ! <<< [JFCM, 2025_04_02] <<<
         endif
         ! <<< [JFCM, 2025-03-13] <<<
 

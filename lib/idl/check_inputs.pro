@@ -38,13 +38,14 @@ PRO check_inputs, inputs
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
               calc_cfpd:zero_int,calc_res:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
-              adaptive:zero_int, split_tol:zero_double, max_cell_splits:zero_int}
+              adaptive:zero_int, split_tol:zero_double, max_cell_splits:zero_int,$
+              max_crossings:zero_int}
     
     keys = tag_names(inputs)
     w = where(keys.capwords() eq 'ADAPTIVE')
     if w eq -1 then begin
         warn, 'Missing adaptive time step settings, defaulting to off'
-        inputs = create_struct(inputs, 'adaptive', 0, 'split_tol', double(0.0), 'max_cell_splits', 1)
+        inputs = create_struct(inputs, 'adaptive', 0, 'split_tol', double(0.0), 'max_cell_splits', 1, 'max_crossings', 2)
     endif
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
@@ -115,6 +116,12 @@ PRO check_inputs, inputs
     if inputs.max_cell_splits lt 1 then begin
       error,'Invalid max cell splits. Expected value >= 1'
       print,'max_cell_splits = ',inputs.max_cell_splits
+      err_status = 1
+    endif
+
+    if inputs.max_crossings lt 2 then begin
+      error,'Invalid max_crossings. Expected value >= 2'
+      print,'max_crossings = ',inputs.max_crossings
       err_status = 1
     endif
 

@@ -1108,6 +1108,8 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
+    integer(Int32) :: max_crossings
+        !+ Number of times a neutral particle/LOS can cross the plasma boundary default=2
 end type SimulationInputs
 
 type ParticleTrack
@@ -1988,7 +1990,7 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: adaptive, max_cell_splits, max_crossings
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
@@ -2010,7 +2012,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        adaptive, max_cell_splits, split_tol, max_crossings
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2089,6 +2091,7 @@ subroutine read_inputs
     adaptive=0
     max_cell_splits=1
     split_tol=0
+    max_crossings = 2
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2172,6 +2175,7 @@ subroutine read_inputs
     inputs%flr = flr
     inputs%stark_components = stark_components
     inputs%split = split
+    inputs%max_crossings = max_crossings
 
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
@@ -7917,7 +7921,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -8183,7 +8187,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -9862,7 +9866,8 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
         endif
     enddo
 
-    if(ncross.gt.1) states = 0.0
+    ! max_crossings - 1 because the particle should always start in the plasma
+    if(ncross.gt.(inputs%max_crossings - 1)) states = 0.0
 
 end subroutine attenuate
 

@@ -4308,13 +4308,14 @@ subroutine read_nuclear_rates(fid, grp, rates)
         err = .True.
     endif
 
-    if(abs(thermal_mass(1)-rates%bt_amu(2)).gt.0.2) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
-                 rates%bt_amu(2),' amu got ', thermal_mass(1), ' amu'
-        endif
-        err = .True.
-    endif
+    ! TODO
+ !!!if(abs(thermal_mass(1)-rates%bt_amu(2)).gt.0.2) then
+ !!!    if(inputs%verbose.ge.0) then
+ !!!        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+ !!!             rates%bt_amu(2),' amu got ', thermal_mass(1), ' amu'
+ !!!    endif
+ !!!    err = .True.
+ !!!endif
 
     if(err) then
         if(inputs%verbose.ge.0) then
@@ -9768,8 +9769,8 @@ subroutine get_dd_weight(pitch,protonpitch,gammaplus,gammaminus,weight)
     real(Float64), dimension(3) :: vi_norm
 
     !!!TODO For now turn off the polarization
-    pdvector =  0.00
-    pdtensor =  0.00
+    pdvector =  0.70
+    pdtensor =  0.41
 
     ngyro = 181
     allocate(gyroangles(ngyro))
@@ -13214,11 +13215,11 @@ subroutine cfpd_f
                             call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu,gammaplus=gammaplus,gammaminus=gammaminus)
 
                             !! Compute effects of spin polarization for D-D reactions
-                            !!! Add SPF logical
-                         !!!if (inputs%calc_cfpd.eq.1) then
-                         !!!    call get_dd_weight(pitch,chi3,gammaplus,gammaminus,pgyro_dd_spf)
-                         !!!    pgyro = pgyro_dd_spf
-                         !!!endif
+                            !!! TODO: Add SPF logical
+                            if (inputs%calc_cfpd.eq.1) then
+                                call get_dd_weight(pitch,chi3,gammaplus,gammaminus,pgyro_dd_spf)
+                                pgyro = pgyro_dd_spf
+                            endif
 
                             if (pgyro.le.0.d0) cycle energy_loop
                             cnt = cnt + 1

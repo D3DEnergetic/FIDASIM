@@ -14,6 +14,21 @@ def fluxmap(g):
     npts = g['nw']
     dpsi = g['ssibry'] - g['ssimag']
 
+    # Check to see how much data is lost to flux surface compression
+    dpsi_dr = np.gradient(g['psirz'], g['r'][1]-g['r'][0], axis=1)
+    dpsi_dz = np.gradient(g['psirz'], g['z'][1]-g['z'][0], axis=0)
+    flux_gradient_magnitude = np.sqrt(dpsi_dr**2 + dpsi_dz**2)
+    
+    # Identify regions with high flux surface compression
+    compression_threshold = np.percentile(flux_gradient_magnitude, 95)
+    high_compression_mask = flux_gradient_magnitude > compression_threshold
+    
+    # Warn user about potential interpolation issues
+    if np.any(high_compression_mask):
+        compressed_fraction = np.sum(high_compression_mask) / high_compression_mask.size
+        print(f"WARNING: {compressed_fraction:.1%} of grid points show high flux surface compression")
+        print("Results on high field side may have reduced accuracy due to interpolation")
+
     # Create phi array excluding boundary
     psi_eqdsk = np.linspace(0,1,npts-1,endpoint=False)
     q_eqdsk = g['qpsi'][0:(npts-1)]

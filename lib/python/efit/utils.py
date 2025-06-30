@@ -5,6 +5,8 @@
 import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
+
+from fidasim import utils as ut
 from matplotlib.tri import Triangulation
 
 from scipy.integrate import cumtrapz
@@ -13,6 +15,34 @@ from skimage.measure import find_contours
 def fluxmap(g):
     npts = g['nw']
     dpsi = g['ssibry'] - g['ssimag']
+
+
+    # Calcualte flux gradients and r z grid sizes
+    dpsi_dr = np.gradient(g['psirz'], g['r'], axis=1)
+    dpsi_dz = np.gradient(g['psirz'], g['z'], axis=0)
+
+    dr = np.diff(g['r'])
+    dz = np.diff(g['z'])
+    
+    # Calculate flux changes across single grid cells
+    avg_dr = np.mean(dr)
+    avg_dz = np.mean(dz)
+
+    flux_change_per_cell_r = np.abs(dpsi_dr) * avg_dr
+    flux_change_per_cell_z = np.abs(dpsi_dz) * avg_dz
+    max_flux_change_per_cell = np.maximum(flux_change_per_cell_r, flux_change_per_cell_z)
+
+    # Calculate a threshold for percentage flux change in a single cell
+    flux_range = g['ssibry'] - g['ssimag']
+    compression_threshold = 0.05 * np.abs(flux_range)
+
+    problem_cells = max_flux_change_per_cell > compression_threshold
+
+    if np.any(problem_cells):
+        num_bad_cells = np.sum(problem_cells)
+        total_cells = problem_cells.size
+        ut.warn(f"{num_bad_cells}/{total_cells} grid cells ({100*num_bad_cells/total_cells:.1f}%) contain multiple flux surfaces that may cause interpolation inaccuracy.")
+        ut.warn("Results may be inaccurate due to flux surface interpolation on the r z grid.  Consider a finer grid selection in your equilibrium solver")
 
     # Create phi array excluding boundary
     psi_eqdsk = np.linspace(0,1,npts-1,endpoint=False)
@@ -99,7 +129,8 @@ def rho_rz_orig(g,r_pts,z_pts,norm=True):
     x_pts = r_pts.flatten()
     y_pts = z_pts.flatten()
 
-    psirz = scipy.interpolate.interp2d(r,z,g['psirz'],'cubic')
+    psirz = scipy.interpolate.RectBivariateSpline(r,z,g['psirz'].T, kx=3, ky=3)
+    
     psi_pts = np.array([psirz(x,y) for (x,y) in zip(x_pts,y_pts)])
 
     a = fluxmap(g)
@@ -139,7 +170,9 @@ def rho_rz(g,r_pts,z_pts,norm=True,psi_pts=None, do_linear=False):
     x_pts = r_pts.flatten()
     y_pts = z_pts.flatten()
 
-    psirz = scipy.interpolate.interp2d(r,z,g['psirz'],'cubic')
+
+    psirz = scipy.interpolate.RectBivariateSpline(r,z,g['psirz'].T,kx=3,ky=3)
+    
     psi_pts = np.array([psirz(x,y) for (x,y) in zip(x_pts,y_pts)])
 
     a = fluxmap(g)

@@ -134,11 +134,13 @@ The following code snippit will generate the atomic tables using the default set
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
 In that case edit the file `tables/table_settings.dat` before running the following command if FIDASIM was compiled with OpenMP (the default build)
 ```bash
-./tables/generate_tables ./tables/table_settings.dat [num_threads]
+cd tables
+./generate_tables ./table_settings.dat [num_threads]
 ```
 or if FIDASIM was built with MPI
 ```bash
-mpirun -np num_processes ./tables/generate_tables ./tables/table_settings.dat
+cd tables
+mpirun -np num_processes ./generate_tables ./table_settings.dat
 ```
 @warning
 This is computationally expensive so make sure you run this on a computer
@@ -149,6 +151,7 @@ Now would be a good time to get more coffee... or maybe a nap.
 ##Run a test case
 From the command line
 ```bash
+cd ../test
 run_tests.py, "/place/where/you/want/the/output"
 ```
 ** Note: This requires python **

@@ -5,6 +5,7 @@
 import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
+
 from fidasim import utils as ut
 from matplotlib.tri import Triangulation
 
@@ -14,6 +15,7 @@ from skimage.measure import find_contours
 def fluxmap(g):
     npts = g['nw']
     dpsi = g['ssibry'] - g['ssimag']
+
 
     # Calcualte flux gradients and r z grid sizes
     dpsi_dr = np.gradient(g['psirz'], g['r'], axis=1)
@@ -128,6 +130,7 @@ def rho_rz_orig(g,r_pts,z_pts,norm=True):
     y_pts = z_pts.flatten()
 
     psirz = scipy.interpolate.RectBivariateSpline(r,z,g['psirz'].T, kx=3, ky=3)
+    
     psi_pts = np.array([psirz(x,y) for (x,y) in zip(x_pts,y_pts)])
 
     a = fluxmap(g)
@@ -167,7 +170,9 @@ def rho_rz(g,r_pts,z_pts,norm=True,psi_pts=None, do_linear=False):
     x_pts = r_pts.flatten()
     y_pts = z_pts.flatten()
 
+
     psirz = scipy.interpolate.RectBivariateSpline(r,z,g['psirz'].T,kx=3,ky=3)
+    
     psi_pts = np.array([psirz(x,y) for (x,y) in zip(x_pts,y_pts)])
 
     a = fluxmap(g)

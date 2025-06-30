@@ -14609,8 +14609,9 @@ subroutine calculate_dcx_process
 
               ! Record ion birth particle:
               !$OMP CRITICAL
-              weight = tot_flux_dep/nlaunch(i,j,k)
-              !                        (tracks,ntrack,mass            ,vi  ,weight,neut_type)
+              ! >>> [JFCM, 2025-06-30] >>>
+              weight = tot_flux_dep
+              ! <<< [JFCM, 2025-06-30] <<<
               ntrack = jj - 1
               call store_birth_particle(tracks,ntrack,thermal_mass(is),vion,weight,dcx_type)
               !$OMP END CRITICAL

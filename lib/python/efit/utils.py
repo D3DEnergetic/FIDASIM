@@ -5,6 +5,7 @@
 import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
+from fidasim import utils as ut
 from matplotlib.tri import Triangulation
 
 from scipy.integrate import cumtrapz
@@ -14,20 +15,32 @@ def fluxmap(g):
     npts = g['nw']
     dpsi = g['ssibry'] - g['ssimag']
 
-    # Check to see how much data is lost to flux surface compression
-    dpsi_dr = np.gradient(g['psirz'], g['r'][1]-g['r'][0], axis=1)
-    dpsi_dz = np.gradient(g['psirz'], g['z'][1]-g['z'][0], axis=0)
-    flux_gradient_magnitude = np.sqrt(dpsi_dr**2 + dpsi_dz**2)
+    # Calcualte flux gradients and r z grid sizes
+    dpsi_dr = np.gradient(g['psirz'], g['r'], axis=1)
+    dpsi_dz = np.gradient(g['psirz'], g['z'], axis=0)
+
+    dr = np.diff(g['r'])
+    dz = np.diff(g['z'])
     
-    # Identify regions with high flux surface compression
-    compression_threshold = np.percentile(flux_gradient_magnitude, 95)
-    high_compression_mask = flux_gradient_magnitude > compression_threshold
-    
-    # Warn user about potential interpolation issues
-    if np.any(high_compression_mask):
-        compressed_fraction = np.sum(high_compression_mask) / high_compression_mask.size
-        print(f"WARNING: {compressed_fraction:.1%} of grid points show high flux surface compression")
-        print("Results on high field side may have reduced accuracy due to interpolation")
+    # Calculate flux changes across single grid cells
+    avg_dr = np.mean(dr)
+    avg_dz = np.mean(dz)
+
+    flux_change_per_cell_r = np.abs(dpsi_dr) * avg_dr
+    flux_change_per_cell_z = np.abs(dpsi_dz) * avg_dz
+    max_flux_change_per_cell = np.maximum(flux_change_per_cell_r, flux_change_per_cell_z)
+
+    # Calculate a threshold for percentage flux change in a single cell
+    flux_range = g['ssibry'] - g['ssimag']
+    compression_threshold = 0.05 * np.abs(flux_range)
+
+    problem_cells = max_flux_change_per_cell > compression_threshold
+
+    if np.any(problem_cells):
+        num_bad_cells = np.sum(problem_cells)
+        total_cells = problem_cells.size
+        ut.warn(f"{num_bad_cells}/{total_cells} grid cells ({100*num_bad_cells/total_cells:.1f}%) contain multiple flux surfaces that may cause interpolation inaccuracy.")
+        ut.warn("Results may be inaccurate due to flux surface interpolation on the r z grid.  Consider a finer grid selection in your equilibrium solver")
 
     # Create phi array excluding boundary
     psi_eqdsk = np.linspace(0,1,npts-1,endpoint=False)

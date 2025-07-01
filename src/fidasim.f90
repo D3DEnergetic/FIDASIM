@@ -4851,8 +4851,13 @@ subroutine write_birth_profile(gen)
 
 end subroutine write_birth_profile
 
-subroutine write_sink_profile
+subroutine write_sink_profile(gen)
   !+ Writes [[libfida:sink]] to a HDF5 file
+
+  ! >>> [JFCM, 2025-07-02] >>>
+  integer, intent(in), optional :: gen
+  ! <<< [JFCM, 2025-07-02] <<<
+
   integer(HID_T) :: fid
   integer(HSIZE_T), dimension(4) :: dim4
   integer(HSIZE_T), dimension(2) :: dim2
@@ -4871,6 +4876,11 @@ subroutine write_sink_profile
   logical :: do_write
   real(Float64), dimension(:), allocatable :: atomic_mass
   real(Float64), dimension(:), allocatable :: denf4d, denf4d_per_marker
+  ! >>> [JFCM, 2025-07-02] >>>
+  character(charlim) :: base_filename
+  integer :: generation
+  ! <<< [JFCM, 2025-07-02] <<<
+
 
 #ifdef _MPI
   integer :: rank
@@ -4955,7 +4965,29 @@ subroutine write_sink_profile
       c = c + 1
   enddo
 
-  filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_sink.h5"
+  ! >>> [JFCM, 2025-07-02] >>>
+  ! filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_sink.h5"
+  base_filename = trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_sink"
+
+  !! Determine the generation value:
+  if (present(gen)) then
+    generation = gen
+  else
+    generation = 0
+  endif
+
+  !! Construct the file name based on the generation:
+  if (generation == 0) then
+    ! Use the base filename without modification:
+    filename = trim(adjustl(base_filename)) // ".h5"
+  else
+    ! Append the generation index to filename
+    write(filename,'(A, "_", I0, ".h5")') trim(adjustl(base_filename)), generation
+  endif
+
+  ! Debug output (optional):
+  print *, "Writing sink profile to file: ", filename
+  ! <<< [JFCM, 2025-07-02] <<<
 
   do_write = .True.
 #ifdef _MPI

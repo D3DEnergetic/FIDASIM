@@ -14505,8 +14505,9 @@ subroutine calculate_dcx_process
   call reset_birth_data
 
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
-  !$OMP& ri,rates,states,plasma,fields,eb,ptch,f4d_defined,denn,denn_per_marker, &
-  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux,weight)
+  !$OMP& ri,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
+  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux,weight, &
+  !$OMP& flux_per_marker,denf4d_per_marker,denf4d)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"

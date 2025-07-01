@@ -5227,7 +5227,7 @@ subroutine write_neutrals
              "Third Energy Neutral Population", error)
 
         !! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>
-        if (inputs%calc_sink.ge.1) then
+        if (inputs%calc_sink.ge.1 .and. allocated(neut%dcx%dens)) then
           !! Need to add input namelist to enable this case or write my own subroutine:
           call h5gcreate_f(fid, "/dcx", gid, error)
           call write_neutral_population(gid, neut%dcx, error)
@@ -5236,6 +5236,19 @@ subroutine write_neutrals
                "Direct Charge Exchange (DCX) Neutral Population", error)
         endif
        !! <<<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<
+
+       !! >>> [JFCM, 2025-07-02] >>>
+       !! TODO: This is temporary, we need to relegate this to halo code area
+       !! TODO: We also need a way to control this from the user interface
+       if (inputs%calc_sink.ge.1 .and. allocated(neut%halo%dens)) then
+         !! Need to add input namelist to enable this case or write my own subroutine:
+         call h5gcreate_f(fid, "/halo", gid, error)
+         call write_neutral_population(gid, neut%halo, error)
+         call h5gclose_f(gid, error)
+         call h5ltset_attribute_string_f(fid,"/halo","description", &
+              "Halo Neutral Population", error)
+       endif
+      !! <<< [JFCM, 2025-07-02] <<<
 
     endif
 
@@ -14513,7 +14526,7 @@ end subroutine reset_birth_data
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
 subroutine calculate_dcx_process
-  !+ Calculates the DCX process by initiating neutrals from the NBI birth points and then creates sink points and new birth points from the DCX neutrals.
+  !+ Calculates the DCX process and stores sink and birth points from the DCX neutrals.
   integer :: ic,i,j,k,ncell,is,ib,ntrack,jj
   integer(Int64) :: idcx !! counter
   real(Float64), dimension(3) :: ri    !! ion start position vector
@@ -15819,21 +15832,35 @@ program fidasim
                     if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
 
-                if (inputs%calc_sink.ge.1) then
+                if (inputs%calc_birth.eq.1 .and. inputs%calc_sink.ge.1) then
                   if(inputs%verbose.ge.1) then
-                      write(*,*) 'calculation of dcx process:    ' , time_string(time_start)
+                      write(*,*) 'CALCULATE_DCX_PROCESS:    ' , time_string(time_start)
                   endif
                   call calculate_dcx_process
+
+                  if(inputs%verbose.ge.1) then
+                      write(*,*) 'write 0th gen sink and 1st gen birth:    ' , time_string(time_start)
+                  endif
+                  call write_sink_profile()
+                  call write_birth_profile(gen=1)
+                  if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
 
-                if(inputs%calc_sink.eq.1)then
-                    if(inputs%verbose.ge.1) then
-                        write(*,*) 'write 0th gen sink and 1st gen birth:    ' , time_string(time_start)
-                    endif
-                    call write_sink_profile()
-                    call write_birth_profile(gen=1)
-                    if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+                !! >>> [JFCM, 2025-07-02] >>>
+                !! TODO: need switches for user to enable this
+                !! TODO: consider using n_halo_gen = 0 for nbi + dcx only, n_halo_gen > 0 for nbi + dcx + halo
+                !! TODO: Incorporate write_<src>_profile into calculate_dcx_process
+                !! TODO: Fix the photon accumulation in dcx and halo process subroutines to mimic orignal dcx and halo subroutines, then add switch to skip or enable calc_spec so what we can move dcx and halo process subroutines to where dcx and halo are located.
+                !! TODO: Bring the wall condition inputs to the user interface
+                if (inputs%calc_birth.eq.1 .and. inputs%calc_sink.ge.1 .and. .TRUE. ) then
+                  if(inputs%verbose.ge.1) then
+                      write(*,*) 'CALCULATE_HALO_PROCESS:    ' , time_string(time_start)
+                  endif
+                  ! call calculate_halo_process
+
                 endif
+                !! <<< [JFCM, 2025-07-02] <<<
+
             endif
 
             !! ---------- DCX (Direct charge exchange) ---------- !!

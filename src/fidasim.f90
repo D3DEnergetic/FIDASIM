@@ -4837,14 +4837,17 @@ subroutine write_birth_profile(gen)
 
     ! Deallocate arrays since they aren't needed anymore
     deallocate(ri,vi,ri_gc,energy,pitch,neut_types,inds)
-    ! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>>
-    !deallocate(birth%dens,birth%part)
-    ! Commented this as in new development for DCX, we need to use birth points as spawn points for new neutrals
-    ! <<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<<<<<
 
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
     endif
+
+    ! >>> [JFCM, 2025-07-01] >>>
+    birth%cnt = 1
+    deallocate(birth%part)
+    deallocate(birth%dens)
+    print *, "Deallocating birth%part and dens, birth%cnt = ", birth%cnt
+    ! <<< [JFCM, 2025-07-01] <<<
 
 end subroutine write_birth_profile
 
@@ -5053,13 +5056,17 @@ subroutine write_sink_profile
 
   ! Deallocate arrays since they aren't needed anymore
   deallocate(ri,vi,ri_gc,energy,pitch,neut_types,inds,atomic_mass,denf4d,denf4d_per_marker)
-  ! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>>
-  !deallocate(sink%dens,sink%part)
-  ! <<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<<<<<
 
   if(inputs%verbose.ge.1) then
       write(*,'(T4,a,a)') 'Ion sink profile written to: ',trim(filename)
   endif
+
+  ! >>> [JFCM, 2025-07-01] >>>
+  sink%cnt = 1
+  deallocate(sink%part)
+  deallocate(sink%dens)
+  print *, "Deallocating sink%part and dens, sink%cnt = ", sink%cnt
+  ! <<< [JFCM, 2025-07-01] <<<
 
 end subroutine write_sink_profile
 
@@ -14494,15 +14501,61 @@ subroutine calculate_dcx_process
   real(Float64) :: tot_flux_dep, initial_flux, final_flux
   real(Float64) :: photons, weight
   real(Float64) :: denf4d, denf4d_per_marker
+  !! >>> [JFCM, 2025-07-01] >>>
+  real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+  real(Float64) :: tot_denn
+  !! <<< [JFCM, 2025-07-01] <<<
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
 
-  !! Calculate histogram of neutrals to launch (nlaunch):
-  call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
+  !! >>> [JFCM, 2025-07-01] >>>
+  ! !! Calculate histogram of neutrals to launch (nlaunch):
+  ! call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
+  !
+  ! !! Clear birth structure to make space for new generation birth data:
+  ! call reset_birth_data
+  !! <<< [JFCM, 2025-07-01] <<<
 
-  !! Clear birth structure to make space for new generation birth data:
-  call reset_birth_data
+  !! >>> [JFCM, 2025-07-01] >>>
+  !! Calculate the distribution of markers to launch from the beam grid:
+  papprox=0.d0
+  tot_denn=0.d0
+  do ic=1,beam_grid%ngrid
+      call ind2sub(beam_grid%dims,ic,ind)
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      call get_plasma(plasma,ind=ind)
+      if(.not.plasma%in_plasma) cycle
+      tot_denn = sum(neut%full%dens(:,i,j,k)) + &
+                 sum(neut%half%dens(:,i,j,k)) + &
+                 sum(neut%third%dens(:,i,j,k))
+      papprox(i,j,k)= tot_denn*sum(plasma%deni)
+  enddo
+
+  call get_nlaunch_no_fill_min(inputs%n_dcx,papprox,nlaunch)
+
+  print *, "number of partices in nlaunch: ", sum(nlaunch)
+
+  ncell = 0
+  do ic=1,beam_grid%ngrid
+      call ind2sub(beam_grid%dims,ic,ind)
+      i = ind(1) ; j = ind(2) ; k = ind(3)
+      if(nlaunch(i,j,k).gt.0.0) then
+          ncell = ncell + 1
+          cell_ind(ncell) = ic
+      endif
+  enddo
+  !! <<< [JFCM, 2025-07-01] <<<
+
+  !! >>> [JFCM, 2025-07-01] >>>
+  ! Allocate birth particles for the DCX process:
+  allocate(birth%part(inputs%n_dcx))
+  allocate(birth%dens(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(sink%part(inputs%n_dcx))
+  allocate(sink%dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  birth%dens=0.d0
+  sink%dens=0.d0
+  !! <<< [JFCM, 2025-07-01] <<<
 
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
   !$OMP& ri,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
@@ -15562,12 +15615,12 @@ program fidasim
     endif
 
     if (inputs%calc_sink.ge.1) then
-      allocate(sink%dens(n_thermal, &
-                          beam_grid%nx, &
-                          beam_grid%ny, &
-                          beam_grid%nz))
+      ! allocate(sink%dens(n_thermal, &
+      !                     beam_grid%nx, &
+      !                     beam_grid%ny, &
+      !                     beam_grid%nz))
       ! allocate(sink%part(inputs%n_dcx))
-      allocate(sink%part(size(birth%part)))
+      ! allocate(sink%part(size(birth%part)))
     endif
 
     !! Spectra
@@ -15782,8 +15835,8 @@ program fidasim
 
             !! Deallocating birth and sink:
             ! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>>
-            if (inputs%calc_birth.ge.1) deallocate(birth%dens,birth%part)
-            if (inputs%calc_sink.ge.1) deallocate(sink%dens,sink%part)
+            ! if (inputs%calc_birth.ge.1) deallocate(birth%dens,birth%part)
+            ! if (inputs%calc_sink.ge.1) deallocate(sink%dens,sink%part)
             ! Since we disabled the deallocation step in write_birth_profile(), we need to deallocate here
             ! <<<<<<<<<<< [jfcm, 2024-11-23] <<<<<<<<<<<<<<<
         endif

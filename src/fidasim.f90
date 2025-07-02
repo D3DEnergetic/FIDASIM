@@ -14722,6 +14722,274 @@ subroutine calculate_dcx_process
 end subroutine calculate_dcx_process
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
+!! >>> [JFCM, 2025-07-02] >>>
+subroutine calculate_halo_process
+  !+ Calculates the DCX process and stores sink and birth points from the DCX neutrals.
+  use omp_lib
+  integer :: hh, ic, i, j, k, is, ihalo, ii, jj, kk, it
+  real(Float64) :: dcx_dens, halo_iter_dens(2), seed_dcx, tot_flux_dep, tot_denn
+  integer :: prev_type = 1 ! Previous iteration
+  integer :: cur_type = 2 ! current iteration
+  integer(Int64) :: n_halo
+  integer :: ncell, ntrack, n_iter
+  type(NeutralPopulation) :: cur_pop, prev_pop
+  real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+  integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+  type(LocalEMFields) :: fields
+  integer, dimension(beam_grid%ngrid) :: cell_ind
+  integer, dimension(3) :: ind
+  type(LocalProfiles) :: plasma
+  real(Float64) , dimension(3) :: ri, vi
+  logical :: f4d_defined = .FALSE.
+  logical :: pump_hit = .FALSE.
+  real(Float64) :: denf4d, starting_flux, denf4d_per_marker, initial_flux, final_flux
+  real(Float64) :: weight, photons, flux_per_marker
+  type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+  real(Float64), dimension(nlevs) :: rates, states, denn, denn_per_marker
+
+  !! Initialize halo neutral population container:
+  call init_neutral_population(neut%halo)
+
+  !! Compute initial total number of DCX neutrals:
+  dcx_dens = sum(neut%dcx%dens)
+
+  !! Initialize the halo iteration density:
+  halo_iter_dens(prev_type) = dcx_dens
+  if (dcx_dens .eq. 0) then
+      if (inputs%verbose .ge. 0) then
+          write(*,'(a)') 'CALCULATE_HALO_PROCESS: Density of DCX-neutrals is zero'
+      end if
+  end if
+
+  !! Define initial number of halo markers to track:
+  n_halo = inputs%n_halo
+
+  !! Initialize container to store initial population state:
+  call init_neutral_population(prev_pop)
+  prev_pop = neut%dcx
+
+  !! Loop over halo iterations:
+  n_iter = 3
+  seed_dcx = 1.0
+  iterations: do hh = 1,n_iter
+
+    !! Clear current population:
+    call init_neutral_population(cur_pop)
+    halo_iter_dens(cur_type) = 0.d0
+
+    !! Calculate distribution of markers on beam grid:
+    papprox = 0.d0
+    cell_ind = 0
+    ncell = 0
+    do ic = 1,beam_grid%ngrid
+        !! Convert linear index ic to 3D vector indices:
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1); j = ind(2); k = ind(3)
+
+        !! Get plasma conditions in cell:
+        call get_plasma(plasma,ind=ind)
+        if (.not. plasma%in_plasma) cycle
+
+        !! Get total neutral density in cell, sum over all excited states:
+        tot_denn = sum(prev_pop%dens(:,i,j,k))
+
+        !! Compute the reaction probability (unnormalized) for cell:
+        papprox(i,j,k) = tot_denn*sum(plasma%deni)
+
+    end do
+
+    !! Distribute n_halo markers over reaction probability PDF:
+    call get_nlaunch_no_fill_min(n_halo, papprox, nlaunch)
+
+    !! Identify active cells in nlaunch:
+    do ic = 1,beam_grid%ngrid
+
+      !! Convert linear index ic to 3D vector indices:
+      call ind2sub(beam_grid%dims,ic,ind)
+      i = ind(1); j = ind(2); k = ind(3)
+
+      !! Store list of linear indices for active cells:
+      if (nlaunch(i,j,k) .gt. 0) then
+          ncell = ncell + 1
+          cell_ind(ncell) = ic
+      end if
+    end do
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
+    endif
+
+    !! Allocate birth and sink containers for current halo iteration:
+    allocate(birth%part(n_halo))
+    allocate(sink%part(n_halo))
+    allocate(birth%dens(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(sink%dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    birth%dens=0.d0
+    sink%dens=0.d0
+
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,pump_hit,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
+    !$OMP& ntrack,ii,jj,kk,rates,states,denn,starting_flux,denf4d_per_marker,it,tot_flux_dep,initial_flux,weight, &
+    !$OMP& photons,final_flux,plasma,flux_per_marker,denn_per_marker,fields)
+    loop_over_cells: do ic = istart,ncell,istep
+
+      !! Convert linear index ic to 3D vector indices:
+      call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+      i = ind(1); j = ind(2); k = ind(3)
+
+      ! print *, "nlaunch: ", nlaunch(i,j,k)
+
+      loop_over_species: do is = 1,n_thermal
+        loop_over_halos: do ihalo = 1,nlaunch(i,j,k)
+
+          !! Get neutral particle position in beam grid:
+          call mc_beam_grid(ind,ri)
+
+          !! Pick the neutral particle velocity vector from the ion distribution function:
+          call mc_ion_velocity_f4d(ind,is,ri,vi,denf4d,f4d_defined)
+          if (dot_product(vi,vi) .eq. 0) then
+              cycle loop_over_halos
+          end if
+
+          !! Compute neutral particle track accross the beam grid:
+          ! pump_hit = .FALSE.
+          ! call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
+          call track(ri,vi,tracks,ntrack)
+          if (ntrack .eq. 0) then
+              cycle loop_over_halos
+          end if
+
+          !! Compute neutral particle source term (states) at the start of the neutral trajectory: [p/s 1/cm3]
+          !! ************************************************************************
+
+          !! 1- reaction rate (rates): [s^-1]
+          !! Given an ion velocity vector vi, compute the total CX reaction rate in the cell:
+          ind = tracks(1)%ind
+          ii = ind(1); jj = ind(2); kk = ind(3)
+          call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk),prev_pop%res(ii,jj,kk),vi,rates)
+          if (sum(rates) .le. 0) cycle loop_over_halos
+
+          !! 2- source term (states) in the cell: flux per unit volume [p/s cm^{-3}]
+          call get_plasma(plasma,pos=tracks(1)%pos)
+          states = rates*plasma%deni(is)
+          if (sum(states) .le. 0) cycle loop_over_halos
+
+          !! Store ion sink term:
+          starting_flux = sum(states)
+          flux_per_marker = starting_flux/nlaunch(i,j,k)
+          denf4d_per_marker = denf4d/nlaunch(i,j,k)
+          call store_sinks(ind,is,flux_per_marker)
+          call store_sink_particle(ind,ri,vi,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
+
+          !! Loop along neutral trajectory:
+          tot_flux_dep = 0.d0
+          loop_along_track: do it = 1,ntrack
+
+            !! Initial flux of neutral:
+            initial_flux = sum(states)
+
+            !! Get plasma profiles seen by neutral particle:
+            call get_plasma(plasma,pos=tracks(it)%pos)
+
+            !! Compute particle attenuation through cell
+            if (plasma%in_plasma) then
+                ! call colrad(plasma,thermal_mass(is),tracks(it)%vn,tracks(it)%time,states,denn,photons)
+                call colrad(plasma,thermal_mass(is),vi,tracks(it)%time,states,denn,photons)
+            else !! No particle attenuation
+                ! denn = states*tracks(it)%time
+                cycle loop_along_track
+            end if
+
+            !! Accumulate neutral density on beam_grid: (OMP critical)
+            denn_per_marker = denn/nlaunch(i,j,k)
+            ! call update_neutrals(cur_pop,tracks(it)%ind,tracks(it)%vn,denn_per_marker)
+            call update_neutrals(cur_pop,tracks(it)%ind,vi,denn_per_marker)
+
+            !! Calculate neutral flux per marker lost to cell due to COLRAD:
+            final_flux = sum(states)
+            tracks(it)%flux = (initial_flux - final_flux)/nlaunch(i,j,k) ! [p/s cm^-3]
+            tot_flux_dep = tot_flux_dep + tracks(it)%flux*beam_grid%dv ! [p/s]
+
+            !! Accumulate ion birth flux on beam grid: (OMP critical)
+            call store_births(tracks(it)%ind,halo_type,tracks(it)%flux)
+
+            !! Photon quantities:
+
+            !! Stop advancing ray when flux drops by more than 3 orders of magnitude:
+            if (final_flux/starting_flux .lt. 1E-3) then
+                exit loop_along_track
+            end if
+
+          end do loop_along_track
+
+          !! Record ion birth particle:
+          !! *************************************************************************************************
+          !$OMP CRITICAL
+          weight = tot_flux_dep
+          ntrack = it - 1
+          ! vi = tracks(ntrack)%vn
+          call store_birth_particle(tracks,ntrack,thermal_mass(is),vi,weight,halo_type)
+          !$OMP END CRITICAL
+
+        end do loop_over_halos
+      end do loop_over_species
+    end do loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine densities
+    call parallel_merge_populations(cur_pop)
+#endif
+
+    !! Update the halo iteration density:
+    halo_iter_dens(cur_type) = sum(cur_pop%dens)
+    if (halo_iter_dens(cur_type)/halo_iter_dens(prev_type) .gt. 1.0) then
+        write(*,'(a)') "CALCULATE_HALO_PROCESS: Halo generation density exceeds the seed density. This should not happen"
+        print *, "ratio: ", halo_iter_dens(cur_type)/halo_iter_dens(prev_type)
+        exit iterations
+    end if
+
+    !! Set current generation to previous generation:
+    halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
+    prev_pop = cur_pop
+
+    !! Merge current population with halo population:
+    call merge_neutral_populations(neut%halo,cur_pop)
+
+    !! Compute new number of markers to use:
+    seed_dcx = halo_iter_dens(cur_type)/dcx_dens
+    if (isnan(seed_dcx)) then
+        write(*,'(a)') "NaN (Halo generation)/DCX. Exiting..."
+    end if
+    ! n_halo = int(inputs%n_halo*seed_dcx,Int64)
+    n_halo = int(inputs%n_halo,Int64)
+
+    !! Write birth and sink particles:
+    !! NDMC produces: birth
+    !! DCX_PROCESS produces: birth_1, sink
+    !! HALO_PROCESS produces: birth_(X), sink_(X-1) where X>1
+    print *, "gen: ", hh+1, " , CX flux: ", sum(sink%dens)
+    call write_sink_profile(gen=1+hh-1)
+    call write_birth_profile(gen=1+hh)
+
+    ! if (seed_dcx .lt. 0.01) then
+    !   print *, ""
+    !   print *, "Halo process completed!"
+    !   write(*,'(T6,"n_halo: ",i10," --- Seed/DCX: ",f5.3)') n_halo, seed_dcx
+    !   exit iterations
+    ! endif
+
+    !TODO:
+    ! As plasma conditions change over time, there could be situations that require more or less halo generations to converge. in such cases, we might need to delete all souce/sink files prior to writting to text file to prevent writing data from old generations that did not get overwritten.
+    ! We also need to enable exponentially decaying markers for halos which will require variable number of particles passed to CQL3DM. For now, we have a maximum number of 3 iterations and with fixed number of particles each.
+
+  end do iterations
+
+  !! Add MPI preprocessor code:
+  !! Combine spectra
+
+end subroutine calculate_halo_process
+!! <<< [JFCM, 2025-07-02] <<<
+
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
 subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
   !+ Record an ion birth particle into [[libfida::birth]]
@@ -15856,7 +16124,7 @@ program fidasim
                   if(inputs%verbose.ge.1) then
                       write(*,*) 'CALCULATE_HALO_PROCESS:    ' , time_string(time_start)
                   endif
-                  ! call calculate_halo_process
+                  call calculate_halo_process
 
                 endif
                 !! <<< [JFCM, 2025-07-02] <<<

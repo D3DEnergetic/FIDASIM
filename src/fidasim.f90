@@ -14455,7 +14455,8 @@ subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
 
       if (present(denf4d)) then
         !! Get ion density in velocity space:
-        call get_ep_denf(eb,ptch,denf4d,pos=rn,coeffs=fields%b)
+        ! call get_ep_denf(eb,ptch,denf4d,pos=rn,coeffs=fields%b)
+        call get_ep_denf(eb,ptch,denf4d,ind=ind,coeffs=fields%b)
       endif
 
     else
@@ -14470,8 +14471,8 @@ subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
     !! Get thermal plasma profiles at ion position:
     !! input: ri in XYZ or ind in 3D index for beam_grid
     !! output: plasma
-    call get_plasma(plasma, pos=rn)
-    ! call get_plasma(plasma, ind=ind)
+    ! call get_plasma(plasma, pos=rn)
+    call get_plasma(plasma, ind=ind)
 
     !! Get velocity vector from thermal distribution:
     !! input: plasma, thermal_mass(is)

@@ -2589,7 +2589,10 @@ subroutine make_beam_grid
             write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                             &Less than 10% of the beam grid cells fall within the plasma."
         endif
-        stop
+        ! >>> [JFCM, 2025-07-03] >>>
+        ! Allow for larger beam grids while keeping plasma small relative to grid in mirror development
+        ! stop
+        !<<< [JFCM, 2025-07-03] <<<
     endif
 
 end subroutine make_beam_grid

@@ -200,6 +200,10 @@ type BeamGrid
         !+ y positions of cell centers
     real(Float64), dimension(:), allocatable :: zc
         !+ z positions of cell centers
+    ! <<< [JFCM, 2025-07-03] <<<
+    integer(Int32), dimension(:,:,:), allocatable :: in_plasma
+        !+ Array with values .eq. 1 in locations with plasma, otherwise .eq. 0
+    ! >>> [JFCM, 2025-07-03] >>>
 end type BeamGrid
 
 type InterpolationGrid
@@ -950,7 +954,10 @@ type NeutralParticleReservoir
         !+ Size of the reservoir
     real(Float64)  :: W = 0.d0
         !+ Sampling weight
-    type(NeutralParticle), dimension(reservoir_size) :: R
+    ! >>> [JFCM, 2025-07-03] >>>
+    ! type(NeutralParticle), dimension(reservoir_size) :: R
+    type(NeutralParticle), dimension(:), allocatable :: R
+    ! <<< [JFCM, 2025-07-03] <<<
         !+ Neutral Particle Reservoir
 end type NeutralParticleReservoir
 
@@ -2501,6 +2508,11 @@ subroutine make_beam_grid
              beam_grid%yc(beam_grid%ny),  &
              beam_grid%zc(beam_grid%nz))
 
+    ! >>> [JFCM, 2025-07-03] >>>
+    allocate(beam_grid%in_plasma(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    beam_grid%in_plasma = 0
+    ! <<< [JFCM, 2025-07-03] <<<
+
     dx = (beam_grid%xmax - beam_grid%xmin)/beam_grid%nx
     dy = (beam_grid%ymax - beam_grid%ymin)/beam_grid%ny
     dz = (beam_grid%zmax - beam_grid%zmin)/beam_grid%nz
@@ -2548,7 +2560,12 @@ subroutine make_beam_grid
             do i=1,beam_grid%nx
                 ri = [beam_grid%xc(i),beam_grid%yc(j), beam_grid%zc(k)]
                 call in_plasma(ri, inp)
-                if(inp) n = n + 1
+                if(inp) then
+                  n = n + 1
+                  ! >>> [JFCM, 2025-07-03] >>>
+                  beam_grid%in_plasma(i,j,k) = 1
+                  ! <<< [JFCM, 2025-07-03] <<<
+                endif
             enddo
         enddo
     enddo
@@ -5149,10 +5166,14 @@ subroutine write_neutral_population(id, pop, error)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         n(i,j,k) = pop%res(i,j,k)%n
         nk = min(pop%res(i,j,k)%k, pop%res(i,j,k)%n)
-        w(1:nk,i,j,k) = pop%res(i,j,k)%R(1:nk)%w
-        do ir=1, nk
-            v(:,ir,i,j,k) = pop%res(i,j,k)%R(ir)%v
-        enddo
+        ! >>> [JFCM, 2025-07-03] >>>
+        if (allocated(pop%res(i,j,k)%R)) then
+          w(1:nk,i,j,k) = pop%res(i,j,k)%R(1:nk)%w
+          do ir=1, nk
+              v(:,ir,i,j,k) = pop%res(i,j,k)%R(ir)%v
+          enddo
+        endif
+        ! <<< [JFCM, 2025-07-03] <<<
     enddo
 
     !Create reservoir group
@@ -9131,6 +9152,24 @@ subroutine init_neutral_population(pop)
     endif
     if(.not.allocated(pop%res)) then
         allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+
+        ! >>> [JFCM, 2025-07-03] >>>
+        !! Allocate reservoir memory only where plasma exists.
+        ! This will affect neut%full,half,third,dcx,halo%R (Modifications taken to deal with this properly)
+        ! We have yet to correct subroutine read_neutral_population to account for this change
+        ! I will also affect spatres%dcx,halo,fida,pfida%R (Action not yet taken to deal with this)
+        ! This can be dealt in section starting with allocate(spatres% ..., where we can allocate memory for all associated reservoirs
+        do k=1,beam_grid%nz
+            do j=1,beam_grid%ny
+                do i=1,beam_grid%nx
+                  if (beam_grid%in_plasma(i,j,k) .eq. 1) then
+                    allocate(pop%res(i,j,k)%R(reservoir_size))
+                  endif
+                enddo
+            enddo
+        enddo
+        ! <<< [JFCM, 2025-07-03] <<<
+
     endif
     pop%dens = 0.d0
     pop%res%n = 0
@@ -9172,7 +9211,9 @@ subroutine update_neutrals(pop, ind, vn, dens)
     pop%dens(:,i,j,k) = pop%dens(:,i,j,k) + dens
     !$OMP END CRITICAL(update_neutrals_1)
 
-    call update_reservoir(pop%res(i,j,k), vn, sum(dens))
+    if (allocated(pop%res(i,j,k)%R)) then
+      call update_reservoir(pop%res(i,j,k), vn, sum(dens))
+    endif
 
 end subroutine update_neutrals
 
@@ -9222,7 +9263,11 @@ subroutine merge_neutral_populations(pop1, pop2)
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call merge_reservoirs(pop1%res(i,j,k), pop2%res(i,j,k))
+        ! >>> [JFCM, 2025-07-03] >>>
+        if (allocated(pop2%res(i,j,k)%R)) then
+          call merge_reservoirs(pop1%res(i,j,k), pop2%res(i,j,k))
+        endif
+        ! <<< [JFCM, 2025-07-03] <<<
     enddo
 
 end subroutine merge_neutral_populations
@@ -9303,7 +9348,11 @@ subroutine parallel_merge_populations(pop)
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call parallel_merge_reservoirs(pop%res(i,j,k))
+        ! >>> [JFCM, 2025-07-03] >>>
+        if (allocated(pop%res(i,j,k)%R)) then
+          call parallel_merge_reservoirs(pop%res(i,j,k))
+        endif
+        ! <<< [JFCM, 2025-07-03] <<<
     enddo
 
 end subroutine parallel_merge_populations

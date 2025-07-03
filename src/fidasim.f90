@@ -143,6 +143,15 @@ real(Float64) :: beam_lambda0 = 0.d0
 !real(Float64) :: fast_lambda0(max_species) = 0.d0
 !    !+ Reference wavelength for fast species
 
+! >>> [JFCM, 2025_07_04] >>>
+type AABB
+    !+ Defines an Axis-Aligned Bounding box type
+    real(Float64) :: xmin, xmax
+    real(Float64) :: ymin, ymax
+    real(Float64) :: zmin, zmax
+end type AABB
+! <<< [JFCM, 2025_07_04] <<<
+
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
     integer(Int32) :: nx
@@ -204,6 +213,10 @@ type BeamGrid
     integer(Int32), dimension(:,:,:), allocatable :: in_plasma
         !+ Array with values .eq. 1 in locations with plasma, otherwise .eq. 0
     ! >>> [JFCM, 2025-07-03] >>>
+    ! >>> [JFCM, 2025_07_04] >>>
+    type(AABB) :: gaabb
+        !+ Beam grid's Axis-Aligned bounding box
+    ! <<< [JFCM, 2025_07_04] <<<
 end type BeamGrid
 
 type InterpolationGrid
@@ -1172,6 +1185,10 @@ type ParticleTrack
         !+ Indices of cell
     real(Float64), dimension(3)  :: pos = 0.d0
         !+ Midpoint of track in cell [cm]
+    ! >>> [JFCM, 2025_07_04] >>>
+    real(Float64), dimension(3)  :: vn = 0.d0
+        !+ Particle velocity
+    ! <<< [JFCM, 2025_07_04] <<<
 end type ParticleTrack
 
 type GyroSurface
@@ -2527,6 +2544,16 @@ subroutine make_beam_grid
         beam_grid%zc(i) = beam_grid%zmin + (i-0.5)*dz
     enddo
 
+    !! >>> [JFCM, 2025_07_04] >>>
+    ! Populate AABB from grid bounds
+    beam_grid%gaabb%xmin = beam_grid%xmin
+    beam_grid%gaabb%xmax = beam_grid%xmax
+    beam_grid%gaabb%ymin = beam_grid%ymin
+    beam_grid%gaabb%ymax = beam_grid%ymax
+    beam_grid%gaabb%zmin = beam_grid%zmin
+    beam_grid%gaabb%zmax = beam_grid%zmax
+    !! <<< [JFCM, 2025_07_04] <<<
+
     beam_grid%dr(1) = abs(beam_grid%xc(2)-beam_grid%xc(1))
     beam_grid%dr(2) = abs(beam_grid%yc(2)-beam_grid%yc(1))
     beam_grid%dr(3) = abs(beam_grid%zc(2)-beam_grid%zc(1))
@@ -2543,7 +2570,10 @@ subroutine make_beam_grid
 
     beam_grid%drmin  = minval(beam_grid%dr)
     beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
-    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*inputs%max_cell_splits
+    !! >>> [JFCM, 2025_07_04] >>>
+    ! beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*inputs%max_cell_splits
+    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*50
+    !! >>> [JFCM, 2025_07_04] >>>
     beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
 
     beam_grid%dims(1) = beam_grid%nx
@@ -8367,6 +8397,392 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     endif
 
 end subroutine track
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
+    !+ Description:
+    real(Float64), dimension(3), intent(in) :: rin
+        !+ Initial position of particle
+    real(Float64), dimension(3), intent(in) :: vin
+      !+ Initial velocity of particle
+    type(ParticleTrack), dimension(:), intent(inout) :: tracks
+        !+ Array of [[ParticleTrack]] type
+    integer(Int32), intent(out)                      :: ntrack
+        !+ Number of cells that a particle crosses
+    logical, intent(out) :: pump_hit
+        !+ logical flag indicating if particle was absorbed at the pump
+
+    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next, nhat
+    integer, dimension(3) :: ind, sgn
+    integer :: cc, mind
+    logical :: confirmed_hit
+    real(Float64) :: dT, T_wall, vT, p_specular, p_absorb, p_thermal
+    type(AABB) :: wall, pump, throat1, throat2, Ta_surf
+    real(Float64), dimension(1) :: randomu
+
+    vn = vin; rn = rin; sgn = 0; ntrack = 0
+
+    if(dot_product(vin,vin).eq.0.0) then
+        print *, "dot(vin,vin) == 0"
+        return
+    endif
+
+    !! Define indices and position of starting cell:
+    call get_indices(rn,ind)
+    ri_cell = [beam_grid%xc(ind(1)), &
+               beam_grid%yc(ind(2)), &
+               beam_grid%zc(ind(3))]
+
+    !! TODO: Need to add a new section in the input namelist to define these wall related quantities:
+    !! TODO: We might not need to pad the aabbs but rather add a tiny increment along the ray
+    !! Define the wall boundary using the beam_grid's AABB:
+    wall = beam_grid%gaabb
+    call pad_aabb(wall,-beam_grid%dr*1E-4)
+
+    !! Define neutral gas temperature at the wall:
+    T_wall = 3e-3 !! [keV]
+    vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1))) !! [cm/s]
+
+    !! Wall reaction probabilities:
+    p_specular = 0 !! Specular reflection
+    p_absorb = 1 !! Absorbed by the wall
+    p_thermal = 1 - p_absorb - p_specular !! Thermal scattering from wall
+
+    !! Define pump aperture:
+    pump%xmax = beam_grid%gaabb%xmax
+    pump%xmin = beam_grid%gaabb%xmax
+    pump%ymax = -15
+    pump%ymin = +15
+    pump%zmin = -25 - 15
+    pump%zmax = -25 + 15
+    call pad_aabb(pump,+beam_grid%dr*1E-2)
+
+    !! Define vacuum chamber mirror throats:
+    throat1%xmax = +5
+    throat1%xmin = -5
+    throat1%ymax = +5
+    throat1%ymin = -5
+    throat1%zmax =  beam_grid%gaabb%zmax
+    throat1%zmin =  beam_grid%gaabb%zmax
+    call pad_aabb(throat1,+beam_grid%dr*1E-2)
+
+    throat2%xmax = +5
+    throat2%xmin = -5
+    throat2%ymax = +5
+    throat2%ymin = -5
+    throat2%zmax = beam_grid%gaabb%zmin
+    throat2%zmin = beam_grid%gaabb%zmin
+    call pad_aabb(throat2,+beam_grid%dr*1E-2)
+
+    !! Define a Ta surface
+    Ta_surf%xmax = beam_grid%gaabb%xmin
+    Ta_surf%xmin = beam_grid%gaabb%xmin
+    Ta_surf%ymax = +30
+    Ta_surf%ymin = -30
+    Ta_surf%zmax = +30
+    Ta_surf%zmin = -30
+    call pad_aabb(Ta_surf,+beam_grid%dr*1E-2)
+
+    !! Initialize variables:
+    cc = 1
+    pump_hit = .FALSE.
+    tracks%time = 0.d0
+    tracks%flux = 0.d0
+
+    !! Track loop:
+    do while (.not. pump_hit)
+
+      !! Particle starts a new balistic trajectory:
+      confirmed_hit = .FALSE.
+
+      !! Get time and distance to next cell boundary:
+      call get_velocity_sign(sgn,vn)
+      dr = beam_grid%dr*sgn
+      inv_vn = 1/vn
+      dt_arr = abs(( (ri_cell + 0.5*dr) - rn)*inv_vn)
+      mind = minloc(dt_arr,1)
+      dT = dt_arr(mind)
+
+      !! Estimate next ray position:
+      !! TODO: Here we can add the small tolerance in direction of motion to avoid padding aabbs
+      rn_next = rn + dT*vn
+
+      !! Check if next ray position hits the wall:
+      if (.not. is_point_in_aabb(rn_next, wall)) then
+        confirmed_hit = .TRUE.
+      endif
+
+      !! Update state tracks:
+      tracks(cc)%vn = vn
+      tracks(cc)%pos = rn + 0.5*dT*vn
+      tracks(cc)%time = dT
+      tracks(cc)%ind = ind
+      cc = cc + 1
+
+      !! Check for out of bounds:
+      if (cc > beam_grid%ntrack) then
+          ! print *, "WARNING: track buffer full at cc =", cc
+          exit
+      end if
+
+      !! Update the state of the ray:
+      if (.not. confirmed_hit) then
+        !! Continue the ray's ballistic trajectory
+        rn = rn_next
+        ind(mind) = ind(mind) + sgn(mind)
+        ri_cell(mind) = ri_cell(mind) + dr(mind)
+      else
+        !! Collision has occured:
+        rn = rn_next !! Assign the collision point to the new ray point
+
+        if (is_point_in_aabb(rn, pump)) then
+          pump_hit = .TRUE.
+          exit
+        else if (is_point_in_aabb(rn, throat1)) then
+          pump_hit = .TRUE.
+          exit
+        else if (is_point_in_aabb(rn, throat2)) then
+          pump_hit = .TRUE.
+          exit
+        else if (is_point_in_aabb(rn, Ta_surf)) then
+          pump_hit = .TRUE.
+          exit
+        else !! Particle has hit wall and will reflect
+          !! Compute unit vector normal to wall:
+          nhat = 0.d0
+          nhat(mind) = -sgn(mind)
+
+          !! Compute new velocity vector based on wall reflection model:
+          call randu(randomu)
+          if (randomu(1) < p_specular) then
+            call specular_reflection(vn,nhat)
+          else if (randomu(1) < p_specular + p_thermal) then
+            call get_vn_thermal_wall_emission(vT,nhat,vn)
+          else
+            !! Absorbed at the wall:
+            !! Here we could record fluence on local triangle and update reservoir
+            pump_hit = .TRUE.
+            exit
+          endif
+
+        endif !! is_point_in_aabb
+      endif !! .not. confirmed_hit
+
+    end do !! while
+    ntrack = cc - 1
+
+end subroutine track_to_wall
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine pad_aabb(box,pad)
+    !+ Pads an AABB structure in-place by a specified amount.
+    type(AABB), intent(inout) :: box
+        !+ Axis-Aligned bounding box
+    real(Float64), intent(in)  :: pad(:)
+        !+ scalar or 3-element array defining padding
+
+    real(Float64) :: pad_x, pad_y, pad_z
+
+    select case (size(pad))
+    case (1)
+        pad_x = pad(1)
+        pad_y = pad(1)
+        pad_z = pad(1)
+    case (3)
+        pad_x = pad(1)
+        pad_y = pad(2)
+        pad_z = pad(3)
+    case default
+        print *, "ERROR in pad_aabb: pad must be scalar or 3-vector"
+        stop
+    end select
+
+    !! Update the AABB:
+    box%xmin = box%xmin - pad_x
+    box%xmax = box%xmax + pad_x
+    box%ymin = box%ymin - pad_y
+    box%ymax = box%ymax + pad_y
+    box%zmin = box%zmin - pad_z
+    box%zmax = box%zmax + pad_z
+
+end subroutine pad_aabb
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+logical function is_point_in_aabb(p, box)
+    !+ Checks whether a 3D point lies inside an axis-aligned bounding box (AABB)
+    real(Float64), intent(in) :: p(3)
+        !+ Point in 3D space
+    type(AABB),    intent(in) :: box
+        !+ Axis-Aligned Bounding Box to test
+
+        is_point_in_aabb = &
+                       (p(1) >= box%xmin) .and. (p(1) <= box%xmax) .and. &
+                       (p(2) >= box%ymin) .and. (p(2) <= box%ymax) .and. &
+                       (p(3) >= box%zmin) .and. (p(3) <= box%zmax)
+
+end function is_point_in_aabb
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine rotation_matrix_local_to_lab(nhat,R)
+    !+ Constructs a 3×3 rotation matrix R that rotates vectors
+    !+ from a local coordinate system (where the surface normal is [0,0,1])
+    !+ to a lab coordinate system where the surface normal is nhat.
+    real(Float64), intent(in)  :: nhat(3)
+        !+ Unit vector in beam grid coordinate system XYZ
+    real(Float64), intent(out) :: R(3,3)
+        !+ Rotation matrix where [e_hat_prime] = [e_hat]*R
+        !+ This is then used for vec_lab = R * vec_local
+
+    real(Float64) :: zhat(3), phat(3), qhat(3)
+    real(Float64) :: dot_prod, tol
+
+    ! Define reference z-axis
+    zhat = [0.d0, 0.d0, 1.d0]
+
+    ! Tolerance for alignment
+    tol = 1E-10
+    dot_prod = dot_product(zhat, nhat)
+
+    if (abs(dot_prod - 1.d0) < tol) then
+        ! Case: nhat is parallel to +zhat; thus use identity rotation
+        R = 0.d0
+        R(1,1) = 1.d0
+        R(2,2) = 1.d0
+        R(3,3) = 1.d0
+        return
+
+    else if (abs(dot_prod + 1.d0) < tol) then
+        ! Case: nhat is antiparallel +zhat, thus use arbitrary orthonormal basis
+        phat = [1.d0, 0.d0, 0.d0]
+        qhat = cross_product(nhat, phat)
+        qhat = qhat / sqrt(dot_product(qhat, qhat))
+        R(:,1) = phat
+        R(:,2) = qhat
+        R(:,3) = nhat
+        return
+    end if
+
+    ! General case: construct orthonormal basis
+    phat = cross_product(zhat, nhat)
+    phat = phat / sqrt(dot_product(phat, phat))
+    qhat = cross_product(nhat, phat)
+
+    R(:,1) = phat
+    R(:,2) = qhat
+    R(:,3) = nhat
+
+end subroutine rotation_matrix_local_to_lab
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine get_vn_thermal_wall_emission(vT,nhat,v_lab)
+    !+ Samples a velocity vector from a flux-weighted Maxwellian
+    !+ emitted from a surface with normal vector nhat.
+    !+ The returned vector is beam_grid's frame.
+    real(Float64), intent(in)  :: vT
+        !+ Thermal emission velocity of wall [cm/s]
+    real(Float64), intent(in)  :: nhat(3)
+        !+ Unit vector normal to wall
+    real(Float64), intent(inout) :: v_lab(3)
+        ! Particle velocity in the lab frame
+
+    ! Local variables
+    real(Float64), dimension(2) :: randomu
+    real(Float64) :: x, v
+    real(Float64) :: theta, phi
+    real(Float64) :: v_local(3)
+    real(Float64) :: R(3,3)
+
+    ! Step 1: Sample speed from Gamma(2,1)
+    call randu(randomu)
+    x = -log(randomu(1)) - log(randomu(2))
+    v = vT*sqrt(x) ! [cm/s]
+
+    ! Step 2: Sample emission angles
+    call randu(randomu)
+    phi = 2*pi*randomu(1)      ! phi ∈ [0, 2π]
+    theta = asin(sqrt(randomu(2))) ! p(θ) ∝ cosθ·sinθ
+
+    ! Step 3: Convert to local velocity components
+    v_local(1) = v * sin(theta) * cos(phi)   ! vx'
+    v_local(2) = v * sin(theta) * sin(phi)   ! vy'
+    v_local(3) = v * cos(theta)              ! vz'
+
+    ! --- Step 4: Rotate into lab frame
+    call rotation_matrix_local_to_lab(nhat, R)
+    v_lab = matmul(R, v_local)
+
+end subroutine get_vn_thermal_wall_emission
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine get_velocity_sign(sgn,vn)
+    !+ Description
+    integer, dimension(3), intent(inout) :: sgn
+      !+ description
+    real(Float64), dimension(3), intent(inout) :: vn
+      !+ Particle velocity
+
+    integer :: i
+
+    do i=1,3
+        if (vn(i).gt.0.0) sgn(i) = 1
+        if (vn(i).lt.0.0) sgn(i) =-1
+        if (vn(i).eq.0.0) vn(i)  = 1.0d-3
+    enddo
+
+end subroutine get_velocity_sign
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine specular_reflection(vi, nhat)
+    !+ Reflects velocity vector vi off a surface with unit normal n_hat.
+    !+ The input vector vi is overwritten with its specular reflection.
+    !+  vi_out = vi - 2 * (vi · nhat) * nhat
+    real(Float64), intent(inout) :: vi(3)
+        !+ Particle velocity [cm/s]
+    real(Float64), intent(in) :: nhat(3)
+        !+ Wall normal unit vector
+
+    ! Reflect vi
+    vi = vi - 2.d0*dot_product(vi,nhat)*nhat
+
+end subroutine specular_reflection
+!! <<< [JFCM, 2025-07-04] <<<
+
+!! >>> [JFCM, 2025-07-04] >>>
+subroutine write_particle_tracks_to_file(filename, tracks, ntrack)
+    !+ Writes ParticleTrack data to a text file in a MATLAB-friendly format.
+    character(len=*), intent(in) :: filename
+    type(ParticleTrack), intent(in) :: tracks(:)
+    integer, intent(in) :: ntrack
+
+    ! Local variables
+    integer :: i, unit
+    character(len=128) :: header
+
+    ! Assign a free logical unit number
+    inquire(iolength=unit)
+    open(newunit=unit, file=filename, status='replace', action='write')
+
+    ! Header line
+    write(unit, '(A)') "time flux ind1 ind2 ind3 pos1 pos2 pos3 vn1 vn2 vn3"
+
+    ! Data write with scientific notation
+    do i = 1, ntrack
+        write(unit,'(ES14.6,1X,ES14.6,1X,3I6,1X,3ES14.6,1X,3ES14.6)') &
+            tracks(i)%time, tracks(i)%flux, &
+            tracks(i)%ind(1), tracks(i)%ind(2), tracks(i)%ind(3), &
+            tracks(i)%pos(1), tracks(i)%pos(2), tracks(i)%pos(3), &
+            tracks(i)%vn(1),  tracks(i)%vn(2),  tracks(i)%vn(3)
+    end do
+
+    close(unit)
+end subroutine write_particle_tracks_to_file
+!! <<< [JFCM, 2025-07-04] <<<
 
 subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:pass_grid]]
@@ -14580,6 +14996,7 @@ end subroutine reset_birth_data
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
 subroutine calculate_dcx_process
   !+ Calculates the DCX process and stores sink and birth points from the DCX neutrals.
+  use omp_lib
   integer :: ic,i,j,k,ncell,is,ib,ntrack,jj
   integer(Int64) :: idcx !! counter
   real(Float64), dimension(3) :: ri    !! ion start position vector
@@ -14595,10 +15012,13 @@ subroutine calculate_dcx_process
   real(Float64) :: eb, ptch
   logical :: f4d_defined = .False.
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
-  real(Float64) :: flux, flux_per_marker
+  real(Float64) :: starting_flux, flux_per_marker
   real(Float64) :: tot_flux_dep, initial_flux, final_flux
   real(Float64) :: photons, weight
   real(Float64) :: denf4d, denf4d_per_marker
+  !! >>> [JFCM, 2025-07-04] >>>
+  logical :: pump_hit = .FALSE.
+  !! <<< [JFCM, 2025-07-04] <<<
   !! >>> [JFCM, 2025-07-01] >>>
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   real(Float64) :: tot_denn
@@ -14606,14 +15026,6 @@ subroutine calculate_dcx_process
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
-
-  !! >>> [JFCM, 2025-07-01] >>>
-  ! !! Calculate histogram of neutrals to launch (nlaunch):
-  ! call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
-  !
-  ! !! Clear birth structure to make space for new generation birth data:
-  ! call reset_birth_data
-  !! <<< [JFCM, 2025-07-01] <<<
 
   !! >>> [JFCM, 2025-07-01] >>>
   !! Calculate the distribution of markers to launch from the beam grid:
@@ -14657,8 +15069,8 @@ subroutine calculate_dcx_process
 
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
   !$OMP& ri,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
-  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,flux,weight, &
-  !$OMP& flux_per_marker,denf4d_per_marker,denf4d)
+  !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
+  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -14684,7 +15096,12 @@ subroutine calculate_dcx_process
               endif
 
               ! Compute neutral particle track across beam_grid:
-              call track(ri,vion,tracks,ntrack)
+              !! >>> [JFCM, 2025-07-04] >>>
+              ! call track(ri,vion,tracks,ntrack)
+              pump_hit = .FALSE.
+              call track_to_wall(ri,vion,tracks,ntrack,pump_hit)
+              ! <<< [JFCM, 2025-07-04] <<<
+
               if (ntrack .eq. 0) then
                 write (*,*) "ntrack .eq. 0 (track)"
                 cycle loop_over_dcx
@@ -14702,6 +15119,7 @@ subroutine calculate_dcx_process
                 write (*,*) "sum(rates) .le. 0 (get_total_cx_rate)"
                 cycle loop_over_dcx
               endif
+
               ! 2- Calculate neutral flux density created via CX (ion->neutral):
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
               call get_plasma(plasma,pos=tracks(1)%pos)
@@ -14713,8 +15131,8 @@ subroutine calculate_dcx_process
 
               !! Store ion sink data:
               !! ion sink flux per unit volume in [[beam_grid]]:
-              flux = sum(states) !! [ion/s 1/cm^3]
-              flux_per_marker = flux/nlaunch(i,j,k)
+              starting_flux = sum(states) !! [ion/s 1/cm^3]
+              flux_per_marker = starting_flux/nlaunch(i,j,k)
               denf4d_per_marker = denf4d/nlaunch(i,j,k)
               call store_sinks(ind,is,flux_per_marker)
               call store_sink_particle(ind,ri,vion,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
@@ -14731,20 +15149,16 @@ subroutine calculate_dcx_process
 
                 ! Update plasma profiles seen by marker:
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-                if (.not. plasma%in_plasma) then
-                  ! Here we could project the neutral to the wall and do the following:
-                  ! - From reflection coefficient, decide of particle is to be reflected
-                  !   + if reflected, reflected, recalculate track and startin point in beam grid (might need ntrack to be private so that we can modify it to further track neutral)
-                  !   + if not reflected, accumulate particle flux and energy incident on wall on 2D array then exit loop
-                  exit loop_along_track
-                endif
 
                 ! Calculate attenuation using COLRAD:
                 call colrad(plasma,thermal_mass(is),vion,tracks(jj)%time,states,denn,photons)
 
                 ! Store neutral density per marker on beam_grid:
                 denn_per_marker = denn/nlaunch(i,j,k)
-                call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vion,dcx_type,denn_per_marker)
+                ! >>> [JFCM, 2025-07-04] >>>
+                ! call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vion,dcx_type,denn_per_marker)
+                call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,tracks(jj)%vn,dcx_type,denn_per_marker)
+                ! <<< [JFCM, 2025-07-04] <<<
 
                 !! Calculate neutral flux per marker lost to cell due to COLRAD:
                 final_flux = sum(states)
@@ -14757,7 +15171,34 @@ subroutine calculate_dcx_process
                 ! Photon quantities:
                 ! photons = fi_correction*photons ! Need to remove this later
 
+                ! >>> [JFCM, 2025-07-04] >>>
+                !! Stop advancing ray if flux has dropped by more than 3 orders of magnitude
+                if (final_flux/starting_flux .lt. 1E-3) then
+                  exit loop_along_track
+                endif
+                ! <<< [JFCM, 2025-07-04] <<<
+
               enddo loop_along_track
+
+              ! >>> [JFCM, 2025-07-04] >>>
+              !! Check if end of tracks has been reached and attenuation is poor
+              if ( (.not. pump_hit) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
+                print *, "This particle did not reach pump and has poor atteuation, rel attenuation: ", final_flux/starting_flux
+                print *, "jj : ", jj
+                print *, "ntrack: ", ntrack
+              endif
+              ! <<< [JFCM, 2025-07-04] <<<
+
+              ! >>> [JFCM, 2025-07-04] >>>
+#ifdef _OPENMP
+              if (OMP_get_thread_num() == 0) then
+                if (.FALSE.) then
+                  print *, "writting to file ..."
+                  call write_particle_tracks_to_file("tracks_2.txt", tracks, ntrack)
+                endif
+              endif
+#endif
+              ! <<< [JFCM, 2025-07-04] <<<
 
               ! Record ion birth particle:
               !$OMP CRITICAL

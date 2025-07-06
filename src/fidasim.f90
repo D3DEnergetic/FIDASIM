@@ -15493,7 +15493,10 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     !+ Number of cells that a neutral marker crosses
   real(Float64), intent(in) :: mass
     !+ Mass of newly created ion:
-  real(Float64), dimension(3), intent(in) :: vi
+! >>> [JFCM, 2025-07-04] >>>
+  ! real(Float64), dimension(3), intent(in) :: vi
+  real(Float64), dimension(3), intent(inout) :: vi
+! <<< [JFCM, 2025-07-04] <<<
     !+ Marker velocity vector in [[beam_grid]] coordinates
   real(Float64), intent(in) :: weight
     !+ Weight of neutral marker in [p/s]
@@ -15514,10 +15517,20 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     call randu(randomu)
     birth%part(birth%cnt)%neut_type = neut_type
     ! birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
-    birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
+
+    ! >>> [JFCM, 2025-07-04] >>>
+    ! birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
+    ! <<< [JFCM, 2025-07-04] <<<
+
     ! birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
     birth%part(birth%cnt)%weight = weight ! [p/s]
     birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+
+    ! >>> [JFCM, 2025-05-23] >>>
+    vi = tracks(randi(1))%vn
+    birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
+    ! <<< [JFCM, 2025-05-23] <<<
+
     birth%part(birth%cnt)%vi = vi
     ri = tracks(randi(1))%pos + vi*(tracks(randi(1))%time*(randomu(1)-0.5))
     birth%part(birth%cnt)%ri = ri

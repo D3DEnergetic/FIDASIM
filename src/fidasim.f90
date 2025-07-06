@@ -15122,7 +15122,8 @@ subroutine calculate_dcx_process
 
               ! 2- Calculate neutral flux density created via CX (ion->neutral):
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-              call get_plasma(plasma,pos=tracks(1)%pos)
+              ! call get_plasma(plasma,pos=tracks(1)%pos)
+              call get_plasma(plasma,ind=tracks(1)%ind)
               states = plasma%deni(is)*rates ! flux per unit volume [p/s cm^-3]
               if(sum(states).le.0.) then
                 write (*,*) "sum(rates) .le. 0 (states)"

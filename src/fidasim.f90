@@ -14856,6 +14856,12 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   !! Get fields at actual particle position (pos=ri):
   call get_fields(fields,pos=ri)
 
+  ! >>> [JFCM, 2025-07-08] >>>
+  if (.not.fields%in_plasma) then
+    call get_fields(fields,ind=ind)
+  endif
+  ! <<< [JFCM, 2025-07-08] <<<
+
   !! Ion pitch at particle position:
   sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
 
@@ -15535,16 +15541,14 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     ri = tracks(randi(1))%pos + vi*(tracks(randi(1))%time*(randomu(1)-0.5))
     birth%part(birth%cnt)%ri = ri
 
-    !! To catch cases which sample just outside the plasma region:
-    !! Maybe consider randi(1)-1?
     call get_fields(fields,pos=ri)
-    if (fields%in_plasma .eqv. .FALSE.) then
-      ri = tracks(randi(1))%pos
-      birth%part(birth%cnt)%ri = ri
-      call get_fields(fields,pos=ri)
-    endif
 
-    call get_fields(fields,pos=ri)
+    ! >>> [JFCM, 2025-07-08] >>>
+    if (.not.fields%in_plasma) then
+      call get_fields(fields,ind=tracks(randi(1))%ind)
+    endif
+    ! <<< [JFCM, 2025-07-08] <<<
+
     birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vi/norm2(vi))
     call gyro_step(vi,fields,mass,r_gyro)
     birth%part(birth%cnt)%ri_gc = ri + r_gyro

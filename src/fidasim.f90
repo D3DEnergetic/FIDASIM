@@ -15152,7 +15152,7 @@ subroutine calculate_dcx_process
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 ! Calculate attenuation using COLRAD:
-                call colrad(plasma,thermal_mass(is),vion,tracks(jj)%time,states,denn,photons)
+                call colrad(plasma,thermal_mass(is),tracks(jj)%vn,tracks(jj)%time,states,denn,photons)
 
                 ! Store neutral density per marker on beam_grid:
                 denn_per_marker = denn/nlaunch(i,j,k)
@@ -15206,8 +15206,7 @@ subroutine calculate_dcx_process
               ! >>> [JFCM, 2025-06-30] >>>
               weight = tot_flux_dep
               ! <<< [JFCM, 2025-06-30] <<<
-              ntrack = jj - 1
-              call store_birth_particle(tracks,ntrack,thermal_mass(is),vion,weight,dcx_type)
+              call store_birth_particle(tracks,ntrack,thermal_mass(is),tracks(ntrack)%vn,weight,dcx_type)
               !$OMP END CRITICAL
 
           enddo loop_over_dcx

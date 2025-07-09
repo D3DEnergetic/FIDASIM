@@ -4,7 +4,10 @@
 
 import numpy as np
 import scipy.interpolate
-from scipy.integrate import cumtrapz
+try:
+    from scipy.integrate import cumtrapz
+except ImportError:
+    from scipy.integrate import cumulative_trapezoid as cumtrapz
 from skimage.measure import find_contours
 
 def fluxmap(g):

@@ -8444,8 +8444,8 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1))) !! [cm/s]
 
     !! Wall reaction probabilities:
-    p_specular = 0 !! Specular reflection
-    p_absorb = 1 !! Absorbed by the wall
+    p_specular = 0.1 !! Specular reflection
+    p_absorb = 0.4 !! Absorbed by the wall
     p_thermal = 1 - p_absorb - p_specular !! Thermal scattering from wall
 
     !! Define pump aperture:
@@ -15165,7 +15165,6 @@ subroutine calculate_dcx_process
                 ! Store neutral density per marker on beam_grid:
                 denn_per_marker = denn/nlaunch(i,j,k)
                 ! >>> [JFCM, 2025-07-04] >>>
-                ! call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vion,dcx_type,denn_per_marker)
                 call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,tracks(jj)%vn,dcx_type,denn_per_marker)
                 ! <<< [JFCM, 2025-07-04] <<<
 
@@ -15214,7 +15213,7 @@ subroutine calculate_dcx_process
               ! >>> [JFCM, 2025-06-30] >>>
               weight = tot_flux_dep
               ! <<< [JFCM, 2025-06-30] <<<
-              call store_birth_particle(tracks,ntrack,thermal_mass(is),tracks(ntrack)%vn,weight,dcx_type)
+              call store_birth_particle(tracks,ntrack,thermal_mass(is),weight,dcx_type)
               !$OMP END CRITICAL
 
           enddo loop_over_dcx
@@ -15431,9 +15430,7 @@ subroutine calculate_halo_process
           !! *************************************************************************************************
           !$OMP CRITICAL
           weight = tot_flux_dep
-          ! ntrack = it - 1
-          vi = tracks(ntrack)%vn
-          call store_birth_particle(tracks,ntrack,thermal_mass(is),vi,weight,halo_type)
+          call store_birth_particle(tracks,ntrack,thermal_mass(is),weight,halo_type)
           !$OMP END CRITICAL
 
         end do loop_over_halos
@@ -15497,7 +15494,7 @@ end subroutine calculate_halo_process
 !! <<< [JFCM, 2025-07-02] <<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
-subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
+subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)
   !+ Record an ion birth particle into [[libfida::birth]]
   type(ParticleTrack), dimension(:), intent(in) :: tracks
     !+ Array of [[ParticleTrack]] type
@@ -15507,7 +15504,7 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     !+ Mass of newly created ion:
 ! >>> [JFCM, 2025-07-04] >>>
   ! real(Float64), dimension(3), intent(in) :: vi
-  real(Float64), dimension(3), intent(inout) :: vi
+  ! real(Float64), dimension(3), intent(inout) :: vi
 ! <<< [JFCM, 2025-07-04] <<<
     !+ Marker velocity vector in [[beam_grid]] coordinates
   real(Float64), intent(in) :: weight
@@ -15523,7 +15520,7 @@ subroutine store_birth_particle(tracks,ntrack,mass,vi,weight,neut_type)
     integer, dimension(1) :: randi
     real(Float64), dimension(1) :: randomu
     type(LocalEMFields) :: fields
-    real(Float64), dimension(3) :: ri, r_gyro
+    real(Float64), dimension(3) :: ri, r_gyro, vi
 
     call randind(tracks(1:ntrack)%flux,randi)
     call randu(randomu)

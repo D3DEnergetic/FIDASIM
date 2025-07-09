@@ -1,4 +1,4 @@
-# July 2025:
+# July 2025: 8a7207aadbd3d9bca6afc74dc6f0f5a8d50c3029
 - Bug corrected in [extract_transp_geqdsk](lib/scripts/extract_transp_geqdsk): string and not binary was passed to the console of txpl
 - [efit module](lib/python/efit/utils.py). Added compatibility with modern scipy 
 

@@ -15109,8 +15109,8 @@ subroutine calculate_dcx_process
               ! <<< [JFCM, 2025-07-04] <<<
 
               if (ntrack .eq. 0) then
-                write (*,*) "ntrack .eq. 0 (track)"
-                cycle loop_over_dcx
+                write (*,*) "ntrack .eq. 0 (calculate_dcx_process)"
+                stop
               endif
 
               ! Compute initial state (flux density) of neutral at start of track:
@@ -15128,11 +15128,13 @@ subroutine calculate_dcx_process
 
               ! 2- Calculate neutral flux density created via CX (ion->neutral):
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-              ! call get_plasma(plasma,pos=tracks(1)%pos)
-              call get_plasma(plasma,ind=tracks(1)%ind)
+              call get_plasma(plasma,pos=tracks(1)%pos)
+              if (.not. plasma%in_plasma)  then
+                call get_plasma(plasma,ind=tracks(1)%ind)
+              endif
               states = plasma%deni(is)*rates ! flux per unit volume [p/s cm^-3]
               if(sum(states).le.0.) then
-                write (*,*) "sum(rates) .le. 0 (states)"
+                write (*,*) "sum(states) .le. 0 (states)"
                 cycle loop_over_dcx
               endif
 
@@ -15351,11 +15353,12 @@ subroutine calculate_halo_process
           end if
 
           !! Compute neutral particle track accross the beam grid:
-          ! pump_hit = .FALSE.
-          ! call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
-          call track(ri,vi,tracks,ntrack)
+          pump_hit = .FALSE.
+          call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
+          ! call track(ri,vi,tracks,ntrack)
           if (ntrack .eq. 0) then
-              cycle loop_over_halos
+              write (*,*) "ntrack .eq. 0 (calculate_halo_process)"
+              stop
           end if
 
           !! Compute neutral particle source term (states) at the start of the neutral trajectory: [p/s 1/cm3]
@@ -15366,12 +15369,21 @@ subroutine calculate_halo_process
           ind = tracks(1)%ind
           ii = ind(1); jj = ind(2); kk = ind(3)
           call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk),prev_pop%res(ii,jj,kk),vi,rates)
-          if (sum(rates) .le. 0) cycle loop_over_halos
+          if(sum(rates).le.0.) then
+            write (*,*) "sum(rates) .le. 0"
+            cycle loop_over_halos
+          endif
 
           !! 2- source term (states) in the cell: flux per unit volume [p/s cm^{-3}]
           call get_plasma(plasma,pos=tracks(1)%pos)
+          if (.not. plasma%in_plasma)  then
+            call get_plasma(plasma,ind=tracks(1)%ind)
+          endif
           states = rates*plasma%deni(is)
-          if (sum(states) .le. 0) cycle loop_over_halos
+          if(sum(states).le.0.) then
+            write (*,*) "sum(states) .le. 0"
+            cycle loop_over_halos
+          endif
 
           !! Store ion sink term:
           starting_flux = sum(states)
@@ -15390,19 +15402,13 @@ subroutine calculate_halo_process
             !! Get plasma profiles seen by neutral particle:
             call get_plasma(plasma,pos=tracks(it)%pos)
 
-            !! Compute particle attenuation through cell
-            if (plasma%in_plasma) then
-                ! call colrad(plasma,thermal_mass(is),tracks(it)%vn,tracks(it)%time,states,denn,photons)
-                call colrad(plasma,thermal_mass(is),vi,tracks(it)%time,states,denn,photons)
-            else !! No particle attenuation
-                ! denn = states*tracks(it)%time
-                cycle loop_along_track
-            end if
+            !! Compute particle attenuation through cell:
+            call colrad(plasma,thermal_mass(is),tracks(it)%vn,tracks(it)%time,states,denn,photons)
 
             !! Accumulate neutral density on beam_grid: (OMP critical)
             denn_per_marker = denn/nlaunch(i,j,k)
-            ! call update_neutrals(cur_pop,tracks(it)%ind,tracks(it)%vn,denn_per_marker)
-            call update_neutrals(cur_pop,tracks(it)%ind,vi,denn_per_marker)
+            call update_neutrals(cur_pop,tracks(it)%ind,tracks(it)%vn,denn_per_marker)
+            ! call update_neutrals(cur_pop,tracks(it)%ind,vi,denn_per_marker)
 
             !! Calculate neutral flux per marker lost to cell due to COLRAD:
             final_flux = sum(states)
@@ -15425,8 +15431,8 @@ subroutine calculate_halo_process
           !! *************************************************************************************************
           !$OMP CRITICAL
           weight = tot_flux_dep
-          ntrack = it - 1
-          ! vi = tracks(ntrack)%vn
+          ! ntrack = it - 1
+          vi = tracks(ntrack)%vn
           call store_birth_particle(tracks,ntrack,thermal_mass(is),vi,weight,halo_type)
           !$OMP END CRITICAL
 

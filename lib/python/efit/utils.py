@@ -84,8 +84,10 @@ def rho_rz(g,r_pts,z_pts,norm=True):
     z_pts = np.array(z_pts)
     x_pts = r_pts.flatten()
     y_pts = z_pts.flatten()
-
-    psirz = scipy.interpolate.interp2d(r,z,g['psirz'],'cubic')
+    try:
+        psirz = scipy.interpolate.interp2d(r,z,g['psirz'],'cubic')
+    except NotImplementedError:
+        psirz = scipy.interpolate.RectBivariateSpline(r,z,g['psirz'])
     psi_pts = np.array([psirz(x,y) for (x,y) in zip(x_pts,y_pts)])
 
     a = fluxmap(g)

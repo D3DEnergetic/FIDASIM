@@ -58,9 +58,11 @@ real(Float64), parameter :: H3_amu = 3.01550071632d0
     !+ Atomic mass of Hydrogen-3 (tritium) [amu]
 real(Float64), parameter :: He3_amu = 3.01602931914d0
     !+ Atomic mass of Helium-3 [amu]
-real(Float64), parameter :: B5_amu = 10.81d0
+real(Float64), parameter :: He4_amu = 4.00260325413d0
+    !+ Atomic mass of Helium-4 [amu]
+real(Float64), parameter :: B10_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
-real(Float64), parameter :: C6_amu = 12.011d0
+real(Float64), parameter :: C12_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
 real(Float64), parameter :: mass_u    = 1.660539040d-27
     !+ Atomic mass unit [kg]
@@ -771,6 +773,12 @@ type NPAParticle
         !+ Birth Energy [keV]
     real(Float64) :: pitch = 0.d0
         !+ Birth Pitch
+    real(Float64) :: xgci = 0.d0
+        !+ Initial x position of the gyrocenter
+    real(Float64) :: ygci = 0.d0
+        !+ Initial y position of the gyrocenter
+    real(Float64) :: zgci = 0.d0
+        !+ Initial z position of the gyrocenter
 end type NPAParticle
 
 type NPAResults
@@ -995,7 +1003,7 @@ type SimulationInputs
     integer(Int64) :: n_pfida
         !+ Number of Passive FIDA mc markers
     integer(Int64) :: n_npa
-        !+ Number of Passiv NPA mc markers
+        !+ Number of Active NPA mc markers
     integer(Int64) :: n_pnpa
         !+ Number of Passive NPA mc markers
     integer(Int64) :: n_nbi
@@ -1100,6 +1108,8 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
+    integer(Int32) :: max_crossings
+        !+ Number of times a neutral particle/LOS can cross the plasma boundary default=2
 end type SimulationInputs
 
 type ParticleTrack
@@ -1332,6 +1342,9 @@ subroutine npa_part_assign(p1, p2)
     p1%energy = p2%energy
     p1%pitch = p2%pitch
     p1%detector = p2%detector
+    p1%xgci = p2%xgci
+    p1%ygci = p2%ygci
+    p1%zgci = p2%zgci
 
 end subroutine npa_part_assign
 
@@ -1977,7 +1990,7 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: adaptive, max_cell_splits, max_crossings
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
@@ -1999,7 +2012,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        adaptive, max_cell_splits, split_tol, max_crossings
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2078,6 +2091,7 @@ subroutine read_inputs
     adaptive=0
     max_cell_splits=1
     split_tol=0
+    max_crossings = 2
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2161,6 +2175,7 @@ subroutine read_inputs
     inputs%flr = flr
     inputs%stark_components = stark_components
     inputs%split = split
+    inputs%max_crossings = max_crossings
 
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
@@ -3374,10 +3389,12 @@ subroutine read_plasma
     enddo
 
     select case (impurity_charge)
+        case (2)
+            impurity_mass = He4_amu
         case (5)
-            impurity_mass = B5_amu
+            impurity_mass = B10_amu
         case (6)
-            impurity_mass = C6_amu
+            impurity_mass = C12_amu
         case DEFAULT
             impurity_mass = 2.d0*impurity_charge*H1_amu
     end select
@@ -3624,7 +3641,6 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: deni_tot
     integer :: ir,is
     logical :: path_valid
 
@@ -3679,8 +3695,16 @@ subroutine read_f(fid, error)
     else
         fbm%phi=0.d0
     endif
-    !call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
-    fbm%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        fbm%A = beam_mass
+    endif
 
     equil%plasma%denf = fbm%denf
 
@@ -3710,23 +3734,6 @@ subroutine read_f(fid, error)
     fbm%phimax = maxval(fbm%phi,1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
-    deni_tot = 0.0
-    do ir=1,fbm%nr
-        fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
-        do is=1,n_thermal
-            deni_tot = deni_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%deni(is))*fbm%r(ir)
-        enddo
-    enddo
-
-    if(fbm%n_tot.ge.deni_tot) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
-                "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
-                 fbm%n_tot, deni_tot
-            write(*,'(a)') "This is usually caused by zeff being incorrect."
-        endif
-        stop
-    endif
 
     if(inputs%verbose.ge.1) then
         if(fbm%nphi.gt.1) then
@@ -3748,7 +3755,10 @@ subroutine read_f(fid, error)
         if(fbm%nphi.gt.1) then
             write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         endif
-        write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
+        ! This fbm%n_tot is never caalculated not used, so it just print 0 in
+        ! the output file, which is quite confusing for the user, just comment 
+        ! this to avoid confusion
+        ! write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
 
@@ -3782,8 +3792,17 @@ subroutine read_mc(fid, error)
     allocate(weight(particles%nparticle))
 
     dims(1) = particles%nparticle
-    !call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
-    particles%fast_ion%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_MC: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        particles%fast_ion%A = beam_mass
+    endif
+
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
@@ -4374,12 +4393,14 @@ subroutine read_tables
     !!Read Hydrogen-Impurity Transitions
     impname = ''
     select case (impurity_charge)
+        case (2)
+            impname = "He2"
         case (5)
             impname = "B5"
         case (6)
             impname = "C6"
         case DEFAULT
-            impname = "Aq"
+            write(impname,'("A",i1)') impurity_charge
     end select
 
     call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), tables%H_Aq)
@@ -4842,7 +4863,7 @@ subroutine write_npa
     integer :: error
 
     integer, dimension(:), allocatable :: dcount
-    real(Float64), dimension(:,:), allocatable :: ri, rf
+    real(Float64), dimension(:,:), allocatable :: ri, rf, gci
     real(Float64), dimension(:), allocatable :: weight, energy, pitch
     integer, dimension(:), allocatable :: det, orbit_type
     integer :: i, npart, c, start_index, end_index
@@ -4901,7 +4922,7 @@ subroutine write_npa
     end_index = npa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3,npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -4916,6 +4937,10 @@ subroutine write_npa
             rf(1,i) = npa%part(c)%xf
             rf(2,i) = npa%part(c)%yf
             rf(3,i) = npa%part(c)%zf
+            gci(1,i) = npa%part(c)%xgci
+            gci(2,i) = npa%part(c)%ygci
+            gci(3,i) = npa%part(c)%zgci
+
             weight(i) = npa%part(c)%weight
             energy(i) = npa%part(c)%energy
             pitch(i) = npa%part(c)%pitch
@@ -4926,6 +4951,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -4985,6 +5011,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -4999,7 +5026,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
-            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)            
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -5025,7 +5055,7 @@ subroutine write_npa
 
     deallocate(dcount)
     if(npart.gt.0) then
-        deallocate(ri,rf)
+        deallocate(ri,rf, gci)
         deallocate(energy,pitch,weight,det,orbit_type)
     endif
 
@@ -5059,7 +5089,7 @@ subroutine write_npa
     end_index = pnpa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3, npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -5074,6 +5104,10 @@ subroutine write_npa
             rf(1,i) = pnpa%part(c)%xf
             rf(2,i) = pnpa%part(c)%yf
             rf(3,i) = pnpa%part(c)%zf
+            gci(1,i) = pnpa%part(c)%xgci
+            gci(2,i) = pnpa%part(c)%ygci
+            gci(3,i) = pnpa%part(c)%zgci
+            
             weight(i) = pnpa%part(c)%weight
             energy(i) = pnpa%part(c)%energy
             pitch(i) = pnpa%part(c)%pitch
@@ -5084,6 +5118,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -5143,6 +5178,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -5158,6 +5194,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
             call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
+
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -5221,6 +5261,8 @@ subroutine write_spectra
 
     real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
     real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
+    integer, dimension(n_stark) :: stark_sign
+    stark_sign = +1*stark_sigma - 1*stark_pi
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -5245,6 +5287,9 @@ subroutine write_spectra
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
     if(inputs%stark_components.ge.1) then
         call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
+        call h5ltmake_compressed_dataset_int_f(fid, "/stark_sign", 1, dims(1:1), stark_sign, error)
+        call h5ltset_attribute_string_f(fid,"/stark_sign", "description", &
+         "Stark line indicator: 1=sigma, -1=pi ", error)
     endif
     dims(1) = n_stark
     dims(2) = inputs%nlambda
@@ -5906,7 +5951,7 @@ subroutine write_fida_weights
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
     real(Float64), dimension(:,:), allocatable :: jacobian,e_grid,p_grid
     real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
-    real(Float64) :: dlambda, wtot, dE, dP
+    real(Float64) :: dlambda, dE, dP
 
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     allocate(lambda_arr(inputs%nlambda_wght))
@@ -5951,18 +5996,6 @@ subroutine write_fida_weights
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
     jacobian = ((beam_mass*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
-
-    !! normalize mean_f
-    do ic=1,spec_chords%nchan
-        do ip=1,inputs%np_wght
-            do ie=1,inputs%ne_wght
-                wtot = sum(fweight%weight(:,ie,ip,ic))
-                if((wtot.gt.0.d0)) then
-                    fweight%mean_f(ie,ip,ic) = fweight%mean_f(ie,ip,ic)/wtot
-                endif
-            enddo
-        enddo
-    enddo
 
     !! Calculate FIDA estimate
     allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
@@ -7888,7 +7921,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -8154,7 +8187,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -8874,7 +8907,7 @@ subroutine store_births(ind, neut_type, dflux)
     !$OMP END ATOMIC
 end subroutine store_births
 
-subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
+subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive, gs)
     !+ Store NPA particles in [[libfida:npa]]
     integer, intent(in)                     :: det
         !+ Detector/Channel Number
@@ -8890,10 +8923,12 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         !+ Orbit class ID
     logical, intent(in), optional           :: passive
         !+ Indicates whether npa particle is passive
+    type(GyroSurface), optional, intent(in)  :: gs
+        !+ Gyro-surface
 
     integer :: iclass, oclass
     type(LocalEMFields) :: fields
-    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
+    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm, uvw_gc
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
@@ -8912,6 +8947,9 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     ! Convert to machine coordinates
     call xyz_to_uvw(ri,uvw_ri)
     call xyz_to_uvw(rf,uvw_rf)
+    if (present(gs)) then
+        call xyz_to_uvw(gs%center, uvw_gc)
+    endif
 
     ! Calculate energy
     energy = beam_mass*v2_to_E_per_amu*dot_product(vn,vn)
@@ -8949,6 +8987,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         pnpa%part(pnpa%npart)%xf = uvw_rf(1)
         pnpa%part(pnpa%npart)%yf = uvw_rf(2)
         pnpa%part(pnpa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            pnpa%part(pnpa%npart)%xgci = uvw_gc(1)
+            pnpa%part(pnpa%npart)%ygci = uvw_gc(2)
+            pnpa%part(pnpa%npart)%zgci = uvw_gc(3)
+        endif
         pnpa%part(pnpa%npart)%energy = energy
         pnpa%part(pnpa%npart)%pitch = pitch
         pnpa%part(pnpa%npart)%weight = flux
@@ -8974,6 +9017,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         npa%part(npa%npart)%xf = uvw_rf(1)
         npa%part(npa%npart)%yf = uvw_rf(2)
         npa%part(npa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            npa%part(npa%npart)%xgci = uvw_gc(1)
+            npa%part(npa%npart)%ygci = uvw_gc(2)
+            npa%part(npa%npart)%zgci = uvw_gc(3)
+        endif
         npa%part(npa%npart)%energy = energy
         npa%part(npa%npart)%pitch = pitch
         npa%part(npa%npart)%weight = flux
@@ -9171,6 +9219,9 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
         rate = 0.d0
     else
         rate = 0.d0
+        if (beam_mass.eq.H2_amu) then
+            rate = plasma%denf * exp(lograte*log_10)
+        endif
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
                 rate = rate + plasma%deni(is) * exp(lograte*log_10)
@@ -9534,7 +9585,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     real(Float64) :: logTmin, dlogT, logti, logti_amu, logte
     integer :: neb, nt, i
     type(InterpolCoeffs2D) :: c
-    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp
+    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp, denf, deni_i
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop_i, H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop_i, H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
@@ -9549,6 +9600,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     deni = plasma%deni
     dene = plasma%dene
     denimp = plasma%denimp
+    denf = plasma%denf
     logeb_amu = log10(eb/ab)
     logti = log10(plasma%ti)
     logte = log10(plasma%te)
@@ -9564,6 +9616,10 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     do i=1, n_thermal
         H_H_pop_i = 0.d0
         H_H_depop_i = 0.d0
+        deni_i = deni(i)
+        if(beam_mass.eq.thermal_mass(i)) then
+            deni_i = deni(i) + denf
+        endif
         logti_amu = log10(plasma%ti/thermal_mass(i))
         call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
                             logeb_amu, logti_amu, c, err_status)
@@ -9587,7 +9643,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_pop_i.lt.tables%H_H%minlog_pop)
                 H_H_pop_i = 0.d0
             elsewhere
-                H_H_pop_i = deni(i) * exp(H_H_pop_i*log_10)
+                H_H_pop_i = deni_i * exp(H_H_pop_i*log_10)
             end where
 
             H_H_depop_i = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
@@ -9597,7 +9653,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_depop_i.lt.tables%H_H%minlog_depop)
                 H_H_depop_i = 0.d0
             elsewhere
-                H_H_depop_i = deni(i) * exp(H_H_depop_i*log_10)
+                H_H_depop_i = deni_i * exp(H_H_depop_i*log_10)
             end where
         endif
         H_H_pop = H_H_pop + H_H_pop_i
@@ -9810,7 +9866,8 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
         endif
     enddo
 
-    if(ncross.gt.1) states = 0.0
+    ! max_crossings - 1 because the particle should always start in the plasma
+    if(ncross.gt.(inputs%max_crossings - 1)) states = 0.0
 
 end subroutine attenuate
 
@@ -10222,7 +10279,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         !+ LOS intersection length with [[libfida:beam_grid]] cell particle is in
     real(Float64), intent(in)               :: sigma_pi
         !+ Sigma-pi ratio for channel
-    real(Float64), intent(in)               :: denf
+    real(Float64), optional, intent(in)               :: denf
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
@@ -10243,15 +10300,13 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
         if (bin.gt.inputs%nlambda_wght) cycle loop_over_stark
-        !fida(bin,ichan)= fida(bin,ichan) + &
-        !  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
         fweight%weight(bin,eind,pind,ichan) = &
           fweight%weight(bin,eind,pind,ichan) + intensity(i)*intens_fac !(ph*cm)/(s*nm*sr*fast-ion*dE*dp)
+        if(present(denf)) then
+           fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
+                                             denf*intensity(i)*intens_fac
+        endif       
     enddo loop_over_stark
-    if(denf.gt.0.d0) then
-        fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
-                                          (denf*intens_fac)*sum(intensity)
-    endif
     !$OMP END CRITICAL(fida_wght)
 
 end subroutine store_fw_photons_at_chan
@@ -10307,13 +10362,13 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
 
     logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
     real(Float64), dimension(beam_grid%ngrid) :: cdf
-    integer  :: c, i, j, k, nc, nm, ind(3)
-    integer  :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
     real(Float64), pointer :: papprox_ptr(:)
@@ -10342,6 +10397,11 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             nlaunch(i,j,k) = nlaunch(i,j,k) + 1
         enddo
+        !! Safety check, we should be close to the desired number of markers
+        if ((abs(nr_markers - sum(nlaunch))/nr_markers).gt.0.1) then
+            write(*,*) 'The number of markers is off my more than 10%'
+            stop
+        endif
     endif
 
 end subroutine get_nlaunch
@@ -10352,15 +10412,15 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), intent(in)   :: papprox
         !+ [[libfida:pass_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
 
     logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
     real(Float64), dimension(pass_grid%ngrid) :: cdf
     integer, dimension(1) :: randomi
     type(rng_type) :: r
-    integer :: c, i, j, k, nc, nm, ind(3)
-    integer :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -11043,7 +11103,7 @@ subroutine dcx
     real(Float64):: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
 
     !! Initialized Neutral Population
@@ -11172,7 +11232,7 @@ subroutine halo
     real(Float64) :: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: local_iter_dens
 
     type(NeutralPopulation) :: cur_pop, prev_pop
@@ -11617,7 +11677,9 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength ! move dlength
                 call get_plasma(plasma,pos=r0)
                 max_length = max_length + dlength
-                if(max_length.gt.300) cycle loop_over_los
+                ! If plasma is not within max_length [1000 cm] of LOS lens then no brems is calculated for the channel
+                ! 1000 cm is assumed to cover the limit for most devices simulated in FIDASIM as of March 2023
+                if(max_length.gt.1000) cycle loop_over_los
             enddo
 
             ! Calculate bremsstrahlung along los
@@ -11675,7 +11737,7 @@ subroutine fida_f
     real(Float64) :: eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -11786,7 +11848,7 @@ subroutine pfida_f
     real(Float64) :: max_papprox, eb, ptch
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -12116,7 +12178,7 @@ subroutine npa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
     do ic=1,beam_grid%ngrid
@@ -12131,7 +12193,7 @@ subroutine npa_f
                         sum(neut%halo%dens(:,i,j,k)))* &
                         plasma%denf
     enddo
-
+    
     ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -12192,7 +12254,7 @@ subroutine npa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux)
+                    call store_npa(det,ri,rf,vi,flux, gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -12229,7 +12291,7 @@ subroutine pnpa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell, is
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     papprox=0.d0
     do ic=1,pass_grid%ngrid
@@ -12306,7 +12368,7 @@ subroutine pnpa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*pass_grid%r(i)*pass_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux,passive=.True.)
+                    call store_npa(det,ri,rf,vi,flux,passive=.True., gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -12398,7 +12460,7 @@ subroutine npa_mc
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
                             if (inputs%verbose.ge.0)then
-                                write(*,*) "NPA_MC: Missed Detector ",ichan
+                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan
                             endif
                             cycle gyro_range_loop
                         endif
@@ -12424,7 +12486,7 @@ subroutine npa_mc
                             call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                             if(det.ne.ichan) then
                                 if (inputs%verbose.ge.0)then
-                                    write(*,*) "NPA_MC: Missed Detector ",ichan
+                                    write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
                                 endif
                                 cycle spread_loop
                             endif
@@ -13052,7 +13114,10 @@ subroutine fida_weights_mc
     real(Float64) :: fbm_denf,phase_area
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+
+    !! For Normalization of mean_f:
+    real(Float64), allocatable :: wtot(:,:,:)
 
     nwav = inputs%nlambda_wght
 
@@ -13174,6 +13239,11 @@ subroutine fida_weights_mc
 
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
+    !! normalize mean_f
+    wtot = sum(fweight%weight, dim=1)   ! sum over wavelengths
+    where(wtot.gt.0.d0) 
+       fweight%mean_f = fweight%mean_f / wtot
+    endwhere
 
     if(inputs%verbose.ge.1) then
         write(*,*) 'write fida weights:    ' , time_string(time_start)
@@ -13394,10 +13464,10 @@ subroutine fida_weights_los
 
                     call colrad(plasma,beam_mass,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
+                    fweight%mean_f(ienergy,ipitch,ichan) = denf
                     photons = photons/real(inputs%nphi_wght)
                     call store_fw_photons_at_chan(ichan, ienergy, ipitch, &
-                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, denf, photons)
-
+                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, photons=photons)
                 enddo
             enddo
         enddo

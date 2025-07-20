@@ -808,7 +808,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = transform_COCOS_from_geqdsk(efit.readg(filename), ccw_phi=ccw_phi, exp_Bp=exp_Bp, **convert_COCOS_kw)
+
+    g = efit.readg(filename)
+    cc = identify_COCOS_from_geqdsk(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+
+    cc_factor = cc.sigma_RphZ*cc.sigma_Bp/((2*np.pi)**cc.exp_Bp)
+
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -827,8 +832,8 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     else:
         rhogrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
 
-    br = np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
-    bz = np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    br = cc_factor*np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    bz = cc_factor*np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
     bt = np.array([fpol_itp(psirz_itp(rr,zz))/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
 
     er = br*0
@@ -871,16 +876,16 @@ def transform_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     '''
     cc_out = COCOS() # cc_out = FIDASIM COCOS
     
-    cc_in = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+    cc_in = identify_COCOS_from_geqdsk(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
     
     if cc_in.cocos != cc_out.cocos:
         return convert_COCOS(g.copy(), cc_in, cc_out, **convert_COCOS_kw)
     else:
         return g.copy()
 
-def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
+def identify_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0):
     '''
-    #+#identify_COCOS
+    #+#identify_COCOS_from_geqdsk
     #+Identifies the COCOS index of a GEQDSK dictionary object
     #+Reference:
     #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
@@ -900,16 +905,40 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     #+##Example Usage
     #+```python
     #+>>> g = efit.readg(filename)
-    #+>>> g_cocos = identify_COCOS(g)
+    #+>>> g_cocos = identify_COCOS_from_geqdsk(g)
     #+```
     '''
     # Sauter, eq. 22    
     sigma_Bp_in = -1 * np.sign(g['pprime'][0] * g['current'])
     sigma_RphZ_in = 1 if ccw_phi else -1
     sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
-    
+
     sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
- 
+    index = identify_COCOS_index(sigmas)
+
+    return COCOS(index+(10*exp_Bp))
+
+def identify_COCOS_index(sigmas):
+    """
+    #+#identify_COCOS_index
+    #+Identifies the COCOS index from sigma_Bp, sigma_{R, phi, Z}, and sigma_{rho, theta, phi}
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **sigmas**: List-like object with values for sigma_Bp, sigma_{R, phi, Z}, and sigma_{rho, theta, phi}
+    #+
+    #+##Return Value
+    #+Index for COCOS object
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> index = identify_COCOS_index([-1, 1, -1])
+    #+>>> cocos = COCOS(index)
+    #+```
+
+    """ 
     if sigmas == [1, 1, 1]:
         index = 1
     elif sigmas == [1, -1, 1]:
@@ -929,7 +958,7 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     else:
         index = FIDASIM_default_COCOS
     
-    return COCOS(index+(10*exp_Bp))
+    return index
 
 def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
     '''

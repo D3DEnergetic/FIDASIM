@@ -84,6 +84,18 @@ real(Float64), parameter :: log_10 = log(10.d0)
 real(Float64), parameter :: a_0 = 5.29177210903d-11
     !+ bohr radius in [m]
 
+! >>> [JFCM, 2025_07_22] >>>
+! Define parameters used for analytic surfaces:
+integer, parameter :: DESCRIPTION_MESH = 1
+integer, parameter :: DESCRIPTION_ANALYTIC = 2
+integer, parameter :: SURFACE_PLANAR = 1
+integer, parameter :: SURFACE_CYL = 2
+integer, parameter :: BOUNDARY_RECT = 1
+integer, parameter :: BOUNDARY_CIRC = 2
+integer, parameter :: FUNCTION_WALL = 1
+integer, parameter :: FUNCTION_PUMP = 2
+! <<< [JFCM, 2025_07_22] <<<
+
 real(Float64) :: line_lambda0(3)   = [0.00000d0, 0.00000d0, 0.00000d0]
     !+ H/D/T emission lines [nm]
 integer :: n_stark = 0
@@ -151,6 +163,142 @@ type AABB
     real(Float64) :: zmin, zmax
 end type AABB
 ! <<< [JFCM, 2025_07_04] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type Voxel
+    !+ Stores boundary-beam grid indexing information
+    logical :: intersects = .FALSE.
+        !+ Flag which determines if any surface (from mesh or analytic surfaces) intersects voxel
+    integer(Int32) , dimension(:), allocatable :: list_id
+        !+ List of indices of triangular (from mesh) or analytic surface present in voxel
+    integer :: nid
+        !+ Number of surfaces in list_id
+end type Voxel
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type MeshStructure
+  !+ Holds all data relating to a surface mesh describing a boundary
+  real(Float64), dimension(:,:), allocatable :: vertices
+    !+ Store triangle vertices. dimensions are N_vert x 3
+  Integer(Int32), dimension(:,:), allocatable :: triangles
+    !+ Define triangles as triplets of vertex indices. dimensions are N_tri x 3
+end type MeshStructure
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type PlaneBoundary
+    !+ Describes a basic bounded plane whose boundary can be rectangular or circular.
+    !+ All boundary dimensions are given in terms of local coordinate system.
+    !+ The bounded plan can function as a wall in which case it uses surface properties.
+    !+ If it functions as a pump, then a collided particle is terminated from the simulation
+    integer :: function ! 1: FUNCTION_WALL, 2: FUNCTION_PUMP
+    integer :: boundary_type ! 1: BOUNDARY_RECT, 2: BOUNDARY_CIRC
+    real(Float64) :: pabs
+    real(Float64) :: pspec
+    real(Float64) :: ptherm
+    real(Float64) :: T
+
+    ! When boundary_type = BOUNDARY_RECT:
+    real(Float64) :: xmin
+    real(Float64) :: xmax
+    real(Float64) :: ymin
+    real(Float64) :: ymax
+
+    ! When boundary_type = BOUNDARY_CIRC:
+    real(Float64), dimension(2) :: origin ! origin of circular boundary (x,y)
+    real(Float64) :: rmin
+    real(Float64) :: rmax
+    real(Float64) :: tmin
+    real(Float64) :: tmax
+
+end type PlaneBoundary
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type CompoundPlaneBoundary
+    !+ A compound plane is defined by a main bounded plane "base" with certain surface properties.
+    !+ The base plane can contain other bounded planes "regions" with their own surface properties
+
+    real(Float64), dimension(3) :: normal
+      !+ Unit vector normal to plane
+    type(PlaneBoundary) :: base
+      !+ Boundary parameters for the "base" plane
+    type(PlaneBoundary), dimension(:), allocatable :: regions
+      !+ Boundary paramters for the sub regions contained inside the "base" plane
+
+end type CompoundPlaneBoundary
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type CylBoundary
+    !+ Describes a basic bounded cylinder with a rectangular boundary in the local coordinate system.
+    !+ Boundary dimensions are given in terms of local coordinate system.
+    !+ The bounded cylinder can function as a wall in which case it uses surface properties.
+    !+ If it functions as a pump, then a collided particle is terminated from the simulation
+    integer :: function ! 1: FUNCTION_WALL, 2: FUNCTION_PUMP
+    real(Float64) :: pabs
+    real(Float64) :: pspec
+    real(Float64) :: ptherm
+    real(Float64) :: T
+    real(Float64) :: zmin
+    real(Float64) :: zmax
+    real(Float64) :: tmin
+    real(Float64) :: tmax
+end type CylBoundary
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type CompoundCylBoundary
+    !+ A compound cylindrical boundary is defined by a main bounded cylinder "base" with certain surface properties.
+    !+ The base cylinder can contain other bounded cylinder "regions" with their own surface properties
+    real(Float64) :: R
+    !+ Radius of cylinder
+    real(Float64), dimension(3) :: axis
+    !+ Unit vector describing the axis of cylinder
+    type(CylBoundary) :: base
+    type(CylBoundary), dimension(:), allocatable :: regions
+
+end type CompoundCylBoundary
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type AnalyticSurface
+    !+ Describes surfaces using analytic planes or cylinders.
+    !+ Each analytic surface requires an origen vector relative to the beam grid
+    !+ Also requires a local coordinate system defined relative to the beam grid
+    !+ The analytic surfaces are described by compound bounded surfaces.
+
+    integer :: type ! 1: SURFACE_PLANAR, 2: SURFACE_CYL
+    real(Float64), dimension(3) :: origin
+    real(Float64), dimension(3,3) :: basis
+    real(Float64), dimension(3,3) :: inv_basis
+
+    ! Use when type = SURFACE_PLANAR
+    type(CompoundPlaneBoundary) :: plane
+
+    ! Use when type = SURFACE_CYL
+    type(CompoundCylBoundary) :: cyl
+end type AnalyticSurface
+! <<< [JFCM, 2025_07_22] <<<
+
+! >>> [JFCM, 2025_07_22] >>>
+type VacuumVessel
+    !+ Structure to describe the vaccum vessel as a surface mesh or
+    !+ an analytic surface (bounded planes and cylinders)
+    !+ The vacuum vessel is described as having no thickness and represented entirely by surfaces
+    !+ A voxel map is used to index the surface (mesh or analytic) into beam grid
+    !+ The map is used to speed up ray-surface intersection
+    integer :: description_type ! 1: DESCRIPTION_MESH, 2: DESCRIPTION_ANALYTIC
+      !+ Determines if boundary is defined as a "mesh" or using "analytic" surfaces
+    type(MeshStructure) :: mesh
+      !+ Store boundary as surface triangular mesh
+    type(AnalyticSurface), dimension(:), allocatable :: surface
+      !+ Store boundary as a analytic surface
+    type(Voxel), dimension(:,:,:), allocatable :: map
+      !+ Structure used for mapping mesh or analytic surfaces to the beam_grid [[libfida:beam_grid]]
+end type VacuumVessel
+! <<< [JFCM, 2025_07_22] <<<
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
@@ -1333,6 +1481,10 @@ type(SpatialSpectra), save      :: spatres
     !+ Variable for storing birth neutral for spatial resolution
 type(Surface), dimension(:), allocatable, save :: surfaces
     !+ Variable for storing details and geometry of neutral gas emitting surfaces
+! >>> [JFCM, 2025_07_22] >>>
+type(VacuumVessel), save :: vacuum_vessel
+      !+ Variable for defining the surface boundary of the vacuum vessel
+! <<< [JFCM, 2025_07_22] <<<
 contains
 
 subroutine print_banner()

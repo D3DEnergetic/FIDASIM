@@ -47,7 +47,7 @@ endif
 #Check for Python3
 PYTHON3_CHECK := $(shell command -v python3 2>/dev/null)
 ifeq ($(PYTHON3_CHECK),)
-	$(erro Python3 not found.  Please install Python3 to continue.)
+	$(error Python3 not found.  Please install Python3 to continue.)
 endif
 
 PYTHON_EXEC = $(shell which python3)

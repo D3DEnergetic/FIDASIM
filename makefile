@@ -14,6 +14,7 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
+PYTHON_EXEC = $(shell which python3)
 
 PYTHON_EXEC = $(shell which python3 python 2> /dev/null | head -1)
 ifeq ($(PYTHON_EXEC),)
@@ -42,6 +43,15 @@ HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
     $(error C++ compiler $(CXX) is not supported. Set CXX to g++)
 endif
+
+#Check for Python3
+PYTHON3_CHECK := $(shell command -v python3 2>/dev/null)
+ifeq ($(PYTHON3_CHECK),)
+	$(error Python3 not found.  Please install Python3 to continue.)
+endif
+
+PYTHON_EXEC = $(shell which python3)
+
 
 # Compiler Flags
 # User defined Flags

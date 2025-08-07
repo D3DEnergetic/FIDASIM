@@ -84,18 +84,6 @@ real(Float64), parameter :: log_10 = log(10.d0)
 real(Float64), parameter :: a_0 = 5.29177210903d-11
     !+ bohr radius in [m]
 
-! >>> [JFCM, 2025_07_22] >>>
-! Define parameters used for analytic surfaces:
-integer, parameter :: DESCRIPTION_MESH = 1
-integer, parameter :: DESCRIPTION_ANALYTIC = 2
-integer, parameter :: SURFACE_PLANAR = 1
-integer, parameter :: SURFACE_CYL = 2
-integer, parameter :: BOUNDARY_RECT = 1
-integer, parameter :: BOUNDARY_CIRC = 2
-integer, parameter :: FUNCTION_WALL = 1
-integer, parameter :: FUNCTION_PUMP = 2
-! <<< [JFCM, 2025_07_22] <<<
-
 real(Float64) :: line_lambda0(3)   = [0.00000d0, 0.00000d0, 0.00000d0]
     !+ H/D/T emission lines [nm]
 integer :: n_stark = 0
@@ -164,21 +152,46 @@ type AABB
 end type AABB
 ! <<< [JFCM, 2025_07_04] <<<
 
+! >>> [JFCM, 2025_08_01] >>>
+type RayStruct
+  real(Float64), dimension(3) :: origin
+    !+ Position vector of ray in [cm] in the beam_grid frame
+  real(Float64), dimension(3) :: v
+    !+ Velocity vector of ray in [cm/s] in the beam_grid frame
+end type RayStruct
+! <<< [JFCM, 2025_08_01] <<<
+
+! >>> [JFCM, 2025_08_01] >>>
+type RayIntersection
+  !+ Structure to store ray-surface intersection information
+  logical :: hit = .FALSE.
+    !+ Logical flag indicating if ray has collided with a surface
+  integer :: n_roots
+    !+ Number of valid intersection points, x1 for planes and x2 for cylinders
+  real(Float64), dimension(2) :: s_star
+    !+ "time" parameter along the ray where intersection with surface occurs. Two roots of cylindrical surface
+  real(Float64), dimension(3,2) :: p_star
+    !+ Position vectors in [cm] in beam grid frame where intersections with surface occurs
+  real(Float64), dimension(3,2) :: normal
+    !+ Unit vectors normal to surface at point of intersectons in beam_grid frame
+end type RayIntersection
+! <<< [JFCM, 2025_08_01] <<<
+
 ! >>> [JFCM, 2025_07_22] >>>
 type Voxel
-    !+ Stores boundary-beam grid indexing information
+  !+ Stores surface-beam grid indexing information
     logical :: intersects = .FALSE.
         !+ Flag which determines if any surface (from mesh or analytic surfaces) intersects voxel
     integer(Int32) , dimension(:), allocatable :: list_id
         !+ List of indices of triangular (from mesh) or analytic surface present in voxel
-    integer :: nid
-        !+ Number of surfaces in list_id
 end type Voxel
 ! <<< [JFCM, 2025_07_22] <<<
 
 ! >>> [JFCM, 2025_07_22] >>>
 type MeshStructure
   !+ Holds all data relating to a surface mesh describing a boundary
+  character(len=charlim) :: filename
+    !+ Full path to .msh file
   real(Float64), dimension(:,:), allocatable :: vertices
     !+ Store triangle vertices. dimensions are N_vert x 3
   Integer(Int32), dimension(:,:), allocatable :: triangles
@@ -186,117 +199,159 @@ type MeshStructure
 end type MeshStructure
 ! <<< [JFCM, 2025_07_22] <<<
 
-! >>> [JFCM, 2025_07_22] >>>
-type PlaneBoundary
-    !+ Describes a basic bounded plane whose boundary can be rectangular or circular.
-    !+ All boundary dimensions are given in terms of local coordinate system.
-    !+ The bounded plan can function as a wall in which case it uses surface properties.
-    !+ If it functions as a pump, then a collided particle is terminated from the simulation
-    integer :: function ! 1: FUNCTION_WALL, 2: FUNCTION_PUMP
-    integer :: boundary_type ! 1: BOUNDARY_RECT, 2: BOUNDARY_CIRC
-    real(Float64) :: pabs
-    real(Float64) :: pspec
-    real(Float64) :: ptherm
+! >>> [JFCM, 2025_07_31] >>>
+type :: PlaneRectRegion
+  !+ Region on a planar surface with rectangular bounds (x', y')
+  real(Float64) :: xmin, xmax
+    !+ Minimum and maximum "x" extent in [cm] of plane-rect region
+  real(Float64) :: ymin, ymax
+    !+ Minimum and maximum "y" extent in [cm] of plane-rect region
+end type PlaneRectRegion
+! <<< [JFCM, 2025_07_31] <<<
+
+! >>> [JFCM, 2025_07_31] >>>
+type :: PlaneCircRegion
+  !+ Region on a planar surface with circular bounds (r, θ) in local (x', y') plane
+  real(Float64), dimension(2) :: origin
+    !+ Origin vector in [cm] of plane-circular region
+  real(Float64) :: rmin, rmax
+    !+ Minimum and maximum "r" extent in [cm] of plane-circ region
+  real(Float64) :: tmin, tmax
+    !+ Minimum and maximum "theta" extent in [radians] of plane-circ region
+end type PlaneCircRegion
+
+! >>> [JFCM, 2025_07_31] >>>
+type :: CylRectRegion
+  !+ Rectangular region on a cylindrical surface bounded in (z, θ)
+  real(Float64) :: zmin, zmax
+    !+ Minimum and maximum "z" extent in [cm] of cyl region
+  real(Float64) :: tmin, tmax
+    !+ Minimum and maximum "theta" extent in [radians] of cyl region
+end type CylRectRegion
+! <<< [JFCM, 2025_07_31] <<<
+
+! >>> [JFCM, 2025_07_30] >>>
+type SurfaceRegion
+    !+ Defines a bounded region on an analytic surface and its interaction with rays.
+    !+ Each region is interpreted using parent AnalyticSurface%surface_type ("plane" or "cyl").
+    !+ Region's geometry is defined by a boundary type: "rect" (rectangular) or "circ" (circular).
+    !+ Region’s interaction behavoir is given by function_type:
+    !+   - "wall": opaque, reflects/absorbs rays.
+    !+   - "pump": absorbs and terminates rays.
+    !+   - "opening": transparent to rays.
+    !+ Rectangular and circular boundaries are specified in the local surface frame (x', y') for planes,
+    !+ and (z, θ) for cylinders, both defined by the surface origin and basis.
+    !+ Boundary parameters must be set appropriately depending on the combination of surface_type and boundary_type.
+    !+ The first region in AnalyticSurface%region must not be of type "opening"
+    !+ to ensure correct identification of surface intersection.
+
+    character(len=16) :: boundary_type
+      !+ Defines how the surface's boundary is described: "rect", "circ"
+    character(len=16) :: function_type
+      !+ Defines how the region interacts with rays: "wall", "pump", or "opening"
     real(Float64) :: T
-
-    ! When boundary_type = BOUNDARY_RECT:
-    real(Float64) :: xmin
-    real(Float64) :: xmax
-    real(Float64) :: ymin
-    real(Float64) :: ymax
-
-    ! When boundary_type = BOUNDARY_CIRC:
-    real(Float64), dimension(2) :: origin ! origin of circular boundary (x,y)
-    real(Float64) :: rmin
-    real(Float64) :: rmax
-    real(Float64) :: tmin
-    real(Float64) :: tmax
-
-end type PlaneBoundary
-! <<< [JFCM, 2025_07_22] <<<
-
-! >>> [JFCM, 2025_07_22] >>>
-type CompoundPlaneBoundary
-    !+ A compound plane is defined by a main bounded plane "base" with certain surface properties.
-    !+ The base plane can contain other bounded planes "regions" with their own surface properties
-
-    real(Float64), dimension(3) :: normal
-      !+ Unit vector normal to plane
-    type(PlaneBoundary) :: base
-      !+ Boundary parameters for the "base" plane
-    type(PlaneBoundary), dimension(:), allocatable :: regions
-      !+ Boundary paramters for the sub regions contained inside the "base" plane
-
-end type CompoundPlaneBoundary
-! <<< [JFCM, 2025_07_22] <<<
-
-! >>> [JFCM, 2025_07_22] >>>
-type CylBoundary
-    !+ Describes a basic bounded cylinder with a rectangular boundary in the local coordinate system.
-    !+ Boundary dimensions are given in terms of local coordinate system.
-    !+ The bounded cylinder can function as a wall in which case it uses surface properties.
-    !+ If it functions as a pump, then a collided particle is terminated from the simulation
-    integer :: function ! 1: FUNCTION_WALL, 2: FUNCTION_PUMP
+      !+ Temperature of region in [keV]
     real(Float64) :: pabs
+      !+ Absorption probability of region
     real(Float64) :: pspec
+      !+ Specular reflection probability of region
     real(Float64) :: ptherm
-    real(Float64) :: T
-    real(Float64) :: zmin
-    real(Float64) :: zmax
-    real(Float64) :: tmin
-    real(Float64) :: tmax
-end type CylBoundary
-! <<< [JFCM, 2025_07_22] <<<
+      !+ Thermal emission probability of region
+    type(PlaneRectRegion) :: plane_rect
+      !+ Rectangular region on a planar analytic surface.
+    type(PlaneCircRegion) :: plane_circ
+      !+ Circular region on a planar analytic surface.
+    type(CylRectRegion) :: cyl_rect
+      !+ Rectangular region in (z,theta) on a cylindrical analytic surface.
+end type SurfaceRegion
+! <<< [JFCM, 2025_07_30] <<<
 
-! >>> [JFCM, 2025_07_22] >>>
-type CompoundCylBoundary
-    !+ A compound cylindrical boundary is defined by a main bounded cylinder "base" with certain surface properties.
-    !+ The base cylinder can contain other bounded cylinder "regions" with their own surface properties
-    real(Float64) :: R
-    !+ Radius of cylinder
-    real(Float64), dimension(3) :: axis
-    !+ Unit vector describing the axis of cylinder
-    type(CylBoundary) :: base
-    type(CylBoundary), dimension(:), allocatable :: regions
+! >>> [JFCM, 2025_07_31] >>>
+type PlaneGeometry
+  !+ Defines the geometric parameters of a plane surface used in an analytic surface model.
+  !+ The plane is defined by:
+  !+   - A local origin (position vector) relative to the beam grid.
+  !+   - A local orthonormal basis (used to transform between surface-local and beam-grid coordinates).
+  !+   - A unit normal vector to the plane (must match one of the basis directions).
 
-end type CompoundCylBoundary
-! <<< [JFCM, 2025_07_22] <<<
+  real(Float64), dimension(3) :: origin
+    !+ Position vector in [cm] of the surface's origin relative to xyz beam_grid frame.
+  real(Float64), dimension(3,3) :: basis
+    !+ Surface's orthonormal basis. Used for converting positions in surface frame to beam grid frame
+    !+ Columns define (x',y',z') unit vectors of the local surface frame
+  real(Float64), dimension(3,3) :: inv_basis
+    !+ Inverse of the basis matrix. Used to transform beam-grid positions into the local surface frame.
+  real(Float64), dimension(3) :: normal
+    !+ Unit vector normal to the plane in beam-grid coordinates equal to basis(:,3)
+end type PlaneGeometry
+! <<< [JFCM, 2025_07_31] <<<
+
+! >>> [JFCM, 2025_07_31] >>>
+type CylinderGeometry
+  !+ Defines the geometric parameters of a cylindrical surface used in an analytic surface model.
+  !+ The cylinder is defined by:
+  !+   - A local origin (position vector) relative to the beam grid.
+  !+   - A local orthonormal basis (used to transform between surface-local and beam-grid coordinates).
+  !+   - A unit vector along the cylinder axis (typically z' axis in the basis).
+  !+   - A scalar radius in the radial direction orthogonal to the axis.
+
+  real(Float64), dimension(3) :: origin
+    !+ Position vector in [cm] of the surface's origin relative to xyz beam_grid frame.
+  real(Float64), dimension(3,3) :: basis
+    !+ Surface's orthonormal basis. Used for converting positions in surface frame to beam grid frame
+    !+ Columns define (x',y',z') unit vectors of the local surface frame
+  real(Float64), dimension(3,3) :: inv_basis
+    !+ Inverse of the basis matrix. Used to transform global positions into the local surface frame.
+  real(Float64), dimension(3) :: axis
+    !+ Unit vector along the cylinder's axis in beam-grid coordinates equal to basis(:,3)
+  real(Float64) :: radius
+    !+ Radius of the cylinder in [cm], measured from the axis to the surface.
+end type CylinderGeometry
+! <<< [JFCM, 2025_07_31] <<<
 
 ! >>> [JFCM, 2025_07_22] >>>
 type AnalyticSurface
-    !+ Describes surfaces using analytic planes or cylinders.
-    !+ Each analytic surface requires an origen vector relative to the beam grid
-    !+ Also requires a local coordinate system defined relative to the beam grid
-    !+ The analytic surfaces are described by compound bounded surfaces.
+    !+ Holds data to describe a surface using analytic bounded planes or bounded cylinders.
+    !+ Each analytic surface has an origin vector relative to the beam grid
+    !+ Also has a local coordinate system (basis) defined relative to the beam grid
+    !+ The analytic surface is composed of at least one bounded SurfaceRegion
+    !+ The first element of SurfaceRegion can only be a "wall" or "pump"
+    !+ All other elements of SurfaceRegion, if present, can be of any function_type
 
-    integer :: type ! 1: SURFACE_PLANAR, 2: SURFACE_CYL
-    real(Float64), dimension(3) :: origin
-    real(Float64), dimension(3,3) :: basis
-    real(Float64), dimension(3,3) :: inv_basis
-
-    ! Use when type = SURFACE_PLANAR
-    type(CompoundPlaneBoundary) :: plane
-
-    ! Use when type = SURFACE_CYL
-    type(CompoundCylBoundary) :: cyl
+    logical :: is_active = .true.
+      !+ Enables or disables the use of this surface
+    character(len=16) :: surface_type
+      !+ Type of surface: "plane" or "cyl"
+    type(SurfaceRegion), dimension(:), allocatable :: region
+      !+ Collection of bounded regions defined on this surface.
+      !+ Each region inherits the `surface_type` of the parent.
+      !+ region(1) is the parent region which geometrically must contains all region(>1)
+    type(PlaneGeometry) :: plane
+      !+ When surface_type = "plane", this describes the geometry of the plane
+    type(CylinderGeometry) :: cyl
+      !+ When surface_type = "cyl", this describes the geometyr of the cylindrical surface
 end type AnalyticSurface
 ! <<< [JFCM, 2025_07_22] <<<
 
 ! >>> [JFCM, 2025_07_22] >>>
 type VacuumVessel
-    !+ Structure to describe the vaccum vessel as a surface mesh or
+    !+ Structure to describe the vacuum vessel as a surface mesh (triangles) or
     !+ an analytic surface (bounded planes and cylinders)
     !+ The vacuum vessel is described as having no thickness and represented entirely by surfaces
-    !+ A voxel map is used to index the surface (mesh or analytic) into beam grid
-    !+ The map is used to speed up ray-surface intersection
-    integer :: description_type ! 1: DESCRIPTION_MESH, 2: DESCRIPTION_ANALYTIC
-      !+ Determines if boundary is defined as a "mesh" or using "analytic" surfaces
+    !+ A voxel map is used to index the surface (mesh or analytic) into the beam grid
+    !+ The map is used to optimize the ray-surface intersection calculations
+    character(len=16) :: description_type
+      !+ Determines how the VacuumVessel is described: "mesh" or "analytic" surfaces
     type(MeshStructure) :: mesh
-      !+ Store boundary as surface triangular mesh
+      !+ Store surface triangular mesh which describes the vacuum vessel
     type(AnalyticSurface), dimension(:), allocatable :: surface
-      !+ Store boundary as a analytic surface
+      !+ Store collection of analytic surfaces which describes the vacuum vessel
+      !+ Only used when geometry_type == "analytic"
     type(Voxel), dimension(:,:,:), allocatable :: map
       !+ Structure used for mapping mesh or analytic surfaces to the beam_grid [[libfida:beam_grid]]
+    real(Float64) :: surface_padding_epsilon
+      !+ Small positive value used to pad surface extents when checking intersections,
+      !+ to account for numerical roundoff and ensure robustness near edges.
 end type VacuumVessel
 ! <<< [JFCM, 2025_07_22] <<<
 
@@ -365,6 +420,18 @@ type BeamGrid
     type(AABB) :: gaabb
         !+ Beam grid's Axis-Aligned bounding box
     ! <<< [JFCM, 2025_07_04] <<<
+    ! >>> [JFCM, 2025_08_01] >>>
+    real(Float64), dimension(:), allocatable :: xe
+        !+ x positions of cell edges
+    real(Float64), dimension(:), allocatable :: ye
+        !+ y positions of cell edges
+    real(Float64), dimension(:), allocatable :: ze
+        !+ z positions of cell edges
+    ! >>> [JFCM, 2025_08_01] >>>
+    ! >>> [JFCM, 2025_08_06] >>>
+    real(Float64) :: ds
+        !+ Smallest grid increment [cm]
+    ! <<< [JFCM, 2025_08_01] <<<
 end type BeamGrid
 
 type InterpolationGrid
@@ -2710,6 +2777,10 @@ subroutine make_beam_grid
     beam_grid%dr(2) = abs(beam_grid%yc(2)-beam_grid%yc(1))
     beam_grid%dr(3) = abs(beam_grid%zc(2)-beam_grid%zc(1))
 
+    !! >>> [JFCM, 2025_08_06] >>>
+    beam_grid%ds = minval(beam_grid%dr)
+    !! <<< [JFCM, 2025_08_06] <<<
+
     beam_grid%lwh(1) = abs(beam_grid%xc(beam_grid%nx) - beam_grid%xc(1)) + beam_grid%dr(1)
     beam_grid%lwh(2) = abs(beam_grid%yc(beam_grid%ny) - beam_grid%yc(1)) + beam_grid%dr(2)
     beam_grid%lwh(3) = abs(beam_grid%zc(beam_grid%nz) - beam_grid%zc(1)) + beam_grid%dr(3)
@@ -2752,6 +2823,23 @@ subroutine make_beam_grid
         enddo
     enddo
 
+    ! >>> [JFCM, 2025-08-01] >>>
+    ! Create beam_grid edges:
+    allocate(beam_grid%xe(beam_grid%nx+1))
+    allocate(beam_grid%ye(beam_grid%ny+1))
+    allocate(beam_grid%ze(beam_grid%nz+1))
+
+    do i = 0, beam_grid%nx
+        beam_grid%xe(i+1) = beam_grid%xmin + i * dx
+    end do
+    do i = 0, beam_grid%ny
+        beam_grid%ye(i+1) = beam_grid%ymin + i * dy
+    end do
+    do i = 0, beam_grid%nz
+        beam_grid%ze(i+1) = beam_grid%zmin + i * dz
+    end do
+    ! <<< [JFCM, 2025-08-01] <<<
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Beam grid settings ----"
         write(*,'(T2,"Nx: ", i3)') beam_grid%nx
@@ -2778,6 +2866,962 @@ subroutine make_beam_grid
     endif
 
 end subroutine make_beam_grid
+
+! >>> [JFCM, 2025-08-06] >>>
+subroutine write_boundary_map
+  !+ This subroutine has been written to provide means to test how the boundary-beam grid map is formed
+  integer(Int32), dimension(:,:,:), allocatable :: intersects
+  integer :: i, j, k
+  integer(HID_T) :: h5file_id, gid
+  integer(HSIZE_T), dimension(1) :: dims1
+  integer(HSIZE_T), dimension(2) :: dims2
+  integer(HSIZE_T), dimension(3) :: dims3
+  integer :: rank
+  character(len=256) :: filename, result_dir, full_file_name
+  integer :: error
+
+  result_dir = inputs%result_dir
+  filename = 'vacuum_vessel.h5'
+
+  dims3(1) = beam_grid%nx
+  dims3(2) = beam_grid%ny
+  dims3(3) = beam_grid%nz
+
+  ! Allocate temporary logical array:
+  allocate(intersects(dims3(1), dims3(2), dims3(3)))
+  do k = 1, dims3(3)
+    do j = 1, dims3(2)
+      do i = 1, dims3(1)
+        if (vacuum_vessel%map(i,j,k)%intersects) then
+          intersects(i,j,k) = 1
+        else
+          intersects(i,j,k) = 0
+        endif
+      end do
+    end do
+  end do
+
+  call h5open_f(error)
+
+  ! Create file:
+  full_file_name = trim(adjustl(result_dir)) // '/' // trim(adjustl(filename))
+  call h5fcreate_f(trim(adjustl(full_file_name)), H5F_ACC_TRUNC_F, h5file_id, error)
+
+  ! Write intersect:
+  call h5ltmake_compressed_dataset_int_f(h5file_id,"/intersects", 3, dims3, intersects, error)
+
+  ! Write beam grid data:
+  call h5gcreate_f(h5file_id, "beam_grid", gid, error)
+  dims1(1) = 1
+  call h5ltmake_dataset_double_f(gid,"xmax",0,dims1(1:1),[beam_grid%xmax],error)
+  call h5ltmake_dataset_double_f(gid,"xmin",0,dims1(1:1),[beam_grid%xmin],error)
+  call h5ltmake_dataset_double_f(gid,"ymax",0,dims1(1:1),[beam_grid%ymax],error)
+  call h5ltmake_dataset_double_f(gid,"ymin",0,dims1(1:1),[beam_grid%ymin],error)
+  call h5ltmake_dataset_double_f(gid,"zmax",0,dims1(1:1),[beam_grid%zmax],error)
+  call h5ltmake_dataset_double_f(gid,"zmin",0,dims1(1:1),[beam_grid%zmin],error)
+  call h5ltmake_dataset_int_f(gid,"nx",0,dims1(1:1),[beam_grid%nx],error)
+  call h5ltmake_dataset_int_f(gid,"ny",0,dims1(1:1),[beam_grid%ny],error)
+  call h5ltmake_dataset_int_f(gid,"nz",0,dims1(1:1),[beam_grid%nz],error)
+
+  ! Close group:
+  call h5gclose_f(gid, error)
+
+  ! Close file:
+  call h5fclose_f(h5file_id, error)
+
+  ! Release memory:
+  deallocate(intersects)
+
+end subroutine write_boundary_map
+! <<< [JFCM, 2025-08-06] <<<
+
+! >>> [JFCM, 2025-07-23] >>>
+subroutine define_vacuum_vessel()
+  !+ This routine sets up the vacuum vessel based on the description type.
+  !+ It supports mesh or analytic surface descriptions.
+  !+ For analytic surfaces, it reads from input, applies padding, and maps them.
+  integer :: n
+  character(len=16) :: description_type
+
+  ! GET analytic surface info from namelist
+  call read_vacuum_vessel()
+
+  ! Pad dimensions to avoid grazing boundary issues
+  ! call pad_vacuum_vessel()
+
+  ! ALLOCATE the voxel map
+  allocate(vacuum_vessel%map(beam_grid%nx, beam_grid%ny, beam_grid%nz))
+
+  ! CHECK and COMPUTE voxel map based on description type
+  description_type = vacuum_vessel%description_type
+  select case (trim(adjustl(description_type)))
+    case ("analytic")
+        call map_vacuum_vessel_to_beam_grid()
+    case ("mesh")
+      ! Not yet implemented
+      print *, "Error: Mesh-grid intersection infrastructure not implemented."
+      stop
+    case default
+      print *, "Error: Unknown vacuum vessel description_type: ", trim(adjustl(vacuum_vessel%description_type))
+      stop
+  end select
+
+  ! WRITE voxel map to disk:
+  call write_boundary_map()
+
+end subroutine define_vacuum_vessel
+! <<< [JFCM, 2025-07-23] <<<
+
+! >>> [JFCM, 2025-07-23] >>>
+subroutine read_vacuum_vessel
+  !+ Reads the vacuum_vessel.nml file
+  integer, parameter :: max_surfaces = 5, max_regions = 5
+  integer :: ios, unit, ss, rr
+  integer :: num_analytic_surfaces
+  character(len=charlim) :: mesh_filename, nml_filename, description_type
+  real(Float64) :: surface_padding_epsilon
+  logical :: is_active
+  character(len=16) :: surface_type
+  integer :: num_regions
+  real(Float64) :: origin(3), origin_XYZ(3)
+  real(Float64) :: basis(3,3), basis_XYZ(3,3)
+  real(Float64) :: cyl_R
+  character(len=16) :: function_type(max_regions)
+  character(len=16) :: boundary_type(max_regions)
+  real(Float64) :: T(max_regions)
+  real(Float64) :: pabs(max_regions)
+  real(Float64) :: pspec(max_regions)
+  real(Float64) :: xmin(max_regions), xmax(max_regions)
+  real(Float64) :: ymin(max_regions), ymax(max_regions)
+  real(Float64) :: origin_x(max_regions), origin_y(max_regions)
+  real(Float64) :: rmin(max_regions), rmax(max_regions)
+  real(Float64) :: circ_tmin(max_regions), circ_tmax(max_regions)
+  real(Float64) :: zmin(max_regions), zmax(max_regions)
+  real(Float64) :: cyl_tmin(max_regions), cyl_tmax(max_regions)
+
+  namelist /config/ description_type, num_analytic_surfaces, mesh_filename, surface_padding_epsilon
+  namelist /surface_1/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
+                       function_type, boundary_type, T, pabs, pspec, &
+                       xmin, xmax, ymin, ymax, origin_x, origin_y, &
+                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+
+  namelist /surface_2/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
+                      function_type, boundary_type, T, pabs, pspec, &
+                      xmin, xmax, ymin, ymax, origin_x, origin_y, &
+                      rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+
+  namelist /surface_3/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
+                       function_type, boundary_type, T, pabs, pspec, &
+                       xmin, xmax, ymin, ymax, origin_x, origin_y, &
+                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+
+  namelist /surface_4/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
+                        function_type, boundary_type, T, pabs, pspec, &
+                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
+                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+
+  namelist /surface_5/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
+                        function_type, boundary_type, T, pabs, pspec, &
+                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
+                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+
+  ! Define vacuum vessel namelist file name:
+  nml_filename = trim(adjustl(inputs%result_dir))//"/"//'vacuum_vessel.nml'
+
+  ! Read config namelist:
+  ! ========================
+  open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
+  if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
+  read(unit, nml=config, iostat=ios)
+  if (ios /= 0) stop 'Error reading vacuum_vessel_config.'
+  close(unit)
+
+  if (num_analytic_surfaces > max_surfaces) then
+    stop "ERROR: num_analytic_surfaces > max_surfaces"
+  end if
+
+  ! Populate vacuum vessel config data:
+  vacuum_vessel%description_type = trim(adjustl(description_type))
+  allocate(vacuum_vessel%surface(num_analytic_surfaces))
+  vacuum_vessel%surface_padding_epsilon = surface_padding_epsilon
+  vacuum_vessel%mesh%filename = trim(adjustl(mesh_filename))
+
+  ! Read surface namelists:
+  ! ========================
+  open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
+  if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
+
+  do ss = 1, num_analytic_surfaces
+    select case (ss)
+    case (1)
+      read(unit, nml=surface_1, iostat=ios)
+    case (2)
+      read(unit, nml=surface_2, iostat=ios)
+    case (3)
+      read(unit, nml=surface_3, iostat=ios)
+    case (4)
+      read(unit, nml=surface_4, iostat=ios)
+    case (5)
+      read(unit, nml=surface_1, iostat=ios)
+    end select
+
+    if (ios /= 0) then
+      print *, 'ERROR reading surface ', ss
+      select case (ios)
+        case (5010)
+          print *, 'Syntax error or missing variable in namelist.'
+          stop 'Namelist read failed.'
+        case (5050)
+          print *, 'Namelist group not found.'
+          print *, 'Continue program ...'
+          continue
+        case default
+          print *, 'Unknown read error. IOSTAT =', ios
+          stop
+      end select
+    end if
+
+    ! Check handedness of basis:
+    call check_basis_diagnostics(basis, ss)
+
+    ! Compute surface's origin and basis in the beam grid frame:
+    ! \vec{O_sb} = [ehat]([O_s] - [O_b]) and [ehat'] = [ehat][basis_b]
+    ! \vec{O_sb} = [ehat'][invbasis_b]([O_s] - [O_b])
+    ! [ehat''] = [ehat'][invbasis_b][basis_s]
+    origin_XYZ = matmul(beam_grid%inv_basis,origin - beam_grid%origin)
+    basis_XYZ = matmul(beam_grid%inv_basis,basis)
+
+    ! Populate surface structure:
+    vacuum_vessel%surface(ss)%is_active = is_active
+    vacuum_vessel%surface(ss)%surface_type = surface_type
+    allocate(vacuum_vessel%surface(ss)%region(num_regions))
+    select case (trim(adjustl(surface_type)))
+    case ("plane")
+      vacuum_vessel%surface(ss)%plane%origin = origin_XYZ
+      vacuum_vessel%surface(ss)%plane%basis = basis_XYZ
+      vacuum_vessel%surface(ss)%plane%inv_basis = transpose(basis_XYZ)
+      vacuum_vessel%surface(ss)%plane%normal = basis_XYZ(:,3)
+    case ("cyl")
+      vacuum_vessel%surface(ss)%cyl%origin = origin_XYZ
+      vacuum_vessel%surface(ss)%cyl%basis = basis_XYZ
+      vacuum_vessel%surface(ss)%cyl%inv_basis = transpose(basis_XYZ)
+      vacuum_vessel%surface(ss)%cyl%axis = basis_XYZ(:,3)
+      vacuum_vessel%surface(ss)%cyl%radius = cyl_R
+    case default
+      write(*,*) 'surface_type on surface ', ss, ' is incorrect. surface_type = ', trim(adjustl(surface_type))
+      stop
+    end select
+
+    ! Populate regions, all positions given in local coordinate system: basis_XYZ
+    do rr = 1,num_regions
+      vacuum_vessel%surface(ss)%region(rr)%function_type = function_type(rr)
+      vacuum_vessel%surface(ss)%region(rr)%boundary_type = boundary_type(rr)
+      vacuum_vessel%surface(ss)%region(rr)%T = T(rr)
+      vacuum_vessel%surface(ss)%region(rr)%pabs = pabs(rr)
+      vacuum_vessel%surface(ss)%region(rr)%pspec = pspec(rr)
+      vacuum_vessel%surface(ss)%region(rr)%ptherm = 1 - (pspec(rr) + pabs(rr))
+      vacuum_vessel%surface(ss)%region(rr)%plane_rect%xmin = xmin(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_rect%xmax = xmax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_rect%ymin = ymin(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_rect%ymax = ymax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%origin(1) = origin_x(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%origin(2) = origin_y(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%rmin = rmin(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%rmax = rmax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%tmin = circ_tmin(rr)
+      vacuum_vessel%surface(ss)%region(rr)%plane_circ%tmax = circ_tmax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%cyl_rect%zmax = zmax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%cyl_rect%zmin = zmin(rr)
+      vacuum_vessel%surface(ss)%region(rr)%cyl_rect%tmax = cyl_tmax(rr)
+      vacuum_vessel%surface(ss)%region(rr)%cyl_rect%tmin = cyl_tmin(rr)
+    end do ! LOOP rr over regions
+  end do ! LOOP ss over surfaces
+  close(unit)
+
+  ! TODO: Need to perform checks and validations
+  ! check that regions(>1) are geometrically bounded by region(1)
+
+end subroutine read_vacuum_vessel
+! <<< [JFCM, 2025-07-23] <<<
+
+! >>> [JFCM, 2025-07-23] >>>
+subroutine check_basis_diagnostics(basis, surface_index)
+  !+ Checks that basis matrix is right-handed, normalized and orthonormal
+  real(Float64), intent(in) :: basis(3,3)
+  integer, intent(in) :: surface_index
+
+  real(Float64) :: det, dot1, dot2, dot3, norm1, norm2, norm3, tol
+  logical :: fail
+
+  tol = 1.0e-6
+  fail = .false.
+
+  ! Compute determinant (for handedness check)
+  det = basis(1,1)*(basis(2,2)*basis(3,3) - basis(2,3)*basis(3,2)) &
+      - basis(1,2)*(basis(2,1)*basis(3,3) - basis(2,3)*basis(3,1)) &
+      + basis(1,3)*(basis(2,1)*basis(3,2) - basis(2,2)*basis(3,1))
+
+  if (det <= 0.0) then
+     print *, 'ERROR: Surface ', surface_index, ': basis matrix is not right-handed (determinant = ', det, ')'
+     fail = .true.
+  end if
+
+  ! Norms of columns (for normalization check)
+  norm1 = sqrt(sum(basis(:,1)**2))
+  norm2 = sqrt(sum(basis(:,2)**2))
+  norm3 = sqrt(sum(basis(:,3)**2))
+
+  if (abs(norm1 - 1.0) > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis column 1 not unit length (norm = ', norm1, ')'
+     fail = .true.
+  end if
+
+  if (abs(norm2 - 1.0) > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis column 2 not unit length (norm = ', norm2, ')'
+     fail = .true.
+  end if
+
+  if (abs(norm3 - 1.0) > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis column 3 not unit length (norm = ', norm3, ')'
+     fail = .true.
+  end if
+
+  ! Dot products (for orthogonality check)
+  dot1 = abs(sum(basis(:,1) * basis(:,2)))
+  dot2 = abs(sum(basis(:,1) * basis(:,3)))
+  dot3 = abs(sum(basis(:,2) * basis(:,3)))
+
+  if (dot1 > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis columns 1 and 2 not orthogonal (dot = ', dot1, ')'
+     fail = .true.
+  end if
+
+  if (dot2 > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis columns 1 and 3 not orthogonal (dot = ', dot2, ')'
+     fail = .true.
+  end if
+
+  if (dot3 > tol) then
+     print *, 'ERROR: Surface ', surface_index, ': basis columns 2 and 3 not orthogonal (dot = ', dot3, ')'
+     fail = .true.
+  end if
+
+  if (fail) then
+     stop 'Invalid basis matrix for surface.'
+  end if
+end subroutine check_basis_diagnostics
+! <<< [JFCM, 2025-07-23] <<<
+
+! ! >>> [JFCM, 2025-07-23] >>>
+! subroutine pad_vacuum_vessel()
+! !+ Applies geometric padding to analytic surfaces in `vacuum_vessel` to avoid
+! !+ edge-coincidence issues during voxel indexing and ray-surface intersection.
+!   integer :: ss
+!   real(Float64) :: dw, dt
+!   real(Float64) :: eps_geom
+!   type(SurfaceRegion) :: reg
+!   type(AnalyticSurface) :: srf
+!
+!   ! Get padding scale
+!   eps_geom = vacuum_vessel%surface_padding_epsilon
+!   dw = eps_geom * sqrt(sum(beam_grid%dr**2))
+!   dt = eps_geom * 2.0*pi
+!
+!   ! Loop over all analytic surfaces
+!     do ss = 1, size(vacuum_vessel%surface)
+!
+!       ! Enforce region(1) exists:
+!       srf = vacuum_vessel%surface(ss)
+!       if (.not. allocated(srf%region)) then
+!         write(*,*) 'Error: region not allocated for surface ', ss
+!         stop
+!       end if
+!
+!       ! Pad only region(1):
+!       reg = srf%region(1)
+!       select case (trim(adjustl(srf%surface_type)))
+!         case ("cyl")  ! Cylindrical
+!           srf%cyl%radius = srf%cyl%radius + dw
+!           select case (trim(adjustl(reg%boundary_type)))
+!             case ("rect")
+!               reg%cyl_rect%zmin = reg%cyl_rect%zmin - dw
+!               reg%cyl_rect%zmax = reg%cyl_rect%zmax + dw
+!               reg%cyl_rect%tmin = reg%cyl_rect%tmin - dt
+!               reg%cyl_rect%tmax = reg%cyl_rect%tmax + dt
+!             case default
+!               write(*,*) 'Error: boundary_type = ', reg%boundary_type, ' not defined for surface_tupe = "cyl"'
+!             end select
+!         case ("plane")  ! Planar
+!           srf%plane%origin = srf%plane%origin + abs(dw) * srf%plane%normal
+!           select case (trim(adjustl(reg%boundary_type)))
+!             case ("rect")
+!               reg%plane_rect%xmin = reg%plane_rect%xmin - dw
+!               reg%plane_rect%xmax = reg%plane_rect%xmax + dw
+!               reg%plane_rect%ymin = reg%plane_rect%ymin - dw
+!               reg%plane_rect%ymax = reg%plane_rect%ymax + dw
+!             case ("circ")
+!               reg%plane_circ%rmin = reg%plane_circ%rmin - dw
+!               reg%plane_circ%rmax = reg%plane_circ%rmax + dw
+!             case default
+!               write(*,*) 'Error: boundary_type = ', reg%boundary_type, ' not defined for surface_tupe = "plane"'
+!             end select
+!         case default
+!           write(*,*) 'Warning: unknown surface_type for surface ', ss
+!           write(*,*) 'Unknown surface_type: ', trim(srf%surface_type)
+!           stop
+!         end select
+!
+!         ! Copy back region(1)
+!         srf%region(1) = reg
+!
+!         ! Copy back surface
+!         vacuum_vessel%surface(ss) = srf
+!
+!     end do ! LOOP ss over all surfaces
+! end subroutine pad_vacuum_vessel
+! ! <<< [JFCM, 2025-07-23] <<<
+
+! >>> [JFCM, 2025-08-01] >>>
+subroutine append_to_list_id(list_id, id)
+  !+ Appends an integer ID to a dynamically allocated list of integers.
+  !+ If the list is not yet allocated, it is first allocated and initialized.
+  !+ Used to grow integer ID lists such as voxel index mappings.
+  integer(Int32), allocatable, intent(inout) :: list_id(:)
+    !+ Container holding list of surface id's which intersect voxel
+  integer(Int32), intent(in) :: id
+    !+ surface id to append to list
+
+  ! Local variables:
+  integer(Int32), allocatable  :: temp(:)
+  integer :: nid
+
+  ! CHECK allocation state and APPEND data:
+  if (.not. allocated(list_id)) then
+    allocate(list_id(1))
+    list_id(1) = id
+  else
+    nid = size(list_id)
+    allocate(temp(nid+1))
+    temp(1:nid) = list_id
+    temp(nid+1) = id
+    call move_alloc(temp,list_id)
+  end if
+
+end subroutine append_to_list_id
+! <<< [JFCM, 2025-08-01] <<<
+
+! >>> [JFCM, 2025-08-06] >>>
+pure logical function is_angle_between(theta, tmin, tmax)
+  !+ Checks whether a given angle lies within a specified angular interval.
+  !+ This function determines if the input angle `theta` lies within the
+  !+ angular range defined by [`tmin`, `tmax`], accounting for periodicity
+  !+ over [0, 2π). The interval can wrap around 2π (i.e., `tmin` > `tmax`).
+  !+ A tolerance is applied to treat values within 1.0e-4 of 0 and 2π as exact.
+  !+
+  !+ Arguments:
+  !+   theta    : Angle to test [rad]
+  !+   tmin     : Minimum bound of angular interval [rad]
+  !+   tmax     : Maximum bound of angular interval [rad]
+  !+
+  !+ Returns:
+  !+   is_angle_between : Logical flag indicating whether `theta` lies within
+  !+                      the interval [`tmin`, `tmax`] (inclusive).
+  real(Float64), intent(in) :: theta, tmin, tmax
+  real(Float64) :: th, tmin_mod, tmax_mod
+  real(Float64), parameter :: tol = 1.0d-4
+
+  ! Normalize all angles:
+  th = modulo(theta, 2*pi)
+  tmin_mod = modulo(tmin, 2*pi)
+  tmax_mod = modulo(tmax, 2*pi)
+
+  ! Preserve 0 and 2pi if within tolerance:
+  if (abs(tmin_mod) < tol) tmin_mod = 0d0
+  if (abs(tmax - 2*pi) < tol) tmax_mod = 2*pi
+
+  ! CHECK in which direction angle wraps around:
+  if (tmin_mod <= tmax_mod) then
+    ! Short arc:
+    is_angle_between = (th >= tmin_mod) .and. (th <= tmax_mod)
+  else
+    ! Long arc:
+    is_angle_between = (th >= tmin_mod) .or. (th <= tmax_mod)
+  end if
+
+end function is_angle_between
+! <<< [JFCM, 2025-08-06] <<<
+
+! >>> [JFCM, 2025-08-06] >>>
+subroutine solve_ray_plane_intersection(ray, surface, isect)
+  type(RayStruct), intent(in) :: ray
+  type(AnalyticSurface), intent(in) :: surface
+  type(RayIntersection), intent(inout) :: isect
+
+  ! Local variables:
+  real(Float64) :: va, Ka, s_coll
+  real(Float64), dimension(3) :: ray_origin, ray_v, plane_origin, plane_normal
+  real(Float64), dimension(3) :: K, p_coll, p_coll_prime
+  real(Float64), dimension(2) :: q_prime
+  real(Float64) :: x, y, r, t
+  logical :: in_x, in_y, in_theta, in_radius, in_boundary
+  type(SurfaceRegion) :: region
+  real(Float64) :: xmin, xmax, ymin, ymax
+  real(Float64) :: rmin, rmax, tmin, tmax
+  integer :: boundary_type
+
+  ! INIT results structure:
+  isect%hit = .false.
+  isect%n_roots = 0
+
+  ! CHECK surface type
+  if (trim(surface%surface_type) /= 'plane') stop 'solve_ray_plane_intersection: surface must be plane'
+
+  ! GET geometric terms:
+  ray_origin = ray%origin
+  ray_v = ray%v
+  region = surface%region(1)
+  plane_origin = surface%plane%origin
+  plane_normal = surface%plane%normal / sqrt(sum(surface%plane%normal**2))
+
+  ! GET boundary type:
+  boundary_type = 1
+  if (trim(region%boundary_type) == 'circ') boundary_type = 2
+
+  ! COMPUTE ray-plane intersection terms:
+  K  = ray_origin - plane_origin
+  va = dot_product(ray_v, plane_normal)
+  Ka = dot_product(K, plane_normal)
+
+  ! CHECK parallel condition:
+  if (abs(va) < 1e-12) then
+    return ! Ray is effectively parallel to plane
+  endif
+
+  ! COMPUTE intersection time
+  s_coll = -Ka / va
+
+  ! CHECK negative intersection times:
+  if (s_coll <= 0.0) then
+   return ! Collison point is in opposite direction to ray:
+ endif
+
+  ! COMPUTE collision point
+  p_coll = ray_origin + s_coll*ray_v
+
+  ! COMPUTE transformation to plane's local frame:
+  p_coll_prime = matmul(surface%plane%inv_basis, p_coll - plane_origin)
+
+  ! CHECK boundaries:
+  select case (boundary_type)
+  case (1) ! Rectangular boundary
+
+    ! GET local cartesian position:
+    x = p_coll_prime(1)
+    y = p_coll_prime(2)
+
+    ! GET region's bounds:
+    xmin = region%plane_rect%xmin
+    xmax = region%plane_rect%xmax
+    ymin = region%plane_rect%ymin
+    ymax = region%plane_rect%ymax
+
+    ! CHECK bounds:
+    in_x = (x >= xmin) .and. (x <= xmax)
+    in_y = (y >= ymin) .and. (y <= ymax)
+    in_boundary = in_x .and. in_y
+
+  case (2) ! Circular boundary
+
+    ! COMPUTE collision point in the boundary's local frame:
+    q_prime = p_coll_prime(1:2) - region%plane_circ%origin
+
+    ! GET local cartesian position:
+    x = q_prime(1)
+    y = q_prime(2)
+
+    ! COMPUTE polar coordinates:
+    t = modulo(atan2(y, x), 2.0*pi)
+    r = sqrt(x**2 + y**2)
+
+    ! GET region's bounds:
+    tmin = region%plane_circ%tmin
+    tmax = region%plane_circ%tmax
+    rmin = region%plane_circ%rmin
+    rmax = region%plane_circ%rmax
+
+    ! CHECK: bounds:
+    in_theta  = is_angle_between(t, tmin, tmax)
+    in_radius = (r >= rmin) .and. (r <= rmax)
+    in_boundary = in_theta .and. in_radius
+
+  case default
+    stop 'solve_ray_plane_intersection: unknown boundary type'
+  end select
+
+  if (in_boundary) then
+    isect%hit = .true.
+    isect%n_roots = 1
+    isect%s_star(1) = s_coll
+    isect%p_star(:,1) = p_coll
+    isect%normal(:,1) = plane_normal
+  end if
+
+end subroutine solve_ray_plane_intersection
+! <<< [JFCM, 2025-08-06] <<<
+
+! >>> [JFCM, 2025-08-01] >>>
+subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
+  !+ Solves ray-cylinder intersection for a bounded cylindrical analytic surface.
+  !+ Returns up to two valid intersection points and normals based on mode.
+  type(RayStruct), intent(in) :: ray
+    !+ Defines the ray's initial state
+  type(AnalyticSurface), intent(in) :: surface
+    !+ Structure containing information about surface
+  character(len=*), intent(in) :: mode
+    !+ Defines how many roots to return: (1) "first" or (2) "all"
+  type(RayIntersection), intent(inout) :: isect
+    !+ Structure to store and return the intersection result
+
+  ! Local variables
+  real(Float64) :: A, B, C, D, sqrtD, R
+  real(Float64) :: s_roots(2), s_coll(2)
+  real(Float64) :: padding_dist, padding_s
+  real(Float64), dimension(3) :: ray_origin, ray_v, cyl_origin, cyl_axis, K, vper, Kper, p
+  real(Float64), dimension(3,2) :: p_coll, p_coll_prime, normal_prime, normal
+  real(Float64), dimension(2) :: x, y, z, t, rho
+  integer :: ii, n_valid
+  logical :: in_theta(2), in_height(2), in_bounds(2)
+  type(SurfaceRegion) :: region
+  real(Float64) :: tmin, tmax, zmin, zmax
+
+  ! CHECK surface type:
+  if (trim(surface%surface_type) /= "cyl") then
+    write(*,*) "Error: solve_ray_cylinder_intersection requires a cylindrical surface."
+    stop
+  end if
+
+  ! CHECK boundary type:
+  region = surface%region(1)
+  if (trim(region%boundary_type) /= "rect") then
+    write(*,*) "Error: solve_ray_cylinder_intersection requires rectangular cylinder bounds."
+    stop
+  end if
+
+  ! INIT output
+  isect%hit = .false.
+  isect%n_roots = 0
+
+  ! COMPUTE Geometric terms
+  ray_origin = ray%origin
+  ray_v = ray%v
+  cyl_origin = surface%cyl%origin
+  cyl_axis = surface%cyl%axis
+  R  = surface%cyl%radius
+
+  ! UPDATE axis to a unit vector:
+  cyl_axis = cyl_axis/sqrt(sum(cyl_axis**2))
+
+  ! COMPUTE quadratic equation terms:
+  K = ray_origin - cyl_origin
+  Kper = K - dot_product(K,cyl_axis)*cyl_axis
+  vper = ray_v - dot_product(ray_v,cyl_axis)*cyl_axis
+  A = dot_product(vper, vper)
+  B = 2.0 * dot_product(Kper, vper)
+  C = dot_product(Kper, Kper) - R**2
+
+  ! CHECK parallel condition:
+  if (abs(A) < 1e-12) return
+
+  ! COMPUTE and CHECK discriminant:
+  D = B**2 - 4*A*C
+  if (D < 0.0) return ! No intersection
+
+  ! COMPUTE roots:
+  sqrtD = sqrt(D)
+  s_roots(1) = (-B + sqrtD) / (2*A)
+  s_roots(2) = (-B - sqrtD) / (2*A)
+
+  ! SELECT only positive roots:
+  n_valid = 0
+  do ii = 1, 2
+    if (s_roots(ii) > 0.0) then
+      n_valid = n_valid + 1
+      s_coll(n_valid) = s_roots(ii)
+    end if
+  end do
+
+  ! CHECK that at least on root is positive;
+  if (n_valid == 0) return ! All roots are negative:
+
+  ! CHECK output mode:
+  if (trim(mode) == 'first') then
+    ! Keep only the smallest positive root:
+    s_coll(1) = minval(s_coll(:n_valid))
+    n_valid = 1
+  end if
+
+  ! COMPUTE collision points:
+  do ii = 1, n_valid
+    p_coll(:,ii) = ray_origin + s_coll(ii)*ray_v
+  end do
+
+  ! COMPUTE transformation to local cylinder frame:
+  do ii = 1, n_valid
+    p_coll_prime(:,ii) = matmul(surface%cyl%inv_basis, p_coll(:,ii) - cyl_origin)
+  end do
+
+  ! COMPUTE local cartesian coordinates:
+  x = p_coll_prime(1,:)
+  y = p_coll_prime(2,:)
+  z = p_coll_prime(3,:)
+
+  ! COMPUTE local cylindrical coordinates:
+  rho = sqrt(x**2 + y**2)
+  t = atan2(y,x)
+  t = modulo(t, 2.0*pi) ! Ensure [0, 2pi)
+
+  ! CHECK bounds:
+  ! TODO: upgrade to multi-region
+  ! TODO: How to ensure that angles are entered in radians?
+  tmin = region%cyl_rect%tmin ! [rad]
+  tmax = region%cyl_rect%tmax ! [rad]
+  zmin = region%cyl_rect%zmin
+  zmax = region%cyl_rect%zmax
+  do ii = 1, n_valid
+    in_theta(ii) = is_angle_between(t(ii), tmin, tmax)
+    in_height(ii) = (z(ii) >= zmin) .and. (z(ii) <= zmax)
+    in_bounds(ii) = in_theta(ii) .and. in_height(ii)
+  end do
+
+  ! SET return structure isect:
+  if (any(in_bounds)) then
+    isect%hit = .true.
+    isect%n_roots = count(in_bounds)
+
+    ! LOOP over all roots:
+    n_valid = 0
+    do ii = 1, 2
+      if (in_bounds(ii)) then
+        n_valid = n_valid + 1
+
+        ! COMPUTE surface normal:
+        normal_prime(:,n_valid) = -[x(ii), y(ii), 0.d0]
+        normal_prime(:,n_valid) = normal_prime(:,n_valid) / sqrt(sum(normal_prime(:,n_valid)**2))
+        normal(:,n_valid) = matmul(surface%cyl%basis, normal_prime(:,n_valid))
+
+        ! SET output data:
+        isect%s_star(n_valid) = s_coll(ii)
+        isect%p_star(:,n_valid) = p_coll(:,ii)
+        isect%normal(:,n_valid) = normal(:,n_valid)
+      end if
+    end do ! LOOP ii over roots
+  end if
+
+end subroutine solve_ray_cylinder_intersection
+! <<< [JFCM, 2025-08-01] <<<
+
+! >>> [JFCM, 2025-08-01] >>>
+subroutine index_surface_to_beam_grid(surf,map)
+  !+ Performs voxel-based indexing of an analytic surface onto beam_grid structured grid.
+  !+ For each projection axis (x, y, z), rays are cast through face corners
+  !+ to accumulate all intersected voxels in a logical 3D array `map`.
+  !+ zero-thickness surface are volumetrized to avoid numerical problems when surface coincides with cell edges
+  type(AnalyticSurface), intent(in) :: surf
+    !+ Surface structure containing all the geometric data defining the surface
+  logical, dimension(:,:,:), intent(inout) :: map
+    !+ Logical array to populate from indexing process
+
+  ! Local variables
+  integer :: proj_axis, i1, i2, cc, rr, vv
+  integer :: id, ix, iy, iz
+  real(Float64) :: ds, dw, ndotv
+  real(Float64), dimension(3) :: ray_origin, p, vhat, nhat
+  real(Float64), dimension(3,2) :: p_coll
+  real(Float64), dimension(2,4) :: corners
+  type(RayStruct) :: ray
+  type(RayIntersection) :: isect
+  real(Float64), allocatable :: edge(:), edge1(:), edge2(:)
+  integer :: N, N1, N2
+  character(len=16) :: mode = "all"
+  real(Float64), dimension(2) :: corner ! Local corner vector
+
+  ! LOOP over projection axes:
+  do proj_axis = 1,3
+
+    ! INIT edge containers:
+    if (allocated(edge))  deallocate(edge)
+    if (allocated(edge1)) deallocate(edge1)
+    if (allocated(edge2)) deallocate(edge2)
+
+    ! SELECT axis-depedent data:
+    select case (proj_axis)
+      case (1)
+        ray%v = [1.0, 0.0, 0.0]
+        allocate(edge(size(beam_grid%xe)))
+        allocate(edge1(size(beam_grid%ye)))
+        allocate(edge2(size(beam_grid%ze)))
+        edge  = beam_grid%xe;   N  = beam_grid%nx;   ds = beam_grid%dr(1)
+        edge1 = beam_grid%ye;   N1 = beam_grid%ny
+        edge2 = beam_grid%ze;   N2 = beam_grid%nz
+      case (2)
+        ray%v = [0.0, 1.0, 0.0]
+        allocate(edge(size(beam_grid%ye)))
+        allocate(edge1(size(beam_grid%xe)))
+        allocate(edge2(size(beam_grid%ze)))
+        edge  = beam_grid%ye;   N  = beam_grid%ny;   ds = beam_grid%dr(2)
+        edge1 = beam_grid%xe;   N1 = beam_grid%nx
+        edge2 = beam_grid%ze;   N2 = beam_grid%nz
+      case (3)
+        ray%v = [0.0, 0.0, 1.0]
+        allocate(edge(size(beam_grid%ze)))
+        allocate(edge1(size(beam_grid%xe)))
+        allocate(edge2(size(beam_grid%ye)))
+        edge  = beam_grid%ze;   N  = beam_grid%nz;   ds = beam_grid%dr(3)
+        edge1 = beam_grid%xe;   N1 = beam_grid%nx
+        edge2 = beam_grid%ye;   N2 = beam_grid%ny
+      end select
+
+    ! Unit vector along ray direction:
+    vhat = ray%v/norm2(ray%v)
+
+    ! LOOP over plane spanned by edge1 and edge2:
+    do i1 = 1, N1
+      do i2 = 1, N2
+
+        ! Compute 4 voxel corners in edge1-edge2 plane:
+        corners(:,1) = [edge1(i1),   edge2(i2)]
+        corners(:,2) = [edge1(i1+1), edge2(i2)]
+        corners(:,3) = [edge1(i1),   edge2(i2+1)]
+        corners(:,4) = [edge1(i1+1), edge2(i2+1)]
+
+        ! LOOP over 4 corners of current voxel:
+        do cc = 1,4
+          corner = corners(:,cc)
+          ray%origin = 0.0
+
+          ! SET ray state:
+          select case (proj_axis)
+          case (1)
+            ray%origin(1) = edge(1)
+            ray%origin(2) = corner(1)
+            ray%origin(3) = corner(2)
+          case (2)
+            ray%origin(1) = corner(1)
+            ray%origin(2) = edge(1)
+            ray%origin(3) = corner(2)
+          case (3)
+            ray%origin(1) = corner(1)
+            ray%origin(2) = corner(2)
+            ray%origin(3) = edge(1)
+          end select
+
+          ! COMPUTE ray-surface intersection:
+          select case (trim(surf%surface_type))
+          case ("plane")
+            call solve_ray_plane_intersection(ray,surf,isect)
+          case ("cyl")
+            call solve_ray_cylinder_intersection(ray,surf,mode,isect)
+          end select
+
+          ! CHECK if intersection happens:
+          if (isect%hit) then
+
+            ! LOOP over roots:
+            do rr = 1,isect%n_roots
+
+              ! COMPUTE intersection point at zero-thickness surface:
+              p = ray%origin + (isect%s_star(rr)*ray%v)
+
+              ! COMPUTE projection of surface normal on ray direction:
+              nhat = isect%normal(:,rr)
+              ndotv = dot_product(nhat,vhat)
+
+              ! COMPUTE wall thickness projected in ray direction:
+              if (abs(ndotv) > 1e-3) then
+                dw = beam_grid%ds*vacuum_vessel%surface_padding_epsilon/abs(ndotv)
+              else
+                ! TODO: this may not be the correct solution to this edge case
+                dw = 0.d0 ! Ray direction and surface normal are close to perpendicular
+              end if
+
+              ! COMPUTE intersection point for both sides of volumetrized surface:
+              p_coll(:,1) = p - vhat*dw
+              p_coll(:,2) = p + vhat*dw
+
+              ! LOOP over volumetrized collision points:
+              do vv = 1,2
+
+                ! COMPUTE collison point index along projection axis:
+                id = floor((p_coll(proj_axis,vv) - edge(1))/ds) + 1
+
+                ! CHECK if intersection index lies inside the beam_grid:
+                if (id >= 1 .and. id <= N) then
+                  select case (proj_axis)
+                  case (1)
+                    ix = id; iy = i1; iz = i2
+                  case (2)
+                    ix = i1; iy = id; iz = i2
+                  case (3)
+                    ix = i1; iy = i2; iz = id
+                  end select
+
+                  ! UPDATE map:
+                  map(ix, iy, iz) = .true.
+
+                end if
+              end do! LOOP vv over volumetrized coll points
+            end do ! LOOP rr over roots
+          end if ! hit
+        end do ! LOOP cc over corners
+      end do ! LOOP i1
+    end do ! LOOP i2
+  end do ! LOOP proj_axis
+
+end subroutine index_surface_to_beam_grid
+! <<< [JFCM, 2025-08-01] <<<
+
+! >>> [JFCM, 2025-07-31] >>>
+subroutine map_vacuum_vessel_to_beam_grid()
+  !+ Maps analytic vacuum vessel surfaces to beam grid voxels.
+  !+ For each surface, this subroutine computes which voxels it intersects
+  !+ and updates the voxel map to store surface presence and intersection flags.
+
+  integer(Int32) :: ss, i, j, k, nid
+  logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: local_map
+  type(AnalyticSurface) :: surf
+
+  ! LOOP over surfaces:
+  surf_loop: do ss = 1,size(vacuum_vessel%surface)
+
+    ! INIT local map for current surface:
+    local_map = .FALSE.
+
+    ! GET surface and CHECK if active:
+    surf = vacuum_vessel%surface(ss)
+    if (.not.surf%is_active) cycle surf_loop
+
+    ! COMPUTE index:
+    call index_surface_to_beam_grid(surf,local_map)
+
+    ! LOOP over local map
+    do k = 1, beam_grid%nz
+      do j = 1, beam_grid%ny
+        do i = 1, beam_grid%nx
+          ! CHECK if intersection occurs:
+          if (local_map(i,j,k)) then
+            ! UPDATE global map:
+            vacuum_vessel%map(i,j,k)%intersects = .TRUE.
+
+            ! UPDATE list of surfaces in current voxel:
+            call append_to_list_id(vacuum_vessel%map(i,j,k)%list_id, ss)
+          end if
+        end do ! i
+      end do ! j
+    end do ! k
+  end do surf_loop
+
+end subroutine map_vacuum_vessel_to_beam_grid
+! <<< [JFCM, 2025-07-31] <<<
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
@@ -3813,6 +4857,9 @@ subroutine read_equilibrium
 
 
     call h5ltpath_valid_f(fid, "/plasma/denn", .True., path_valid, error)
+    ! >>> [JFCM, 2025_07_31] >>>
+    path_valid = .false.
+    ! <<< [JFCM, 2025_07_31] <<<
     if(path_valid) then
         call h5ltread_dataset_double_f(gid, "/plasma/denn", denn3d, dims, error)
         where(denn3d.lt.0.0)
@@ -16556,6 +17603,9 @@ program fidasim
     call read_tables()
     call read_equilibrium()
     call make_beam_grid()
+    ! >>> [JFCM, 2025_07_23] >>>
+    call define_vacuum_vessel()
+    ! <<< [JFCM, 2025_07_23] <<<
     if(inputs%calc_beam.ge.1) call read_beam()
     call read_distribution()
 

@@ -2941,9 +2941,6 @@ subroutine define_vacuum_vessel()
   ! GET analytic surface info from namelist
   call read_vacuum_vessel()
 
-  ! Pad dimensions to avoid grazing boundary issues
-  ! call pad_vacuum_vessel()
-
   ! ALLOCATE the voxel map
   allocate(vacuum_vessel%map(beam_grid%nx, beam_grid%ny, beam_grid%nz))
 
@@ -3206,75 +3203,6 @@ subroutine check_basis_diagnostics(basis, surface_index)
   end if
 end subroutine check_basis_diagnostics
 ! <<< [JFCM, 2025-07-23] <<<
-
-! ! >>> [JFCM, 2025-07-23] >>>
-! subroutine pad_vacuum_vessel()
-! !+ Applies geometric padding to analytic surfaces in `vacuum_vessel` to avoid
-! !+ edge-coincidence issues during voxel indexing and ray-surface intersection.
-!   integer :: ss
-!   real(Float64) :: dw, dt
-!   real(Float64) :: eps_geom
-!   type(SurfaceRegion) :: reg
-!   type(AnalyticSurface) :: srf
-!
-!   ! Get padding scale
-!   eps_geom = vacuum_vessel%surface_padding_epsilon
-!   dw = eps_geom * sqrt(sum(beam_grid%dr**2))
-!   dt = eps_geom * 2.0*pi
-!
-!   ! Loop over all analytic surfaces
-!     do ss = 1, size(vacuum_vessel%surface)
-!
-!       ! Enforce region(1) exists:
-!       srf = vacuum_vessel%surface(ss)
-!       if (.not. allocated(srf%region)) then
-!         write(*,*) 'Error: region not allocated for surface ', ss
-!         stop
-!       end if
-!
-!       ! Pad only region(1):
-!       reg = srf%region(1)
-!       select case (trim(adjustl(srf%surface_type)))
-!         case ("cyl")  ! Cylindrical
-!           srf%cyl%radius = srf%cyl%radius + dw
-!           select case (trim(adjustl(reg%boundary_type)))
-!             case ("rect")
-!               reg%cyl_rect%zmin = reg%cyl_rect%zmin - dw
-!               reg%cyl_rect%zmax = reg%cyl_rect%zmax + dw
-!               reg%cyl_rect%tmin = reg%cyl_rect%tmin - dt
-!               reg%cyl_rect%tmax = reg%cyl_rect%tmax + dt
-!             case default
-!               write(*,*) 'Error: boundary_type = ', reg%boundary_type, ' not defined for surface_tupe = "cyl"'
-!             end select
-!         case ("plane")  ! Planar
-!           srf%plane%origin = srf%plane%origin + abs(dw) * srf%plane%normal
-!           select case (trim(adjustl(reg%boundary_type)))
-!             case ("rect")
-!               reg%plane_rect%xmin = reg%plane_rect%xmin - dw
-!               reg%plane_rect%xmax = reg%plane_rect%xmax + dw
-!               reg%plane_rect%ymin = reg%plane_rect%ymin - dw
-!               reg%plane_rect%ymax = reg%plane_rect%ymax + dw
-!             case ("circ")
-!               reg%plane_circ%rmin = reg%plane_circ%rmin - dw
-!               reg%plane_circ%rmax = reg%plane_circ%rmax + dw
-!             case default
-!               write(*,*) 'Error: boundary_type = ', reg%boundary_type, ' not defined for surface_tupe = "plane"'
-!             end select
-!         case default
-!           write(*,*) 'Warning: unknown surface_type for surface ', ss
-!           write(*,*) 'Unknown surface_type: ', trim(srf%surface_type)
-!           stop
-!         end select
-!
-!         ! Copy back region(1)
-!         srf%region(1) = reg
-!
-!         ! Copy back surface
-!         vacuum_vessel%surface(ss) = srf
-!
-!     end do ! LOOP ss over all surfaces
-! end subroutine pad_vacuum_vessel
-! ! <<< [JFCM, 2025-07-23] <<<
 
 ! >>> [JFCM, 2025-08-01] >>>
 subroutine append_to_list_id(list_id, id)

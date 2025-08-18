@@ -166,14 +166,16 @@ type RayIntersection
   !+ Structure to store ray-surface intersection information
   logical :: hit = .FALSE.
     !+ Logical flag indicating if ray has collided with a surface
-  integer :: n_roots
+  integer :: n_roots = 0
     !+ Number of valid intersection points, x1 for planes and x2 for cylinders
-  real(Float64), dimension(2) :: s_star
+  real(Float64), dimension(2) :: s_star = [huge(1.d0), huge(1.d0)]
     !+ "time" parameter along the ray where intersection with surface occurs. Two roots of cylindrical surface
   real(Float64), dimension(3,2) :: p_star
     !+ Position vectors in [cm] in beam grid frame where intersections with surface occurs
   real(Float64), dimension(3,2) :: normal
     !+ Unit vectors normal to surface at point of intersectons in beam_grid frame
+  integer(Int32) :: sid = -1
+    !+ ID of surface in vacuum_vessel%surface where collision occured
 end type RayIntersection
 ! <<< [JFCM, 2025_08_01] <<<
 
@@ -2870,7 +2872,7 @@ end subroutine make_beam_grid
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine write_boundary_map
   !+ This subroutine has been written to provide means to test how the boundary-beam grid map is formed
-  integer(Int32), dimension(:,:,:), allocatable :: intersects
+  integer(Int32), dimension(:,:,:), allocatable :: intersects, nid
   integer :: i, j, k
   integer(HID_T) :: h5file_id, gid
   integer(HSIZE_T), dimension(1) :: dims1
@@ -2889,13 +2891,16 @@ subroutine write_boundary_map
 
   ! Allocate temporary logical array:
   allocate(intersects(dims3(1), dims3(2), dims3(3)))
+  allocate(nid(dims3(1), dims3(2), dims3(3)))
   do k = 1, dims3(3)
     do j = 1, dims3(2)
       do i = 1, dims3(1)
         if (vacuum_vessel%map(i,j,k)%intersects) then
           intersects(i,j,k) = 1
+          nid(i,j,k) = size(vacuum_vessel%map(i,j,k)%list_id)
         else
           intersects(i,j,k) = 0
+          nid(i,j,k) = 0
         endif
       end do
     end do
@@ -2909,6 +2914,10 @@ subroutine write_boundary_map
 
   ! Write intersect:
   call h5ltmake_compressed_dataset_int_f(h5file_id,"/intersects", 3, dims3, intersects, error)
+
+  ! Write nid:
+  call h5ltmake_compressed_dataset_int_f(h5file_id,"/nid", 3, dims3, nid, error)
+  if (error<0) write(*,*) "(write_boundary_map::nid) Error"
 
   ! Write beam grid data:
   call h5gcreate_f(h5file_id, "beam_grid", gid, error)
@@ -3363,13 +3372,13 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   real(Float64), dimension(3) :: K, p_coll, p_coll_prime
   real(Float64), dimension(2) :: q_prime
   real(Float64) :: x, y, r, t
-  logical :: in_x, in_y, in_theta, in_radius, in_boundary
+  logical :: in_x, in_y, in_theta, in_radius, in_bounds
   type(SurfaceRegion) :: region
   real(Float64) :: xmin, xmax, ymin, ymax
   real(Float64) :: rmin, rmax, tmin, tmax
   integer :: boundary_type
 
-  ! INIT results structure:
+  ! INIT default output structure:
   isect%hit = .false.
   isect%n_roots = 0
 
@@ -3401,7 +3410,7 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   s_coll = -Ka / va
 
   ! CHECK negative intersection times:
-  if (s_coll <= 0.0) then
+  if (s_coll <= 0) then
    return ! Collison point is in opposite direction to ray:
  endif
 
@@ -3428,7 +3437,7 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
     ! CHECK bounds:
     in_x = (x >= xmin) .and. (x <= xmax)
     in_y = (y >= ymin) .and. (y <= ymax)
-    in_boundary = in_x .and. in_y
+    in_bounds = in_x .and. in_y
 
   case (2) ! Circular boundary
 
@@ -3452,13 +3461,13 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
     ! CHECK: bounds:
     in_theta  = is_angle_between(t, tmin, tmax)
     in_radius = (r >= rmin) .and. (r <= rmax)
-    in_boundary = in_theta .and. in_radius
+    in_bounds = in_theta .and. in_radius
 
   case default
     stop 'solve_ray_plane_intersection: unknown boundary type'
   end select
 
-  if (in_boundary) then
+  if (in_bounds) then
     isect%hit = .true.
     isect%n_roots = 1
     isect%s_star(1) = s_coll
@@ -3483,16 +3492,19 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
     !+ Structure to store and return the intersection result
 
   ! Local variables
-  real(Float64) :: A, B, C, D, sqrtD, R
-  real(Float64) :: s_roots(2), s_coll(2)
+  real(Float64) :: A, B, C, D, sqrtD, R, dummy
+  real(Float64) :: s_roots(2), s_coll(2), s_pos(2)
   real(Float64) :: padding_dist, padding_s
   real(Float64), dimension(3) :: ray_origin, ray_v, cyl_origin, cyl_axis, K, vper, Kper, p
-  real(Float64), dimension(3,2) :: p_coll, p_coll_prime, normal_prime, normal
-  real(Float64), dimension(2) :: x, y, z, t, rho
-  integer :: ii, n_valid
-  logical :: in_theta(2), in_height(2), in_bounds(2)
+  real(Float64), dimension(3) :: p_coll, p_coll_prime, nhat, nhat_prime, vhat
+  real(Float64) :: x, y, z, t, rho
+  integer :: ii, n_pos, rr
+  logical :: in_theta  = .false., &
+             in_height = .false., &
+             in_bounds = .false.
   type(SurfaceRegion) :: region
   real(Float64) :: tmin, tmax, zmin, zmax
+  real(Float64), parameter :: eps_s = 1d-10, eps_A = 1d-12, tol = 1d-10
 
   ! CHECK surface type:
   if (trim(surface%surface_type) /= "cyl") then
@@ -3507,7 +3519,7 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
     stop
   end if
 
-  ! INIT output
+  ! INIT default output
   isect%hit = .false.
   isect%n_roots = 0
 
@@ -3519,104 +3531,110 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   R  = surface%cyl%radius
 
   ! UPDATE axis to a unit vector:
-  cyl_axis = cyl_axis/sqrt(sum(cyl_axis**2))
+  cyl_axis = cyl_axis/norm2(cyl_axis)
 
   ! COMPUTE quadratic equation terms:
   K = ray_origin - cyl_origin
   Kper = K - dot_product(K,cyl_axis)*cyl_axis
   vper = ray_v - dot_product(ray_v,cyl_axis)*cyl_axis
   A = dot_product(vper, vper)
-  B = 2.0 * dot_product(Kper, vper)
+  B = 2d0*dot_product(Kper, vper)
   C = dot_product(Kper, Kper) - R**2
 
-  ! CHECK parallel condition:
-  if (abs(A) < 1e-12) return
-
-  ! COMPUTE and CHECK discriminant:
-  D = B**2 - 4*A*C
-  if (D < 0.0) return ! No intersection
+  ! CHECK complex and parallel conditions:
+  if (abs(A) < eps_A) return ! Parallel ray to cylindrical axis
+  D = B**2 - 4d0*A*C
+  if (D < 0d0) return ! No intersection
+  !! TODO: what happens when D == 0? ray is exactly tangent, how do we treat this?
 
   ! COMPUTE roots:
   sqrtD = sqrt(D)
-  s_roots(1) = (-B + sqrtD) / (2*A)
-  s_roots(2) = (-B - sqrtD) / (2*A)
+  s_roots(1) = (-B + sqrtD) / (2d0*A)
+  s_roots(2) = (-B - sqrtD) / (2d0*A)
 
   ! SELECT only positive roots:
-  n_valid = 0
-  do ii = 1, 2
-    if (s_roots(ii) > 0.0) then
-      n_valid = n_valid + 1
-      s_coll(n_valid) = s_roots(ii)
+  n_pos = 0
+  do rr = 1, 2
+    if (s_roots(rr) > eps_s) then
+      n_pos = n_pos + 1
+      s_pos(n_pos) = s_roots(rr)
     end if
   end do
 
   ! CHECK that at least on root is positive;
-  if (n_valid == 0) return ! All roots are negative:
+  if (n_pos == 0) return ! All roots are negative:
+
+  ! SORT roots in ascending order:
+  if (n_pos == 2 .and. s_pos(2) < s_pos(1)) then
+    dummy = s_pos(1); s_pos(1) = s_pos(2); s_pos(2) = dummy
+  end if
 
   ! CHECK output mode:
-  if (trim(mode) == 'first') then
-    ! Keep only the smallest positive root:
-    s_coll(1) = minval(s_coll(:n_valid))
-    n_valid = 1
-  end if
+  select case (trim(mode))
+  case ('first'); n_pos = 1
+  case ('all');   continue
+  case default
+    stop "ERROR: incorrect selection for 'mode'"
+  end select
 
-  ! COMPUTE collision points:
-  do ii = 1, n_valid
-    p_coll(:,ii) = ray_origin + s_coll(ii)*ray_v
-  end do
+  !! LOOP over all positive roots:
+  do rr = 1, n_pos
 
-  ! COMPUTE transformation to local cylinder frame:
-  do ii = 1, n_valid
-    p_coll_prime(:,ii) = matmul(surface%cyl%inv_basis, p_coll(:,ii) - cyl_origin)
-  end do
+    ! COMPUTE collision point in beam grid frame:
+     p_coll = ray_origin + s_pos(rr)*ray_v
 
-  ! COMPUTE local cartesian coordinates:
-  x = p_coll_prime(1,:)
-  y = p_coll_prime(2,:)
-  z = p_coll_prime(3,:)
+    ! COMPUTE collision point transformation to local cylinder frame:
+    p_coll_prime = matmul(surface%cyl%inv_basis, p_coll - cyl_origin)
 
-  ! COMPUTE local cylindrical coordinates:
-  rho = sqrt(x**2 + y**2)
-  t = atan2(y,x)
-  t = modulo(t, 2.0*pi) ! Ensure [0, 2pi)
+    ! GET local cartesian coordinates:
+    x = p_coll_prime(1)
+    y = p_coll_prime(2)
+    z = p_coll_prime(3)
 
-  ! CHECK bounds:
-  ! TODO: upgrade to multi-region
-  ! TODO: How to ensure that angles are entered in radians?
-  tmin = region%cyl_rect%tmin ! [rad]
-  tmax = region%cyl_rect%tmax ! [rad]
-  zmin = region%cyl_rect%zmin
-  zmax = region%cyl_rect%zmax
-  do ii = 1, n_valid
-    in_theta(ii) = is_angle_between(t(ii), tmin, tmax)
-    in_height(ii) = (z(ii) >= zmin) .and. (z(ii) <= zmax)
-    in_bounds(ii) = in_theta(ii) .and. in_height(ii)
-  end do
+    ! COMPUTE local cylindrical coordinates:
+    rho = sqrt(x**2 + y**2)
+    t = atan2(y,x)
+    t = modulo(t, 2d0*pi) ! Ensure [0, 2pi)
 
-  ! SET return structure isect:
-  if (any(in_bounds)) then
-    isect%hit = .true.
-    isect%n_roots = count(in_bounds)
+    ! GET region bounds:
+    ! TODO: upgrade to multi-region
+    ! TODO: How to ensure that angles are entered in radians?
+    tmin = region%cyl_rect%tmin ! [rad]
+    tmax = region%cyl_rect%tmax ! [rad]
+    zmin = region%cyl_rect%zmin ! [cm]
+    zmax = region%cyl_rect%zmax ! [cm]
+    in_theta = is_angle_between(t, tmin, tmax)
+    in_height = (z >= zmin) .and. (z <= zmax)
+    in_bounds = in_theta .and. in_height
 
-    ! LOOP over all roots:
-    n_valid = 0
-    do ii = 1, 2
-      if (in_bounds(ii)) then
-        n_valid = n_valid + 1
+    ! CHECK region bounds:
+    if (in_bounds) then
 
-        ! COMPUTE surface normal:
-        normal_prime(:,n_valid) = -[x(ii), y(ii), 0.d0]
-        normal_prime(:,n_valid) = normal_prime(:,n_valid) / sqrt(sum(normal_prime(:,n_valid)**2))
-        normal(:,n_valid) = matmul(surface%cyl%basis, normal_prime(:,n_valid))
+      ! UPDATE return structure:
+      isect%hit = .true.
+      isect%n_roots = isect%n_roots + 1
+      isect%s_star(isect%n_roots) = s_pos(rr)
+      isect%p_star(:,isect%n_roots) = p_coll
 
-        ! SET output data:
-        isect%s_star(n_valid) = s_coll(ii)
-        isect%p_star(:,n_valid) = p_coll(:,ii)
-        isect%normal(:,n_valid) = normal(:,n_valid)
-      end if
-    end do ! LOOP ii over roots
-  end if
+      ! COMPUTE surface normal in local frame:
+      nhat_prime = (/ x, y, 0d0 /)
+      nhat_prime = nhat_prime / max(rho, tol)
 
+      ! COMPUTE surface normal in beam grid frame:
+      nhat = matmul(surface%cyl%basis, nhat_prime)
+
+      ! COMPUTE normal consistent with reflection process:
+      vhat = ray_v/norm2(ray_v)
+      if (dot_product(vhat,nhat) > 1e-10) nhat = -nhat
+
+      ! UPDATE return structure:
+      isect%normal(:,isect%n_roots) = nhat
+
+      ! CHECK result mode:
+      if (trim(mode) == 'first') exit
+    end if
+
+  end do ! LOOP rr over roots
 end subroutine solve_ray_cylinder_intersection
 ! <<< [JFCM, 2025-08-01] <<<
 
@@ -9597,6 +9615,62 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
 end subroutine track
 
+!! >>> [JFCM, 2025-08-08] >>>
+subroutine find_ray_surface_intersection(ray,ind,intersection)
+    !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
+    type(RayStruct), intent(in) :: ray
+      !+ Contains data on initial ray state: origin [cm] and velocity [cm/s] in beam_grid frame
+    integer, dimension(3), intent(in) :: ind
+      !+ Indices of voxel in beam_grid
+    type(RayIntersection), intent(out) :: intersection
+      !+ Structure to store results of intersection event
+
+    ! Local variables:
+    integer(Int32) :: nid = 0
+    integer(Int32), dimension(:), allocatable :: surf_list
+    integer(Int32) :: ss, ii
+    type(RayIntersection) :: isect
+
+    !! GET number of surfaces in current voxel:
+    nid = size(vacuum_vessel%map(ind(1),ind(2),ind(3))%list_id)
+    if (nid == 0) then
+      stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
+    end if
+
+    !! LOOP over surfaces:
+    do ss = 1,nid
+
+      !! GET surface id:
+      ii = vacuum_vessel%map(ind(1),ind(2),ind(3))%list_id(ss)
+
+      !! COMPUTE ray-surface intersection:
+      select case (vacuum_vessel%surface(ii)%surface_type)
+      case ("plane")
+         call solve_ray_plane_intersection(ray,vacuum_vessel%surface(ii),isect)
+      case ("cyl")
+        call solve_ray_cylinder_intersection(ray,vacuum_vessel%surface(ii),"first",isect)
+      case DEFAULT
+        stop "Incorrect surface_type selection"
+      end select
+
+      ! CHECK hit:
+      if (isect%hit) then
+        if (isect%s_star(1) < intersection%s_star(1)) then
+          intersection%hit = .TRUE.
+          intersection%n_roots = 1;
+          intersection%s_star(1) = isect%s_star(1)
+          intersection%p_star(:,1) = isect%p_star(:,1)
+          intersection%normal(:,1) = isect%normal(:,1)
+          intersection%sid = ii
+        end if
+      end if
+
+    end do !! LOOP ss
+
+end subroutine find_ray_surface_intersection
+!! <<< [JFCM, 2025-08-08] <<<
+
+
 !! >>> [JFCM, 2025-07-04] >>>
 subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     !+ Description:
@@ -9611,163 +9685,231 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     logical, intent(out) :: pump_hit
         !+ logical flag indicating if particle was absorbed at the pump
 
-    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next, nhat
-    integer, dimension(3) :: ind, sgn
+    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
+    integer, dimension(3) :: ind, sgn, gdims
     integer :: cc, mind
-    logical :: confirmed_hit
-    real(Float64) :: dT, T_wall, vT, p_specular, p_absorb, p_thermal
-    type(AABB) :: wall, pump, throat1, throat2, Ta_surf
+    real(Float64) :: T_wall, vT, pspec, pabs, ptherm
+    ! type(AABB) :: wall, pump, throat1, throat2, Ta_surf
     real(Float64), dimension(1) :: randomu
+    logical :: in_grid, hit, surface_in_voxel
+    real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall
+    type(RayStruct) :: ray
+    type(RayIntersection) :: intersection
+    real(Float64) :: vmag, alpha
+    real(Float64), dimension(3) :: nhat, vhat
+    real(Int32) :: sid
+    character(len=16) :: function_type
 
-    vn = vin; rn = rin; sgn = 0; ntrack = 0
+    vn = vin; rn = rin; sgn = 0;
 
+    ! CHECK: avoid zero velocity
+    ! --------------------------
     if(dot_product(vin,vin).eq.0.0) then
         print *, "dot(vin,vin) == 0"
         return
     endif
 
-    !! Define indices and position of starting cell:
+    !! INIT ray state:
+    ! ----------------
+    ! The ray has the following states:
+    ! rn: ray position
+    ! vn: ray velocity
+    ! ind: beam grid cell indices containing ray
+    ! ri_cell: cell center containing ray
     call get_indices(rn,ind)
     ri_cell = [beam_grid%xc(ind(1)), &
                beam_grid%yc(ind(2)), &
                beam_grid%zc(ind(3))]
 
-    !! TODO: Need to add a new section in the input namelist to define these wall related quantities:
-    !! TODO: We might not need to pad the aabbs but rather add a tiny increment along the ray
-    !! Define the wall boundary using the beam_grid's AABB:
-    wall = beam_grid%gaabb
-    call pad_aabb(wall,-beam_grid%dr*1E-4)
-
-    !! Define neutral gas temperature at the wall:
-    T_wall = 3e-3 !! [keV]
-    vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1))) !! [cm/s]
-
-    !! Wall reaction probabilities:
-    p_specular = 0.1 !! Specular reflection
-    p_absorb = 0.4 !! Absorbed by the wall
-    p_thermal = 1 - p_absorb - p_specular !! Thermal scattering from wall
-
-    !! Define pump aperture:
-    pump%xmax = beam_grid%gaabb%xmax
-    pump%xmin = beam_grid%gaabb%xmax
-    pump%ymax = -15
-    pump%ymin = +15
-    pump%zmin = -25 - 15
-    pump%zmax = -25 + 15
-    call pad_aabb(pump,+beam_grid%dr*1E-2)
-
-    !! Define vacuum chamber mirror throats:
-    throat1%xmax = +5
-    throat1%xmin = -5
-    throat1%ymax = +5
-    throat1%ymin = -5
-    throat1%zmax =  beam_grid%gaabb%zmax
-    throat1%zmin =  beam_grid%gaabb%zmax
-    call pad_aabb(throat1,+beam_grid%dr*1E-2)
-
-    throat2%xmax = +5
-    throat2%xmin = -5
-    throat2%ymax = +5
-    throat2%ymin = -5
-    throat2%zmax = beam_grid%gaabb%zmin
-    throat2%zmin = beam_grid%gaabb%zmin
-    call pad_aabb(throat2,+beam_grid%dr*1E-2)
-
-    !! Define a Ta surface
-    Ta_surf%xmax = beam_grid%gaabb%xmin
-    Ta_surf%xmin = beam_grid%gaabb%xmin
-    Ta_surf%ymax = +30
-    Ta_surf%ymin = -30
-    Ta_surf%zmax = +30
-    Ta_surf%zmin = -30
-    call pad_aabb(Ta_surf,+beam_grid%dr*1E-2)
-
-    !! Initialize variables:
-    cc = 1
-    pump_hit = .FALSE.
+    !! INIT track structure:
+    ! ---------------------
     tracks%time = 0.d0
     tracks%flux = 0.d0
+    cc = 1
+    ntrack = 0
 
-    !! Track loop:
-    do while (.not. pump_hit)
+    !! INIT grid data:
+    ! ---------------
+    gdims(1) = beam_grid%nx
+    gdims(2) = beam_grid%ny
+    gdims(3) = beam_grid%nz
 
-      !! Particle starts a new balistic trajectory:
-      confirmed_hit = .FALSE.
+    !! INIT flags:
+    ! ------------------------
+    pump_hit = .FALSE.
+    in_grid = .TRUE.
+    surface_in_voxel = .FALSE.
 
-      !! Get time and distance to next cell boundary:
+    !! LOOP over track segments:
+    ! -------------------------
+    do while (in_grid .and. .not. pump_hit)
+
+      !! RESET surface hit flag:
+      ! -----------------------
+      hit = .FALSE.
+
+      !! COMPUTE time to next cell boundary:
+      ! ------------------------------------
       call get_velocity_sign(sgn,vn)
       dr = beam_grid%dr*sgn
       inv_vn = 1/vn
       dt_arr = abs(( (ri_cell + 0.5*dr) - rn)*inv_vn)
       mind = minloc(dt_arr,1)
-      dT = dt_arr(mind)
+      dT_next = dt_arr(mind)
 
-      !! Estimate next ray position:
-      !! TODO: Here we can add the small tolerance in direction of motion to avoid padding aabbs
-      rn_next = rn + dT*vn
+      !! GET collision check flag:
+      ! --------------------------
+      surface_in_voxel = vacuum_vessel%map(ind(1),ind(2),ind(3))%intersects
 
-      !! Check if next ray position hits the wall:
-      if (.not. is_point_in_aabb(rn_next, wall)) then
-        confirmed_hit = .TRUE.
-      endif
+      !! COMPUTE collision time:
+      ! ------------------------
+      if (surface_in_voxel) then
 
-      !! Update state tracks:
+        ! SET ray object:
+        ray%origin = rn
+        ray%v = vn
+
+        ! COMPUTE intersection with surfaces:
+        call find_ray_surface_intersection(ray,ind,intersection)
+
+        ! SET time to collision (choose 1st and closest root):
+        dT_coll = intersection%s_star(1)
+
+        ! CHECK if collsion ocurred and compute correction:
+        if (intersection%hit) then
+
+          ! DIAGNOSTIC:
+          if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
+            write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
+          end if
+
+          ! COMPUTE effect of volumetrization:
+          ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
+          ! TODO: It will require a full general volumetrized calculation
+          vmag = norm2(vn)
+          nhat = intersection%normal(:,1) ! Choose 1st root only
+          vhat = vn/vmag
+          alpha = vacuum_vessel%surface_padding_epsilon
+          ds_wall = alpha*beam_grid%ds/abs(dot_product(nhat,vhat))
+          dT_wall = ds_wall/vmag
+
+          ! UPDATE collision time with volumetrized effect:
+          dT_coll = dT_coll - dT_wall
+        end if
+
+      else
+        dT_coll = huge(1.d0)
+      end if
+
+      !! COMPARE time steps and SET hit flag:
+      ! ------------------------------------------
+      if (dT_coll < dT_next) then
+        hit = .TRUE.
+        dT = dT_coll
+      else
+        hit = .FALSE.
+        dT = dT_next
+      end if
+
+      !! STORE track data:
+      ! ------------------
       tracks(cc)%vn = vn
       tracks(cc)%pos = rn + 0.5*dT*vn
       tracks(cc)%time = dT
       tracks(cc)%ind = ind
       cc = cc + 1
 
-      !! Check for out of bounds:
+      !! CHECK if limit of track segments has been reached:
+      ! --------------------------------------------------
       if (cc > beam_grid%ntrack) then
           ! print *, "WARNING: track buffer full at cc =", cc
           exit
       end if
 
-      !! Update the state of the ray:
-      if (.not. confirmed_hit) then
-        !! Continue the ray's ballistic trajectory
-        rn = rn_next
-        ind(mind) = ind(mind) + sgn(mind)
-        ri_cell(mind) = ri_cell(mind) + dr(mind)
-      else
-        !! Collision has occured:
-        rn = rn_next !! Assign the collision point to the new ray point
+      !! UPDATE ray states:
+      ! -------------------
+      rn = rn + dT*vn
 
-        if (is_point_in_aabb(rn, pump)) then
-          pump_hit = .TRUE.
-          exit
-        else if (is_point_in_aabb(rn, throat1)) then
-          pump_hit = .TRUE.
-          exit
-        else if (is_point_in_aabb(rn, throat2)) then
-          pump_hit = .TRUE.
-          exit
-        else if (is_point_in_aabb(rn, Ta_surf)) then
-          pump_hit = .TRUE.
-          exit
-        else !! Particle has hit wall and will reflect
-          !! Compute unit vector normal to wall:
-          nhat = 0.d0
-          nhat(mind) = -sgn(mind)
+      !! CHECK hit flag and COMPUTE collision effects:
+      ! ----------------------------------------------
+      if (hit) then ! UPDATE ray velocity
+        !! GET surface id:
+        sid = intersection%sid
 
-          !! Compute new velocity vector based on wall reflection model:
+        !! GET surface function
+        !! TODO: at some point we need to also return the region ID (rid) from intersection
+        function_type = trim(adjustl(vacuum_vessel%surface(sid)%region(1)%function_type))
+
+        !! CHECK by function:
+        select case (function_type)
+          !! COMPUTE and update new ray velocity:
+        case ("wall")
+          !! STORE event in surface's reservoir or bucket:
+
+          !! GET surface properties:
+          T_wall = vacuum_vessel%surface(sid)%region(1)%T ! [keV]
+          pabs = vacuum_vessel%surface(sid)%region(1)%pabs
+          pspec = vacuum_vessel%surface(sid)%region(1)%pspec
+          ptherm = 1 - (pabs + pspec)
+
+          !! GET uniform randon number:
           call randu(randomu)
-          if (randomu(1) < p_specular) then
-            call specular_reflection(vn,nhat)
-          else if (randomu(1) < p_specular + p_thermal) then
+
+          !! CHECK and UPDATE surface normal:
+          if (dot_product(nhat,vhat) > 0) nhat = -nhat
+
+          !! SELECT and COMPUTE reflection process:
+          ! select case (randomu(1))
+          ! case (:pspec)  !! Specular reflection
+          !     call specular_reflection(vn, nhat)
+          ! case (pspec:ptherm+pspec) !! Thermal emission
+          !     vT = sqrt(T_wall / (v2_to_E_per_amu*thermal_mass(1)))
+          !     call get_vn_thermal_wall_emission(vT, nhat, vn)
+          ! case default !! Absorption process
+          !     !! STORE event
+          !     exit
+          ! end select
+
+          !! SELECT and COMPUTE reflection process:
+          if (randomu(1) < pspec) then
+            !! COMPUTE specular reflection:
+            call specular_reflection(vn, nhat)
+          elseif (randomu(1) < (pspec + ptherm)) then
+            !! COMPUTE thermal velocity [cm/s]:
+            vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
+
+            !! COMPUTE thermal emission from wall:
             call get_vn_thermal_wall_emission(vT,nhat,vn)
           else
-            !! Absorbed at the wall:
-            !! Here we could record fluence on local triangle and update reservoir
-            pump_hit = .TRUE.
+            !! Absorption process:
+            !! STORE event
             exit
-          endif
+          end if
 
-        endif !! is_point_in_aabb
-      endif !! .not. confirmed_hit
+        case ("pump")
+          ! STORE event
+          pump_hit = .TRUE.
+        case ("opening")
+        case DEFAULT
+          write(*,*) "This function_type is not defined: ", function_type
+          stop
+        end select
+      else ! UPDATE ray index and cell position
+        ind(mind) = ind(mind) + sgn(mind)
+        ri_cell(mind) = ri_cell(mind) + dr(mind)
+      end if
 
-    end do !! while
+      !! CHECK if ray has crossed beam grid boundaries:
+      ! ----------------------------------------------
+      if (any(ind > gdims) .or. any(ind < 1)) then
+        ! Ray has reached limit of grid:
+        in_grid = .FALSE.
+      end if
+
+    end do !! WHILE
+
+    !! SET number of steps taken:
+    ! --------------------------
     ntrack = cc - 1
 
 end subroutine track_to_wall
@@ -9953,35 +10095,77 @@ end subroutine specular_reflection
 !! <<< [JFCM, 2025-07-04] <<<
 
 !! >>> [JFCM, 2025-07-04] >>>
-subroutine write_particle_tracks_to_file(filename, tracks, ntrack)
-    !+ Writes ParticleTrack data to a text file in a MATLAB-friendly format.
-    character(len=*), intent(in) :: filename
-    type(ParticleTrack), intent(in) :: tracks(:)
-    integer, intent(in) :: ntrack
-
-    ! Local variables
-    integer :: i, unit
-    character(len=128) :: header
-
-    ! Assign a free logical unit number
-    inquire(iolength=unit)
-    open(newunit=unit, file=filename, status='replace', action='write')
-
-    ! Header line
-    write(unit, '(A)') "time flux ind1 ind2 ind3 pos1 pos2 pos3 vn1 vn2 vn3"
-
-    ! Data write with scientific notation
-    do i = 1, ntrack
-        write(unit,'(ES14.6,1X,ES14.6,1X,3I6,1X,3ES14.6,1X,3ES14.6)') &
-            tracks(i)%time, tracks(i)%flux, &
-            tracks(i)%ind(1), tracks(i)%ind(2), tracks(i)%ind(3), &
-            tracks(i)%pos(1), tracks(i)%pos(2), tracks(i)%pos(3), &
-            tracks(i)%vn(1),  tracks(i)%vn(2),  tracks(i)%vn(3)
-    end do
-
-    close(unit)
-end subroutine write_particle_tracks_to_file
+! subroutine write_particle_tracks_to_file(filename, tracks, ntrack)
+!     !+ Writes ParticleTrack data to a text file in a MATLAB-friendly format.
+!     character(len=*), intent(in) :: filename
+!     type(ParticleTrack), intent(in) :: tracks(:)
+!     integer, intent(in) :: ntrack
+!
+!     ! Local variables
+!     integer :: i, unit
+!     character(len=128) :: header
+!
+!     ! Assign a free logical unit number
+!     inquire(iolength=unit)
+!     open(newunit=unit, file=filename, status='replace', action='write')
+!
+!     ! Header line
+!     write(unit, '(A)') "time flux ind1 ind2 ind3 pos1 pos2 pos3 vn1 vn2 vn3"
+!
+!     ! Data write with scientific notation
+!     do i = 1, ntrack
+!         write(unit,'(ES14.6,1X,ES14.6,1X,3I6,1X,3ES14.6,1X,3ES14.6)') &
+!             tracks(i)%time, tracks(i)%flux, &
+!             tracks(i)%ind(1), tracks(i)%ind(2), tracks(i)%ind(3), &
+!             tracks(i)%pos(1), tracks(i)%pos(2), tracks(i)%pos(3), &
+!             tracks(i)%vn(1),  tracks(i)%vn(2),  tracks(i)%vn(3)
+!     end do
+!
+!     close(unit)
+! end subroutine write_particle_tracks_to_file
 !! <<< [JFCM, 2025-07-04] <<<
+
+subroutine write_particle_tracks_to_file(filename, tracks, ntrack, pid, num_parts)
+  ! Appends rows if file exists, otherwise creates it and writes header once.
+  character(len=*), intent(in) :: filename
+  type(ParticleTrack), intent(in) :: tracks(:)
+  integer, intent(in) :: ntrack
+  integer(Int64), intent(in) :: pid   ! optional particle id col for filtering
+  integer, intent(in) :: num_parts
+
+  ! Locals"
+  integer :: u, i, ios
+  logical :: exists
+
+  ! CHECK number of particles already saved:
+  if (pid > num_parts) return
+
+  ! CHECK of file exists:
+  inquire(file=filename, exist=exists)
+
+  if (.not. exists .or. pid == 1) then
+    ! CREATE new file:
+    open(newunit=u, file=filename, status='replace', action='write', form='formatted', iostat=ios)
+    if (ios /= 0) stop 'Could not create track file'
+    write(u,'(A)') 'particle_id time flux ind1 ind2 ind3 pos1 pos2 pos3 vn1 vn2 vn3'
+  else
+    ! APPEND to file:
+    open(newunit=u, file=filename, status='old', action='write', form='formatted', position='append', iostat=ios)
+    if (ios /= 0) stop 'Could not open track file for append'
+  end if
+
+  ! LOOP over all track segments:
+  do i = 1, ntrack
+    write(u,'(I0,1X,ES14.6,1X,ES14.6,1X,3(I0,1X),6(ES14.6,1X))') &
+      pid, tracks(i)%time, tracks(i)%flux, &
+      tracks(i)%ind(1), tracks(i)%ind(2), tracks(i)%ind(3), &
+      tracks(i)%pos(1), tracks(i)%pos(2), tracks(i)%pos(3), &
+      tracks(i)%vn(1),  tracks(i)%vn(2),  tracks(i)%vn(3)
+  end do
+
+  flush(u)
+  close(u)
+end subroutine write_particle_tracks_to_file
 
 subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:pass_grid]]
@@ -16228,6 +16412,8 @@ subroutine calculate_dcx_process
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   real(Float64) :: tot_denn
   !! <<< [JFCM, 2025-07-01] <<<
+  character(len=charlim) :: filename
+  integer(Int64) :: pid = 1
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -16398,11 +16584,18 @@ subroutine calculate_dcx_process
 
               ! >>> [JFCM, 2025-07-04] >>>
 #ifdef _OPENMP
-              if (OMP_get_thread_num() == 0) then
-                if (.FALSE.) then
-                  print *, "writting to file ..."
-                  call write_particle_tracks_to_file("tracks_2.txt", tracks, ntrack)
-                endif
+              if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
+                  filename = "tracks_group.txt"
+                  filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+                  call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+                  pid = pid + 1
+              endif
+#else
+              if (.TRUE.) then
+                  filename = "tracks_group.txt"
+                  filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+                  call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+                  pid = pid + 1
               endif
 #endif
               ! <<< [JFCM, 2025-07-04] <<<

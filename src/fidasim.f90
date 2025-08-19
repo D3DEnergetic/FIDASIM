@@ -2855,6 +2855,82 @@ subroutine make_beam_grid
 
 end subroutine make_beam_grid
 
+! >>> [JFCM, 2025-08-19] >>>
+subroutine write_nlaunch(papprox,nlaunch,suffix)
+  !+ This subroutine writes (1) beam_grid%in_plasma, (2) papprox and (3) nlaunch to file for postprocessing
+  !+ This was created to confirm correct formation of papprox
+  integer(Int32), dimension(:,:,:), intent(in) :: nlaunch
+  real(Float64), dimension(:,:,:), intent(in) :: papprox
+  character(len=*), intent(in) :: suffix
+
+  ! Locals:
+  ! integer :: i, j, k
+  integer(HID_T) :: h5file_id, gid
+  integer(HSIZE_T), dimension(1) :: dims1
+  integer(HSIZE_T), dimension(2) :: dims2
+  integer(HSIZE_T), dimension(3) :: dims3
+  ! integer :: rank
+  character(len=256) :: filename, result_dir, full_file_name
+  integer :: error
+
+  !! CHECK suffix:
+  select case (trim(adjustl(suffix)))
+  case ("DCX","HALO","dcx","halo")
+     ! valid cases: do nothing, continue
+  case default
+     write(*,*) "ERROR: invalid mode = '"//trim(adjustl(suffix))//"'. Must be 'DCX' or 'HALO'."
+     stop 1   ! or call error stop if you prefer
+  end select
+
+  !! SET path and filename:
+  result_dir = inputs%result_dir
+  filename = 'nlaunch'
+  filename = trim(adjustl(filename)) // '_' // trim(adjustl(suffix)) // '.h5'
+
+  !! GET grid dimensions:
+  dims3(1) = beam_grid%nx
+  dims3(2) = beam_grid%ny
+  dims3(3) = beam_grid%nz
+
+  call h5open_f(error)
+
+  ! Create file:
+  full_file_name = trim(adjustl(result_dir)) // '/' // trim(adjustl(filename))
+  call h5fcreate_f(trim(adjustl(full_file_name)), H5F_ACC_TRUNC_F, h5file_id, error)
+  if (error<0) write(*,*) "(write_nlaunch::create file) Error"
+
+  ! Write nlaunch:
+  call h5ltmake_compressed_dataset_int_f(h5file_id,"/nlaunch", 3, dims3, nlaunch, error)
+  if (error<0) write(*,*) "(write_nlaunch::nlaunch) Error"
+
+  ! Write papprox:
+  call h5ltmake_compressed_dataset_double_f(h5file_id,"/papprox", 3, dims3, papprox, error)
+  if (error<0) write(*,*) "(write_nlaunch::papprox) Error"
+
+  ! Write beam grid data:
+  call h5gcreate_f(h5file_id, "beam_grid", gid, error)
+  dims1(1) = 1
+  call h5ltmake_dataset_double_f(gid,"xmax",0,dims1(1:1),[beam_grid%xmax],error)
+  call h5ltmake_dataset_double_f(gid,"xmin",0,dims1(1:1),[beam_grid%xmin],error)
+  call h5ltmake_dataset_double_f(gid,"ymax",0,dims1(1:1),[beam_grid%ymax],error)
+  call h5ltmake_dataset_double_f(gid,"ymin",0,dims1(1:1),[beam_grid%ymin],error)
+  call h5ltmake_dataset_double_f(gid,"zmax",0,dims1(1:1),[beam_grid%zmax],error)
+  call h5ltmake_dataset_double_f(gid,"zmin",0,dims1(1:1),[beam_grid%zmin],error)
+  call h5ltmake_dataset_int_f(gid,"nx",0,dims1(1:1),[beam_grid%nx],error)
+  call h5ltmake_dataset_int_f(gid,"ny",0,dims1(1:1),[beam_grid%ny],error)
+  call h5ltmake_dataset_int_f(gid,"nz",0,dims1(1:1),[beam_grid%nz],error)
+  call h5ltmake_compressed_dataset_int_f(gid,"in_plasma", 3, dims3, beam_grid%in_plasma, error)
+  if (error<0) write(*,*) "(write_nlaunch::beam_grid%in_plasma) Error"
+
+  ! Close group:
+  call h5gclose_f(gid, error)
+
+  ! Close file:
+  call h5fclose_f(h5file_id, error)
+
+end subroutine write_nlaunch
+! <<< [JFCM, 2025-08-19] <<<
+
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine write_boundary_map
   !+ This subroutine has been written to provide means to test how the boundary-beam grid map is formed
@@ -10008,37 +10084,6 @@ subroutine specular_reflection(vi, nhat)
 end subroutine specular_reflection
 !! <<< [JFCM, 2025-07-04] <<<
 
-!! >>> [JFCM, 2025-07-04] >>>
-! subroutine write_particle_tracks_to_file(filename, tracks, ntrack)
-!     !+ Writes ParticleTrack data to a text file in a MATLAB-friendly format.
-!     character(len=*), intent(in) :: filename
-!     type(ParticleTrack), intent(in) :: tracks(:)
-!     integer, intent(in) :: ntrack
-!
-!     ! Local variables
-!     integer :: i, unit
-!     character(len=128) :: header
-!
-!     ! Assign a free logical unit number
-!     inquire(iolength=unit)
-!     open(newunit=unit, file=filename, status='replace', action='write')
-!
-!     ! Header line
-!     write(unit, '(A)') "time flux ind1 ind2 ind3 pos1 pos2 pos3 vn1 vn2 vn3"
-!
-!     ! Data write with scientific notation
-!     do i = 1, ntrack
-!         write(unit,'(ES14.6,1X,ES14.6,1X,3I6,1X,3ES14.6,1X,3ES14.6)') &
-!             tracks(i)%time, tracks(i)%flux, &
-!             tracks(i)%ind(1), tracks(i)%ind(2), tracks(i)%ind(3), &
-!             tracks(i)%pos(1), tracks(i)%pos(2), tracks(i)%pos(3), &
-!             tracks(i)%vn(1),  tracks(i)%vn(2),  tracks(i)%vn(3)
-!     end do
-!
-!     close(unit)
-! end subroutine write_particle_tracks_to_file
-!! <<< [JFCM, 2025-07-04] <<<
-
 subroutine write_particle_tracks_to_file(filename, tracks, ntrack, pid, num_parts)
   ! Appends rows if file exists, otherwise creates it and writes header once.
   character(len=*), intent(in) :: filename
@@ -16362,6 +16407,10 @@ subroutine calculate_dcx_process
   enddo
   !! <<< [JFCM, 2025-07-01] <<<
 
+  !! >>> [JFCM, 2025-08-19] >>>
+  call write_nlaunch(papprox,nlaunch,"dcx")
+  !! <<< [JFCM, 2025-08-19] <<<
+
   !! >>> [JFCM, 2025-07-01] >>>
   ! Allocate birth particles for the DCX process:
   allocate(birth%part(inputs%n_dcx))
@@ -16607,6 +16656,12 @@ subroutine calculate_halo_process
 
     !! Distribute n_halo markers over reaction probability PDF:
     call get_nlaunch_no_fill_min(n_halo, papprox, nlaunch)
+
+    !! >>> [JFCM, 2025-08-19] >>>
+    if (hh .eq. 1) then
+      call write_nlaunch(papprox,nlaunch,"halo")
+    end if
+    !! <<< [JFCM, 2025-08-19] <<<
 
     !! Identify active cells in nlaunch:
     do ic = 1,beam_grid%ngrid

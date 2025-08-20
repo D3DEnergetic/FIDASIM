@@ -79,7 +79,13 @@ endif
 ifneq ($(findstring gfortran, $(FC)),)
         L_FLAGS = -lm
         COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp -Wfatal-errors
-        DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+				# >>> [JFCM, 2025-08-20] >>>
+        # DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+				DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall \
+				               -ffpe-trap=invalid,zero,overflow -D_DEBUG \
+				               -fno-omit-frame-pointer -fno-inline -fno-inline-functions -fno-ipa-cp \
+				               -finit-real=snan -Wsurprising
+			  # <<< [JFCM, 2025-08-20] <<<											 
         OPENMP_FLAGS = -fopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF

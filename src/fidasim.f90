@@ -2863,6 +2863,8 @@ subroutine write_nlaunch(papprox,nlaunch,suffix)
   real(Float64), dimension(:,:,:), intent(in) :: papprox
   character(len=*), intent(in) :: suffix
 
+  ! TODO: add new argument "gen" so we can potentially store all HALO generation nlaunch data
+
   ! Locals:
   ! integer :: i, j, k
   integer(HID_T) :: h5file_id, gid
@@ -3483,7 +3485,8 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
 
   ! Local variables
   real(Float64) :: A, B, C, D, sqrtD, R, dummy
-  real(Float64) :: s_roots(2), s_coll(2), s_pos(2)
+  real(Float64) :: s_roots(2), s_coll(2)
+  real(FLoat64) :: s_pos(2) = 0.d0
   real(Float64) :: padding_dist, padding_s
   real(Float64), dimension(3) :: ray_origin, ray_v, cyl_origin, cyl_axis, K, vper, Kper, p
   real(Float64), dimension(3) :: p_coll, p_coll_prime, nhat, nhat_prime, vhat
@@ -10520,6 +10523,9 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
         if(ics.eq.2) then
             call get_position(ind,xyz,input_coords=2)
         endif
+        ! >>> [JFCM,2025-08-20] >>>
+        call xyz_to_uvw(xyz, uvw)
+        ! <<< [JFCM,2025-08-20] <<<
     endif
 
     if(present(pos)) then
@@ -16178,7 +16184,7 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
       !+ Value of ion distribution function at ri, vion [ion/cm^3 (s/cm)^3]
   real(Float64), intent(in) :: denf4d_per_marker
       !+ Value of ion distribution function at ri, vion PER MARKER [ion/cm^3 (s/cm)^3]
-  type(LocalEMFields), intent(inout) :: fields
+  type(LocalEMFields), intent(in) :: fields
       !+ Field values at ri position
 
   !! Local variables:
@@ -16196,12 +16202,12 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   sink%part(sink%cnt)%denf4d_per_marker = denf4d_per_marker
 
   !! Get fields at actual particle position (pos=ri):
-  call get_fields(fields,pos=ri)
+  ! call get_fields(fields,pos=ri)
 
   ! >>> [JFCM, 2025-07-08] >>>
-  if (.not.fields%in_plasma) then
-    call get_fields(fields,ind=ind)
-  endif
+  ! if (.not.fields%in_plasma) then
+  !   call get_fields(fields,ind=ind)
+  ! endif
   ! <<< [JFCM, 2025-07-08] <<<
 
   !! Ion pitch at particle position:
@@ -16219,6 +16225,114 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   !$OMP END CRITICAL
 
 end subroutine store_sink_particle
+
+! >>> [JFCM, 2025-08-20] >>>
+subroutine mc_sample_ion_f4d_gc(ind_gc,is,rgc,deni_gc,fields_gc,rp,vp,ind_p,denf4d,f4d_defined)
+  !+ Samples an ion from the guiding center distribution function [[libfida::fbm]]
+  !+ For regions beyond the LFCS, fbm is zero so we sample from thermal plasma in SOL
+  !+ Sampling [[libfida::fbm]] or a thermal distribution in the SOL returns the particle
+  !+ energy and pitch.
+  !+ Fields are evaluated at the GC position and are used to convert energy and pitch
+  !+ into particle position (with gyro offset) and particle velocity.
+  ! TODO: How to consider the effect of rotation on the nonthermal f4d sampling
+  ! TODO: Remove the use of denf4d, no longer needed
+
+  integer, dimension(3), intent(in) :: ind_gc
+    !+ [[libfida:beam_grid]] 3D index of Guiding-Center (GC) position
+  integer, intent(in) :: is
+    !+ Index for the neutral species to be used
+  real(Float64), dimension(3), intent(out) :: rgc
+    !+ Position vector of GC in [[libfida:beam_grid]] XYZ coordinates [cm]
+  real(Float64), intent(out) :: deni_gc
+    !+ Ion density of species "is" at the GC position [cm^-3]
+  type(LocalEMFields), intent(out) :: fields_gc
+    !+ Fields at the GC position
+  real(Float64), dimension(3), intent(out) :: rp
+    !+ Position vector of particle in [[libfida:beam_grid]] XYZ coordinates [cm]
+  real(Float64), dimension(3), intent(out) :: vp
+    !+ Velocity vector of particle in [[libfida:beam_grid]] XYZ coordinates [cm/s]
+  integer, dimension(3), intent(out) :: ind_p
+    !+ [[libfida:beam_grid]] 3D index of particle position rp
+  real(Float64), intent(out) :: denf4d
+    !+ value of ion distribution at phase space position rgc and velocity vn [ion cm^{-3} v^{-3}]
+  logical, intent(out) :: f4d_defined
+    !+ Flag that defines if f4d was used to sample ion velocity vector
+
+  ! Locals:
+  logical :: inp
+  logical :: use_f4d
+  integer :: it
+  integer :: max_it = 5
+  real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
+  real(Float64) :: deni_min = 1e3 ! [cm^-3]
+  integer, dimension(2,1) :: ep_ind
+  real(Float64), dimension(1) :: randomu1
+  real(Float64), dimension(3) :: randomu3
+  type(LocalProfiles) :: plasma
+  real(Float64) :: eb, ptch
+
+  ! GET valid GC position in cell:
+  inp = .FALSE.
+  it = 0
+  do while (.not. inp .and. it .le. max_it)
+    ! Uniformly sample GC position in cell:
+    call mc_beam_grid(ind_gc,rgc)
+
+    ! CHECK if valid:
+    call in_plasma(rgc,inp)
+
+    ! UPDATE Counter:
+    it = it + 1
+  end do
+  if (.not. inp) call get_position(ind_gc,rgc)
+
+  ! GET fields at GC position:
+  call get_fields(fields_gc,pos=rgc)
+
+  ! CHECK
+  if (.not.fields_gc%in_plasma) then
+    write(*,*) "ERROR in mc_sample_ion_f4d_gc at get_fields"
+    stop
+  end if
+
+  ! CHECK for nonthermal flag and CHECK if it is valid at GC position:
+  use_f4d = .FALSE.
+  f4d_defined = .FALSE.
+  if (inputs%enable_nonthermal_calc .eq. 1) then
+    use_f4d = .TRUE.
+    call get_distribution(fbeam,deni_gc,pos=rgc, coeffs=fields_gc%b)
+    if (deni_gc > deni_min) then
+      f4d_defined = .TRUE.
+    end if
+  end if
+
+  ! CALCULATE ion energy, pitch and GC density:
+  if (use_f4d .and. f4d_defined) then
+    ! Sample non-thermal ion:
+    call randind(fbeam,ep_ind)
+    call randu(randomu3)
+    eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5) ! [keV]
+    ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
+    denf4d = 0.d0 ! Not needed anymore
+  else
+    ! Sample thermal ion:
+    call get_plasma(plasma,pos=rgc)
+    call mc_halo(plasma,thermal_mass(is),vp)
+    eb = (norm2(vp)**2)*thermal_mass(is)*v2_to_E_per_amu ! [keV]
+    call randu(randomu1)
+    ptch = 2*randomu1(1) - 1
+    deni_gc = plasma%deni(is)
+    denf4d = 0.d0 ! Not needed anymore
+  end if
+
+  ! Convert ion energy and pitch into ion particle position and velocity:
+  call gyro_correction(fields_gc,eb,ptch,thermal_mass(is),rp,vp)
+
+  ! GET indices of particle position:
+  call get_indices(rp,ind_p)
+
+end subroutine mc_sample_ion_f4d_gc
+! <<< [JFCM, 2025-08-20] <<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_22] >>>>>>>>>>>>
 subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
@@ -16318,6 +16432,7 @@ end subroutine mc_ion_velocity_f4d
 !! <<<<<<<<<<< [jfcm, 2024_11_22] <<<<<<<<<<<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
+!! to be DELETED:
 subroutine reset_birth_data
     !+ Subroutine to reset birth particles and birth density
     type(BirthParticle) :: default_part
@@ -16347,25 +16462,25 @@ subroutine calculate_dcx_process
   use omp_lib
   integer :: ic,i,j,k,ncell,is,ib,ntrack,jj
   integer(Int64) :: idcx !! counter
-  real(Float64), dimension(3) :: ri    !! ion start position vector
-  real(Float64), dimension(3) :: vion  !! ion start velocity vector
-  integer,dimension(3) :: ind
+  real(Float64), dimension(3) :: rp    !! Ion particle position vector
+  real(Float64), dimension(3) :: vp  !! Ion particle velocity vector
+  integer,dimension(3) :: ind, ind_p, ind_res
   integer,dimension(3) :: neut_types = [1,2,3]
   type(LocalProfiles) :: plasma
   real(Float64), dimension(nlevs) :: rates, states, denn, denn_per_marker
   integer, dimension(beam_grid%ngrid) :: cell_ind
   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
   type(LocalEMFields) :: fields
-  real(Float64), dimension(3) :: ri_gc, r_gyro
+  real(Float64), dimension(3) :: rgc
   real(Float64) :: eb, ptch
   logical :: f4d_defined = .False.
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
   real(Float64) :: starting_flux, flux_per_marker
   real(Float64) :: tot_flux_dep, initial_flux, final_flux
   real(Float64) :: photons, weight
-  real(Float64) :: denf4d, denf4d_per_marker
+  real(Float64) :: denf4d, denf4d_per_marker, deni_gc
   !! >>> [JFCM, 2025-07-04] >>>
-  logical :: pump_hit = .FALSE.
+  logical :: pump_hit
   !! <<< [JFCM, 2025-07-04] <<<
   !! >>> [JFCM, 2025-07-01] >>>
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
@@ -16373,6 +16488,7 @@ subroutine calculate_dcx_process
   !! <<< [JFCM, 2025-07-01] <<<
   character(len=charlim) :: filename
   integer(Int64) :: pid = 1
+  logical :: inp
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -16421,10 +16537,11 @@ subroutine calculate_dcx_process
   sink%dens=0.d0
   !! <<< [JFCM, 2025-07-01] <<<
 
-  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion,jj, &
-  !$OMP& ri,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
+  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vp,jj, &
+  !$OMP& rp,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
-  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit)
+  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit,rgc, &
+  !$OMP& deni_gc,ind_p,inp,ind_res)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -16434,26 +16551,24 @@ subroutine calculate_dcx_process
       loop_over_species: do is=1, n_thermal !This loop has to come first
           loop_over_dcx: do idcx=1, nlaunch(i,j,k) !! Loop over the markers
 
-              !! Get neutral particle position in [[beam_grid]]:
-              !! input: ind (in beam grid)
-              !! output: ri in XYZ coords
-              call mc_beam_grid(ind, ri)
-
-              ! Get neutral particle velocity vector:
-              call mc_ion_velocity_f4d(ind,is,ri,vion,denf4d,f4d_defined)
-              if(dot_product(vion,vion).eq.0.) then
-                write (*,*) "vion .eq. 0 skipping marker ..."
-                write (*,*) "vion:", vion
+              ! Sample ion GC distribution function:
+              ! input: ind, is
+              ! output: rgc, deni_gc, fields, rp, vp, ind_p
+              ! call mc_ion_velocity_f4d(ind,is,rp,vp,denf4d,f4d_defined)
+              call mc_sample_ion_f4d_gc(ind,is,rgc,deni_gc,fields,rp,vp,ind_p,denf4d,f4d_defined)
+              if(dot_product(vp,vp).eq.0.) then
+                write (*,*) "vp .eq. 0 skipping marker ..."
+                write (*,*) "vp:", vp
                 write (*,*) "ind: ", ind
-                write (*,*) "ri: ", ri
+                write (*,*) "rp: ", rp
                 cycle loop_over_dcx
               endif
 
               ! Compute neutral particle track across beam_grid:
               !! >>> [JFCM, 2025-07-04] >>>
-              ! call track(ri,vion,tracks,ntrack)
+              ! call track(rp,vp,tracks,ntrack)
               pump_hit = .FALSE.
-              call track_to_wall(ri,vion,tracks,ntrack,pump_hit)
+              call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
               ! <<< [JFCM, 2025-07-04] <<<
 
               if (ntrack .eq. 0) then
@@ -16461,14 +16576,19 @@ subroutine calculate_dcx_process
                 stop
               endif
 
-              ! Compute initial state (flux density) of neutral at start of track:
+              ! SET indices for neutral reservoir:
+              call in_plasma(rp,inp)
+              if (.not.inp) then
+                call get_indices(rgc,ind_res) ! GC cell
+              else
+                call get_indices(rp,ind_res) ! Particle position cell
+              end if
+
+              ! COMPUTE initial state (flux density) of neutral at start of track:
               ! 1- Calculate CX (ion->neutral) reaction rates [s^-1]:
-              !! input: ind, pos (not used), vion, neut_types
+              !! input: ind, pos (not used), vp, neut_types
               !! output: rates (dim nlevs)
-              !! ind needs to be at the actual particle position pos=ri not GC
-              !! if at "ind" there are no neutrals in reservoir, then rates becomes zero
-              ind = tracks(1)%ind
-              call get_total_cx_rate(ind, ri, vion, neut_types, rates)
+              call get_total_cx_rate(ind_res,rp,vp,neut_types,rates)
               if(sum(rates).le.0.) then
                 write (*,*) "sum(rates) .le. 0 (get_total_cx_rate)"
                 cycle loop_over_dcx
@@ -16476,27 +16596,22 @@ subroutine calculate_dcx_process
 
               ! 2- Calculate neutral flux density created via CX (ion->neutral):
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-              call get_plasma(plasma,pos=tracks(1)%pos)
-              if (.not. plasma%in_plasma)  then
-                call get_plasma(plasma,ind=tracks(1)%ind)
-              endif
-              states = plasma%deni(is)*rates ! flux per unit volume [p/s cm^-3]
+              states = deni_gc*rates !  flux per unit volume [p/s cm^-3]
               if(sum(states).le.0.) then
                 write (*,*) "sum(states) .le. 0 (states)"
                 cycle loop_over_dcx
               endif
 
               !! Store ion sink data:
-              !! ion sink flux per unit volume in [[beam_grid]]:
+              !! Ion sink flux per unit volume in [[beam_grid]]:
               starting_flux = sum(states) !! [ion/s 1/cm^3]
               flux_per_marker = starting_flux/nlaunch(i,j,k)
               denf4d_per_marker = denf4d/nlaunch(i,j,k)
-              call store_sinks(ind,is,flux_per_marker)
-              call store_sink_particle(ind,ri,vion,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
+              call store_sinks(ind_p,is,flux_per_marker)
+              call store_sink_particle(ind_p,rp,vp,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
 
               ! Initialize deposition accumulator for current marker:
               tot_flux_dep = 0.d0
-              !! cycle loop_over_dcx
 
               ! Attenuate neutral marker long track trajectory:
               loop_along_track: do jj = 1,ntrack
@@ -16596,8 +16711,8 @@ subroutine calculate_halo_process
   integer, dimension(3) :: ind
   type(LocalProfiles) :: plasma
   real(Float64) , dimension(3) :: ri, vi
-  logical :: f4d_defined = .FALSE.
-  logical :: pump_hit = .FALSE.
+  logical :: f4d_defined
+  logical :: pump_hit
   real(Float64) :: denf4d, starting_flux, denf4d_per_marker, initial_flux, final_flux
   real(Float64) :: weight, photons, flux_per_marker
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks

@@ -9430,6 +9430,85 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
 
 end subroutine get_ddpt_anisotropy
 
+subroutine get_ddnhe_anisotropy(plasma, v1, v3, kappa)
+    !+ Gets d(d,n)3He anisotropy defecit/enhancement factor for a beam interacting with a target plasma
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters
+    real(Float64), dimension(3), intent(in) :: v1
+        !+ Beam velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v3
+        !+ Neutron velocity [cm/s]
+    real(Float64), intent(out)              :: kappa
+        !+ Anisotropy factor
+    !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
+
+    real(Float64), dimension(3,12) :: abc
+    real(Float64), dimension(13)   :: bhcor !!! 13?
+    real(Float64), dimension(12)   :: e, a, b, c
+    real(Float64), dimension(3)    :: vcm, v3cm, vrel
+    type(InterpolCoeffs1D) :: c1D
+
+    real(Float64) :: ai, bi, ci, b1, b2, b11, b12, b21, b22, cos_phi, sin_phi
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, Q, mp, k0, JMeV
+    integer :: ei, i, err_status
+
+    !! Calculate effective beam energy
+    vrel = v1-plasma%vrot ![cm/s]
+    vnet_square=dot_product(vrel, vrel) ![(cm/s)**2]
+    eb = v2_to_E_per_amu*fbm%A*vnet_square ![keV]
+
+    !!Calculate anisotropy enhancement/deficit factor
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 3.27*JMeV ![J]
+
+    vcm = 0.5*(v1+plasma%vrot) ![cm/s]
+    KE = 0.5*mp*vnet_square*1.d-4  ! [J] C-O-M kinetic energy
+    k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+    if ((norm2(vcm)*norm2(v3)).gt.0.d0) then
+        cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
+        sin_phi = sin(acos(cos_phi))
+
+        if (abs(k0*sin_phi).le.1) then
+            cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
+        else
+            cos_theta = 0.d0
+        endif
+
+    else
+        cos_theta = 0.d0
+    endif
+
+    !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
+    e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
+    a = [0.0,0.0181,0.0782,0.178,0.2994,0.4406,0.564,0.716,0.8769,1.018,1.138,1.231]
+    b = [0.0,0.0108,0.0425,0.1027,0.212,0.303,0.446,0.537,0.674,0.755,1.09,1.05]
+    c = [0.0,0.0,0.0,0.0,0.0,0.049,0.111,0.052,0.095,0.2,0.09,0.2]
+    e(1) = 10.0
+    a(1) = 0.00903775/(4*pi)
+    abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
+
+    !Correction factor to make it consistent with Bosch & Hale
+    bhcor=[1.0, 1.00648, 1.00817, 1.00431, 0.99405, .98711, .99591, 1.02146, .99845, 1.00157, .98565, 1.00405]
+    do i=1,12
+        abc(:,i) = abc(:,i)*bhcor(i)
+    enddo
+
+    e1com=0.5d0*eb
+    call interpol_coeff(e, e1com, c1D, err_status)
+
+    ei = c1D%i
+    b1 = c1D%b1
+    b2 = c1D%b2
+
+    ai = b1*abc(1,ei) + b2*abc(1,ei+1)
+    bi = b1*abc(2,ei) + b2*abc(2,ei+1)
+    ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+
+    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
+
+end subroutine get_ddnhe_anisotropy
+
 subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     !+ Returns fraction of gyroangles that can produce a reaction with
     !+ given inputs
@@ -13770,6 +13849,15 @@ subroutine neutron_spec_f
     integer :: ntrack
     integer :: i      !! counter along track
     type(ParticleTrack),dimension(pass_grid%ntrack) :: tracks
+    logical :: beam_available
+    real(Float64) :: track_step, factor
+    
+    !! Check if the beam is available
+    beam_available = allocate(beam_grid%r) .and. allocate(fbm%energy)
+    
+    if (.not.beam_available .and. inputs%verbose.ge.1) then
+    	write(*,'(T2,a)') 'NEUTRON_SPEC_F: Running without beam grid - using track-based volumes'
+    endif
 
     ngamma = 20
     flux = 0
@@ -13787,6 +13875,16 @@ subroutine neutron_spec_f
         !! Calculate the flux produced in each cell along the path
         loop_along_track: do i=1,ntrack
             rn = tracks(i)%pos
+            
+            if (i.lt.ntrack) then
+                track_step = norm2(tracks(i+1)%pos - tracks(i)%pos)
+            else
+                if (i.gt.1) then
+                    track_step = norm2(tracks(i)%pos - tracks(i-1)%pos)
+                else
+                    track_step = 0.1d0
+                endif
+            endif
 
             !! Get fields
             call get_fields(fields,pos=rn)
@@ -13804,7 +13902,10 @@ subroutine neutron_spec_f
 
             call get_indices(rn, ind)
          !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
-            factor = domega*beam_grid%dv/ngamma
+         !!!factor = domega*beam_grid%dv/ngamma
+            factor = domega*track_step/ngamma
+            
+            if (beam_available) then
             !! Loop over energy/pitch/gamma
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)
@@ -13832,7 +13933,11 @@ subroutine neutron_spec_f
                         erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                         !! Get neutron production flux
-                        call get_dd_rate(plasma, erel, flux, branch=2)
+                        call get_dd_rate(plasma,erel,flux,branch=2)
+                
+                	!! Apply anisotropy correction for neutron emission
+                        call get_ddnhe_anisotropy(plasma,vi,vn,kappa)
+                        flux = flux*kappa
                         flux = flux*2*fbm_denf*factor
                         !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
 

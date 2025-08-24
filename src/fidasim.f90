@@ -868,6 +868,8 @@ type NeutronRate
         !+ Neutron rate weight: weight(E,p,R,Z,Phi)
     real(Float64), dimension(:,:,:), allocatable :: emis
         !+ Neutron emissivity: emis(R,Z,Phi)
+    real(Float64), dimension(:,:), allocatable :: flux
+        !+ Neutron flux: flux(orbit_type,chan) [neutrons/sec]
 end type NeutronRate
 
 type CFPDRate
@@ -1050,6 +1052,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_neut_spec
+        !+ Calculate neutron collimation flux: 0 = off, 1=on
     integer(Int32) :: calc_cfpd
         !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
     integer(Int32) :: calc_res
@@ -1220,6 +1224,8 @@ type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
+type(NPAChords), save           :: nc_chords
+    !+ Variable containing the Neutron Collimator system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
@@ -1969,7 +1975,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed, calc_cfpd
+    integer            :: pathlen, calc_neutron, calc_neut_spec, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght, calc_res
@@ -1992,7 +1998,7 @@ subroutine read_inputs
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, calc_res, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
-        calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_neutron, calc_neut_spec, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -2039,6 +2045,7 @@ subroutine read_inputs
     output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
+    calc_neut_spec=0
     calc_cfpd=0
     n_fida=0
     n_pfida=0
@@ -2150,6 +2157,7 @@ subroutine read_inputs
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
+    inputs%calc_neut_spec=calc_neut_spec
     inputs%calc_cfpd=calc_cfpd
     inputs%calc_res = calc_res
 
@@ -2641,7 +2649,7 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
-    if((inputs%calc_pfida+inputs%calc_pnpa+inputs%calc_cold).gt.0) then
+    if((inputs%calc_pfida+inputs%calc_pnpa.gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
         else
@@ -3223,6 +3231,150 @@ subroutine read_npa
     deallocate(d_cent,d_redge,d_tedge)
 
 end subroutine read_npa
+
+subroutine read_neutron_collimator
+    !+ Reads the Neutron Collimator geometry and stores the quantities in [[libfida:nc_chords]]
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(2) :: dims
+    logical :: path_valid
+
+    real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
+    real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
+    real(Float64), dimension(beam_grid%ngrid) :: probs
+    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
+    integer, dimension(:), allocatable :: a_shape, d_shape
+    character(len=20) :: system = ''
+
+    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
+    real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
+    real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
+    real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
+    real(Float64), dimension(3,3) :: basis, inv_basis
+    real(Float64), dimension(50) :: xd, yd
+    type(LocalEMFields) :: fields
+    real(Float64) :: length,total_prob, hh, hw, dprob, dx, dy, r, pitch
+    integer :: ichan,ic,i,j,k,id,ix,iy,d_index,nd,ind_d(2),ind(3)
+    integer :: error
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
+
+    !!Check if Neutron Collimator group exists
+    call h5ltpath_valid_f(fid, "/nc", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'Neutron Collimator geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without Neutron signals'
+        endif
+        inputs%calc_neutron = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
+        return
+    endif
+
+    !!Open Neutron Collimator group
+    call h5gopen_f(fid, "/nc", gid, error)
+
+    call h5ltread_dataset_string_f(gid, "/nc/system", system, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/nc/nchan", nc_chords%nchan, error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- Neutron Collimator settings ----"
+        write(*,'(T2,"Neutron Collimator System: ", a)') trim(adjustl(system))
+        write(*,'(T2,"Number of channels: ",i3)') nc_chords%nchan
+    endif
+
+    allocate(a_tedge(3, nc_chords%nchan))
+    allocate(a_redge(3, nc_chords%nchan))
+    allocate(a_cent(3,  nc_chords%nchan))
+    allocate(a_shape(nc_chords%nchan))
+    allocate(d_tedge(3, nc_chords%nchan))
+    allocate(d_redge(3, nc_chords%nchan))
+    allocate(d_cent(3,  nc_chords%nchan))
+    allocate(d_shape(nc_chords%nchan))
+    allocate(nc_chords%radius(nc_chords%nchan))
+    allocate(nc_chords%det(nc_chords%nchan))
+    allocate(nc_chords%phit(beam_grid%nx, &
+                             beam_grid%ny, &
+                             beam_grid%nz, &
+                             nc_chords%nchan) )
+    allocate(nc_chords%hit(beam_grid%nx, &
+                            beam_grid%ny, &
+                            beam_grid%nz) )
+    nc_chords%hit = .False.
+
+    dims = [3,spec_chords%nchan]
+    call h5ltread_dataset_double_f(gid,"/nc/radius", nc_chords%radius, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/nc/a_shape", a_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_tedge", a_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_redge", a_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_cent",  a_cent, dims, error)
+
+    call h5ltread_dataset_int_f(gid, "/nc/d_shape", d_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_tedge", d_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_redge", d_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_cent",  d_cent, dims, error)
+
+    !!Close Neutron Collimator group
+    call h5gclose_f(gid, error)
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    ! Define detector/aperture shape
+    nc_chords%det%detector%shape = d_shape
+    nc_chords%det%aperture%shape = a_shape
+
+    chan_loop: do ichan=1,nc_chords%nchan
+        ! Convert to beam grid coordinates
+        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
+        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
+        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
+        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
+        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
+        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
+
+        ! Define detector/aperture hh/hw
+        nc_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
+
+        nc_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
+
+        ! Define detector/aperture origin
+        nc_chords%det(ichan)%detector%origin = xyz_d_cent
+        nc_chords%det(ichan)%aperture%origin = xyz_a_cent
+
+        ! Define detector/aperture basis
+        call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
+             nc_chords%det(ichan)%detector%basis, &
+             nc_chords%det(ichan)%detector%inv_basis)
+        call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
+             nc_chords%det(ichan)%aperture%basis, &
+             nc_chords%det(ichan)%aperture%inv_basis)
+
+        v0 = xyz_a_cent - xyz_d_cent
+        v0 = v0/norm2(v0)
+        call grid_intersect(xyz_d_cent,v0,length,r0,r0_d)
+        if(length.le.0.0) then
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
+            endif
+        endif
+    enddo chan_loop
+
+    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+
+    deallocate(a_shape,a_cent,a_redge,a_tedge)
+    deallocate(d_shape,d_cent,d_redge,d_tedge)
+
+end subroutine read_neutron_collimator
 
 subroutine read_cfpd
     !+ Reads the CFPD geometry and stores the quantities in [[libfida:ctable]]
@@ -4394,7 +4546,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_neut_spec.ge.1.or.inputs%calc_cfpd.ge.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
     endif
 
@@ -5719,6 +5871,7 @@ subroutine write_neutrons
     !+ Writes [[libfida:neutron]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(5) :: dim5
     integer :: error
@@ -5792,6 +5945,24 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/z","description", &
              "Z array", error)
         call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+    endif
+    
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neut_spec.ge.1)) then
+        if(particles%nclass.gt.1) then
+            dim1(1) = 1
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
+            dim1(1) = particles%nclass
+            dim2 = shape(neutron%flux)
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, neutron%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux: flux(orbit_class,chan)", error)
+        else
+            dim2 = shape(neutron%flux)
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, neutron%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux: flux(chan)", error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/flux","units","neutrons/s",error )
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -10181,14 +10352,18 @@ subroutine store_photon_birth(pos, photons, res, passive)
 
 end subroutine store_photon_birth
 
-subroutine store_neutrons(rate, orbit_class)
+subroutine store_neutrons(rate, orbit_class, neutron_collimator, channel)
     !+ Store neutron rate in [[libfida:neutron]]
     real(Float64), intent(in)     :: rate
         !+ Neutron rate [neutrons/sec]
     integer, intent(in), optional :: orbit_class
         !+ Orbit class ID
+    logical, intent(in), optional :: neutron_collimator
+        !+ Indicates whether `rate` is for a Neutron Collimator diagnostic
+    integer, intent(in), optional :: channel
 
-    integer :: iclass
+    integer :: iclass, ichan
+    logical :: nc
 
     if(present(orbit_class)) then
         iclass = min(orbit_class,particles%nclass)
@@ -10196,9 +10371,23 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP ATOMIC UPDATE
-    neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END ATOMIC
+    if(present(neutron_collimator)) then
+        nc = neutron_collimator
+    else
+        nc = .False.
+    endif
+
+    if(present(channel)) ichan = channel
+
+    if (nc) then
+        !$OMP ATOMIC UPDATE
+        neutron%flux(iclass,ichan)= neutron%flux(iclass,ichan) + rate
+        !$OMP END ATOMIC
+    else
+        !$OMP ATOMIC UPDATE
+        neutron%rate(iclass)= neutron%rate(iclass) + rate
+        !$OMP END ATOMIC
+    endif
 
 end subroutine store_neutrons
 
@@ -12747,19 +12936,6 @@ subroutine neutron_f
     endif
 #endif
 
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
-        write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time_string(time_start)
-    endif
-
-#ifdef _MPI
-    if(my_rank().eq.0) call write_neutrons()
-#else
-    call write_neutrons()
-#endif
-
-
 end subroutine neutron_f
 
 subroutine cfpd_f
@@ -13001,18 +13177,6 @@ subroutine neutron_mc
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
-#endif
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
-        write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time_string(time_start)
-    endif
-
-#ifdef _MPI
-    if(my_rank().eq.0) call write_neutrons()
-#else
-    call write_neutrons()
 #endif
 
 end subroutine neutron_mc
@@ -13590,6 +13754,103 @@ subroutine npa_weights
 
 end subroutine npa_weights
 
+subroutine neutron_spec_f
+    !+ Calculate neutron collimator flux using a fast-ion distribution function F(E,p,r,z,phi)
+    integer :: ie, ip, igamma, ngamma, ichan
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb, pitch
+    real(Float64) :: erel, flux, d, domega
+    real(Float64), dimension(3) :: ri
+    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: rn, vn, r_gyro
+    integer, dimension(3) :: ind
+    real(Float64)  :: vnet_square, factor
+    real(Float64) :: fbm_denf
+    integer :: ntrack
+    integer :: i      !! counter along track
+    type(ParticleTrack),dimension(pass_grid%ntrack) :: tracks
+
+    ngamma = 20
+    flux = 0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
+    !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,tracks)
+    channel_loop: do ichan=1, nc_chords%nchan
+
+        rn = nc_chords%det(ichan)%detector%origin
+        vn = nc_chords%det(ichan)%aperture%origin-rn
+        vn = vn/norm2(vn)
+
+        call track_cylindrical(rn, vn, tracks, ntrack)
+        if(ntrack.eq.0) cycle channel_loop
+
+        !! Calculate the flux produced in each cell along the path
+        loop_along_track: do i=1,ntrack
+            rn = tracks(i)%pos
+
+            !! Get fields
+            call get_fields(fields,pos=rn)
+            if(.not.fields%in_plasma) cycle loop_along_track
+
+            !! Calculate solid angle in the large distance limit
+            d = norm2(nc_chords%det(ichan)%detector%origin-rn)
+            if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                         (pi * d**2) !the 4s cancelled out
+            else
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                         (4 * d**2) !the pis cancelled out
+            endif
+
+            call get_indices(rn, ind)
+         !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
+            factor = domega*beam_grid%dv/ngamma
+            !! Loop over energy/pitch/gamma
+            pitch_loop: do ip = 1, fbm%npitch
+                pitch = fbm%pitch(ip)
+                energy_loop: do ie =1, fbm%nenergy
+                    eb = fbm%energy(ie)
+                    gyro_loop: do igamma=1, ngamma
+                        call gyro_correction(fields,eb,pitch, fbm%A, ri, vi)
+
+                        !!Correct for gyro orbit
+                        call gyro_step(vi,fields,fbm%A,r_gyro)
+
+                        fbm_denf=0
+                        if (inputs%dist_type.eq.1) then
+                            !get dist at guiding center
+                            call get_ep_denf(eb,pitch,fbm_denf,pos=(ri+r_gyro))
+                        endif
+                        if (fbm_denf.ne.fbm_denf) cycle gyro_loop
+
+                        !! Get plasma parameters at particle position
+                        call get_plasma(plasma,pos=ri)
+                        if(.not.plasma%in_plasma) cycle gyro_loop
+
+                        !! Calculate effective beam energy
+                        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                        erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+
+                        !! Get neutron production flux
+                        call get_dd_rate(plasma, erel, flux, branch=2)
+                        flux = flux*2*fbm_denf*factor
+                        !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
+
+                        !! Store neutrons
+                        call store_neutrons(flux, neutron_collimator=.True.,channel=ichan)
+                    enddo gyro_loop
+                enddo energy_loop
+            enddo pitch_loop
+        enddo loop_along_track
+    enddo channel_loop
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(neutron%flux)
+#endif
+
+end subroutine neutron_spec_f
+
 end module libfida
 
 !=============================================================================
@@ -13711,6 +13972,10 @@ program fidasim
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
+    
+     if(inputs%calc_neut_spec.ge.1) then
+        call read_neutron_collimator()
+    endif
 
     if(inputs%calc_cfpd.ge.1) then
         call read_cfpd()
@@ -13825,6 +14090,11 @@ program fidasim
     if(inputs%calc_neutron.ge.1)then
         allocate(neutron%rate(particles%nclass))
         neutron%rate = 0.d0
+    endif
+    
+    if(inputs%calc_neut_spec.ge.1)then
+        allocate(neutron%flux(particles%nclass, nc_chords%nchan))
+        neutron%flux = 0.d0
     endif
 
     !! -----------------------------------------------------------------------
@@ -14011,6 +14281,7 @@ program fidasim
         endif
         if(inputs%dist_type.eq.1) then
             call neutron_f()
+            if(inputs%calc_neut_spec.ge.1) call neutron_spec_f
         else
             call neutron_mc()
         endif
@@ -14022,6 +14293,18 @@ program fidasim
             write(*,*) 'charged fusion products:    ', time_string(time_start)
         endif
         call cfpd_f()
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+    
+    if(inputs%calc_neutron.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'write neutrons:    ' , time_string(time_start)
+        endif
+#ifdef _MPI
+        if(my_rank().eq.0) call write_neutrons()
+#else
+        call write_neutrons()
+#endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

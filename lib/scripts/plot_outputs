@@ -583,9 +583,9 @@ def main():
                     fpaths[2].append(neutron_dir)
             else:
                 fpaths = []
-                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_spectra\.h5',f)])
-                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_npa\.h5',f)])
-                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_neutrons\.h5',f)])
+                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_spectra\\.h5',f)])
+                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_npa\\.h5',f)])
+                fpaths.append([fdir+'/'+ f for f in files if re.search('.*_neutrons\\.h5',f)])
         else:
             print('ERROR: %s is not a directory' % fdir)
             raise SystemExit

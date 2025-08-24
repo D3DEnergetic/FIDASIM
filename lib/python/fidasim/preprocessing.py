@@ -175,6 +175,7 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int,
+              'calc_neut_spec': zero_int,
               'calc_cfpd': zero_int,
               'calc_res': zero_int,
               'adaptive': zero_int,
@@ -1178,6 +1179,146 @@ def check_npa(inp, npa):
     else:
         success('NPA geometry is valid')
 
+def check_nc(inp, nc):
+    """
+    Checks if Neutron Collimator geometry structure is valid.
+
+    Args:
+        inp: Input dictionary.
+        nc: Neutron Collimator geometry dictionary.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If Neutron Collimator geometry is invalid, halts execution.
+    """
+
+    err_status = 0
+    print("Checking Neutron Collimator geometry...")
+
+    # Check if 'nchan' exists in nc
+    if 'nchan' not in nc:
+        raise ValueError('"nchan" is missing from the Neutron Collimator geometry')
+
+    nchan = nc['nchan']
+
+     # Define schema for dictionary structure validation, using similar setup as check_npa
+    zero_string = {'dims': 0, 'type': [str]}
+    zero_long = {'dims': 0, 'type': [int, np.int32, np.int64]}
+    nchan_int = {'dims': [nchan], 'type': [int, np.int32, np.int64]}
+    nchan_double = {'dims': [nchan], 'type': [float, np.float64]}
+    nchan_string = {'dims': [nchan], 'type': [np.bytes_, str]}  # Allow both bytes and str
+    three_nchan_float = {'dims': [3, nchan], 'type': [float, np.float64]}
+
+    schema = {
+        'data_source': zero_string,
+        'nchan': zero_long,
+        'system': zero_string,
+        'id': nchan_string,
+        'a_shape': nchan_int,  
+        'd_shape': nchan_int,
+        'a_tedge': three_nchan_float,
+        'a_redge': three_nchan_float,
+        'a_cent': three_nchan_float,
+        'd_tedge': three_nchan_float,
+        'd_redge': three_nchan_float,
+        'd_cent': three_nchan_float,
+        'radius': nchan_double
+    }
+
+    # Check if nc adheres to the schema
+    err_status = check_dict_schema(schema, nc, desc="Neutron Collimator geometry")  # Assuming you have a check_dict_schema function
+    if err_status == 1:
+        raise ValueError('Invalid Neutron Collimator geometry. Exiting...')
+
+    # Check detector/aperture shape
+    invalid_detector_indices = np.where((nc['d_shape'] > 2) | (nc['d_shape'] == 0))[0]
+    if len(invalid_detector_indices) > 0:
+        raise ValueError(
+            'Invalid detector shape. Expected 1 (rectangular) or 2 (circular)\n'
+            f'Invalid indices: {invalid_detector_indices}'
+        )
+
+    invalid_aperture_indices = np.where((nc['a_shape'] > 2) | (nc['a_shape'] == 0))[0]
+    if len(invalid_aperture_indices) > 0:
+        raise ValueError(
+            'Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)\n'
+            f'Invalid indices: {invalid_aperture_indices}'
+        )
+    """
+    # Calculate grid center and side lengths
+    dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']])
+    rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']]) + 0.5 * dr
+
+    err_arr = np.zeros(nchan)
+    err_arr = np.zeros(nchan)
+    for i in range(nchan):
+        # 1. Extract Detector and Aperture Information for Channel 'i'
+        uvw_det = nc['d_cent'][:, i]  # Detector center in UVW coordinates
+        d_e1 = nc['d_redge'][:, i] - uvw_det  # Detector edge vector 1
+        d_e2 = nc['d_tedge'][:, i] - uvw_det  # Detector edge vector 2
+
+        uvw_aper = nc['a_cent'][:, i]  # Aperture center in UVW coordinates
+        a_e1 = nc['a_redge'][:, i] - uvw_aper  # Aperture edge vector 1
+        a_e2 = nc['a_tedge'][:, i] - uvw_aper  # Aperture edge vector 2
+
+        uvw_dir = uvw_aper - uvw_det  # Direction vector from detector to aperture
+
+        # 2. Convert to XYZ Coordinates
+        xyz_aper = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_aper, origin=inp['origin'])
+        xyz_det = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_det, origin=inp['origin'])
+        xyz_dir = xyz_aper - xyz_det
+        xyz_dir /= np.linalg.norm(xyz_dir)  # Normalize the direction vector
+
+        # 3. Check for Intersection with Beam Grid
+        length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_det, xyz_dir)
+
+        if length <= 0.0:
+            err_arr[i] = 1  # Flag error if no intersection
+
+        # 4. Check Detector Direction
+        d_enter = np.linalg.norm(r_enter - xyz_aper)
+        d_exit = np.linalg.norm(r_exit - xyz_aper)
+
+        if d_exit < d_enter:
+            err_arr[i] = 1  # Flag error if detector is pointing in the wrong direction
+
+        # 5. Check Detector and Aperture Alignment
+        d_e3 = np.cross(d_e1, d_e2)  # Detector normal vector
+        a_e3 = np.cross(a_e1, a_e2)  # Aperture normal vector
+
+        d_dp = np.dot(uvw_dir, d_e3)
+        a_dp = np.dot(uvw_dir, a_e3)
+        dp = np.dot(d_e3, a_e3)
+
+        if (a_dp <= 0.0) or (d_dp <= 0.0) or (dp <= 0.0):
+            raise ValueError(
+                'The detector and/or aperture plane normal vectors are '
+                'pointing in the wrong direction. The Neutron Collimator '
+                'definition is incorrect.'
+            )
+            err_arr[i] = 1
+
+        # Check how many channels crossed the beam grid
+    crossed_grid_indices = np.where(err_arr == 0)[0]
+    num_crossed = len(crossed_grid_indices)
+    num_missed = len(np.where(err_arr != 0)[0])
+
+    print(f"{num_crossed} out of {nchan} channels crossed the beam grid")
+
+    if num_crossed == 0:
+        raise ValueError('No channels intersect the beam grid')
+
+    if num_missed > 0:
+        print('Some channels did not intersect the beam grid')
+        print(f'Number missed: {num_missed}')
+        print('Missed channels:')
+        print(f'    {nc["id"][np.where(err_arr != 0)[0]]}')  # Assuming 'id' is a numpy array
+    """
+    print('Neutron Collimator geometry is valid')
+        
+
 def check_cfpd(inp, cfpd):
     """
     #+#check_cfpd
@@ -1336,6 +1477,7 @@ def write_namelist(filename, inputs):
         f.write("calc_pfida = {:d}    !! Calculate Passive FIDA Spectra\n".format(inputs['calc_pfida']))
         f.write("calc_pnpa = {:d}   !! Calculate Passive NPA\n".format(inputs['calc_pnpa']))
         f.write("calc_neutron = {:d}   !! Calculate B-T Neutron Rate\n".format(inputs['calc_neutron']))
+        f.write("calc_neut_spec = {:d}   !! Calculate Neutron Spectra\n".format(inputs['calc_neut_spec']))
         f.write("calc_cfpd = {:d}   !! Calculate B-T CFPD Energy Resolved Count Rate\n".format(inputs['calc_cfpd']))
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
@@ -1412,7 +1554,7 @@ def write_namelist(filename, inputs):
 
     success("Namelist file created: {}\n".format(filename))
 
-def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
+def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
     """
     #+#write_geometry
     #+Write geometry values to a HDF5 file
@@ -1541,6 +1683,39 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
                          'a_redge': 'cm'}
 
             write_data(g_npa, npa, desc = npa_description, units = npa_units, name='npa')
+        
+        if nc is not None:
+            # Create npa group
+            g_nc = hf.create_group('nc')
+
+            # Group attributes
+            g_nc.attrs['description'] = 'NC Geometry'
+            g_nc.attrs['coordinate_system'] = 'Right-handed cartesian'
+
+            # Dataset attributes
+            nc_description = {'data_source': 'Source of the NC geometry',
+                               'nchan': 'Number of channels',
+                               'system': 'Names of the different NC systems',
+                               'id': 'Line of sight ID',
+                               'd_shape': 'Shape of the detector: 1="rectangular", 2="circular"',
+                               'd_cent': 'Center of the detector',
+                               'd_tedge': 'Center of the detectors top edge',
+                               'd_redge': 'Center of the detectors right edge',
+                               'a_shape': 'Shape of the aperture: 1="rectangular", 2="circular"',
+                               'a_cent': 'Center of the aperture',
+                               'a_tedge': 'Center of the apertures top edge',
+                               'a_redge': 'Center of the apertures right edge',
+                               'radius': 'Line of sight radius at midplane or tangency point'}
+
+            nc_units = {'d_cent': 'cm',
+                         'd_tedge': 'cm',
+                         'd_redge': 'cm',
+                         'a_cent': 'cm',
+                         'a_tedge': 'cm',
+                         'radius': 'cm',
+                         'a_redge': 'cm'}
+
+            write_data(g_nc, nc, desc = nc_description, units = nc_units, name='nc')
 
         if cfpd is not None:
             # Create cfpd group
@@ -1786,7 +1961,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=None, use_abs_path=True):
+def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -1809,11 +1984,13 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=No
     #+
     #+     **npa**: Optional, NPA geometry structure
     #+
+    #+     **nc**: Optional, NC geometry structure
+    #+
     #+     **cfpd**: Optional, CFPD geometry structure
     #+
     #+##Example Usage
     #+```python
-    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, cfpd=cfpd)
+    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, nc=nc, cfpd=cfpd)
     #+```
     """
     # CHECK INPUTS
@@ -1845,6 +2022,10 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=No
     # CHECK NPA
     if npa is not None:
         check_npa(inputs, npa)
+    
+    # CHECK NC
+    if nc is not None:
+        check_nc(inputs, nc)
 
     # CHECK CFPD
     if cfpd is not None:
@@ -1854,7 +2035,7 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=No
     write_namelist(inputs['input_file'], inputs)
 
     # WRITE GEOMETRY FILE
-    write_geometry(inputs['geometry_file'], nbi, spec=spec, npa=npa, cfpd=cfpd)
+    write_geometry(inputs['geometry_file'], nbi, spec=spec, npa=npa, nc=nc, cfpd=cfpd)
 
     # WRITE EQUILIBRIUM FILE
     write_equilibrium(inputs['equilibrium_file'], plasma, fields)

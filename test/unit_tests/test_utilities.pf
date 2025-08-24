@@ -1,0 +1,209 @@
+!+Unit tests for the utilities module
+@test
+subroutine test_ind2sub()
+    use utilities
+    use funit
+    implicit none
+
+    integer :: i, j, k
+    integer, dimension(3) :: dims, subs
+
+    ! Test 3D indexing
+    dims = [3, 4, 5]
+
+    ! Test first element
+    call ind2sub(dims, 1, subs)
+    @assertEqual([1, 1, 1], subs)
+
+    ! Test last element
+    call ind2sub(dims, 60, subs)
+    @assertEqual([3, 4, 5], subs)
+
+    ! Test middle element
+    call ind2sub(dims, 23, subs)
+    @assertEqual([2, 2, 2], subs)
+
+end subroutine test_ind2sub
+
+@test
+subroutine test_sub2ind()
+    use utilities
+    use funit
+    implicit none
+
+    integer :: ind
+    integer, dimension(3) :: dims, subs
+
+    dims = [3, 4, 5]
+
+    ! Test first element
+    subs = [1, 1, 1]
+    ind = sub2ind(dims, subs)
+    @assertEqual(1, ind)
+
+    ! Test last element
+    subs = [3, 4, 5]
+    ind = sub2ind(dims, subs)
+    @assertEqual(60, ind)
+
+    ! Test middle element
+    subs = [2, 2, 2]
+    ind = sub2ind(dims, subs)
+    @assertEqual(23, ind)
+
+end subroutine test_sub2ind
+
+@test
+subroutine test_sub2ind_ind2sub_inverse()
+    use utilities
+    use funit
+    implicit none
+
+    integer :: i, ind_original, ind_result
+    integer, dimension(3) :: dims, subs
+
+    dims = [5, 6, 7]
+
+    ! Test that sub2ind and ind2sub are inverse operations
+    do i = 1, 210
+        ind_original = i
+        call ind2sub(dims, ind_original, subs)
+        ind_result = sub2ind(dims, subs)
+        @assertEqual(ind_original, ind_result)
+    end do
+
+end subroutine test_sub2ind_ind2sub_inverse
+
+@test
+subroutine test_cumsum()
+    use utilities
+    use funit
+    implicit none
+
+    real(8), dimension(5) :: input_array, expected, result
+
+    ! Test basic cumulative sum
+    input_array = [1.0d0, 2.0d0, 3.0d0, 4.0d0, 5.0d0]
+    expected = [1.0d0, 3.0d0, 6.0d0, 10.0d0, 15.0d0]
+    call cumsum(input_array, result)
+
+    @assertEqual(expected, result, tolerance=1.0d-10)
+
+    ! Test with negative numbers
+    input_array = [1.0d0, -2.0d0, 3.0d0, -4.0d0, 5.0d0]
+    expected = [1.0d0, -1.0d0, 2.0d0, -2.0d0, 3.0d0]
+    call cumsum(input_array, result)
+
+    @assertEqual(expected, result, tolerance=1.0d-10)
+
+end subroutine test_cumsum
+
+@test
+subroutine test_rng_init_seed()
+    use utilities
+    use funit
+    implicit none
+
+    integer :: seed_value, seed_result
+    type(rng_type) :: rng_test
+
+    ! Get current seed value
+    seed_result = rng_seed()
+
+    ! Initialize RNG with a specific seed
+    seed_value = 12345
+    call rng_init(rng_test, seed_value)
+
+    ! Check that seed is set correctly
+    @assertEqual(seed_value, rng_test%seed)
+
+end subroutine test_rng_init_seed
+
+@test  
+subroutine test_rng_uniform_range()
+    use utilities
+    use funit
+    implicit none
+
+    type(rng_type) :: rng_test
+    real(8) :: random_value
+    integer :: i
+
+    ! Initialize RNG
+    call rng_init(rng_test, 42)
+
+    ! Generate 100 random numbers and check they are in [0,1)
+    do i = 1, 100
+        random_value = rng_uniform(rng_test)
+        @assertTrue(random_value >= 0.0d0)
+        @assertTrue(random_value < 1.0d0)
+    end do
+
+end subroutine test_rng_uniform_range
+
+@test
+subroutine test_sparse_array_creation()
+    use utilities
+    use funit
+    implicit none
+
+    type(SparseArray) :: sparse_test
+    real(8), dimension(3,3) :: dense_matrix
+    integer :: nnz_expected
+
+    ! Create a simple sparse matrix
+    dense_matrix = 0.0d0
+    dense_matrix(1,1) = 1.0d0
+    dense_matrix(2,3) = 2.0d0
+    dense_matrix(3,2) = 3.0d0
+
+    nnz_expected = 3
+
+    ! Convert to sparse - call specific version for 2D arrays
+    call sparse(dense_matrix, sparse_test)
+
+    ! Check properties
+    @assertEqual(nnz_expected, sparse_test%nnz)
+    @assertEqual(2, sparse_test%nd)
+    @assertEqual([3, 3], sparse_test%dims)
+
+end subroutine test_sparse_array_creation
+
+@test
+subroutine test_sparse_get_value()
+    use utilities
+    use funit
+    implicit none
+
+    type(SparseArray) :: sparse_test
+    real(8), dimension(3,3) :: dense_matrix
+    real(8) :: val
+    integer, dimension(2) :: subs
+
+    ! Create a sparse matrix
+    dense_matrix = 0.0d0
+    dense_matrix(1,1) = 1.0d0
+    dense_matrix(2,3) = 2.0d0
+    dense_matrix(3,2) = 3.0d0
+
+    call sparse(dense_matrix, sparse_test)
+
+    ! Test getting values
+    subs = [1, 1]
+    val = get_value(sparse_test, subs)
+    @assertEqual(1.0d0, val, tolerance=1.0d-10)
+
+    subs = [2, 3]
+    val = get_value(sparse_test, subs)
+    @assertEqual(2.0d0, val, tolerance=1.0d-10)
+
+    subs = [3, 2]
+    val = get_value(sparse_test, subs)
+    @assertEqual(3.0d0, val, tolerance=1.0d-10)
+
+    ! Test getting zero value
+    subs = [1, 2]
+    val = get_value(sparse_test, subs)
+    @assertEqual(0.0d0, val, tolerance=1.0d-10)
+
+end subroutine test_sparse_get_value

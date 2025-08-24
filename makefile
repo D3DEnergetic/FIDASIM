@@ -209,7 +209,7 @@ python:
 	@echo "Linking python executable: $(PYTHON_EXEC) --> $(DEPS_DIR)/python"
 	@ln -sf $(PYTHON_EXEC) $(DEPS_DIR)/python
 
-clean_all: clean clean_deps clean_docs
+clean_all: clean clean_deps clean_docs clean_tests
 
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim
@@ -232,17 +232,49 @@ clean_tables:
 clean_docs:
 	-rm -rf $(DOCS_DIR)/html
 
+.PHONY: test
+test: src
+	@echo "Building unit tests with pFUnit..."
+	@cd test/unit_tests && \
+	mkdir -p build && \
+	cd build && \
+	cmake .. && \
+	make && \
+	ctest --output-on-failure
+
+clean_tests:
+	-rm -rf test/unit_tests/build
+	-rm -rf test/python_tests/__pycache__
+	-rm -rf test/python_tests/.pytest_cache
+	-find test/python_tests -name "*.pyc" -delete
+
+.PHONY: test-python
+test-python:
+	@echo "Running Python unit tests..."
+	@cd test/python_tests && \
+	$(PYTHON_EXEC) -m pytest -v --tb=short
+
+.PHONY: test-all
+test-all: test test-python
+	@echo "All tests completed"
+
 help:
 	@echo ""
 	@echo "Makefile Targets:"
 	@echo "    fidasim"
 	@echo "        Builds fidasim executable (Default Target)"
+	@echo "    test"
+	@echo "        Builds and runs Fortran unit tests using pFUnit"
+	@echo "    test-python"
+	@echo "        Runs Python unit tests using pytest"
+	@echo "    test-all"
+	@echo "        Runs both Fortran and Python unit tests"
 	@echo "    docs"
 	@echo "        Builds FIDASIM documentation website in $(DOCS_DIR)/html"
 	@echo "    clean"
 	@echo "        Deletes object and module files in the src and tables directories and deletes the fidasim executable"
 	@echo "    clean_all"
-	@echo "        Cleans src, tables, deps, and docs directories"
+	@echo "        Cleans src, tables, deps, docs and test directories"
 	@echo "    clean_src"
 	@echo "        Cleans src directory"
 	@echo "    clean_tables"
@@ -251,6 +283,8 @@ help:
 	@echo "        Cleans deps directory including HDF5 build"
 	@echo "    clean_docs"
 	@echo "        Deletes FIDASIM documentation website directory"
+	@echo "    clean_tests"
+	@echo "        Cleans unit test build directory"
 	@echo ""
 	@echo "Compiling Options:"
 	@echo "    USE_MPI = (y|n)"

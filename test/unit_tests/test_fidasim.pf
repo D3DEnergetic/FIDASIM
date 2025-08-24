@@ -1,0 +1,485 @@
+!+Unit tests for the fidasim module
+@test
+subroutine test_approx_eq()
+    use libfida
+    use funit
+    implicit none
+
+    real(8) :: x, y
+    logical :: result
+
+    ! Test exact equality
+    x = 1.0d0
+    y = 1.0d0
+    result = approx_eq(x, y, 1.0d-10)
+    @assertTrue(result)
+
+    ! Test within tolerance
+    x = 1.0d0
+    y = 1.0000001d0
+    result = approx_eq(x, y, 1.0d-6)
+    @assertTrue(result)
+
+    ! Test outside tolerance
+    x = 1.0d0
+    y = 1.001d0
+    result = approx_eq(x, y, 1.0d-6)
+    @assertFalse(result)
+
+    ! Test negative numbers
+    x = -1.0d0
+    y = -1.0000001d0
+    result = approx_eq(x, y, 1.0d-6)
+    @assertTrue(result)
+
+end subroutine test_approx_eq
+
+@test
+subroutine test_approx_ge_le()
+    use libfida
+    use funit
+    implicit none
+
+    real(8) :: x, y
+    logical :: result
+
+    ! Test approx_ge
+    x = 2.0d0
+    y = 1.0d0
+    result = approx_ge(x, y, 1.0d-10)
+    @assertTrue(result)
+
+    x = 1.0d0
+    y = 1.0d0
+    result = approx_ge(x, y, 1.0d-10)
+    @assertTrue(result)
+
+    x = 0.999999d0
+    y = 1.0d0
+    result = approx_ge(x, y, 1.0d-6)
+    @assertTrue(result)
+
+    x = 0.99d0
+    y = 1.0d0
+    result = approx_ge(x, y, 1.0d-6)
+    @assertFalse(result)
+
+    ! Test approx_le
+    x = 1.0d0
+    y = 2.0d0
+    result = approx_le(x, y, 1.0d-10)
+    @assertTrue(result)
+
+    x = 1.0d0
+    y = 1.0d0
+    result = approx_le(x, y, 1.0d-10)
+    @assertTrue(result)
+
+    x = 1.000001d0
+    y = 1.0d0
+    result = approx_le(x, y, 1.0d-6)
+    @assertTrue(result)
+
+    x = 1.01d0
+    y = 1.0d0
+    result = approx_le(x, y, 1.0d-6)
+    @assertFalse(result)
+
+end subroutine test_approx_ge_le
+
+@test
+subroutine test_cross_product()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: u, v, s, expected
+
+    ! Test standard basis vectors
+    u = [1.0d0, 0.0d0, 0.0d0]
+    v = [0.0d0, 1.0d0, 0.0d0]
+    expected = [0.0d0, 0.0d0, 1.0d0]
+    s = cross_product(u, v)
+    @assertEqual(expected, s, tolerance=1.0d-10)
+
+    ! Test opposite order
+    s = cross_product(v, u)
+    expected = [0.0d0, 0.0d0, -1.0d0]
+    @assertEqual(expected, s, tolerance=1.0d-10)
+
+    ! Test parallel vectors (should give zero)
+    u = [1.0d0, 2.0d0, 3.0d0]
+    v = [2.0d0, 4.0d0, 6.0d0]
+    expected = [0.0d0, 0.0d0, 0.0d0]
+    s = cross_product(u, v)
+    @assertEqual(expected, s, tolerance=1.0d-10)
+
+    ! Test general case
+    u = [1.0d0, 2.0d0, 3.0d0]
+    v = [4.0d0, 5.0d0, 6.0d0]
+    expected = [-3.0d0, 6.0d0, -3.0d0]
+    s = cross_product(u, v)
+    @assertEqual(expected, s, tolerance=1.0d-10)
+
+end subroutine test_cross_product
+
+@test
+subroutine test_xyz_to_uvw_conversion()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: xyz, uvw, xyz_back
+    type(BeamGrid) :: test_grid
+
+    ! Initialize a simple beam grid with no rotation
+    test_grid%origin = [0.0d0, 0.0d0, 0.0d0]
+    test_grid%basis = reshape([1.0d0, 0.0d0, 0.0d0, &
+                               0.0d0, 1.0d0, 0.0d0, &
+                               0.0d0, 0.0d0, 1.0d0], [3,3])
+    test_grid%inv_basis = test_grid%basis  ! Identity matrix
+
+    beam_grid = test_grid
+
+    ! Test identity transformation
+    xyz = [1.0d0, 2.0d0, 3.0d0]
+    call xyz_to_uvw(xyz, uvw)
+    @assertEqual(xyz, uvw, tolerance=1.0d-10)
+
+    ! Test reverse transformation
+    call uvw_to_xyz(uvw, xyz_back)
+    @assertEqual(xyz, xyz_back, tolerance=1.0d-10)
+
+    ! Test with non-zero origin
+    test_grid%origin = [10.0d0, 20.0d0, 30.0d0]
+    beam_grid = test_grid
+
+    xyz = [1.0d0, 2.0d0, 3.0d0]
+    call xyz_to_uvw(xyz, uvw)
+    @assertEqual([11.0d0, 22.0d0, 33.0d0], uvw, tolerance=1.0d-10)
+
+    call uvw_to_xyz(uvw, xyz_back)
+    @assertEqual(xyz, xyz_back, tolerance=1.0d-10)
+
+end subroutine test_xyz_to_uvw_conversion
+
+@test
+subroutine test_xyz_to_cyl_conversion()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: xyz, cyl, xyz_back
+    real(8) :: r_expected, phi_expected
+
+    ! Test point on x-axis
+    xyz = [1.0d0, 0.0d0, 0.0d0]
+    call xyz_to_cyl(xyz, cyl)
+    @assertEqual(1.0d0, cyl(1), tolerance=1.0d-10)  ! r
+    @assertEqual(0.0d0, cyl(2), tolerance=1.0d-10)  ! z  
+    @assertEqual(0.0d0, cyl(3), tolerance=1.0d-10)  ! phi
+
+    ! Test conversion back
+    call cyl_to_xyz(cyl, xyz_back)
+    @assertEqual(xyz, xyz_back, tolerance=1.0d-10)
+
+    ! Test point on y-axis
+    xyz = [0.0d0, 1.0d0, 0.0d0]
+    call xyz_to_cyl(xyz, cyl)
+    @assertEqual(1.0d0, cyl(1), tolerance=1.0d-10)  ! r
+    @assertEqual(0.0d0, cyl(2), tolerance=1.0d-10)  ! z
+    @assertEqual(pi/2.0d0, cyl(3), tolerance=1.0d-10)  ! phi
+
+    ! Test general point
+    xyz = [1.0d0, 1.0d0, 2.0d0]
+    call xyz_to_cyl(xyz, cyl)
+    r_expected = sqrt(2.0d0)
+    phi_expected = pi/4.0d0
+    @assertEqual(r_expected, cyl(1), tolerance=1.0d-10)  ! r
+    @assertEqual(2.0d0, cyl(2), tolerance=1.0d-10)  ! z
+    @assertEqual(phi_expected, cyl(3), tolerance=1.0d-10)  # phi
+
+    call cyl_to_xyz(cyl, xyz_back)
+    @assertEqual(xyz, xyz_back, tolerance=1.0d-10)
+
+end subroutine test_xyz_to_cyl_conversion
+
+@test
+subroutine test_in_grid()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: xyz
+    logical :: result
+    type(BeamGrid) :: test_grid
+
+    ! Setup a simple grid
+    test_grid%xmin = -10.0d0
+    test_grid%xmax = 10.0d0
+    test_grid%ymin = -5.0d0
+    test_grid%ymax = 5.0d0
+    test_grid%zmin = -2.0d0
+    test_grid%zmax = 2.0d0
+
+    beam_grid = test_grid
+
+    ! Test point inside grid
+    xyz = [0.0d0, 0.0d0, 0.0d0]
+    result = in_grid(xyz)
+    @assertTrue(result)
+
+    ! Test point at boundary (should be inside)
+    xyz = [10.0d0, 5.0d0, 2.0d0]
+    result = in_grid(xyz)
+    @assertTrue(result)
+
+    ! Test point outside grid (x too large)
+    xyz = [11.0d0, 0.0d0, 0.0d0]
+    result = in_grid(xyz)
+    @assertFalse(result)
+
+    ! Test point outside grid (y too small)
+    xyz = [0.0d0, -6.0d0, 0.0d0]
+    result = in_grid(xyz)
+    @assertFalse(result)
+
+    ! Test point outside grid (z too large)
+    xyz = [0.0d0, 0.0d0, 3.0d0]
+    result = in_grid(xyz)
+    @assertFalse(result)
+
+end subroutine test_in_grid
+
+@test
+subroutine test_get_indices()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: pos
+    integer, dimension(3) :: ind, expected_ind
+    type(BeamGrid) :: test_grid
+
+    ! Setup a simple grid with 10x10x10 cells
+    test_grid%nx = 10
+    test_grid%ny = 10
+    test_grid%nz = 10
+    test_grid%xmin = 0.0d0
+    test_grid%xmax = 10.0d0
+    test_grid%ymin = 0.0d0
+    test_grid%ymax = 10.0d0
+    test_grid%zmin = 0.0d0
+    test_grid%zmax = 10.0d0
+    test_grid%dr = [1.0d0, 1.0d0, 1.0d0]
+
+    beam_grid = test_grid
+
+    ! Test lower corner
+    pos = [0.5d0, 0.5d0, 0.5d0]
+    call get_indices(pos, ind)
+    expected_ind = [1, 1, 1]
+    @assertEqual(expected_ind, ind)
+
+    ! Test center
+    pos = [5.0d0, 5.0d0, 5.0d0]
+    call get_indices(pos, ind)
+    expected_ind = [5, 5, 5]
+    @assertEqual(expected_ind, ind)
+
+    ! Test upper corner
+    pos = [9.5d0, 9.5d0, 9.5d0]
+    call get_indices(pos, ind)
+    expected_ind = [10, 10, 10]
+    @assertEqual(expected_ind, ind)
+
+    ! Test boundary conditions
+    pos = [10.0d0, 10.0d0, 10.0d0]
+    call get_indices(pos, ind)
+    expected_ind = [10, 10, 10]
+    @assertEqual(expected_ind, ind)
+
+end subroutine test_get_indices
+
+@test
+subroutine test_beam_grid_basis()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3,3) :: basis, inv_basis, identity
+    real(8) :: alpha, beta, gamma
+    integer :: i, j
+
+    ! Test with zero rotation
+    alpha = 0.0d0
+    beta = 0.0d0
+    gamma = 0.0d0
+    call tb_zyx(alpha, beta, gamma, basis, inv_basis)
+
+    ! Should get identity matrix
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, basis(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, basis(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+    ! Test that basis * inv_basis = identity
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+    ! Test with 90 degree rotation about z
+    alpha = pi/2.0d0
+    beta = 0.0d0
+    gamma = 0.0d0
+    call tb_zyx(alpha, beta, gamma, basis, inv_basis)
+
+    ! Check orthogonality
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+end subroutine test_beam_grid_basis
+
+@test
+subroutine test_line_basis()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: r0, v0
+    real(8), dimension(3,3) :: basis, inv_basis, identity
+    integer :: i, j
+
+    ! Test with simple direction along x-axis
+    r0 = [0.0d0, 0.0d0, 0.0d0]
+    v0 = [1.0d0, 0.0d0, 0.0d0]
+    call line_basis(r0, v0, basis, inv_basis)
+
+    ! First column should be normalized v0
+    @assertEqual(1.0d0, basis(1,1), tolerance=1.0d-10)
+    @assertEqual(0.0d0, basis(2,1), tolerance=1.0d-10)
+    @assertEqual(0.0d0, basis(3,1), tolerance=1.0d-10)
+
+    ! Basis should be orthonormal
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+    ! Test with diagonal direction
+    r0 = [0.0d0, 0.0d0, 0.0d0]
+    v0 = [1.0d0, 1.0d0, 1.0d0]
+    call line_basis(r0, v0, basis, inv_basis)
+
+    ! Check orthonormality
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+end subroutine test_line_basis
+
+@test
+subroutine test_plane_basis()
+    use libfida
+    use funit
+    implicit none
+
+    real(8), dimension(3) :: center, redge, tedge
+    real(8), dimension(3,3) :: basis, inv_basis, identity
+    integer :: i, j
+
+    ! Test with standard rectangular aperture
+    center = [0.0d0, 0.0d0, 0.0d0]
+    redge = [1.0d0, 0.0d0, 0.0d0]
+    tedge = [0.0d0, 1.0d0, 0.0d0]
+
+    call plane_basis(center, redge, tedge, basis, inv_basis)
+
+    ! Check that basis is orthonormal
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+    ! Test with non-orthogonal edges (should still produce orthonormal basis)
+    center = [0.0d0, 0.0d0, 0.0d0]
+    redge = [1.0d0, 0.0d0, 0.0d0]
+    tedge = [0.5d0, 1.0d0, 0.0d0]
+
+    call plane_basis(center, redge, tedge, basis, inv_basis)
+
+    identity = matmul(basis, inv_basis)
+    do i = 1, 3
+        do j = 1, 3
+            if (i == j) then
+                @assertEqual(1.0d0, identity(i,j), tolerance=1.0d-10)
+            else
+                @assertEqual(0.0d0, identity(i,j), tolerance=1.0d-10)
+            end if
+        end do
+    end do
+
+end subroutine test_plane_basis
+
+@test
+subroutine test_physical_constants()
+    use libfida
+    use funit
+    implicit none
+
+    ! Test physical constants are reasonable
+    @assertEqual(3.141592653589793d0, pi, tolerance=1.0d-10)
+    @assertEqual(299792458.0d0, c0, tolerance=1.0d0)
+    @assertEqual(1.60217733d-19, e0, tolerance=1.0d-25)
+
+    ! Test mass values
+    @assertTrue(H1_amu > 0.0d0)
+    @assertTrue(H2_amu > H1_amu)
+    @assertTrue(H3_amu > H2_amu)
+    @assertTrue(He3_amu > 0.0d0)
+    @assertTrue(He4_amu > He3_amu)
+
+    ! Test that electron mass is much smaller than proton
+    @assertTrue(e_amu < 0.001d0)
+    @assertTrue(e_amu > 0.0d0)
+
+end subroutine test_physical_constants

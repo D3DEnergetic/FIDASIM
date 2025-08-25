@@ -159,6 +159,9 @@ def check_inputs(inputs, use_abs_path=True):
               'np_wght': zero_int,
               'nphi_wght': zero_int,
               'emax_wght': zero_double,
+              'ne_nc': zero_int,
+              'np_nc': zero_int,
+              'emax_nc': zero_double,
               'nlambda_wght': zero_int,
               'lambdamin_wght': zero_double,
               'lambdamax_wght': zero_double,
@@ -174,6 +177,7 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
+              'calc_nc_wght': zero_int,              
               'calc_neutron': zero_int,
               'calc_neut_spec': zero_int,
               'calc_cfpd': zero_int,
@@ -1482,6 +1486,7 @@ def write_namelist(filename, inputs):
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
+        f.write("calc_nc_wght = {:d}    !! Calculate NC weights\n".format(inputs['calc_nc_wght']))
         f.write("calc_res = {:d}    !! Calculate spatial resolution\n".format(inputs['calc_res']))
 
         f.write("\n!! Advanced Settings\n")
@@ -1544,7 +1549,10 @@ def write_namelist(filename, inputs):
         f.write("emax_wght = {:f}    !! Maximum Energy for Weights [keV]\n".format(inputs['emax_wght']))
         f.write("nlambda_wght = {:d}    !! Number of Wavelengths for Weights \n".format(inputs['nlambda_wght']))
         f.write("lambdamin_wght = {:f}    !! Minimum Wavelength for Weights [nm]\n".format(inputs['lambdamin_wght']))
-        f.write("lambdamax_wght = {:f}    !! Maximum Wavelength for Weights [nm]\n\n".format(inputs['lambdamax_wght']))
+        f.write("lambdamax_wght = {:f}    !! Maximum Wavelength for Weights [nm]\n".format(inputs['lambdamax_wght']))
+        f.write("ne_nc = {:d}    !! Number of Energies for NC Weights\n".format(inputs['ne_nc']))
+        f.write("np_nc = {:d}    !! Number of Pitches for NC Weights\n".format(inputs['np_nc']))
+        f.write("emax_nc = {:f}    !! Maximum Energy for NC Weights [keV]\n\n".format(inputs['emax_nc']))
 
         f.write("!! Adaptive Time Step Settings\n")
         f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))

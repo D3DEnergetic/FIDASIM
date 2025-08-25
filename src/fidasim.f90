@@ -965,6 +965,20 @@ type NPAWeights
         !+ Neutral particle flux: flux(E,chan) [neutrals/(s*dE)]
 end type NPAWeights
 
+type NCWeights
+    !+ Neutron Collimator weight function structure
+    real(Float64), dimension(:,:,:), allocatable     :: weight
+        !+ NC weight function: weight(E,p,chan) [neutrons/(s*fast-ion*dE*dP)]
+    real(Float64), dimension(:,:,:), allocatable     :: emissivity
+        !+ Channel-resolved neutron emissivity: emissivity(r,z,chan) [neutrons/(s*cm^3)]
+    real(Float64), dimension(:,:), allocatable       :: flux
+        !+ Neutron flux: flux(E,chan) [neutrons/(s*dE)]
+    real(Float64), dimension(:), allocatable         :: energy
+        !+ Energy grid [keV]
+    real(Float64), dimension(:), allocatable         :: pitch
+        !+ Pitch grid
+end type NCWeights
+
 type SimulationInputs
     !+ Simulation settings structure
     integer(Int32) :: shot_number
@@ -1054,6 +1068,8 @@ type SimulationInputs
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_neut_spec
         !+ Calculate neutron collimation flux: 0 = off, 1=on
+    integer(Int32) :: calc_nc_wght
+        !+ Calculate NC weight function: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_cfpd
         !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
     integer(Int32) :: calc_res
@@ -1092,6 +1108,12 @@ type SimulationInputs
         !+ Number of wavelength to calculate in weight functions
     real(Float64)  :: emax_wght
         !+ Maximum energy in weight functions [keV]
+    integer(Int32) :: ne_nc
+        !+ Number of energy bins for NC weight function
+    integer(Int32) :: np_nc
+        !+ Number of pitch bins for NC weight function
+    real(Float64)  :: emax_nc
+        !+ Maximum energy for NC weight function [keV]
     real(Float64)  :: lambdamin_wght
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
@@ -1242,6 +1264,8 @@ type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
+type(NCWeights), save           :: ncweight
+    !+ Variable for storing the calculated NC weights
 type(CFPDTable), save           :: ctable
     !+ Variable for storing the calculated Charged Fusion Product orbits
 type(SpatialSpectra), save      :: spatres
@@ -1978,14 +2002,15 @@ subroutine read_inputs
     integer            :: pathlen, calc_neutron, calc_neut_spec, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
-    integer            :: calc_birth,calc_fida_wght,calc_npa_wght, calc_res
+    integer            :: calc_birth,calc_fida_wght,calc_npa_wght,calc_nc_wght, calc_res
     integer            :: load_neutrals,verbose,flr,split,stark_components
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    integer(Int32)     :: ne_nc, np_nc
     integer(Int32)     :: adaptive, max_cell_splits
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)      :: lambdamin_wght,lambdamax_wght
+    real(Float64)      :: lambdamin_wght,lambdamax_wght,emax_nc
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -1997,7 +2022,7 @@ subroutine read_inputs
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, calc_res, seed, flr, split, &
-        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
+        calc_fida_wght, calc_npa_wght, calc_nc_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, calc_neut_spec, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
@@ -2005,6 +2030,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
+        ne_nc, np_nc, emax_nc, &
         adaptive, max_cell_splits, split_tol
 
     inquire(file=namelist_file,exist=exis)
@@ -2041,6 +2067,7 @@ subroutine read_inputs
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
+    calc_nc_wght=0
     load_neutrals=0
     output_neutral_reservoir=1
     verbose=0
@@ -2082,6 +2109,9 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
+    ne_nc=0
+    np_nc=0
+    emax_nc=0
     adaptive=0
     max_cell_splits=1
     split_tol=0
@@ -2156,6 +2186,7 @@ subroutine read_inputs
     inputs%calc_birth=calc_birth
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
+    inputs%calc_nc_wght=calc_nc_wght
     inputs%calc_neutron=calc_neutron
     inputs%calc_neut_spec=calc_neut_spec
     inputs%calc_cfpd=calc_cfpd
@@ -2191,6 +2222,9 @@ subroutine read_inputs
     inputs%np_wght=np_wght
     inputs%nphi_wght=nphi_wght
     inputs%emax_wght=emax_wght
+    inputs%ne_nc=ne_nc
+    inputs%np_nc=np_nc
+    inputs%emax_nc=emax_nc
     inputs%nlambda_wght = nlambda_wght
     inputs%lambdamin_wght=lambdamin_wght
     inputs%lambdamax_wght=lambdamax_wght
@@ -6351,6 +6385,76 @@ subroutine write_npa_weights
     endif
 
 end subroutine write_npa_weights
+
+subroutine write_nc_weights
+    !+ Writes [[libfida:ncweight]] to a HDF5 file
+    character(charlim) :: filename
+    integer :: i
+
+    !! HDF5 variables
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(3) :: dim3
+    integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer :: error
+
+    filename = trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_nc_weights.h5"
+
+    !Open HDF5 interface
+    call h5open_f(error)
+
+    !Create HDF5 file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+    !Create ncweight group
+    call h5gcreate_f(fid, "/ncweight", gid, error)
+
+    !Write energy grid
+    dim1(1) = inputs%ne_nc
+    call h5ltmake_dataset_double_f(gid, "energy", 1, dim1, ncweight%energy, error)
+
+    !Write pitch grid
+    dim1(1) = inputs%np_nc
+    call h5ltmake_dataset_double_f(gid, "pitch", 1, dim1, ncweight%pitch, error)
+
+    !Write weight function
+    dim3 = [inputs%ne_nc, inputs%np_nc, nc_chords%nchan]
+    call h5ltmake_dataset_double_f(gid, "weight", 3, dim3, ncweight%weight, error)
+
+    !Write flux
+    dim2 = [inputs%ne_nc, nc_chords%nchan]
+    call h5ltmake_dataset_double_f(gid, "flux", 2, dim2, ncweight%flux, error)
+
+    !Write emissivity if calculated
+    if(inputs%calc_nc_wght.ge.2) then
+        dim3 = [inter_grid%nr, inter_grid%nz, nc_chords%nchan]
+        call h5ltmake_dataset_double_f(gid, "emissivity", 3, dim3, ncweight%emissivity, error)
+    endif
+
+    !Write channel IDs (if available)
+    ! dim1(1) = nc_chords%nchan
+    ! call h5ltmake_dataset_string_f(gid, "channels", nc_chords%chan_id, error)
+
+    !Write grid information
+    dim1(1) = inter_grid%nr
+    call h5ltmake_dataset_double_f(gid, "r", 1, dim1, inter_grid%r, error)
+    dim1(1) = inter_grid%nz
+    call h5ltmake_dataset_double_f(gid, "z", 1, dim1, inter_grid%z, error)
+
+    !Close ncweight group
+    call h5gclose_f(gid, error)
+
+    !Close HDF5 file
+    call h5fclose_f(fid, error)
+
+    !Close HDF5 interface
+    call h5close_f(error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'NC weight functions written to: ', trim(filename)
+    endif
+
+end subroutine write_nc_weights
 
 subroutine read_neutral_population(id, pop, error)
     !+ Reads neutral population from file
@@ -14116,6 +14220,186 @@ subroutine neutron_spec_f
 
 end subroutine neutron_spec_f
 
+subroutine neutron_weights
+    !+ Calculate neutron collimator weight functions
+    integer :: ie, ip, ichan, i, j, k
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb, pitch, dE, dP
+    real(Float64) :: erel, rate, kappa
+    real(Float64), dimension(3) :: ri, vi, r_gyro
+    real(Float64), dimension(3) :: rn, vn, r_detector
+    real(Float64) :: vnet_square, fbm_denf
+    real(Float64) :: d, domega
+    real(Float64), dimension(:), allocatable :: ebarr, ptcharr
+    integer :: igamma, ngamma
+    integer :: ntrack
+    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+    
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_WEIGHTS: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'NEUTRON_WEIGHTS: Fast-ion species is not Deuterium'
+        return
+    endif
+    
+    !! Define energy array
+    allocate(ebarr(inputs%ne_nc))
+    do i=1,inputs%ne_nc
+        ebarr(i) = real(i-0.5)*inputs%emax_nc/real(inputs%ne_nc)
+    enddo
+    dE = abs(ebarr(2)-ebarr(1))
+    
+    !! Define pitch array
+    allocate(ptcharr(inputs%np_nc))
+    do i=1,inputs%np_nc
+        ptcharr(i) = real(i-0.5)*2./real(inputs%np_nc) - 1.
+    enddo
+    dP = abs(ptcharr(2)-ptcharr(1))
+    
+    if(inputs%verbose.ge.1) then
+        write(*,'(T3,"Number of Channels: ",i3)') nc_chords%nchan
+        write(*,'(T3,"Nenergy: ",i3)') inputs%ne_nc
+        write(*,'(T3,"Npitch: ",i3)') inputs%np_nc
+        write(*,'(T3,"Maximum energy: ",f7.2)') inputs%emax_nc
+        write(*,*) ''
+    endif
+    
+    !! Allocate storage arrays
+    allocate(ncweight%energy(inputs%ne_nc))
+    allocate(ncweight%pitch(inputs%np_nc))
+    allocate(ncweight%weight(inputs%ne_nc, inputs%np_nc, nc_chords%nchan))
+    allocate(ncweight%flux(inputs%ne_nc, nc_chords%nchan))
+    ncweight%energy = ebarr
+    ncweight%pitch = ptcharr
+    ncweight%weight = 0.d0
+    ncweight%flux = 0.d0
+    
+    if(inputs%calc_nc_wght.ge.2) then
+        allocate(ncweight%emissivity(inter_grid%nr, inter_grid%nz, nc_chords%nchan))
+        ncweight%emissivity = 0.d0
+    endif
+    
+    ngamma = 20
+    
+    !$OMP PARALLEL DO schedule(guided) collapse(3) &
+    !$OMP& private(i,j,k,ie,ip,ichan,ri,vi,r_gyro,rn,vn,r_detector, &
+    !$OMP& fields,plasma,eb,pitch,erel,rate,kappa,vnet_square,fbm_denf, &
+    !$OMP& d,domega,igamma,tracks,ntrack)
+    do ichan=1,nc_chords%nchan
+        do ip=1,inputs%np_nc
+            do ie=1,inputs%ne_nc
+                eb = ebarr(ie)
+                pitch = ptcharr(ip)
+                
+                r_detector = nc_chords%det(ichan)%detector%origin
+                vn = nc_chords%det(ichan)%aperture%origin - r_detector
+                vn = vn/norm2(vn)
+                
+                !! Track through plasma along line of sight
+                call track_cylindrical(r_detector, vn, tracks, ntrack)
+                if(ntrack.eq.0) cycle
+                
+                !! Loop along track
+                do i=1,ntrack
+                    rn = tracks(i)%pos
+                    
+                    !! Get fields at position
+                    call get_fields(fields, pos=rn)
+                    if(.not.fields%in_plasma) cycle
+                    
+                    !! Calculate solid angle
+                    d = norm2(r_detector - rn)
+                    if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (pi * d**2)
+                    else
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (4 * d**2)
+                    endif
+                    
+                    !! Average over gyro-angles
+                    do igamma=1,ngamma
+                        !! Gyro-correction
+                        call gyro_correction(fields, eb, pitch, beam_mass/H1_amu, ri, vi)
+                        call gyro_step(vi, fields, beam_mass/H1_amu, r_gyro)
+                        
+                        !! Get plasma parameters
+                        call get_plasma(plasma, pos=ri)
+                        if(.not.plasma%in_plasma) cycle
+                        
+                        !! Calculate effective energy
+                        vnet_square = dot_product(vi-plasma%vrot, vi-plasma%vrot)
+                        erel = v2_to_E_per_amu * beam_mass * vnet_square
+                        
+                        !! Get neutron production rate
+                        call get_dd_rate(plasma, erel, rate, branch=2)
+                        
+                        !! Apply anisotropy correction
+                        call get_ddnhe_anisotropy(plasma, vi, vn, kappa)
+                        
+                        !! Weight function contribution
+                        !$OMP ATOMIC UPDATE
+                        ncweight%weight(ie,ip,ichan) = ncweight%weight(ie,ip,ichan) + &
+                            rate * kappa * domega * beam_grid%dv / (ngamma * dE * dP)
+                        
+                        !! Flux contribution (assuming some fast-ion density)
+                        fbm_denf = 1.0d12  ! Placeholder - would need actual distribution
+                        !$OMP ATOMIC UPDATE
+                        ncweight%flux(ie,ichan) = ncweight%flux(ie,ichan) + &
+                            rate * kappa * domega * fbm_denf * beam_grid%dv / (ngamma * dE)
+                    enddo ! gyro_loop
+                enddo ! track loop
+            enddo ! energy loop
+        enddo ! pitch loop
+    enddo ! channel loop
+    !$OMP END PARALLEL DO
+    
+    !! Calculate channel-resolved emissivity if requested
+    if(inputs%calc_nc_wght.ge.2) then
+        !$OMP PARALLEL DO schedule(guided) collapse(2) &
+        !$OMP& private(i,j,ichan,ri,rate)
+        do ichan=1,nc_chords%nchan
+            do j=1,inter_grid%nz
+                do i=1,inter_grid%nr
+                    ri = [inter_grid%r(i), 0.d0, inter_grid%z(j)]
+                    
+                    call get_plasma(plasma, pos=ri, input_coords=1)
+                    if(.not.plasma%in_plasma) cycle
+                    
+                    !! Simple estimate of local neutron emissivity
+                    !! Would need to integrate over local fast-ion distribution
+                    ncweight%emissivity(i,j,ichan) = 0.d0  ! Placeholder
+                enddo
+            enddo
+        enddo
+        !$OMP END PARALLEL DO
+    endif
+    
+#ifdef _MPI
+    call parallel_sum(ncweight%weight)
+    call parallel_sum(ncweight%flux)
+    if(inputs%calc_nc_wght.ge.2) then
+        call parallel_sum(ncweight%emissivity)
+    endif
+#endif
+    
+    deallocate(ebarr, ptcharr)
+    
+    if(inputs%verbose.ge.1) then
+        write(*,*) 'write nc weights:    ' , time_string(time_start)
+    endif
+    
+#ifdef _MPI
+    if(my_rank().eq.0) call write_nc_weights()
+#else
+    call write_nc_weights()
+#endif
+    
+end subroutine neutron_weights
+
 end module libfida
 
 !=============================================================================
@@ -14594,6 +14878,14 @@ program fidasim
             write(*,*) 'npa weight function:    ', time_string(time_start)
         endif
         call npa_weights()
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    if(inputs%calc_nc_wght.ge.1.and.inputs%calc_neut_spec.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'nc weight function:     ', time_string(time_start)
+        endif
+        call neutron_weights()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

@@ -1,3 +1,4 @@
+
 # July 2025 (2): b9474cbbc22a2de6e858011f2c443521af65a22d
 - [Utils module](lib/python/fidasim/utils.py) write_data makes a copy of the data prior to wrtting it to avoid transposing the input data
 - Added renormalization keyword to solve issue [#298](https://github.com/D3DEnergetic/FIDASIM/issues/298)
@@ -11,3 +12,4 @@
 - Changed counter to int64 to avoid overflows issues
 - Added gyrocenter positions to output file when `n_(p)npa > 1`
 - Updated documentation
+

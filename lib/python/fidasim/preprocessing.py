@@ -179,12 +179,14 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_res': zero_int,
               'adaptive': zero_int,
               'split_tol': zero_double,
-              'max_cell_splits': zero_int}
+              'max_cell_splits': zero_int,
+              'max_crossings': zero_int}
 
     # If user doesn't provide adaptive time step parameters, set default to off
     inputs.setdefault('adaptive', 0)
     inputs.setdefault('split_tol', 0.0)
     inputs.setdefault('max_cell_splits', 1)
+    inputs.setdefault('max_crossings', 2)
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -242,6 +244,11 @@ def check_inputs(inputs, use_abs_path=True):
     if (inputs['max_cell_splits'] < 1):
         error('Invalid max cell splits. Expected value >= 1')
         print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
+        err = True
+
+    if (inputs['max_crossings'] < 2):
+        error('Invalid max_crossings. Expected value >= 2')
+        print('max_crossings = {}'.format(inputs['max_crossings']))
         err = True
 
     ps = os.path.sep
@@ -1408,6 +1415,7 @@ def write_namelist(filename, inputs):
         f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))
         f.write("split_tol = {:f}    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol\n".format(inputs['split_tol']))
         f.write("max_cell_splits = {:d}    !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
+        f.write("max_crossings = {:d}    !! Maximum number of times a neutral/LOS can cross the plasma boundary\n\n".format(inputs['max_crossings']))
         f.write("/\n\n")
 
     success("Namelist file created: {}\n".format(filename))

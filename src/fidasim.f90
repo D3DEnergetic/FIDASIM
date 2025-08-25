@@ -1108,6 +1108,8 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
+    integer(Int32) :: max_crossings
+        !+ Number of times a neutral particle/LOS can cross the plasma boundary default=2
 end type SimulationInputs
 
 type ParticleTrack
@@ -1988,7 +1990,7 @@ subroutine read_inputs
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: adaptive, max_cell_splits, max_crossings
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
@@ -2010,7 +2012,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        adaptive, max_cell_splits, split_tol, max_crossings
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2089,6 +2091,7 @@ subroutine read_inputs
     adaptive=0
     max_cell_splits=1
     split_tol=0
+    max_crossings = 2
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2172,6 +2175,7 @@ subroutine read_inputs
     inputs%flr = flr
     inputs%stark_components = stark_components
     inputs%split = split
+    inputs%max_crossings = max_crossings
 
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
@@ -3694,8 +3698,16 @@ subroutine read_f(fid, error)
     else
         fbm%phi=0.d0
     endif
-    !call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
-    fbm%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        fbm%A = beam_mass
+    endif
 
     equil%plasma%denf = fbm%denf
 
@@ -3783,8 +3795,17 @@ subroutine read_mc(fid, error)
     allocate(weight(particles%nparticle))
 
     dims(1) = particles%nparticle
-    !call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
-    particles%fast_ion%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_MC: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        particles%fast_ion%A = beam_mass
+    endif
+
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
@@ -7903,7 +7924,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -8169,7 +8190,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -9848,7 +9869,8 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
         endif
     enddo
 
-    if(ncross.gt.1) states = 0.0
+    ! max_crossings - 1 because the particle should always start in the plasma
+    if(ncross.gt.(inputs%max_crossings - 1)) states = 0.0
 
 end subroutine attenuate
 
@@ -12441,7 +12463,7 @@ subroutine npa_mc
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
                             if (inputs%verbose.ge.0)then
-                                write(*,*) "NPA_MC: Missed Detector ",ichan
+                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan
                             endif
                             cycle gyro_range_loop
                         endif
@@ -12467,7 +12489,7 @@ subroutine npa_mc
                             call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                             if(det.ne.ichan) then
                                 if (inputs%verbose.ge.0)then
-                                    write(*,*) "NPA_MC: Missed Detector ",ichan
+                                    write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
                                 endif
                                 cycle spread_loop
                             endif

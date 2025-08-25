@@ -14,6 +14,7 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
+PYTHON_EXEC = $(shell which python3)
 
 PYTHON_EXEC = $(shell which python3 python 2> /dev/null | head -1)
 ifeq ($(PYTHON_EXEC),)
@@ -24,9 +25,9 @@ endif
 OS := $(shell uname)
 
 #Compilers
-SUPPORTED_FC = gfortran pgf90 ifort
-SUPPORTED_CC = gcc pgcc
-SUPPORTED_CXX = g++ pgc++
+SUPPORTED_FC = gfortran pgf90 ifort flang
+SUPPORTED_CC = gcc pgcc clang
+SUPPORTED_CXX = g++ pgc++ clang 
 
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
@@ -42,6 +43,15 @@ HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
     $(error C++ compiler $(CXX) is not supported. Set CXX to g++)
 endif
+
+#Check for Python3
+PYTHON3_CHECK := $(shell command -v python3 2>/dev/null)
+ifeq ($(PYTHON3_CHECK),)
+	$(error Python3 not found.  Please install Python3 to continue.)
+endif
+
+PYTHON_EXEC = $(shell which python3)
+
 
 # Compiler Flags
 # User defined Flags
@@ -107,6 +117,17 @@ ifneq ($(findstring ifort, $(FC)),)
         PROF_FLAGS = -p -D_PROF
 ifneq ($(ARCH),n)
         COMMON_CFLAGS := $(COMMON_CFLAGS) -x$(ARCH)
+endif
+endif
+ifneq ($(findstring flang, $(FC)),)
+        L_FLAGS = -lm
+        COMMON_CFLAGS = -O3 -mfma -fvectorize -mfma -mavx2 -m3dnow -floop-unswitch-aggressive -Mpreprocess
+        DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+        OPENMP_FLAGS = -fopenmp -D_OMP
+        MPI_FLAGS = -D_MPI
+        PROF_FLAGS = -pg -D_PROF
+ifneq ($(ARCH),n)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(ARCH)
 endif
 endif
 
@@ -192,7 +213,13 @@ clean_all: clean clean_deps clean_docs
 
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim
-
+	@echo ""
+	@echo "=== CLEANING COMPLETE ==="
+	@echo "Cleaned: source files, tables, and fidasim executable"
+	@echo ""
+	@echo "NOTE: Dependencies (HDF5) and docs were NOT cleaned."
+	@echo "If switching compilers or want a complete clean, run: make clean_all"
+	@echo ""
 clean_src:
 	@cd $(SRC_DIR); make clean
 

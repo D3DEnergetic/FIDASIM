@@ -106,7 +106,7 @@ def main():
 
     for time in times:
         if not args.gfile:
-            time_str = str(long(round(time*1000.)))
+            time_str = str(int(round(time*1000.)))
             gfile = 'g'+re.match('^\d+',args.runid).group(0)+'.'+('0'*(5-len(time_str)))+time_str
         else:
             gfile = args.gfile
@@ -140,8 +140,8 @@ def main():
                          q
                        """%args_dict
 
-        trxpl_script = "\n".join([line.lstrip() for line in trxpl_script.splitlines()])
-
+        trxpl_script =bytes( "\n".join([line.lstrip() for line in trxpl_script.splitlines()]),'utf-8')
+        print(trxpl_script)
         if args.verbose:
             print('Runid: '+args.runid)
             print('Time: '+str(time)+' +/- '+str(args.delta_time)+' [s]')

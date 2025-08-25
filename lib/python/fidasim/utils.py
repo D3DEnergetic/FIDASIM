@@ -15,7 +15,14 @@ import copy
 import h5py
 import efit
 from scipy.io import netcdf
-from scipy.interpolate import interp1d, interp2d, NearestNDInterpolator
+from scipy.interpolate import interp1d, NearestNDInterpolator
+try:
+    from scipy.interpolate import interp2d
+    interp2d(1,2,3)
+    oldinterp2d = True
+except NotImplementedError:
+    from scipy.interpolate import RectBivariateSpline as interp2d
+    oldinterp2d = False
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 
@@ -751,24 +758,26 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     #+>>> write_data(h5_obj, dic, desc, units)
     #+```
     """
-    for key in dic:
-        if isinstance(dic[key], dict):
+    # Make a copy of the dictionary to avoid modifying the original
+    dict2 = copy.deepcopy(dic)
+    for key in dict2:
+        if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)
-            write_data(h5_grp, dic[key])
+            write_data(h5_grp, dict2[key])
             continue
 
         # Transpose data to match expected by Fortran and historically provided by IDL
-        if isinstance(dic[key], np.ndarray):
-            if dic[key].ndim >= 2:
-                dic[key] = dic[key].T
+        if isinstance(dict2[key], np.ndarray):
+            if dict2[key].ndim >= 2:
+                dict2[key] = dict2[key].T
 
         # Make strings of fixed length as required by Fortran.
         # See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii
-        if isinstance(dic[key], str):
-            dic[key] = np.string_(dic[key])
+        if isinstance(dict2[key], str):
+            dict2[key] = np.string_(dict2[key])
 
         # Create dataset
-        ds = h5_obj.create_dataset(key, data = dic[key])
+        ds = h5_obj.create_dataset(key, data = dict2[key])
 
         # Add descrption attribute
         if key in desc:
@@ -824,7 +833,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
 
     psi_arr = np.linspace(psiaxis, psiwall, len(fpol))
     fpol_itp = interp1d(psi_arr, fpol, 'cubic', fill_value=fpol[-1],bounds_error=False)
-    psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
+    if oldinterp2d:
+        psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
+    else:
+        psirz_itp = interp2d(r, z, g["psirz"],)
+        # 
+        # psirz_itp = interp2d((r, z), g["psirz"], fill_value=g["psirz"][-1,-1])
 
     if poloidal:
         rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
@@ -1265,7 +1279,8 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
 
     return plasma
 
-def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
+def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1,
+                renormalize=0):
     """
     #+#read_nubeam
     #+Reads NUBEAM fast-ion distribution function
@@ -1284,6 +1299,7 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     #+
     #+    **species**: Fast-ion species number. Defaults to 1
     #+
+    #+    **renormalize**: Renormalization option (int). 0 means no renormalization, just direct interpolation onto the grid. 1 means renormalize the interpolated distribution such that the total number of particles is conserved (usualliy errors of ~1% are typical with option 0). The grid limits will be check to ensure the renormalization is meaningful. 2 means to renormalize ignoring the limits of the grid. This can produce non-physical results. This option is not recommended and should be used just for testing purposes.
     #+##Return Value
     #+Distribution structure
     #+
@@ -1292,7 +1308,11 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     #+>>> dist = read_nubeam("./159245H02_fi_1.cdf",grid,btipsign=-1)
     #+```
     """
-
+    if renormalize not in [0, 1, 2]:
+        error('Renormalization option must be 0, 1 or 2. Given: {}'.format(renormalize))
+    if renormalize == 2:
+        print('WARNING: Renormalization option 2 is not recommended. It can produce non-physical results. Use only for testing purposes.')
+    print('reading file: ', filename)
     species_var = "SPECIES_{}".format(species)
     sstr = read_ncdf(filename,vars=[species_var])[species_var].tostring().decode('UTF-8')
     print("Species: "+sstr)
@@ -1314,6 +1334,16 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     energy = var["E_"+sstr]*1e-3
     fbm = var["F_"+sstr].T*1e3
     fbm = np.where(fbm > 0.0, 0.5*fbm, 0.0) #0.5 to convert to pitch instead of solid angle d_omega/4pi
+    # Get the grid limits, to deal with the renormalization latter
+    rminTRANSP = np.min(r2d)
+    rmaxTRANSP = np.max(r2d)
+    zminTRANSP = np.min(z2d)
+    zmaxTRANSP = np.max(z2d)
+    if ((grid['r'].min() > rminTRANSP) or (grid['r'].max() < rmaxTRANSP) or \
+         (grid['z'].min() > zminTRANSP) or (grid['z'].max() < zmaxTRANSP)) and renormalize==1:
+          error('Grid does not cover the TRANSP data. Renormalizing with this grid will give unphysical EP distributions.')
+          
+    
 
     if btipsign < 0:
         fbm = fbm[:,::-1,:] #reverse pitch elements
@@ -1352,7 +1382,7 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
 
     fdens = np.sum(fbm,axis=(0,1))*dE*dp
     ntot = np.sum(fdens*bmvol)
-    print('Ntotal in phase space: ',ntot)
+    print('Ntotal in phase space (before interpolatrion): ',ntot)
 
     tri = Delaunay(np.vstack((r2d,z2d)).T) # Triangulation for barycentric interpolation
     pts = np.array([xx for xx in zip(r2d,z2d)])
@@ -1412,10 +1442,11 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     fbm_grid[:,:,w] = 0.0
 
     # enforce correct normalization
-    ntot_denf = 2*np.pi*dr*dz*np.sum(r*np.sum(denf,axis=1))
-    denf = denf*(ntot/ntot_denf)
-    ntot_fbm = (2*np.pi*dE*dp*dr*dz)*np.sum(r*np.sum(fbm_grid,axis=(0,1,3)))
-    fbm_grid = fbm_grid*(ntot/ntot_denf)
+    if renormalize >0:
+        ntot_denf = 2*np.pi*dr*dz*np.sum(r*np.sum(denf,axis=1))
+        denf = denf*(ntot/ntot_denf)
+        ntot_fbm = (2*np.pi*dE*dp*dr*dz)*np.sum(r*np.sum(fbm_grid,axis=(0,1,3)))
+        fbm_grid = fbm_grid*(ntot/ntot_denf)
 
 
     fbm_dict={"type":1,"time":time,"nenergy":nenergy,"energy":energy,"npitch":npitch,

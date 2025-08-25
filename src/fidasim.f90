@@ -2509,14 +2509,14 @@ subroutine make_beam_grid
             write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                             &Less than 10% of the beam grid cells fall within the plasma."
         endif
-        stop
+        ! stop
     endif
 
 end subroutine make_beam_grid
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
-    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr
+    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr, a_cent
     real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
     logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
     logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
@@ -2528,7 +2528,7 @@ subroutine make_passive_grid
     real(Float64), dimension(8)   :: xarr_beam_grid, yarr_beam_grid
     real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax, max_length
     real(Float64) :: dlength = 3.0 !cm
-    integer :: i, iin, iout, dim_le, dim_gt, dim
+    integer :: i, iin, iout, dim_le, dim_gt, dim, j
     logical :: inp, phi_pos
 
     !! Get beam grid boundaries
@@ -2566,31 +2566,34 @@ subroutine make_passive_grid
         yarr_beam_grid(i) = vertices_uvw(2,i)
     enddo
 
-    !! Next consider passive diagnostic extrema relative to the plasma
+        !! Next consider passive diagnostic extrema relative to the plasma
     if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
         do i=1,(spec_chords%nchan)
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
         do i=1, npa_chords%nchan
-            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i+spec_chords%nchan))
+            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
+            call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
             xyz_axis = npa_chords%det(i)%detector%basis
-            v0_arr(:,i+spec_chords%nchan) = matmul(beam_grid%basis, xyz_axis(:,3))
+            v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
+        call get_plasma_extrema(r0_arr,v0_arr,extrema,xarr_beam_grid,yarr_beam_grid)
     else if(inputs%calc_pfida.gt.0) then
         do i=1, spec_chords%nchan
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
+        call get_plasma_extrema(r0_arr(:,:spec_chords%nchan),v0_arr(:,:spec_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
     else !pnpa>=1 case
         do i=1, npa_chords%nchan
             call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
+            call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
             xyz_axis = npa_chords%det(i)%detector%basis
-            v0_arr(:,i) = matmul(beam_grid%basis, xyz_axis(:,3))
+            v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
+        call get_plasma_extrema(r0_arr(:,:npa_chords%nchan),v0_arr(:,:npa_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
     endif
-
-    call get_plasma_extrema(r0_arr,v0_arr,extrema,xarr_beam_grid,yarr_beam_grid)
 
     !! Store the passive neutral grid
     pass_grid%dr = inter_grid%dr

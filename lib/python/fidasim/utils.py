@@ -1312,7 +1312,8 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1,
         error('Renormalization option must be 0, 1 or 2. Given: {}'.format(renormalize))
     if renormalize == 2:
         print('WARNING: Renormalization option 2 is not recommended. It can produce non-physical results. Use only for testing purposes.')
-    print('reading file: ', filename)
+    
+    print('Reading file: ', filename)
     species_var = "SPECIES_{}".format(species)
     sstr = read_ncdf(filename,vars=[species_var])[species_var].tostring().decode('UTF-8')
     print("Species: "+sstr)

@@ -6013,7 +6013,7 @@ subroutine write_birth_profile(gen)
     end if
 
     ! Debug output (Optional)
-    print *, "Writing birth profile to file: ", filename
+    ! print *, "Writing birth profile to file: ", filename
 
     !! <<<<<<<<<<<<<< [jfcm 2024-11-24] <<<<<<<<<<<<<<
 
@@ -6246,7 +6246,7 @@ subroutine write_sink_profile(gen)
   endif
 
   ! Debug output (optional):
-  print *, "Writing sink profile to file: ", filename
+  ! print *, "Writing sink profile to file: ", filename
   ! <<< [JFCM, 2025-07-02] <<<
 
   do_write = .True.
@@ -9772,9 +9772,9 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
         if (intersection%hit) then
 
           ! DIAGNOSTIC:
-          if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
-            write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
-          end if
+          ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
+          !   write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
+          ! end if
 
           ! COMPUTE effect of volumetrization:
           ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
@@ -16070,104 +16070,6 @@ subroutine npa_weights
 
 end subroutine npa_weights
 
-! subroutine calculate_ion_sink_profile
-!   !+ Calculates ion sink profile caused by CX of plasma ions with beam neutrals
-!   integer :: ic,i,j,k,ncell,is,ib,ntrack
-!   integer(Int64) :: idcx !! counter
-!   real(Float64), dimension(3) :: ri    !! ion start position vector
-!   real(Float64), dimension(3) :: vion  !! ion start velocity vector
-!   integer,dimension(3) :: ind
-!   integer,dimension(3) :: neut_types = [1,2,3]
-!   type(LocalProfiles) :: plasma
-!   real(Float64), dimension(nlevs) :: rates    !!  CX rates
-!   real(Float64), dimension(nlevs) :: states  ! Density of n-states
-!   integer, dimension(beam_grid%ngrid) :: cell_ind
-!   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-!   type(LocalEMFields) :: fields
-!   real(Float64), dimension(3) :: ri_gc, r_gyro
-!   real(Float64) :: eb, ptch
-!   logical :: f4d_defined = .False.
-!   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
-!   real(Float64) :: flux
-!
-!   !! Calculate histogram of neutrals to launch (nlaunch):
-!   call get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
-!
-!   !! Clear birth points to make space for new birth points:
-!   call reset_birth_data
-!
-!   !! Compute sink particles:
-!   !! 1- loop over cells in cell_ind (Only those which have birth particles)
-!   !! 2- Loop over thermal species
-!   !! 3- loop over all markers to be launched in that cell
-!
-!   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vion, &
-!   !$OMP& ri,rates,states,plasma,fields,eb,ptch,f4d_defined, &
-!   !$OMP& tracks,ntrack,flux)
-!   loop_over_cells: do ic = istart, ncell, istep
-!
-!       ! Convert linear index "ic" to 3D index "ind"
-!       call ind2sub(beam_grid%dims,cell_ind(ic),ind)
-!       i = ind(1) ; j = ind(2) ; k = ind(3)
-!
-!       loop_over_species: do is=1, n_thermal !This loop has to come first
-!           loop_over_dcx: do idcx=1, nlaunch(i,j,k) !! Loop over the markers
-!
-!               !! Get neutral particle position in [[beam_grid]]:
-!               !! input: ind (in beam grid)
-!               !! output: ri in XYZ coords
-!               call mc_beam_grid(ind, ri)
-!
-!               ! Get neutral particle velocity vector:
-!               call mc_ion_velocity_f4d(ind,is,ri,vion,denf4d,f4d_defined)
-!               if(dot_product(vion,vion).eq.0.) then
-!                 write (*,*) "vion .eq. 0 skipping marker ..."
-!                 write (*,*) "vion:", vion
-!                 write (*,*) "ind: ", ind
-!                 write (*,*) "ri: ", ri
-!                 cycle loop_over_dcx
-!               endif
-!
-!               ! Compute neutral particle track across beam_grid:
-!               call track(ri,vion,tracks,ntrack)
-!               if (ntrack .eq. 0) then
-!                 write (*,*) "ntrack .eq. 0 (track)"
-!                 cycle loop_over_dcx
-!               endif
-!
-!               ! Compute initial state (flux density) of neutral at start of track:
-!               ! 1- Calculate CX (ion->neutral) reaction rates [s^-1]:
-!               !! input: ind, pos (not used), vion, neut_types
-!               !! output: rates (dim nlevs)
-!               !! ind needs to be at the actual particle position pos=ri not GC
-!               !! if at "ind" there are no neutrals in reservoir, then rates becomes zero
-!               ind = tracks(1)%ind
-!               call get_total_cx_rate(ind, ri, vion, neut_types, rates)
-!               if(sum(rates).le.0.) then
-!                 write (*,*) "sum(rates) .le. 0 (get_total_cx_rate)"
-!                 cycle loop_over_dcx
-!               endif
-!               ! 2- Calculate neutral flux density created via CX (ion->neutral):
-!               !! Represents the rate at which ions are CXd into neutrals per unit volume:
-!               call get_plasma(plasma,pos=tracks(1)%pos)
-!               states = plasma%deni(is)*rates ! flux per unit volume [p/s cm^-3]
-!               if(sum(states).le.0.) then
-!                 write (*,*) "sum(rates) .le. 0 (states)"
-!                 cycle loop_over_dcx
-!               endif
-!
-!               !! Store ion sink data:
-!               !! ion sink flux per unit volume in [[beam_grid]]:
-!               flux = sum(states)
-!               call store_sinks(ind,is,flux/nlaunch(i,j,k))
-!               call store_sink_particle(ind,ri,vion,is,flux/nlaunch(i,j,k),fields)
-!
-!           enddo loop_over_dcx
-!       enddo loop_over_species
-!   enddo loop_over_cells
-!   !$OMP END PARALLEL DO
-! end subroutine calculate_ion_sink_profile
-
 subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fields)
   !+ Records an ion sink particle into [[libfida::sink]]
   integer,dimension(3), intent(in) :: ind
@@ -16201,16 +16103,7 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   sink%part(sink%cnt)%denf4d = denf4d
   sink%part(sink%cnt)%denf4d_per_marker = denf4d_per_marker
 
-  !! Get fields at actual particle position (pos=ri):
-  ! call get_fields(fields,pos=ri)
-
-  ! >>> [JFCM, 2025-07-08] >>>
-  ! if (.not.fields%in_plasma) then
-  !   call get_fields(fields,ind=ind)
-  ! endif
-  ! <<< [JFCM, 2025-07-08] <<<
-
-  !! Ion pitch at particle position:
+  !! Ion pitch at GC position:
   sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
 
   !! Get position vector pointing from ri to GC position:
@@ -16488,7 +16381,7 @@ subroutine calculate_dcx_process
   !! <<< [JFCM, 2025-07-01] <<<
   character(len=charlim) :: filename
   integer(Int64) :: pid = 1
-  logical :: inp
+  logical :: inp, res_valid
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -16541,7 +16434,7 @@ subroutine calculate_dcx_process
   !$OMP& rp,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
   !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit,rgc, &
-  !$OMP& deni_gc,ind_p,inp,ind_res)
+  !$OMP& deni_gc,ind_p,inp,ind_res,res_valid)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -16554,7 +16447,6 @@ subroutine calculate_dcx_process
               ! Sample ion GC distribution function:
               ! input: ind, is
               ! output: rgc, deni_gc, fields, rp, vp, ind_p
-              ! call mc_ion_velocity_f4d(ind,is,rp,vp,denf4d,f4d_defined)
               call mc_sample_ion_f4d_gc(ind,is,rgc,deni_gc,fields,rp,vp,ind_p,denf4d,f4d_defined)
               if(dot_product(vp,vp).eq.0.) then
                 write (*,*) "vp .eq. 0 skipping marker ..."
@@ -16565,23 +16457,22 @@ subroutine calculate_dcx_process
               endif
 
               ! Compute neutral particle track across beam_grid:
-              !! >>> [JFCM, 2025-07-04] >>>
-              ! call track(rp,vp,tracks,ntrack)
               pump_hit = .FALSE.
               call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
-              ! <<< [JFCM, 2025-07-04] <<<
-
               if (ntrack .eq. 0) then
                 write (*,*) "ntrack .eq. 0 (calculate_dcx_process)"
                 stop
               endif
 
-              ! SET indices for neutral reservoir:
+              ! CHECK if plasma and reservoir is defined at particle position:
               call in_plasma(rp,inp)
-              if (.not.inp) then
-                call get_indices(rgc,ind_res) ! GC cell
+              res_valid = neut%full%res(ind_p(1),ind_p(2),ind_p(3))%n .gt. 0
+
+              ! SELECT indices for cell with valid plasma and neutral reservoir:
+              if (.not.inp .OR. .not. res_valid) then
+                ind_res = ind  ! GC cell
               else
-                call get_indices(rp,ind_res) ! Particle position cell
+                ind_res = ind_p ! Particle position cell
               end if
 
               ! COMPUTE initial state (flux density) of neutral at start of track:
@@ -16653,7 +16544,7 @@ subroutine calculate_dcx_process
 
               ! >>> [JFCM, 2025-07-04] >>>
               !! Check if end of tracks has been reached and attenuation is poor
-              if ( (.not. pump_hit) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
+              if ( .FALSE. .AND. (.not. pump_hit) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
                 print *, "This particle did not reach pump and has poor atteuation, rel attenuation: ", final_flux/starting_flux
                 print *, "jj : ", jj
                 print *, "ntrack: ", ntrack
@@ -16720,7 +16611,7 @@ subroutine calculate_halo_process
   real(Float64) , dimension(3) :: rgc
   real(Float64) :: deni_gc
   integer, dimension(3) :: ind_p, ind_res
-  logical :: inp
+  logical :: inp, res_valid
 
   !! Initialize halo neutral population container:
   call init_neutral_population(neut%halo)
@@ -16744,7 +16635,7 @@ subroutine calculate_halo_process
   prev_pop = neut%dcx
 
   !! Loop over halo iterations:
-  n_iter = 3
+  n_iter = 5
   seed_dcx = 1.0
   iterations: do hh = 1,n_iter
 
@@ -16810,7 +16701,8 @@ subroutine calculate_halo_process
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,pump_hit,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
     !$OMP& ntrack,ii,jj,kk,rates,states,denn,starting_flux,denf4d_per_marker,it,tot_flux_dep,initial_flux,weight, &
-    !$OMP& photons,final_flux,plasma,flux_per_marker,denn_per_marker,fields,rgc,deni_gc,ind_p,ind_res,inp)
+    !$OMP& photons,final_flux,plasma,flux_per_marker,denn_per_marker,fields,rgc,deni_gc,ind_p,ind_res,inp, &
+    !$OMP& res_valid)
     loop_over_cells: do ic = istart,ncell,istep
 
       !! Convert linear index ic to 3D vector indices:
@@ -16822,11 +16714,7 @@ subroutine calculate_halo_process
       loop_over_species: do is = 1,n_thermal
         loop_over_halos: do ihalo = 1,nlaunch(i,j,k)
 
-          !! Get neutral particle position in beam grid:
-          ! call mc_beam_grid(ind,ri)
-
-          !! Pick the neutral particle velocity vector from the ion distribution function:
-          ! call mc_ion_velocity_f4d(ind,is,ri,vi,denf4d,f4d_defined)
+          !! Pick ion from GC distribution function:
           call mc_sample_ion_f4d_gc(ind,is,rgc,deni_gc,fields,ri,vi,ind_p,denf4d,f4d_defined)
           if (dot_product(vi,vi) .eq. 0) then
               cycle loop_over_halos
@@ -16835,18 +16723,21 @@ subroutine calculate_halo_process
           !! Compute neutral particle track accross the beam grid:
           pump_hit = .FALSE.
           call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
-          ! call track(ri,vi,tracks,ntrack)
           if (ntrack .eq. 0) then
               write (*,*) "ntrack .eq. 0 (calculate_halo_process)"
               stop
           end if
 
-          !! DEFINE indices for reservoir:
+          ! CHECK if plasma and reservoirs are defined at particle position:
           call in_plasma(ri,inp)
-          if (.not.inp) then
-            call get_indices(rgc,ind_res) ! Use GC position
+          ii = ind_p(1); jj = ind_p(2); kk = ind_p(3)
+          res_valid = prev_pop%res(ii,jj,kk)%n .gt. 0
+
+          !! SELECT indices with defined plasma and valid reservoir:
+          if (.not.inp .OR. .not. res_valid) then
+            ind_res = ind  ! GC cell
           else
-            call get_indices(ri,ind_res) ! Use particle position
+            ind_res = ind_p ! Particle position cell
           end if
 
           !! Compute neutral particle source term (states) at the start of the neutral trajectory: [p/s 1/cm3]
@@ -16863,15 +16754,6 @@ subroutine calculate_halo_process
           endif
 
           !! 2- source term (states) in the cell: flux per unit volume [p/s cm^{-3}]
-          ! call get_plasma(plasma,pos=tracks(1)%pos)
-          ! if (.not. plasma%in_plasma)  then
-          !   call get_plasma(plasma,ind=tracks(1)%ind)
-          ! endif
-          ! states = rates*plasma%deni(is)
-          ! if(sum(states).le.0.) then
-          !   write (*,*) "sum(states) .le. 0"
-          !   cycle loop_over_halos
-          ! endif
           states = deni_gc*rates ! [p/s cm^{-3}]
 
           !! Store ion sink term:
@@ -16897,7 +16779,6 @@ subroutine calculate_halo_process
             !! Accumulate neutral density on beam_grid: (OMP critical inside)
             denn_per_marker = denn/nlaunch(i,j,k)
             call update_neutrals(cur_pop,tracks(it)%ind,tracks(it)%vn,denn_per_marker)
-            ! call update_neutrals(cur_pop,tracks(it)%ind,vi,denn_per_marker)
 
             !! Calculate neutral flux per marker lost to cell due to COLRAD:
             final_flux = sum(states)
@@ -16982,75 +16863,6 @@ subroutine calculate_halo_process
 
 end subroutine calculate_halo_process
 !! <<< [JFCM, 2025-07-02] <<<
-
-! !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
-! subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)
-!   !+ Record an ion birth particle into [[libfida::birth]]
-!   type(ParticleTrack), dimension(:), intent(in) :: tracks
-!     !+ Array of [[ParticleTrack]] type
-!   integer, intent(in) :: ntrack
-!     !+ Number of cells that a neutral marker crosses
-!   real(Float64), intent(in) :: mass
-!     !+ Mass of newly created ion:
-! ! >>> [JFCM, 2025-07-04] >>>
-!   ! real(Float64), dimension(3), intent(in) :: vi
-!   ! real(Float64), dimension(3), intent(inout) :: vi
-! ! <<< [JFCM, 2025-07-04] <<<
-!     !+ Marker velocity vector in [[beam_grid]] coordinates
-!   real(Float64), intent(in) :: weight
-!     !+ Weight of neutral marker in [p/s]
-!   integer, intent(in) :: neut_type
-!     !+ (1) full, (2) half, (3) third, (4) dcx and (5) halo neutral particle type
-!
-!     !! To define the weight, consider the following previous equivalent definitions:
-!     !! weight = flux_tot/inputs%n_birth ! [p/s]
-!     !! OR
-!     !! weight = tot_flux_dep/nlaunch(i,j,k) ! [p/s]
-!
-!     integer, dimension(1) :: randi
-!     real(Float64), dimension(1) :: randomu
-!     type(LocalEMFields) :: fields
-!     real(Float64), dimension(3) :: ri, r_gyro, vi
-!
-!     call randind(tracks(1:ntrack)%flux,randi)
-!     call randu(randomu)
-!     birth%part(birth%cnt)%neut_type = neut_type
-!     ! birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
-!
-!     ! >>> [JFCM, 2025-07-04] >>>
-!     ! birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
-!     ! <<< [JFCM, 2025-07-04] <<<
-!
-!     ! birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
-!     birth%part(birth%cnt)%weight = weight ! [p/s]
-!     birth%part(birth%cnt)%ind = tracks(randi(1))%ind
-!
-!     ! >>> [JFCM, 2025-05-23] >>>
-!     vi = tracks(randi(1))%vn
-!     birth%part(birth%cnt)%energy = dot_product(vi,vi)*v2_to_E_per_amu*mass
-!     ! <<< [JFCM, 2025-05-23] <<<
-!
-!     birth%part(birth%cnt)%vi = vi
-!     ri = tracks(randi(1))%pos + vi*(tracks(randi(1))%time*(randomu(1)-0.5))
-!     birth%part(birth%cnt)%ri = ri
-!
-!     call get_fields(fields,pos=ri)
-!
-!     ! >>> [JFCM, 2025-08-21] >>>
-!     ! >>> [JFCM, 2025-07-08] >>>
-!     if (.not.fields%in_plasma) then
-!       call get_fields(fields,pos=tracks(randi(1))%pos)
-!     endif
-!     ! <<< [JFCM, 2025-07-08] <<<
-!     ! <<< [JFCM, 2025-08-21] <<<
-!
-!     birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vi/norm2(vi))
-!     call gyro_step(vi,fields,mass,r_gyro)
-!     birth%part(birth%cnt)%ri_gc = ri + r_gyro
-!     birth%cnt = birth%cnt + 1
-!
-! end subroutine store_birth_particle
-! !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
 !! >>> [2025-08-21] >>>
 subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)

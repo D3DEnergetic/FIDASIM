@@ -232,6 +232,25 @@ type :: CylRectRegion
 end type CylRectRegion
 ! <<< [JFCM, 2025_07_31] <<<
 
+! >>> [JFCM, 2025_09_02] >>>
+type SourceStruct
+    logical :: is_active = .FALSE.
+      !+ Logical flag to turn on or off the source
+    real(Float64) :: T = 0.d0
+      !+ Source temperature in [keV]
+    real(Float64) :: E = 0.d0
+      !+ Energy of neutrals emitted by source in [keV]. Along nhat (plane) or rhat (cyl)
+    real(Float64) :: mass = 0.d0
+      !+ Mass of neutrals emitted by source in [AMU]
+    real(Float64) :: rate = 0.d0
+      !+ Emission rate of neutrals in [p/s]
+    integer :: normal_dir = 1
+      !+ Direction of emission relative to nhat (plane) or rhat (cylinder)
+    integer(Int32) :: n_wall
+      !+ Number of mc particles to represent source
+end type SourceStruct
+! <<< [JFCM, 2025_09_02] <<<
+
 ! >>> [JFCM, 2025_07_30] >>>
 type SurfaceRegion
     !+ Defines a bounded region on an analytic surface and its interaction with rays.
@@ -250,7 +269,7 @@ type SurfaceRegion
     character(len=16) :: boundary_type
       !+ Defines how the surface's boundary is described: "rect", "circ"
     character(len=16) :: function_type
-      !+ Defines how the region interacts with rays: "wall", "pump", or "opening"
+      !+ Defines how the region interacts with rays: "wall", "source", "pump", or "opening"
     real(Float64) :: T
       !+ Temperature of region in [keV]
     real(Float64) :: pabs
@@ -259,6 +278,8 @@ type SurfaceRegion
       !+ Specular reflection probability of region
     real(Float64) :: ptherm
       !+ Thermal emission probability of region
+    type(SourceStruct) :: source
+      !+ Container for "source" parameters
     type(PlaneRectRegion) :: plane_rect
       !+ Rectangular region on a planar analytic surface.
     type(PlaneCircRegion) :: plane_circ
@@ -3068,12 +3089,20 @@ subroutine read_vacuum_vessel
   real(Float64) :: circ_tmin(max_regions), circ_tmax(max_regions)
   real(Float64) :: zmin(max_regions), zmax(max_regions)
   real(Float64) :: cyl_tmin(max_regions), cyl_tmax(max_regions)
+  real(FLoat64) :: src_T(max_regions), src_E(max_regions), src_mass(max_regions), src_rate(max_regions)
+  integer :: src_normal_dir(max_regions)
+  logical :: src_is_active(max_regions)
+  real(Float64) :: src_n_wall(max_regions)
 
   namelist /config/ description_type, num_analytic_surfaces, mesh_filename, surface_padding_epsilon
   namelist /surface_1/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                        function_type, boundary_type, T, pabs, pspec, &
                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
-                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
+                       src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
+                       src_n_wall
+
+                       !! TODO: add the source namelist variables to other namelists
 
   namelist /surface_2/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                       function_type, boundary_type, T, pabs, pspec, &
@@ -3097,6 +3126,16 @@ subroutine read_vacuum_vessel
 
   ! Define vacuum vessel namelist file name:
   nml_filename = trim(adjustl(inputs%result_dir))//"/"//'vacuum_vessel.nml'
+
+  ! Set default values:
+  src_is_active = .FALSE.
+  src_T = 0.d0
+  src_E = 0.d0
+  src_mass = 2
+  src_rate = 0.d0
+  src_normal_dir = 1
+  src_n_wall = 0
+  ! NEED TO ADD MORE
 
   ! Read config namelist:
   ! ========================
@@ -3186,24 +3225,45 @@ subroutine read_vacuum_vessel
     do rr = 1,num_regions
       vacuum_vessel%surface(ss)%region(rr)%function_type = function_type(rr)
       vacuum_vessel%surface(ss)%region(rr)%boundary_type = boundary_type(rr)
+
+      ! WALL:
       vacuum_vessel%surface(ss)%region(rr)%T = T(rr)
       vacuum_vessel%surface(ss)%region(rr)%pabs = pabs(rr)
       vacuum_vessel%surface(ss)%region(rr)%pspec = pspec(rr)
       vacuum_vessel%surface(ss)%region(rr)%ptherm = 1 - (pspec(rr) + pabs(rr))
+
+      ! SOURCE:
+      vacuum_vessel%surface(ss)%region(rr)%source%is_active = src_is_active(rr)
+      if (src_is_active(rr)) then
+        ! TODO: should add some checks on data consistency, like src_T > 0, src_rate > 1e15, n_wall > 0
+        vacuum_vessel%surface(ss)%region(rr)%source%T = src_T(rr)
+        vacuum_vessel%surface(ss)%region(rr)%source%E = src_E(rr)
+        vacuum_vessel%surface(ss)%region(rr)%source%mass = src_mass(rr)
+        vacuum_vessel%surface(ss)%region(rr)%source%rate = src_rate(rr)
+        vacuum_vessel%surface(ss)%region(rr)%source%normal_dir = src_normal_dir(rr)
+        vacuum_vessel%surface(ss)%region(rr)%source%n_wall = int(src_n_wall(rr))
+      end if
+
+      ! PLANE-RECT:
       vacuum_vessel%surface(ss)%region(rr)%plane_rect%xmin = xmin(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_rect%xmax = xmax(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_rect%ymin = ymin(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_rect%ymax = ymax(rr)
+
+      ! PLANE-CIRC:
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%origin(1) = origin_x(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%origin(2) = origin_y(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%rmin = rmin(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%rmax = rmax(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%tmin = circ_tmin(rr)
       vacuum_vessel%surface(ss)%region(rr)%plane_circ%tmax = circ_tmax(rr)
+
+      ! CYL-RECT:
       vacuum_vessel%surface(ss)%region(rr)%cyl_rect%zmax = zmax(rr)
       vacuum_vessel%surface(ss)%region(rr)%cyl_rect%zmin = zmin(rr)
       vacuum_vessel%surface(ss)%region(rr)%cyl_rect%tmax = cyl_tmax(rr)
       vacuum_vessel%surface(ss)%region(rr)%cyl_rect%tmin = cyl_tmin(rr)
+
     end do ! LOOP rr over regions
   end do ! LOOP ss over surfaces
   close(unit)
@@ -16349,6 +16409,285 @@ subroutine reset_birth_data
 end subroutine reset_birth_data
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
+!! >>> [JFCM,2025-09-02] >>>
+subroutine mc_wall_source(ss,rr,rp,vp,err)
+  !+ Samples the source located on surface "ss" and region "ss"
+  integer, intent(in) :: ss
+    !+ Surface id
+  integer, intent(in) :: rr
+    !+ Region id
+  real(Float64), dimension(3), intent(out) :: rp
+    !+ Neutral particle position in beam_grid frame [cm]
+  real(Float64), dimension(3), intent(out) :: vp
+    !+ Neutral particle velocity in beam_grid frame [cm/s]
+  integer, intent(out) :: err
+    !+ Container for communicating internal errors
+
+  !! Locals:
+  character(len=16) :: surface_type, boundary_type, function_type
+  type(SourceStruct) :: source
+  type(SurfaceRegion) :: region
+  real(Float64) :: v_drift, vT, mass
+  real(Float64) :: random2(2), random3(3), v_thermal(3)
+  real(Float64) :: zmin, zmax, tmin, tmax, t, radius
+  real(Float64) :: xmin, xmax, ymin, ymax
+  real(Float64), dimension(3,3) :: basis, inv_basis
+  real(Float64), dimension(3) :: origin, nhat, rhat, vhat
+  real(Float64), dimension(3) :: rp_prime, vp_prime, rhat_prime
+  integer :: normal_dir
+
+  !! INIT variables:
+  rp = 0.d0
+  vp = 0.d0
+  err = 0
+
+  !! CHECK that source is valid:
+  source = vacuum_vessel%surface(ss)%region(rr)%source
+  if (.not.source%is_active) then
+    err = 1
+  elseif (source%T .le. 0) then
+    err = 2
+  elseif (source%E .lt. 0) then
+    err = 3
+  elseif (source%rate .le. 0) then
+    err = 4
+  elseif (source%mass .le. 0) then
+    err = 5
+  end if
+
+  !! CHECK region:
+  if (rr .eq. 1) then
+    err = 6
+    write(*,*) "region(1) cannot be a source, Error in mc_wall_source"
+  end if
+
+  !! CHECK error:
+  if (err .gt. 0) return
+
+  !! GET source parameters:
+  mass = source%mass ! [AMU]
+  vT = sqrt(source%T*0.5/(v2_to_E_per_amu*mass)) ! [cm/s]
+  v_drift = sqrt(source%E/(v2_to_E_per_amu*mass)) ! [cm/s]
+  normal_dir = source%normal_dir
+
+  !! GET surface parameters:
+  surface_type = vacuum_vessel%surface(ss)%surface_type
+  region = vacuum_vessel%surface(ss)%region(rr)
+  boundary_type = region%boundary_type
+
+  !! SAMPLE particle position in local frame:
+  select case(trim(adjustl(surface_type)))
+  !! PLANE: ----------------------------------------------------------
+  case ("plane")
+
+    !! GET plane geometry in the beam_grid frame:
+    basis = vacuum_vessel%surface(ss)%plane%basis
+    inv_basis = vacuum_vessel%surface(ss)%plane%inv_basis
+    origin = vacuum_vessel%surface(ss)%plane%origin
+    nhat = vacuum_vessel%surface(ss)%plane%normal
+
+    ! SELECT boundary:
+    select case(trim(adjustl(boundary_type)))
+    case ("rect")
+
+      !! GET bounds of region:
+      xmin = region%plane_rect%xmin
+      xmax = region%plane_rect%xmax
+      ymin = region%plane_rect%ymin
+      ymax = region%plane_rect%ymax
+
+      !! SAMPLE particle position in surface's frame:
+      call randu(random2)
+      rp_prime(1) = xmin + random2(1)*(xmax - xmin)
+      rp_prime(2) = ymin + random2(2)*(ymax - ymin)
+      rp_prime(3) = 0.d0
+
+    case ("circ")
+      write(*,*) "plane-circ sampling not developed. Error in mc_wall_source"
+      stop
+    end select
+
+  !! CYLINDER: -------------------------------------------------------
+  case ("cyl")
+
+    !! GET cylinder geomtry:
+    basis = vacuum_vessel%surface(ss)%cyl%basis
+    inv_basis = vacuum_vessel%surface(ss)%cyl%inv_basis
+    origin = vacuum_vessel%surface(ss)%cyl%origin
+    radius = vacuum_vessel%surface(ss)%cyl%radius
+
+    !! SELECT boundary:
+    select case(trim(adjustl(boundary_type)))
+    case ("rect")
+
+      !! GET bounds of region:
+      zmin = region%cyl_rect%zmin
+      zmax = region%cyl_rect%zmax
+      tmin = region%cyl_rect%tmin
+      tmax = region%cyl_rect%tmax
+
+      !! SAMPLE particle position:
+      call randu(random2)
+      t = tmin + random2(1)*(tmax - tmin)
+      rp_prime(1) = radius*cos(t)
+      rp_prime(2) = radius*sin(t)
+      rp_prime(3) = zmin + random2(2)*(zmax - zmin)
+
+      !! COMPUTE normal:
+      rhat_prime = [rp_prime(1), rp_prime(2), 0.d0]
+      rhat_prime = rhat_prime/norm2(rhat_prime)
+      rhat = matmul(basis,rhat_prime)
+      nhat = rhat
+
+    case ("circ")
+      write(*,*) "cyl-circ sampling does not exist. Error in mc_wall_source"
+      stop
+    end select
+  case default
+    write(*,*) "surface type missing, error in mc_wall_source"
+    stop
+  end select
+
+  !! Convert rp_prime to beam grid frame:
+  rp = matmul(basis,rp_prime) + origin
+
+  !! Offset rp a small amount from surface:
+  vhat = nhat*normal_dir
+  rp = rp + vhat*vacuum_vessel%surface_padding_epsilon*beam_grid%ds
+
+  !! SAMPLE particle velocity:
+  call  get_vn_thermal_wall_emission(vT,vhat,v_thermal)
+  vp = v_drift*vhat + v_thermal
+
+end subroutine mc_wall_source
+!! <<< [JFCM,2025-09-02] <<<
+
+!! >>> [JFCM,2025-09-02] >>>
+subroutine calculate_wall_source_process(ss,rr)
+  !+ Compute ray-tracing process associated with wall sources
+  use omp_lib
+  integer :: ss
+    !+ surface id
+  integer :: rr
+    !+ Region id
+
+  !! Locals:
+  integer :: nlaunch
+  integer(Int32) :: ii, jj
+  real(Float64), dimension(3) :: rp, vp
+  logical :: pump_hit
+  integer :: ntrack, err
+  type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+  real(Float64) :: rate, mass
+  real(Float64) :: tot_flux_dep, starting_flux, initial_flux, final_flux
+  real(Float64), dimension(nlevs) :: states, denn
+  type(LocalProfiles) :: plasma
+  real(Float64) :: photons, weight
+  integer :: neut_type
+  character(len=charlim) :: filename
+  integer(Int64) :: pid = 1
+
+  !! Initialize Neutral Population
+  if (.not.allocated(neut%full%dens)) then
+    call init_neutral_population(neut%full)
+  end if
+
+  !! DEFINE neutral type:
+  ! SEED (Primary): 1,2,3 for full, half and third
+  ! SCATTERED (Secondary): 4, 5 for dcx and halo
+  neut_type = 1
+
+  !! Get number of markers:
+  nlaunch = vacuum_vessel%surface(ss)%region(rr)%source%n_wall
+
+  !! Get source parameters:
+  rate = vacuum_vessel%surface(ss)%region(rr)%source%rate ! [p/s]:
+  mass = vacuum_vessel%surface(ss)%region(rr)%source%mass ! [AMU]
+
+  !$OMP PARALLEL DO schedule(dynamic,1) &
+  !$OMP& private(ii,jj,rp,vp,err,tracks,ntrack,tot_flux_dep,states,denn, &
+  !$OMP& starting_flux,pump_hit,initial_flux,final_flux,plasma,photons, &
+  !$OMP& weight)
+  loop_over_markers: do ii=istart,nlaunch,istep
+
+    !! SAMPLE neutral from source:
+    call mc_wall_source(ss,rr,rp,vp,err)
+    if (err .ne. 0) then
+      write(*,*) "Error in mc_wall_source: ", err
+      stop
+    end if
+
+    !! COMPUTE neutral trajectory:
+    pump_hit = .FALSE.
+    call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
+
+    tot_flux_dep = 0.d0
+    states = 0.d0
+    states(1) = rate/beam_grid%dv ! [p/s cm^-3]
+    starting_flux = sum(states)
+
+    !! LOOP over tracks:
+    loop_along_track: do jj=1,ntrack
+
+      !! Flux of marker entering cell:
+      initial_flux = sum(states)
+
+      ! GET plasma profiles seen by marker:
+      call get_plasma(plasma,pos=tracks(jj)%pos)
+
+      ! CALCULATE attenuation using COLRAD:
+      call colrad(plasma,mass,tracks(jj)%vn,tracks(jj)%time,states,denn,photons)
+
+      ! STORE neutral density per marker on beam_grid:
+       call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,tracks(jj)%vn,neut_type,denn/nlaunch)
+
+       !! CALCULATE neutral flux per marker lost to cell due to COLRAD:
+       final_flux = sum(states)
+       tracks(jj)%flux = (initial_flux - final_flux)/nlaunch ! [p/s cm^-3]
+       tot_flux_dep = tot_flux_dep + tracks(jj)%flux*beam_grid%dv ! [p/s]
+
+       !! STORE new ion birth flux on beam_grid:
+       call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
+
+       !! STORE photons: see NDMC for details
+
+       !! CHECK ray attenuation:
+       if (final_flux/starting_flux .lt. 1E-3) then
+         exit loop_along_track
+       endif
+
+    enddo loop_along_track
+
+    !! WRITE tracks data:
+#ifdef _OPENMP
+    if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
+        filename = "tracks_wall_source.txt"
+        filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+        call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+        pid = pid + 1
+    endif
+#else
+    if (.TRUE.) then
+        filename = "tracks_wall_source.txt"
+        filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+        call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+        pid = pid + 1
+    endif
+#endif
+
+    !! STORE birth particles:
+    !$OMP CRITICAL
+    call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
+    !$OMP END CRITICAL
+
+  enddo loop_over_markers
+  !$OMP END PARALLEL DO
+
+  !! TODO: NEED to add MPI merge steps, see NDMC
+
+end subroutine calculate_wall_source_process
+!! <<< [2025-09-02] <<<
+
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
 subroutine calculate_dcx_process
   !+ Calculates the DCX process and stores sink and birth points from the DCX neutrals.
@@ -16554,14 +16893,14 @@ subroutine calculate_dcx_process
               ! >>> [JFCM, 2025-07-04] >>>
 #ifdef _OPENMP
               if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
-                  filename = "tracks_group.txt"
+                  filename = "tracks_dcx.txt"
                   filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
                   call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
                   pid = pid + 1
               endif
 #else
               if (.TRUE.) then
-                  filename = "tracks_group.txt"
+                  filename = "tracks_dcx.txt"
                   filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
                   call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
                   pid = pid + 1
@@ -16880,7 +17219,7 @@ subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)
 
     !! NOTE 1:
     !! if a marker has weight = 0, it means that it was created outside the plasma
-    !! and did travel though any plasma region before it was absorbed by a wall or pump.
+    !! and did NOT travel though any plasma region before it was absorbed by a wall or pump.
     !! We still need to record these events but care is taken to avoid evaluating the fields
     !! in such cases as fields and plasma profiles are not defined in those region.
     !! NOTE 2:
@@ -17255,9 +17594,13 @@ program fidasim
     integer               :: i,narg,nthreads,max_threads,seed
 
     ! >>> [JFCM, 2025-03-14] >>>
-    integer :: time_0, time_1, count_rate
+    integer :: time_0, time_1, count_rate, ss, rr
     real :: elapsed_time
     ! <<< [JFCM, 2025-03-14] <<<
+    ! >>> [JFCM, 2025-09-02] >>>
+    integer :: n_birth_wall
+    integer :: n_birth_nbi
+    ! <<< [JFCM, 2025-09-02] <<<
 
 #ifdef _VERSION
     version = _VERSION
@@ -17379,13 +17722,30 @@ program fidasim
         !                     beam_grid%nx, &
         !                     beam_grid%ny, &
         !                     beam_grid%nz))
-        !! >>>>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>
+        !! >>> [jfcm, 2024-11-23] >>>
         allocate(birth%dens(5, &
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
-        !! >>>>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>>>>
-        allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
+        !! >>> [jfcm, 2024-11-23] >>>
+
+        !! >>> [JFCM, 2025-09-02] >>>
+        n_birth_wall = 0
+        do ss = 1,size(vacuum_vessel%surface)
+          do rr = 1,size(vacuum_vessel%surface(ss)%region)
+            if (vacuum_vessel%surface(ss)%region(rr)%source%is_active) then
+              n_birth_wall = n_birth_wall + vacuum_vessel%surface(ss)%region(rr)%source%n_wall
+            endif
+          end do
+        end do
+        !! <<< [JFCM, 2025-09-02] <<<
+
+        !! >>> [JFCM, 2025-09-02] >>>
+        ! allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
+        n_birth_nbi = int(3*inputs%n_birth*inputs%n_nbi)
+        allocate(birth%part(n_birth_nbi + n_birth_wall))
+        !! <<< [JFCM, 2025-09-02] <<<
+
     endif
 
     if (inputs%calc_sink.ge.1) then
@@ -17544,6 +17904,18 @@ program fidasim
                 elapsed_time = real(time_1 - time_0) / real(count_rate)  ! Convert to seconds
                 print *, "NDMC elapsed time: ", elapsed_time, " seconds"
                 ! <<< [JFCM, 2025-03-14] <<<
+
+                ! >>> [JFCM, 2025-09-02] >>>
+                ! Wall source calculation:
+                do ss = 1,size(vacuum_vessel%surface)
+                  do rr = 1,size(vacuum_vessel%surface(ss)%region)
+                    if (vacuum_vessel%surface(ss)%region(rr)%source%is_active) then
+                      write(*,*) "calculate wall source"
+                      call calculate_wall_source_process(ss,rr)
+                    endif
+                end do
+              end do
+                ! <<< [JFCM, 2025-09-02] <<<
 
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 

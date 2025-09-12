@@ -3607,7 +3607,7 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   ! CHECK complex condition:
   D = B**2 - 4d0*A*C
   if (D < 0d0) then
-    write(*,*) "Ray has no intersection"
+    ! write(*,*) "Ray has no intersection"
     return ! No intersection
   end if
   !! TODO: what happens when D == 0? ray is exactly tangent, how do we treat this?
@@ -9741,7 +9741,7 @@ end subroutine find_ray_surface_intersection
 
 
 !! >>> [JFCM, 2025-07-04] >>>
-subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
+subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     !+ Description:
     real(Float64), dimension(3), intent(in) :: rin
         !+ Initial position of particle
@@ -9753,16 +9753,13 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
         !+ Number of cells that a particle crosses
     logical, intent(out) :: pump_hit
         !+ logical flag indicating if particle was absorbed at the pump
-    logical, intent(out), optional :: surface_miss
-        !+ logical flag indicating if ray has incorrectly missed a surface
 
     real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
     integer, dimension(3) :: ind, sgn, gdims
     integer :: cc, mind
     real(Float64) :: T_wall, vT, pspec, pabs, ptherm
-    ! type(AABB) :: wall, pump, throat1, throat2, Ta_surf
     real(Float64), dimension(1) :: randomu
-    logical :: in_grid, hit, surface_in_voxel, surf_miss
+    logical :: in_grid, hit, surface_in_voxel
     real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall, ndotv, delta_s
     type(RayStruct) :: ray, ray_test
     type(RayIntersection) :: intersection, intersection_test
@@ -9772,9 +9769,6 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
     character(len=16) :: function_type
 
     vn = vin; rn = rin; sgn = 0;
-
-    surf_miss = .FALSE.
-    if (present(surface_miss)) surface_miss = surf_miss
 
     ! CHECK: avoid zero velocity
     ! --------------------------
@@ -9861,22 +9855,27 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
           ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
           ! TODO: It will require a full general volumetrized calculation
           vmag = norm2(vn)
+          alpha = vacuum_vessel%surface_padding_epsilon
+          delta_s = alpha*beam_grid%ds
           nhat = intersection%normal(:,1) ! Choose 1st root only
           vhat = vn/vmag
-          alpha = vacuum_vessel%surface_padding_epsilon
-          ndotv = abs(dot_product(nhat,vhat))
-          delta_s = alpha*beam_grid%ds
+
+          ! TODO: attempt to use volumetrization, may not be needed
+          ! ndotv = abs(dot_product(nhat,vhat))
           ! ds_wall = delta_s/ndotv
+
           ds_wall = delta_s
           dT_wall = ds_wall/vmag
 
-          if (dT_wall .ge. dT_coll) then
-            write(*,*) "dT_wall > dT_coll"
-          end if
+          ! CHECK dT_wall to prevent dT_coll < 0
+          do while(dT_wall .ge. dT_coll)
+            dT_wall = dT_wall*0.5
+          end do
 
           ! UPDATE collision time with volumetrized effect:
           dT_coll = dT_coll - dT_wall
 
+          ! DIAGNOSTIC CHECK:
           if (dT_coll < 0) then
             write(*,*) "dT_coll < 0"
           end if
@@ -9912,27 +9911,6 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
           exit
       end if
 
-      !! CHECK if ray has missed cylindrical surface: (debugging)
-      delta_s = vacuum_vessel%surface_padding_epsilon*beam_grid%ds
-      rn_next = rn + dT*vn
-      radius = sqrt(rn_next(1)**2 + rn_next(2)**2)
-      rmax = vacuum_vessel%surface(1)%cyl%radius
-      zpos = rn_next(3)
-      zmin = vacuum_vessel%surface(1)%region(1)%cyl_rect%zmin
-      zmax = vacuum_vessel%surface(1)%region(1)%cyl_rect%zmax
-      if (zpos .le. zmax .AND. zpos .ge. zmin) then
-        if (radius > rmax) then
-          surf_miss = .TRUE.
-          if (present(surface_miss)) surface_miss = surf_miss
-
-          write(*,*) "Surface missed by ray ..."
-
-          !! dbug intersection:
-          ! ray_test%v = tracks(cc-2)%vn
-          ! ray_test%origin = tracks(cc-2)%pos - ray_test%v*tracks(cc-2)%time*0.5
-          ! call find_ray_surface_intersection(ray,tracks(cc-2)%ind,intersection_test)
-        end if
-      end if
       !! UPDATE ray states:
       ! -------------------
       rn = rn + dT*vn
@@ -16778,7 +16756,7 @@ subroutine calculate_dcx_process
   logical :: inp, res_valid
 
   !! INIT:
-  num_tracks_save = 250
+  num_tracks_save = 1000
   pid = 1
 
   !! Initialized Neutral Population
@@ -16951,21 +16929,19 @@ subroutine calculate_dcx_process
               ! <<< [JFCM, 2025-07-04] <<<
 
               ! >>> [JFCM, 2025-07-04] >>>
-
               !$OMP CRITICAL
               if (pid .le. num_tracks_save) then
                   filename = "tracks_dcx.txt"
                   filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
                   call write_particle_tracks_to_file(filename,tracks,ntrack,pid,num_tracks_save)
 #ifdef _OPENMP
-                  write(*,*) "pid = ", pid, ", thread id = ", OMP_get_thread_num()
+                  ! write(*,*) "pid = ", pid, ", thread id = ", OMP_get_thread_num()
 #else
-                  write(*,*) "pid = ", pid
+                  ! write(*,*) "pid = ", pid
 #endif
                   pid = pid + 1
               endif
               !$OMP END CRITICAL
-
               ! <<< [JFCM, 2025-07-04] <<<
 
               ! Record ion birth particle:
@@ -17093,6 +17069,7 @@ subroutine calculate_halo_process
     end do
 
     if(inputs%verbose.ge.1) then
+        write(*,*) ""
         write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
     endif
 
@@ -17246,7 +17223,7 @@ subroutine calculate_halo_process
     !! NDMC produces: birth
     !! DCX_PROCESS produces: birth_1, sink
     !! HALO_PROCESS produces: birth_(X), sink_(X-1) where X>1
-    print *, "gen: ", hh+1, " , CX flux: ", sum(sink%dens)
+    print *, "GEN: ", hh+1, " , CX flux: ", sum(sink%dens)
     call write_sink_profile(gen=1+hh-1)
     call write_birth_profile(gen=1+hh)
     print *, "writing sources completed!"

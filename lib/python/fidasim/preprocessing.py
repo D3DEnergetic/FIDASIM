@@ -179,14 +179,12 @@ def check_inputs(inputs, use_abs_path=True):
               'calc_res': zero_int,
               'adaptive': zero_int,
               'split_tol': zero_double,
-              'max_cell_splits': zero_int,
-              'max_crossings': zero_int}
+              'max_cell_splits': zero_int}
 
     # If user doesn't provide adaptive time step parameters, set default to off
     inputs.setdefault('adaptive', 0)
     inputs.setdefault('split_tol', 0.0)
     inputs.setdefault('max_cell_splits', 1)
-    inputs.setdefault('max_crossings', 2)
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -244,11 +242,6 @@ def check_inputs(inputs, use_abs_path=True):
     if (inputs['max_cell_splits'] < 1):
         error('Invalid max cell splits. Expected value >= 1')
         print('max_cell_splits = {}'.format(inputs['max_cell_splits']))
-        err = True
-
-    if (inputs['max_crossings'] < 2):
-        error('Invalid max_crossings. Expected value >= 2')
-        print('max_crossings = {}'.format(inputs['max_crossings']))
         err = True
 
     ps = os.path.sep
@@ -483,7 +476,7 @@ def check_beam(inputs, nbi):
     if nbi['naperture'] == 0:
         uvw_pos = uvw_src + 100 * uvw_axis
     else:
-        uvw_pos = uvw_src + nbi['adist'][0]
+        uvw_pos = uvw_src + nbi['adist'][0]*np.array([1,0,0])
 
     # Convert to beam coordinates
     xyz_src = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_src, origin=origin)
@@ -612,6 +605,7 @@ def check_plasma(inputs, grid, plasma):
               'denimp': nrnznphi_double,
               'deni': ntnrnznphi_double,
               'denn': nrnznphi_double,
+              'denm': nrnznphi_double,
               'ti': nrnznphi_double,
               'te': nrnznphi_double,
               'zeff': nrnznphi_double,
@@ -1415,7 +1409,6 @@ def write_namelist(filename, inputs):
         f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))
         f.write("split_tol = {:f}    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol\n".format(inputs['split_tol']))
         f.write("max_cell_splits = {:d}    !! Maximum number of times a cell can be split\n\n".format(inputs['max_cell_splits']))
-        f.write("max_crossings = {:d}    !! Maximum number of times a neutral/LOS can cross the plasma boundary\n\n".format(inputs['max_crossings']))
         f.write("/\n\n")
 
     success("Namelist file created: {}\n".format(filename))
@@ -1488,6 +1481,8 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
                      'aoffy': 'cm',
                      'aoffz': 'cm',
                      'adist': 'cm'}
+       
+         
 
         write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units, name='nbi')
 
@@ -1515,6 +1510,7 @@ def write_geometry(filename, nbi, spec=None, npa=None, cfpd=None):
                           'radius': 'cm',
                           'spot_size': 'cm'}
 
+           
             write_data(g_spec, spec, desc=spec_description, units=spec_units, name='spec')
 
         if npa is not None:
@@ -1641,6 +1637,7 @@ def write_equilibrium(filename, plasma, fields):
                               'ti': 'Ion Temperature: Ti(r,z,[phi])',
                               'zeff': 'Effective Nuclear Charge: Zeff(r,z,[phi])',
                               'denn': 'Cold/Edge neutral density: Denn(r,z,[phi])',
+                              'denm': 'Cold/Edge molecular density: Denm(r,z,[phi])',
                               'vr': 'Bulk plasma flow in the r-direction: Vr(r,z,[phi])',
                               'vt': 'Bulk plasma flow in the theta/torodial-direction: Vt(r,z,[phi])',
                               'vz': 'Bulk plasma flow in the z-direction: Vz(r,z,[phi])',
@@ -1657,6 +1654,7 @@ def write_equilibrium(filename, plasma, fields):
                         'dene': 'cm^-3',
                         'deni': 'cm^-3',
                         'denn': 'cm^-3',
+                        'denm': 'cm^-3',
                         'te': 'keV',
                         'ti': 'keV',
                         'vr': 'cm/s',
@@ -1846,13 +1844,13 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, cfpd=No
     # CHECK FAST-ION DISTRIBUTION
     fbm = check_distribution(inputs, grid, fbm)
 
-    # CHECK FIDA/BES
-    if spec is not None:
-        check_spec(inputs, spec)
+  #  # CHECK FIDA/BES
+  #  if spec is not None:
+  #      check_spec(inputs, spec)
 
-    # CHECK NPA
-    if npa is not None:
-        check_npa(inputs, npa)
+   # # CHECK NPA
+   # if npa is not None:
+   #     check_npa(inputs, npa)
 
     # CHECK CFPD
     if cfpd is not None:

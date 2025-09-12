@@ -3546,18 +3546,22 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   ! Local variables
   real(Float64) :: A, B, C, D, sqrtD, R, dummy
   real(Float64) :: s_roots(2), s_coll(2)
-  real(FLoat64) :: s_pos(2) = 0.d0
+  real(FLoat64) :: s_pos(2)
   real(Float64) :: padding_dist, padding_s
   real(Float64), dimension(3) :: ray_origin, ray_v, cyl_origin, cyl_axis, K, vper, Kper, p
   real(Float64), dimension(3) :: p_coll, p_coll_prime, nhat, nhat_prime, vhat
   real(Float64) :: x, y, z, t, rho
   integer :: ii, n_pos, rr
-  logical :: in_theta  = .false., &
-             in_height = .false., &
-             in_bounds = .false.
+  logical :: in_theta, in_height, in_bounds
   type(SurfaceRegion) :: region
   real(Float64) :: tmin, tmax, zmin, zmax
-  real(Float64), parameter :: eps_s = 1d-10, eps_A = 1d-12, tol = 1d-10
+  real(Float64), parameter :: eps_s = 1d-18, eps_A = 1d-18, tol = 1d-10
+
+  ! INIT variables:
+  s_pos = 0.d0
+  in_theta  = .false.
+  in_height = .false.
+  in_bounds = .false.
 
   ! CHECK surface type:
   if (trim(surface%surface_type) /= "cyl") then
@@ -3594,10 +3598,18 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   B = 2d0*dot_product(Kper, vper)
   C = dot_product(Kper, Kper) - R**2
 
-  ! CHECK complex and parallel conditions:
-  if (abs(A) < eps_A) return ! Parallel ray to cylindrical axis
+  ! CHECK parallel conditions:
+  if (abs(A) < eps_A) then
+    ! write(*,*) "Ray parallel to cylindrical axis"
+    return ! Parallel ray to cylindrical axis
+  end if
+
+  ! CHECK complex condition:
   D = B**2 - 4d0*A*C
-  if (D < 0d0) return ! No intersection
+  if (D < 0d0) then
+    write(*,*) "Ray has no intersection"
+    return ! No intersection
+  end if
   !! TODO: what happens when D == 0? ray is exactly tangent, how do we treat this?
 
   ! COMPUTE roots:
@@ -3615,7 +3627,10 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   end do
 
   ! CHECK that at least on root is positive;
-  if (n_pos == 0) return ! All roots are negative:
+  if (n_pos == 0) then
+    write(*,*) "All roots are negative"
+    return ! All roots are negative:
+  end if
 
   ! SORT roots in ascending order:
   if (n_pos == 2 .and. s_pos(2) < s_pos(1)) then
@@ -9679,12 +9694,13 @@ subroutine find_ray_surface_intersection(ray,ind,intersection)
       !+ Structure to store results of intersection event
 
     ! Local variables:
-    integer(Int32) :: nid = 0
+    integer(Int32) :: nid
     integer(Int32), dimension(:), allocatable :: surf_list
     integer(Int32) :: ss, ii
     type(RayIntersection) :: isect
 
     !! GET number of surfaces in current voxel:
+    nid = 0
     nid = size(vacuum_vessel%map(ind(1),ind(2),ind(3))%list_id)
     if (nid == 0) then
       stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
@@ -9725,18 +9741,20 @@ end subroutine find_ray_surface_intersection
 
 
 !! >>> [JFCM, 2025-07-04] >>>
-subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
+subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit,surface_miss)
     !+ Description:
     real(Float64), dimension(3), intent(in) :: rin
         !+ Initial position of particle
     real(Float64), dimension(3), intent(in) :: vin
       !+ Initial velocity of particle
-    type(ParticleTrack), dimension(:), intent(inout) :: tracks
+    type(ParticleTrack), dimension(:), intent(out) :: tracks
         !+ Array of [[ParticleTrack]] type
     integer(Int32), intent(out)                      :: ntrack
         !+ Number of cells that a particle crosses
     logical, intent(out) :: pump_hit
         !+ logical flag indicating if particle was absorbed at the pump
+    logical, intent(out), optional :: surface_miss
+        !+ logical flag indicating if ray has incorrectly missed a surface
 
     real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
     integer, dimension(3) :: ind, sgn, gdims
@@ -9744,16 +9762,19 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     real(Float64) :: T_wall, vT, pspec, pabs, ptherm
     ! type(AABB) :: wall, pump, throat1, throat2, Ta_surf
     real(Float64), dimension(1) :: randomu
-    logical :: in_grid, hit, surface_in_voxel
-    real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall
-    type(RayStruct) :: ray
-    type(RayIntersection) :: intersection
-    real(Float64) :: vmag, alpha
+    logical :: in_grid, hit, surface_in_voxel, surf_miss
+    real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall, ndotv, delta_s
+    type(RayStruct) :: ray, ray_test
+    type(RayIntersection) :: intersection, intersection_test
+    real(Float64) :: vmag, alpha, radius, rmax, zmax, zmin, zpos
     real(Float64), dimension(3) :: nhat, vhat
     real(Int32) :: sid
     character(len=16) :: function_type
 
     vn = vin; rn = rin; sgn = 0;
+
+    surf_miss = .FALSE.
+    if (present(surface_miss)) surface_miss = surf_miss
 
     ! CHECK: avoid zero velocity
     ! --------------------------
@@ -9843,11 +9864,23 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
           nhat = intersection%normal(:,1) ! Choose 1st root only
           vhat = vn/vmag
           alpha = vacuum_vessel%surface_padding_epsilon
-          ds_wall = alpha*beam_grid%ds/abs(dot_product(nhat,vhat))
+          ndotv = abs(dot_product(nhat,vhat))
+          delta_s = alpha*beam_grid%ds
+          ! ds_wall = delta_s/ndotv
+          ds_wall = delta_s
           dT_wall = ds_wall/vmag
+
+          if (dT_wall .ge. dT_coll) then
+            write(*,*) "dT_wall > dT_coll"
+          end if
 
           ! UPDATE collision time with volumetrized effect:
           dT_coll = dT_coll - dT_wall
+
+          if (dT_coll < 0) then
+            write(*,*) "dT_coll < 0"
+          end if
+
         end if
 
       else
@@ -9879,6 +9912,27 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
           exit
       end if
 
+      !! CHECK if ray has missed cylindrical surface: (debugging)
+      delta_s = vacuum_vessel%surface_padding_epsilon*beam_grid%ds
+      rn_next = rn + dT*vn
+      radius = sqrt(rn_next(1)**2 + rn_next(2)**2)
+      rmax = vacuum_vessel%surface(1)%cyl%radius
+      zpos = rn_next(3)
+      zmin = vacuum_vessel%surface(1)%region(1)%cyl_rect%zmin
+      zmax = vacuum_vessel%surface(1)%region(1)%cyl_rect%zmax
+      if (zpos .le. zmax .AND. zpos .ge. zmin) then
+        if (radius > rmax) then
+          surf_miss = .TRUE.
+          if (present(surface_miss)) surface_miss = surf_miss
+
+          write(*,*) "Surface missed by ray ..."
+
+          !! dbug intersection:
+          ! ray_test%v = tracks(cc-2)%vn
+          ! ray_test%origin = tracks(cc-2)%pos - ray_test%v*tracks(cc-2)%time*0.5
+          ! call find_ray_surface_intersection(ray,tracks(cc-2)%ind,intersection_test)
+        end if
+      end if
       !! UPDATE ray states:
       ! -------------------
       rn = rn + dT*vn
@@ -16719,8 +16773,13 @@ subroutine calculate_dcx_process
   real(Float64) :: tot_denn
   !! <<< [JFCM, 2025-07-01] <<<
   character(len=charlim) :: filename
-  integer(Int64) :: pid = 1
+  integer(Int64) :: pid
+  integer(Int32) :: num_tracks_save
   logical :: inp, res_valid
+
+  !! INIT:
+  num_tracks_save = 250
+  pid = 1
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -16769,11 +16828,11 @@ subroutine calculate_dcx_process
   sink%dens=0.d0
   !! <<< [JFCM, 2025-07-01] <<<
 
-  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vp,jj, &
-  !$OMP& rp,rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
+  !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,jj, &
+  !$OMP& rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
-  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit,rgc, &
-  !$OMP& deni_gc,ind_p,inp,ind_res,res_valid)
+  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit, &
+  !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -16806,6 +16865,7 @@ subroutine calculate_dcx_process
               ! CHECK if plasma and reservoir is defined at particle position:
               call in_plasma(rp,inp)
               res_valid = neut%full%res(ind_p(1),ind_p(2),ind_p(3))%n .gt. 0
+              res_valid = res_valid .AND. sum(neut%full%dens(:,ind_p(1),ind_p(2),ind_p(3))) .gt. 0
 
               ! SELECT indices for cell with valid plasma and neutral reservoir:
               if (.not.inp .OR. .not. res_valid) then
@@ -16891,21 +16951,21 @@ subroutine calculate_dcx_process
               ! <<< [JFCM, 2025-07-04] <<<
 
               ! >>> [JFCM, 2025-07-04] >>>
+
+              !$OMP CRITICAL
+              if (pid .le. num_tracks_save) then
+                  filename = "tracks_dcx.txt"
+                  filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+                  call write_particle_tracks_to_file(filename,tracks,ntrack,pid,num_tracks_save)
 #ifdef _OPENMP
-              if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
-                  filename = "tracks_dcx.txt"
-                  filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
-                  call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
-                  pid = pid + 1
-              endif
+                  write(*,*) "pid = ", pid, ", thread id = ", OMP_get_thread_num()
 #else
-              if (.TRUE.) then
-                  filename = "tracks_dcx.txt"
-                  filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
-                  call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+                  write(*,*) "pid = ", pid
+#endif
                   pid = pid + 1
               endif
-#endif
+              !$OMP END CRITICAL
+
               ! <<< [JFCM, 2025-07-04] <<<
 
               ! Record ion birth particle:
@@ -16974,7 +17034,13 @@ subroutine calculate_halo_process
   prev_pop = neut%dcx
 
   !! Loop over halo iterations:
-  n_iter = 5
+  !! TODO: we need to be able to exit iterations with seed_dcx condition
+  !! This will require that we adjust the number of particles passed to CQL3D programtically
+  !! in the cqlinput file
+  !! Also we need to clear all sink and birth files at the start of a new run
+  !! this is importnat if we happen to reduce the number of iterations from one run to another
+  !! This will prevent carrying old source point files incorrecly
+  n_iter = 4
   seed_dcx = 1.0
   iterations: do hh = 1,n_iter
 
@@ -17070,7 +17136,7 @@ subroutine calculate_halo_process
           ! CHECK if plasma and reservoirs are defined at particle position:
           call in_plasma(ri,inp)
           ii = ind_p(1); jj = ind_p(2); kk = ind_p(3)
-          res_valid = prev_pop%res(ii,jj,kk)%n .gt. 0
+          res_valid = (prev_pop%res(ii,jj,kk)%n .gt. 0) .AND. (sum(prev_pop%dens(:,ii,jj,kk)) .gt. 0)
 
           !! SELECT indices with defined plasma and valid reservoir:
           if (.not.inp .OR. .not. res_valid) then
@@ -17183,6 +17249,7 @@ subroutine calculate_halo_process
     print *, "gen: ", hh+1, " , CX flux: ", sum(sink%dens)
     call write_sink_profile(gen=1+hh-1)
     call write_birth_profile(gen=1+hh)
+    print *, "writing sources completed!"
 
     ! if (seed_dcx .lt. 0.01) then
     !   print *, ""

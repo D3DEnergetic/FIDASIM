@@ -3628,7 +3628,7 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
 
   ! CHECK that at least on root is positive;
   if (n_pos == 0) then
-    write(*,*) "All roots are negative"
+    ! write(*,*) "All roots are negative"
     return ! All roots are negative:
   end if
 
@@ -6181,7 +6181,7 @@ subroutine write_birth_profile(gen)
     birth%cnt = 1
     deallocate(birth%part)
     deallocate(birth%dens)
-    print *, "Deallocating birth%part and dens, birth%cnt = ", birth%cnt
+    ! print *, "Deallocating birth%part and dens, birth%cnt = ", birth%cnt
     ! <<< [JFCM, 2025-07-01] <<<
 
 end subroutine write_birth_profile
@@ -6432,7 +6432,7 @@ subroutine write_sink_profile(gen)
   sink%cnt = 1
   deallocate(sink%part)
   deallocate(sink%dens)
-  print *, "Deallocating sink%part and dens, sink%cnt = ", sink%cnt
+  ! print *, "Deallocating sink%part and dens, sink%cnt = ", sink%cnt
   ! <<< [JFCM, 2025-07-01] <<<
 
 end subroutine write_sink_profile
@@ -16693,14 +16693,14 @@ subroutine calculate_wall_source_process(ss,rr)
     !! WRITE tracks data:
 #ifdef _OPENMP
     if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
-        filename = "tracks_wall_source.txt"
+        filename = "tracks_wall_source.dat"
         filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
         call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
         pid = pid + 1
     endif
 #else
     if (.TRUE.) then
-        filename = "tracks_wall_source.txt"
+        filename = "tracks_wall_source.dat"
         filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
         call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
         pid = pid + 1
@@ -16931,7 +16931,7 @@ subroutine calculate_dcx_process
               ! >>> [JFCM, 2025-07-04] >>>
               !$OMP CRITICAL
               if (pid .le. num_tracks_save) then
-                  filename = "tracks_dcx.txt"
+                  filename = "tracks_dcx.dat"
                   filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
                   call write_particle_tracks_to_file(filename,tracks,ntrack,pid,num_tracks_save)
 #ifdef _OPENMP
@@ -17072,6 +17072,12 @@ subroutine calculate_halo_process
         write(*,*) ""
         write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
     endif
+
+    !! >>> [JFCM, 2025_09_15] >>>
+    !! Temporary fix:
+    write(*,*) ""
+    write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
+    !! <<< [JFCM, 2025_09_15] <<<
 
     !! Allocate birth and sink containers for current halo iteration:
     allocate(birth%part(n_halo))

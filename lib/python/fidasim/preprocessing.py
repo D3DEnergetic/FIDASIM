@@ -162,6 +162,9 @@ def check_inputs(inputs, use_abs_path=True):
               'ne_nc': zero_int,
               'np_nc': zero_int,
               'emax_nc': zero_double,
+              'nenergy_nc': zero_int,
+              'emin_nc': zero_double,
+              'emax_nc_spec': zero_double,
               'nlambda_wght': zero_int,
               'lambdamin_wght': zero_double,
               'lambdamax_wght': zero_double,
@@ -209,6 +212,10 @@ def check_inputs(inputs, use_abs_path=True):
 
     if inputs['lambdamin_wght'] >= inputs['lambdamax_wght']:
         error('Invalid wavelength range. Expected lambdamin_wght < lamdbdamax_wght')
+        err = True
+
+    if inputs['emin_nc'] >= inputs['emax_nc_spec']:
+        error('Invalid neutron energy range. Expected emin_nc < emax_nc_spec')
         err = True
 
     if inputs['xmin'] >= inputs['xmax']:
@@ -1553,6 +1560,11 @@ def write_namelist(filename, inputs):
         f.write("ne_nc = {:d}    !! Number of Energies for NC Weights\n".format(inputs['ne_nc']))
         f.write("np_nc = {:d}    !! Number of Pitches for NC Weights\n".format(inputs['np_nc']))
         f.write("emax_nc = {:f}    !! Maximum Energy for NC Weights [keV]\n\n".format(inputs['emax_nc']))
+
+        f.write("!! Neutron Spectra Settings\n")
+        f.write("nenergy_nc = {:d}    !! Number of Energy Bins for Neutron Spectra\n".format(inputs['nenergy_nc']))
+        f.write("emin_nc = {:f}    !! Minimum Neutron Energy [keV]\n".format(inputs['emin_nc']))
+        f.write("emax_nc_spec = {:f}    !! Maximum Neutron Energy [keV]\n\n".format(inputs['emax_nc_spec']))
 
         f.write("!! Adaptive Time Step Settings\n")
         f.write("adaptive = {:d}    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti\n".format(inputs['adaptive']))

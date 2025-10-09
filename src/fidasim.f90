@@ -1126,6 +1126,12 @@ type SimulationInputs
         !+ Number of pitch bins for NC weight function
     real(Float64)  :: emax_nc
         !+ Maximum energy for NC weight function [keV]
+    integer(Int32) :: nenergy_nc
+        !+ Number of energy bins for neutron spectra
+    real(Float64)  :: emin_nc
+        !+ Minimum neutron energy [keV]
+    real(Float64)  :: emax_nc_spec
+        !+ Maximum neutron energy [keV]
     real(Float64)  :: lambdamin_wght
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
@@ -2021,8 +2027,10 @@ subroutine read_inputs
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     integer(Int32)     :: ne_nc, np_nc
     integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: nenergy_nc
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght, emax_nc
+    real(Float64)      :: emin_nc, emax_nc_spec
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -2043,6 +2051,7 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         ne_nc, np_nc, emax_nc, &
+        nenergy_nc, emin_nc, emax_nc_spec, &
         adaptive, max_cell_splits, split_tol
 
     inquire(file=namelist_file,exist=exis)
@@ -2124,6 +2133,9 @@ subroutine read_inputs
     ne_nc=0
     np_nc=0
     emax_nc=0
+    nenergy_nc=100
+    emin_nc=2000.0d0
+    emax_nc_spec=2800.0d0
     adaptive=0
     max_cell_splits=1
     split_tol=0
@@ -2237,6 +2249,9 @@ subroutine read_inputs
     inputs%ne_nc=ne_nc
     inputs%np_nc=np_nc
     inputs%emax_nc=emax_nc
+    inputs%nenergy_nc=nenergy_nc
+    inputs%emin_nc=emin_nc
+    inputs%emax_nc_spec=emax_nc_spec
     inputs%nlambda_wght = nlambda_wght
     inputs%lambdamin_wght=lambdamin_wght
     inputs%lambdamax_wght=lambdamax_wght
@@ -9787,11 +9802,10 @@ subroutine neutron_thermal_thermal(ichan)
     type(LocalProfiles) :: plasma
     real(Float64), dimension(3) :: r_detector, vn_det, ri
     real(Float64) :: rate_tt, e_neutron, weight, flux, domega, flux_contrib
-    real(Float64), dimension(3) :: v1_thermal, v2_thermal, randomu
+    real(Float64), dimension(3) :: v1_thermal, v2_thermal
     type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
     integer :: ntrack, i, ie_neutron, igamma, ngamma
-    real(Float64) :: T_ion, v_thermal_rms, d
-    real(Float64) :: cos_theta, sin_theta, phi
+    real(Float64) :: T_ion, d
 
     ! Get detector position and viewing direction
     r_detector = nc_chords%det(ichan)%detector%origin
@@ -9836,36 +9850,12 @@ subroutine neutron_thermal_thermal(ichan)
                     (4.0d0 * d**2)
         endif
 
-        ! RMS thermal velocity
-        v_thermal_rms = sqrt(2.0d0 * T_ion * 1000.0d0 * 1.60218d-19 / (H2_amu * mass_u))  ! [cm/s]
-
         ! Sample thermal velocities for energy calculation
         ! Use Monte Carlo sampling of Maxwell-Boltzmann distribution
         do igamma = 1, ngamma
-            ! Sample two thermal velocities from Maxwell-Boltzmann
-            call randu(randomu)
-
-            ! Box-Muller transform for normal distribution
-            cos_theta = 2.0d0*randomu(1) - 1.0d0
-            sin_theta = sqrt(1.0d0 - cos_theta**2)
-            phi = 2.0d0*pi*randomu(2)
-
-            ! First particle velocity (thermal)
-            v1_thermal(1) = v_thermal_rms * sin_theta * cos(phi)
-            v1_thermal(2) = v_thermal_rms * sin_theta * sin(phi)
-            v1_thermal(3) = v_thermal_rms * cos_theta
-            v1_thermal = v1_thermal + plasma%vrot  ! Add rotation
-
-            ! Second particle velocity (thermal, independent)
-            call randu(randomu)
-            cos_theta = 2.0d0*randomu(1) - 1.0d0
-            sin_theta = sqrt(1.0d0 - cos_theta**2)
-            phi = 2.0d0*pi*randomu(3)
-
-            v2_thermal(1) = v_thermal_rms * sin_theta * cos(phi)
-            v2_thermal(2) = v_thermal_rms * sin_theta * sin(phi)
-            v2_thermal(3) = v_thermal_rms * cos_theta
-            v2_thermal = v2_thermal + plasma%vrot  ! Add rotation
+            ! Sample two independent thermal ion velocities
+            call sample_thermal_ion_velocity(plasma, v1_thermal)
+            call sample_thermal_ion_velocity(plasma, v2_thermal)
 
             ! Calculate neutron energy for this velocity pair
             call get_dd_neutron_energy(v1_thermal, v2_thermal, vn_det, e_neutron, weight)
@@ -15105,9 +15095,9 @@ program fidasim
 
     if(inputs%calc_neut_spec.ge.2)then
         ! Initialize energy arrays for neutron spectra
-        neutron%nenergy = 100
-        neutron%emin = 2000.0d0  ! 2.0 MeV min
-        neutron%emax = 2800.0d0  ! 2.8 MeV max
+        neutron%nenergy = inputs%nenergy_nc
+        neutron%emin = inputs%emin_nc  ! keV
+        neutron%emax = inputs%emax_nc_spec  ! keV
 
         allocate(neutron%energy(neutron%nenergy))
         allocate(neutron%eflux(neutron%nenergy, nc_chords%nchan, particles%nclass))

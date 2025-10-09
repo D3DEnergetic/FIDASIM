@@ -6030,9 +6030,8 @@ subroutine write_neutrons
                 call h5ltset_attribute_string_f(fid,"/eflux","description", &
                      "Energy-resolved neutron flux: eflux(energy,orbit_class,chan)", error)
             else
-                ! Note: Fortran is column-major, HDF5 is row-major, so dimensions are reversed
-                dim2(1) = size(neutron%eflux, 2)  ! nchan (2nd dimension)
-                dim2(2) = neutron%nenergy          ! nenergy
+                ! Get dimensions directly from the array shape - HDF5 handles column/row major conversion
+                dim2 = shape(neutron%eflux(:,:,1))
                 call h5ltmake_compressed_dataset_double_f(fid, "/eflux", 2, dim2, neutron%eflux(:,:,1), error)
                 call h5ltset_attribute_string_f(fid,"/eflux","description", &
                      "Energy-resolved neutron flux: eflux(chan,energy)", error)
@@ -8853,6 +8852,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     real(Float64) :: dE, dp
     integer :: err
 
+    !! Find nearest grid point in (E, p) space
     epi(1) = minloc(abs(fbm%energy - energy),1)
     epi(2) = minloc(abs(fbm%pitch - pitch),1)
     dE = abs(fbm%energy(epi(1)) - energy)
@@ -9802,7 +9802,7 @@ subroutine neutron_thermal_thermal(ichan)
     call track_cylindrical(r_detector, vn_det, tracks, ntrack)
     if(ntrack.eq.0) return
 
-    ngamma = 20  ! Number of samples for velocity distribution
+    ngamma = 100  ! Number of samples for velocity distribution
 
     ! Loop along sightline
     do i = 1, ntrack
@@ -13721,7 +13721,7 @@ subroutine neutron_spec_mc
 
     flux = 0.0
     ngamma = 20
-    n_thermal = 10  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
+    n_thermal = 100  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
     !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,flux,eb,igamma,phi,ichan, &
     !$OMP& rn,vn,r_detector,d,domega,visible,los_angle,max_angle,kappa, &
@@ -14471,7 +14471,7 @@ subroutine neutron_spec_f
     integer :: n_thermal, itherm
     real(Float64), dimension(3) :: v_thermal
     real(Float64) :: flux_contrib
-    
+
     !! Check if the beam is available
     beam_available = allocated(fbm%energy) .and. allocated(fbm%pitch)
     
@@ -14479,10 +14479,12 @@ subroutine neutron_spec_f
     	write(*,'(T2,a)') 'NEUTRON_SPEC_F: Running without beam grid - using track-based volumes'
     endif
 
-    ngamma = 20
-    n_thermal = 10  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
+    ngamma = 47
+    n_thermal = 256  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
     flux = 0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
+
+    !$OMP PARALLEL DO schedule(guided) &
+    !$OMP& private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
     !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,tracks,kappa,track_step,&
     !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib)
     channel_loop: do ichan=1, nc_chords%nchan
@@ -14536,15 +14538,16 @@ subroutine neutron_spec_f
                     gyro_loop: do igamma=1, ngamma
                         call gyro_correction(fields,eb,pitch, fbm%A, ri, vi)
 
-                        !!Correct for gyro orbit
+                        !! Correct for gyro orbit
                         call gyro_step(vi,fields,fbm%A,r_gyro)
 
+                        !! Get distribution at guiding center
                         fbm_denf=0
                         if (inputs%dist_type.eq.1) then
-                            !get dist at guiding center
                             call get_ep_denf(eb,pitch,fbm_denf,pos=(ri+r_gyro))
                         endif
-                        if (fbm_denf.ne.fbm_denf) cycle gyro_loop
+                        if (fbm_denf.ne.fbm_denf) cycle gyro_loop  ! Skip NaN
+                        if (fbm_denf < 1.0e-20) cycle gyro_loop    ! Skip negligible values
 
                         !! Get plasma parameters at particle position
                         call get_plasma(plasma,pos=ri)
@@ -14580,9 +14583,10 @@ subroutine neutron_spec_f
                                     ie_neutron = floor((e_neutron - neutron%emin) / &
                                         (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
                                     if(ie_neutron >= 1 .and. ie_neutron <= neutron%nenergy) then
-                                        ! Convert to spectral flux [neutrons/(s*keV)] by dividing by bin width
+
+                                        ! Properly weight flux contribution
                                         flux_contrib = flux * e_weight * real(neutron%nenergy) / &
-                                            (real(n_thermal) * (neutron%emax - neutron%emin))
+                                                       (real(n_thermal) * (neutron%emax - neutron%emin))
                                         !$OMP CRITICAL
                                         neutron%eflux(ie_neutron, ichan, 1) = &
                                             neutron%eflux(ie_neutron, ichan, 1) + flux_contrib
@@ -15101,10 +15105,9 @@ program fidasim
 
     if(inputs%calc_neut_spec.ge.2)then
         ! Initialize energy arrays for neutron spectra
-        ! Use defaults if not set
-        if(neutron%nenergy <= 0) neutron%nenergy = 100
-        if(neutron%emin <= 0.0d0) neutron%emin = 2000.0d0  ! 2.0 MeV min
-        if(neutron%emax <= 0.0d0) neutron%emax = 2800.0d0  ! 2.8 MeV max
+        neutron%nenergy = 100
+        neutron%emin = 2000.0d0  ! 2.0 MeV min
+        neutron%emax = 2800.0d0  ! 2.8 MeV max
 
         allocate(neutron%energy(neutron%nenergy))
         allocate(neutron%eflux(neutron%nenergy, nc_chords%nchan, particles%nclass))

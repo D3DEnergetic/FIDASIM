@@ -1128,13 +1128,13 @@ type SimulationInputs
         !+ Number of energy bins for NC weight function
     integer(Int32) :: np_nc
         !+ Number of pitch bins for NC weight function
-    real(Float64)  :: emax_nc
+    real(Float64)  :: emax_nc_wght
         !+ Maximum energy for NC weight function [keV]
     integer(Int32) :: nenergy_nc
         !+ Number of energy bins for neutron spectra
     real(Float64)  :: emin_nc
         !+ Minimum neutron energy [keV]
-    real(Float64)  :: emax_nc_spec
+    real(Float64)  :: emax_nc
         !+ Maximum neutron energy [keV]
     real(Float64)  :: lambdamin_wght
         !+ Minimum wavelength in weight functions [nm]
@@ -2033,8 +2033,8 @@ subroutine read_inputs
     integer(Int32)     :: adaptive, max_cell_splits
     integer(Int32)     :: nenergy_nc
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)      :: lambdamin_wght,lambdamax_wght, emax_nc
-    real(Float64)      :: emin_nc, emax_nc_spec
+    real(Float64)      :: lambdamin_wght,lambdamax_wght, emax_nc_wght
+    real(Float64)      :: emin_nc, emax_nc
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -2054,8 +2054,8 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        ne_nc, np_nc, emax_nc, &
-        nenergy_nc, emin_nc, emax_nc_spec, &
+        ne_nc, np_nc, emax_nc_wght, &
+        nenergy_nc, emin_nc, emax_nc, &
         adaptive, max_cell_splits, split_tol
 
     inquire(file=namelist_file,exist=exis)
@@ -2136,10 +2136,10 @@ subroutine read_inputs
     lambdamax_wght=0
     ne_nc=0
     np_nc=0
-    emax_nc=0
+    emax_nc_wght=0
     nenergy_nc=100
     emin_nc=2000.0d0
-    emax_nc_spec=2800.0d0
+    emax_nc=2800.0d0
     adaptive=0
     max_cell_splits=1
     split_tol=0
@@ -2252,10 +2252,10 @@ subroutine read_inputs
     inputs%emax_wght=emax_wght
     inputs%ne_nc=ne_nc
     inputs%np_nc=np_nc
-    inputs%emax_nc=emax_nc
+    inputs%emax_nc_wght=emax_nc_wght
     inputs%nenergy_nc=nenergy_nc
     inputs%emin_nc=emin_nc
-    inputs%emax_nc_spec=emax_nc_spec
+    inputs%emax_nc=emax_nc
     inputs%nlambda_wght = nlambda_wght
     inputs%lambdamin_wght=lambdamin_wght
     inputs%lambdamax_wght=lambdamax_wght
@@ -13350,7 +13350,10 @@ end subroutine pnpa_mc
 
 subroutine neutron_f
     !+ Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)
-    integer :: ir, iphi, iz, ie, ip, igamma, ngamma
+#ifdef _OMP
+    use omp_lib
+#endif
+    integer :: ir, iphi, iz, ie, ip, igamma, ngamma, tid, max_threads
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb,pitch
@@ -13360,6 +13363,7 @@ subroutine neutron_f
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: s, c
+    real(Float64), dimension(:,:,:,:), allocatable :: emis_local
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'NEUTRON_F: Thermal Deuterium is not present in plasma'
@@ -13382,11 +13386,31 @@ subroutine neutron_f
 
     ngamma = 20
     rate = 0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
-    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
+
+    ! Allocate thread-local arrays to eliminate critical section
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(inputs%calc_neutron.ge.2) then
+        allocate(emis_local(fbm%nr, fbm%nz, fbm%nphi, max_threads))
+        emis_local = 0.d0
+    endif
+
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic, 100) private(fields,vi,ri,pitch,eb,&
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c,tid)
     z_loop: do iz = istart, fbm%nz, istep
         r_loop: do ir=1, fbm%nr
             phi_loop: do iphi = 1, fbm%nphi
+
+#ifdef _OMP
+                tid = OMP_get_thread_num() + 1
+#else
+                tid = 1
+#endif
+
                 !! Calculate position
                 if(fbm%nphi.eq.1) then
                     s = 0.d0
@@ -13402,47 +13426,57 @@ subroutine neutron_f
 
                 !! Get fields
                 call get_fields(fields,pos=uvw,input_coords=1)
-                if(.not.fields%in_plasma) cycle r_loop
 
-                factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
-                !! Loop over energy/pitch/gamma
-                pitch_loop: do ip = 1, fbm%npitch
-                    pitch = fbm%pitch(ip)
-                    energy_loop: do ie =1, fbm%nenergy
-                        eb = fbm%energy(ie)
-                        gyro_loop: do igamma=1, ngamma
-                            call gyro_correction(fields,eb,pitch,fbm%A,ri,vi)
+                ! Use conditional instead of cycle for collapse compatibility
+                if(fields%in_plasma) then
+                    factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
+                    !! Loop over energy/pitch/gamma
+                    pitch_loop: do ip = 1, fbm%npitch
+                        pitch = fbm%pitch(ip)
+                        energy_loop: do ie =1, fbm%nenergy
+                            eb = fbm%energy(ie)
+                            gyro_loop: do igamma=1, ngamma
+                                call gyro_correction(fields,eb,pitch,fbm%A,ri,vi)
 
-                            !! Get plasma parameters at particle position
-                            call get_plasma(plasma,pos=ri)
-                            if(.not.plasma%in_plasma) cycle gyro_loop
+                                !! Get plasma parameters at particle position
+                                call get_plasma(plasma,pos=ri)
+                                if(.not.plasma%in_plasma) cycle gyro_loop
 
-                            !! Calculate effective beam energy
-                            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-                            erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+                                !! Calculate effective beam energy
+                                vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                                erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
-                            !! Get neutron production rate
-                            call get_dd_rate(plasma, erel, rate, branch=2)
-                            if(inputs%calc_neutron.ge.2) then
-                                neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
-                                                                 + rate * factor
-                                !$OMP CRITICAL(neutron_emis)
-                                neutron%emis(ir,iz,iphi) = neutron%emis(ir,iz,iphi) &
-                                                                 + rate * fbm%f(ie,ip,ir,iz,iphi) &
-                                                                 * factor
-                                !$OMP END CRITICAL(neutron_emis)
-                            endif
+                                !! Get neutron production rate
+                                call get_dd_rate(plasma, erel, rate, branch=2)
+                                if(inputs%calc_neutron.ge.2) then
+                                    ! weight: no race condition (each iteration writes to unique element)
+                                    neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
+                                                                     + rate * factor
+                                    ! emis: use thread-local (multiple iterations write to same element)
+                                    emis_local(ir,iz,iphi,tid) = emis_local(ir,iz,iphi,tid) &
+                                                                     + rate * fbm%f(ie,ip,ir,iz,iphi) &
+                                                                     * factor
+                                endif
 
-                            rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
-                            !! Store neutrons
-                            call store_neutrons(rate)
-                        enddo gyro_loop
-                    enddo energy_loop
-                enddo pitch_loop
+                                rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
+                                !! Store neutrons
+                                call store_neutrons(rate)
+                            enddo gyro_loop
+                        enddo energy_loop
+                    enddo pitch_loop
+                endif
             enddo phi_loop
         enddo r_loop
     enddo z_loop
     !$OMP END PARALLEL DO
+
+    ! Combine thread-local emis results
+    if(inputs%calc_neutron.ge.2) then
+        do tid = 1, max_threads
+            neutron%emis(:,:,:) = neutron%emis(:,:,:) + emis_local(:,:,:,tid)
+        enddo
+        deallocate(emis_local)
+    endif
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
@@ -13702,10 +13736,11 @@ subroutine neutron_spec_mc
 #ifdef _OMP
     use omp_lib
 #endif
-    integer :: iion, igamma, ngamma, ichan, ie_neutron
+    integer :: iion, igamma, ngamma, ichan, ie_neutron, i, ntrack
     type(FastIon) :: fast_ion
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
+    type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
     real(Float64) :: eb, flux, kappa, e_neutron, e_weight
     real(Float64), dimension(3) :: ri, vi, uvw, uvw_vi
     real(Float64), dimension(3) :: rn, vn, r_detector
@@ -13718,6 +13753,11 @@ subroutine neutron_spec_mc
     real(Float64) :: flux_contrib
     integer :: tid, max_threads
     real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
+    type(ParticleTrack), dimension(:,:), allocatable :: tt_tracks
+    integer, dimension(:), allocatable :: tt_ntrack
+    integer :: max_ntrack_tt, igamma_tt, ngamma_tt, ie_neutron_tt, itrack
+    real(Float64) :: rate_tt, flux_tt, domega_tt, d_tt, flux_contrib_tt, e_neutron_tt, weight_tt, T_ion
+    real(Float64), dimension(3) :: r_detector_tt, vn_det_tt, ri_tt, v1_thermal_tt, v2_thermal_tt
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'NEUTRON_SPEC_MC: Thermal Deuterium is not present in plasma'
@@ -13919,20 +13959,88 @@ subroutine neutron_spec_mc
 
     !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
     if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
+        ! Pre-compute thermal-thermal tracks for all channels
+        allocate(tt_tracks(pass_grid%ntrack, nc_chords%nchan))
+        allocate(tt_ntrack(nc_chords%nchan))
+        max_ntrack_tt = 0
+
+        do ichan = 1, nc_chords%nchan
+            r_detector_tt = nc_chords%det(ichan)%detector%origin
+            vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+            vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+            call track_cylindrical(r_detector_tt, vn_det_tt, tracks, ntrack)
+            tt_ntrack(ichan) = ntrack
+            if(ntrack > 0) then
+                do itrack = 1, ntrack
+                    tt_tracks(itrack, ichan) = tracks(itrack)
+                enddo
+                max_ntrack_tt = max(max_ntrack_tt, ntrack)
+            endif
+        enddo
+
+        ngamma_tt = 100
+
         ! Allocate thread-local arrays for thermal-thermal
         if(allocated(neutron%eflux)) then
             allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
             eflux_tt_local = 0.d0
         endif
 
-        !$OMP PARALLEL DO schedule(guided) private(ichan,tid)
+        !$OMP PARALLEL DO collapse(2) schedule(dynamic, 10) &
+        !$OMP& private(ichan,i,tid,ri_tt,plasma,T_ion,rate_tt,flux_tt,d_tt,domega_tt, &
+        !$OMP& igamma_tt,v1_thermal_tt,v2_thermal_tt,e_neutron_tt,weight_tt,ie_neutron_tt,flux_contrib_tt,r_detector_tt,vn_det_tt)
         do ichan = 1, nc_chords%nchan
+            do i = 1, max_ntrack_tt
 #ifdef _OMP
-            tid = OMP_get_thread_num() + 1
+                tid = OMP_get_thread_num() + 1
 #else
-            tid = 1
+                tid = 1
 #endif
-            call neutron_thermal_thermal(ichan, tid, eflux_tt_local)
+                if(i > tt_ntrack(ichan)) cycle
+
+                ri_tt = tt_tracks(i, ichan)%pos
+                call get_plasma(plasma, pos=ri_tt, input_coords=1)
+                if(.not.plasma%in_plasma) cycle
+
+                if(abs(thermal_mass(1) - H2_amu) > 0.01) cycle
+
+                T_ion = plasma%ti
+                if(T_ion < 0.1d0) cycle
+
+                call get_thermal_dd_rate(T_ion, rate_tt)
+                flux_tt = 0.25d0 * plasma%deni(1)**2 * rate_tt
+                if(flux_tt <= 0.0d0) cycle
+
+                r_detector_tt = nc_chords%det(ichan)%detector%origin
+                vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+                vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+
+                d_tt = norm2(r_detector_tt - ri_tt)
+                if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (pi * d_tt**2)
+                else
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (4.0d0 * d_tt**2)
+                endif
+
+                do igamma_tt = 1, ngamma_tt
+                    call sample_thermal_ion_velocity(plasma, v1_thermal_tt)
+                    call sample_thermal_ion_velocity(plasma, v2_thermal_tt)
+                    call get_dd_neutron_energy(v1_thermal_tt, v2_thermal_tt, vn_det_tt, e_neutron_tt, weight_tt)
+
+                    if(allocated(neutron%eflux)) then
+                        ie_neutron_tt = floor((e_neutron_tt - neutron%emin) / &
+                            (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                        if(ie_neutron_tt >= 1 .and. ie_neutron_tt <= neutron%nenergy) then
+                            flux_contrib_tt = flux_tt * tt_tracks(i, ichan)%time * weight_tt * domega_tt * &
+                                real(neutron%nenergy) / (real(ngamma_tt) * (neutron%emax - neutron%emin))
+                            eflux_tt_local(ie_neutron_tt, ichan, 1, tid) = &
+                                eflux_tt_local(ie_neutron_tt, ichan, 1, tid) + flux_contrib_tt
+                        endif
+                    endif
+                enddo
+            enddo
         enddo
         !$OMP END PARALLEL DO
 
@@ -13944,6 +14052,8 @@ subroutine neutron_spec_mc
             enddo
             deallocate(eflux_tt_local)
         endif
+
+        deallocate(tt_tracks, tt_ntrack)
     endif
 
 #ifdef _MPI
@@ -14556,17 +14666,42 @@ subroutine neutron_spec_f
     real(Float64) :: flux_contrib
     integer :: tid, max_threads
     real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
+    type(ParticleTrack), dimension(:,:), allocatable :: all_tracks
+    integer, dimension(:), allocatable :: all_ntrack
+    type(ParticleTrack), dimension(:,:), allocatable :: tt_tracks
+    integer, dimension(:), allocatable :: tt_ntrack
+    integer :: max_ntrack_tt, igamma_tt, ngamma_tt, ie_neutron_tt, itrack
+    real(Float64) :: rate_tt, flux_tt, domega_tt, d_tt, flux_contrib_tt, e_neutron_tt, weight_tt, T_ion
+    real(Float64), dimension(3) :: r_detector_tt, vn_det_tt, ri_tt, v1_thermal_tt, v2_thermal_tt
 
     !! Check if the beam is available
     beam_available = allocated(fbm%energy) .and. allocated(fbm%pitch)
-    
-    if (.not.beam_available .and. inputs%verbose.ge.1) then
-    	write(*,'(T2,a)') 'NEUTRON_SPEC_F: Running without beam grid - using track-based volumes'
+
+    if (.not.beam_available) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NEUTRON_SPEC_F: Beam grid not available, skipping beam-thermal neutron calculation'
+        endif
+        return
     endif
 
     ngamma = 47
     n_thermal = 256  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
     flux = 0
+
+    !! Pre-compute track data for all channels to enable collapse parallelization
+    allocate(all_tracks(pass_grid%ntrack, nc_chords%nchan))
+    allocate(all_ntrack(nc_chords%nchan))
+
+    do ichan = 1, nc_chords%nchan
+        rn = nc_chords%det(ichan)%detector%origin
+        vn = nc_chords%det(ichan)%aperture%origin - rn
+        vn = vn/norm2(vn)
+        call track_cylindrical(rn, vn, tracks, ntrack)
+        all_ntrack(ichan) = ntrack
+        if(ntrack > 0) then
+            all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
+        endif
+    enddo
 
     !! Allocate thread-local arrays to eliminate critical sections
 #ifdef _OMP
@@ -14584,64 +14719,66 @@ subroutine neutron_spec_f
         eflux_tt_local = 0.d0
     endif
 
-    !$OMP PARALLEL DO schedule(guided) &
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic, 10) &
     !$OMP& private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
-    !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,tracks,kappa,track_step,&
+    !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,kappa,track_step,&
     !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib,tid)
     channel_loop: do ichan=1, nc_chords%nchan
+        pitch_loop: do ip = 1, fbm%npitch
+            energy_loop: do ie = 1, fbm%nenergy
 
 #ifdef _OMP
-        tid = OMP_get_thread_num() + 1
+                tid = OMP_get_thread_num() + 1
 #else
-        tid = 1
+                tid = 1
 #endif
 
-        rn = nc_chords%det(ichan)%detector%origin
-        vn = nc_chords%det(ichan)%aperture%origin-rn
-        vn = vn/norm2(vn)
+                ! Use pre-computed track data
+                ntrack = all_ntrack(ichan)
+                if(ntrack == 0) cycle energy_loop
 
-        call track_cylindrical(rn, vn, tracks, ntrack)
-        if(ntrack.eq.0) cycle channel_loop
-
-        !! Calculate the flux produced in each cell along the path
-        loop_along_track: do i=1,ntrack
-            rn = tracks(i)%pos
-            
-            if (i.lt.ntrack) then
-                track_step = norm2(tracks(i+1)%pos - tracks(i)%pos)
-            else
-                if (i.gt.1) then
-                    track_step = norm2(tracks(i)%pos - tracks(i-1)%pos)
-                else
-                    track_step = 0.1d0
-                endif
-            endif
-
-            !! Get fields
-            call get_fields(fields,pos=rn)
-            if(.not.fields%in_plasma) cycle loop_along_track
-
-            !! Calculate solid angle in the large distance limit
-            d = norm2(nc_chords%det(ichan)%detector%origin-rn)
-            if (nc_chords%det(ichan)%detector%shape.eq.1) then
-                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
-                         (pi * d**2) !the 4s cancelled out
-            else
-                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
-                         (4 * d**2) !the pis cancelled out
-            endif
-
-            call get_indices(rn, ind)
-         !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
-         !!!factor = domega*beam_grid%dv/ngamma
-            factor = domega*track_step/ngamma
-            
-            if (beam_available) then
-            !! Loop over energy/pitch/gamma
-            pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)
-                energy_loop: do ie =1, fbm%nenergy
-                    eb = fbm%energy(ie)
+                eb = fbm%energy(ie)
+
+                ! Calculate viewing direction for this channel
+                rn = nc_chords%det(ichan)%detector%origin
+                vn = nc_chords%det(ichan)%aperture%origin - rn
+                vn = vn/norm2(vn)
+
+                !! Calculate the flux produced in each cell along the path
+                loop_along_track: do i=1,ntrack
+                    rn = all_tracks(i, ichan)%pos
+
+                    if (i.lt.ntrack) then
+                        track_step = norm2(all_tracks(i+1, ichan)%pos - all_tracks(i, ichan)%pos)
+                    else
+                        if (i.gt.1) then
+                            track_step = norm2(all_tracks(i, ichan)%pos - all_tracks(i-1, ichan)%pos)
+                        else
+                            track_step = 0.1d0
+                        endif
+                    endif
+
+                    !! Get fields
+                    call get_fields(fields,pos=rn)
+                    if(.not.fields%in_plasma) cycle loop_along_track
+
+                    !! Calculate solid angle in the large distance limit
+                    d = norm2(nc_chords%det(ichan)%detector%origin-rn)
+                    if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                        domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                                 (pi * d**2) !the 4s cancelled out
+                    else
+                        domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                                 (4 * d**2) !the pis cancelled out
+                    endif
+
+                    call get_indices(rn, ind)
+                 !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
+                 !!!factor = domega*beam_grid%dv/ngamma
+                    factor = domega*track_step/ngamma
+
+                    !! Loop over gyro-angles (energy and pitch are now outer collapsed loops)
                     gyro_loop: do igamma=1, ngamma
                         call gyro_correction(fields,eb,pitch, fbm%A, ri, vi)
 
@@ -14704,10 +14841,9 @@ subroutine neutron_spec_f
                             enddo thermal_loop
                         endif
                     enddo gyro_loop
-                enddo energy_loop
-            enddo pitch_loop
-            endif
-        enddo loop_along_track
+                enddo loop_along_track
+            enddo energy_loop
+        enddo pitch_loop
     enddo channel_loop
     !$OMP END PARALLEL DO
 
@@ -14721,22 +14857,93 @@ subroutine neutron_spec_f
         deallocate(eflux_local, eflux_bt_local, eflux_tt_local)
     endif
 
+    !! Deallocate pre-computed track arrays
+    deallocate(all_tracks, all_ntrack)
+
     !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
     if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
+        ! Pre-compute thermal-thermal tracks for all channels
+        allocate(tt_tracks(pass_grid%ntrack, nc_chords%nchan))
+        allocate(tt_ntrack(nc_chords%nchan))
+        max_ntrack_tt = 0
+
+        do ichan = 1, nc_chords%nchan
+            r_detector_tt = nc_chords%det(ichan)%detector%origin
+            vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+            vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+            call track_cylindrical(r_detector_tt, vn_det_tt, tracks, ntrack)
+            tt_ntrack(ichan) = ntrack
+            if(ntrack > 0) then
+                do itrack = 1, ntrack
+                    tt_tracks(itrack, ichan) = tracks(itrack)
+                enddo
+                max_ntrack_tt = max(max_ntrack_tt, ntrack)
+            endif
+        enddo
+
+        ngamma_tt = 100
+
         ! Allocate thread-local arrays for thermal-thermal
         if(allocated(neutron%eflux)) then
             allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
             eflux_tt_local = 0.d0
         endif
 
-        !$OMP PARALLEL DO schedule(guided) private(ichan,tid)
+        !$OMP PARALLEL DO collapse(2) schedule(dynamic, 10) &
+        !$OMP& private(ichan,i,tid,ri_tt,plasma,T_ion,rate_tt,flux_tt,d_tt,domega_tt, &
+        !$OMP& igamma_tt,v1_thermal_tt,v2_thermal_tt,e_neutron_tt,weight_tt,ie_neutron_tt,flux_contrib_tt,r_detector_tt,vn_det_tt)
         do ichan = 1, nc_chords%nchan
+            do i = 1, max_ntrack_tt
 #ifdef _OMP
-            tid = OMP_get_thread_num() + 1
+                tid = OMP_get_thread_num() + 1
 #else
-            tid = 1
+                tid = 1
 #endif
-            call neutron_thermal_thermal(ichan, tid, eflux_tt_local)
+                if(i > tt_ntrack(ichan)) cycle
+
+                ri_tt = tt_tracks(i, ichan)%pos
+                call get_plasma(plasma, pos=ri_tt, input_coords=1)
+                if(.not.plasma%in_plasma) cycle
+
+                if(abs(thermal_mass(1) - H2_amu) > 0.01) cycle
+
+                T_ion = plasma%ti
+                if(T_ion < 0.1d0) cycle
+
+                call get_thermal_dd_rate(T_ion, rate_tt)
+                flux_tt = 0.25d0 * plasma%deni(1)**2 * rate_tt
+                if(flux_tt <= 0.0d0) cycle
+
+                r_detector_tt = nc_chords%det(ichan)%detector%origin
+                vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+                vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+
+                d_tt = norm2(r_detector_tt - ri_tt)
+                if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (pi * d_tt**2)
+                else
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (4.0d0 * d_tt**2)
+                endif
+
+                do igamma_tt = 1, ngamma_tt
+                    call sample_thermal_ion_velocity(plasma, v1_thermal_tt)
+                    call sample_thermal_ion_velocity(plasma, v2_thermal_tt)
+                    call get_dd_neutron_energy(v1_thermal_tt, v2_thermal_tt, vn_det_tt, e_neutron_tt, weight_tt)
+
+                    if(allocated(neutron%eflux)) then
+                        ie_neutron_tt = floor((e_neutron_tt - neutron%emin) / &
+                            (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                        if(ie_neutron_tt >= 1 .and. ie_neutron_tt <= neutron%nenergy) then
+                            flux_contrib_tt = flux_tt * tt_tracks(i, ichan)%time * weight_tt * domega_tt * &
+                                real(neutron%nenergy) / (real(ngamma_tt) * (neutron%emax - neutron%emin))
+                            eflux_tt_local(ie_neutron_tt, ichan, 1, tid) = &
+                                eflux_tt_local(ie_neutron_tt, ichan, 1, tid) + flux_contrib_tt
+                        endif
+                    endif
+                enddo
+            enddo
         enddo
         !$OMP END PARALLEL DO
 
@@ -14748,6 +14955,8 @@ subroutine neutron_spec_f
             enddo
             deallocate(eflux_tt_local)
         endif
+
+        deallocate(tt_tracks, tt_ntrack)
     endif
 
 #ifdef _MPI
@@ -14789,7 +14998,7 @@ subroutine neutron_weights
     !! Define energy array
     allocate(ebarr(inputs%ne_nc))
     do i=1,inputs%ne_nc
-        ebarr(i) = real(i-0.5)*inputs%emax_nc/real(inputs%ne_nc)
+        ebarr(i) = real(i-0.5)*inputs%emax_nc_wght/real(inputs%ne_nc)
     enddo
     dE = abs(ebarr(2)-ebarr(1))
     
@@ -14804,7 +15013,7 @@ subroutine neutron_weights
         write(*,'(T3,"Number of Channels: ",i3)') nc_chords%nchan
         write(*,'(T3,"Nenergy: ",i3)') inputs%ne_nc
         write(*,'(T3,"Npitch: ",i3)') inputs%np_nc
-        write(*,'(T3,"Maximum energy: ",f7.2)') inputs%emax_nc
+        write(*,'(T3,"Maximum energy: ",f7.2)') inputs%emax_nc_wght
         write(*,*) ''
     endif
     
@@ -15247,7 +15456,14 @@ program fidasim
         ! Initialize energy arrays for neutron spectra
         neutron%nenergy = inputs%nenergy_nc
         neutron%emin = inputs%emin_nc  ! keV
-        neutron%emax = inputs%emax_nc_spec  ! keV
+        neutron%emax = inputs%emax_nc  ! keV
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"Neutron spectra settings:")')
+            write(*,'(T4,"nenergy_nc = ",I5)') neutron%nenergy
+            write(*,'(T4,"emin_nc = ",F10.2," keV")') neutron%emin
+            write(*,'(T4,"emax_nc = ",F10.2," keV")') neutron%emax
+        endif
 
         allocate(neutron%energy(neutron%nenergy))
         allocate(neutron%eflux(neutron%nenergy, nc_chords%nchan, particles%nclass))

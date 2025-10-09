@@ -879,7 +879,11 @@ type NeutronRate
     real(Float64), dimension(:), allocatable :: energy
         !+ Energy grid for neutron spectra [keV]
     real(Float64), dimension(:,:,:), allocatable :: eflux
-        !+ Energy-resolved neutron flux: eflux(energy,chan,orbit_type) [neutrons/(s*keV)]
+        !+ Energy-resolved neutron flux (combined): eflux(energy,chan,orbit_type) [neutrons/(s*keV)]
+    real(Float64), dimension(:,:,:), allocatable :: eflux_bt
+        !+ Energy-resolved beam-thermal neutron flux: eflux_bt(energy,chan,orbit_type) [neutrons/(s*keV)]
+    real(Float64), dimension(:,:,:), allocatable :: eflux_tt
+        !+ Energy-resolved thermal-thermal neutron flux: eflux_tt(energy,chan,orbit_type) [neutrons/(s*keV)]
     logical :: include_thermal = .false.
         !+ Flag to include thermal-thermal neutron reactions
 end type NeutronRate
@@ -6041,17 +6045,40 @@ subroutine write_neutrons
 
             if(particles%nclass.gt.1) then
                 dim3 = shape(neutron%eflux)
-                call h5ltmake_compressed_dataset_double_f(fid, "/eflux", 3, dim3, neutron%eflux, error)
-                call h5ltset_attribute_string_f(fid,"/eflux","description", &
-                     "Energy-resolved neutron flux: eflux(energy,orbit_class,chan)", error)
+                ! Write combined spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_spectra", 3, dim3, neutron%eflux, error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","description", &
+                     "Combined energy-resolved neutron flux: nc_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","units","neutrons/(s*keV)",error )
+                ! Write beam-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_bt_spectra", 3, dim3, neutron%eflux_bt, error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","description", &
+                     "Beam-thermal energy-resolved neutron flux: nc_bt_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","units","neutrons/(s*keV)",error )
+                ! Write thermal-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_tt_spectra", 3, dim3, neutron%eflux_tt, error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","description", &
+                     "Thermal-thermal energy-resolved neutron flux: nc_tt_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","units","neutrons/(s*keV)",error )
             else
                 ! Get dimensions directly from the array shape - HDF5 handles column/row major conversion
                 dim2 = shape(neutron%eflux(:,:,1))
-                call h5ltmake_compressed_dataset_double_f(fid, "/eflux", 2, dim2, neutron%eflux(:,:,1), error)
-                call h5ltset_attribute_string_f(fid,"/eflux","description", &
-                     "Energy-resolved neutron flux: eflux(chan,energy)", error)
+                ! Write combined spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_spectra", 2, dim2, neutron%eflux(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","description", &
+                     "Combined energy-resolved neutron flux: nc_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","units","neutrons/(s*keV)",error )
+                ! Write beam-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_bt_spectra", 2, dim2, neutron%eflux_bt(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","description", &
+                     "Beam-thermal energy-resolved neutron flux: nc_bt_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","units","neutrons/(s*keV)",error )
+                ! Write thermal-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_tt_spectra", 2, dim2, neutron%eflux_tt(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","description", &
+                     "Thermal-thermal energy-resolved neutron flux: nc_tt_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","units","neutrons/(s*keV)",error )
             endif
-            call h5ltset_attribute_string_f(fid,"/eflux","units","neutrons/(s*keV)",error )
         endif
     endif
 
@@ -9869,7 +9896,10 @@ subroutine neutron_thermal_thermal(ichan)
                     flux_contrib = flux * tracks(i)%time * weight * domega * real(neutron%nenergy) / &
                         (real(ngamma) * (neutron%emax - neutron%emin))
                     !$OMP CRITICAL
+                    ! Store in combined array
                     neutron%eflux(ie_neutron, ichan, 1) = neutron%eflux(ie_neutron, ichan, 1) + flux_contrib
+                    ! Store in thermal-thermal array
+                    neutron%eflux_tt(ie_neutron, ichan, 1) = neutron%eflux_tt(ie_neutron, ichan, 1) + flux_contrib
                     !$OMP END CRITICAL
                 endif
             endif
@@ -13837,8 +13867,12 @@ subroutine neutron_spec_mc
                                 flux_contrib = flux * e_weight * real(neutron%nenergy) / &
                                     (real(n_thermal) * (neutron%emax - neutron%emin))
                                 !$OMP CRITICAL
+                                ! Store in combined array
                                 neutron%eflux(ie_neutron, ichan, fast_ion%class) = &
                                     neutron%eflux(ie_neutron, ichan, fast_ion%class) + flux_contrib
+                                ! Store in beam-thermal array
+                                neutron%eflux_bt(ie_neutron, ichan, fast_ion%class) = &
+                                    neutron%eflux_bt(ie_neutron, ichan, fast_ion%class) + flux_contrib
                                 !$OMP END CRITICAL
                             endif
                         endif
@@ -13862,6 +13896,8 @@ subroutine neutron_spec_mc
     call parallel_sum(neutron%flux)
     if(allocated(neutron%eflux)) then
         call parallel_sum(neutron%eflux)
+        call parallel_sum(neutron%eflux_bt)
+        call parallel_sum(neutron%eflux_tt)
     endif
 #endif
 
@@ -14578,8 +14614,12 @@ subroutine neutron_spec_f
                                         flux_contrib = flux * e_weight * real(neutron%nenergy) / &
                                                        (real(n_thermal) * (neutron%emax - neutron%emin))
                                         !$OMP CRITICAL
+                                        ! Store in combined array
                                         neutron%eflux(ie_neutron, ichan, 1) = &
                                             neutron%eflux(ie_neutron, ichan, 1) + flux_contrib
+                                        ! Store in beam-thermal array
+                                        neutron%eflux_bt(ie_neutron, ichan, 1) = &
+                                            neutron%eflux_bt(ie_neutron, ichan, 1) + flux_contrib
                                         !$OMP END CRITICAL
                                     endif
                                 endif
@@ -14606,6 +14646,8 @@ subroutine neutron_spec_f
     call parallel_sum(neutron%flux)
     if(allocated(neutron%eflux)) then
         call parallel_sum(neutron%eflux)
+        call parallel_sum(neutron%eflux_bt)
+        call parallel_sum(neutron%eflux_tt)
     endif
 #endif
 
@@ -15101,12 +15143,16 @@ program fidasim
 
         allocate(neutron%energy(neutron%nenergy))
         allocate(neutron%eflux(neutron%nenergy, nc_chords%nchan, particles%nclass))
+        allocate(neutron%eflux_bt(neutron%nenergy, nc_chords%nchan, particles%nclass))
+        allocate(neutron%eflux_tt(neutron%nenergy, nc_chords%nchan, particles%nclass))
 
         ! Initialize energy grid
         do i = 1, neutron%nenergy
             neutron%energy(i) = neutron%emin + real(i-0.5d0) * (neutron%emax - neutron%emin) / real(neutron%nenergy)
         enddo
         neutron%eflux = 0.d0
+        neutron%eflux_bt = 0.d0
+        neutron%eflux_tt = 0.d0
 
         ! Enable thermal-thermal if deuterium is present
         if(abs(thermal_mass(1) - H2_amu) < 0.01) then

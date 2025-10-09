@@ -9821,10 +9821,14 @@ subroutine get_thermal_dd_rate(T_ion, rate_tt)
 
 end subroutine get_thermal_dd_rate
 
-subroutine neutron_thermal_thermal(ichan)
+subroutine neutron_thermal_thermal(ichan, tid, eflux_tt_local)
     !+ Calculate neutron flux from thermal-thermal DD reactions for a specific channel
     integer, intent(in) :: ichan
         !+ Channel index
+    integer, intent(in) :: tid
+        !+ Thread ID for thread-local storage
+    real(Float64), dimension(:,:,:,:), intent(inout) :: eflux_tt_local
+        !+ Thread-local array for thermal-thermal flux
 
     type(LocalProfiles) :: plasma
     real(Float64), dimension(3) :: r_detector, vn_det, ri
@@ -9895,12 +9899,9 @@ subroutine neutron_thermal_thermal(ichan)
                     ! Convert to spectral flux [neutrons/(s*keV)] by dividing by bin width
                     flux_contrib = flux * tracks(i)%time * weight * domega * real(neutron%nenergy) / &
                         (real(ngamma) * (neutron%emax - neutron%emin))
-                    !$OMP CRITICAL
-                    ! Store in combined array
-                    neutron%eflux(ie_neutron, ichan, 1) = neutron%eflux(ie_neutron, ichan, 1) + flux_contrib
-                    ! Store in thermal-thermal array
-                    neutron%eflux_tt(ie_neutron, ichan, 1) = neutron%eflux_tt(ie_neutron, ichan, 1) + flux_contrib
-                    !$OMP END CRITICAL
+                    ! Store in thread-local array (no critical section needed)
+                    eflux_tt_local(ie_neutron, ichan, 1, tid) = &
+                        eflux_tt_local(ie_neutron, ichan, 1, tid) + flux_contrib
                 endif
             endif
         enddo
@@ -13698,6 +13699,9 @@ end subroutine neutron_mc
 
 subroutine neutron_spec_mc
     !+ Calculate neutron collimator flux using a Monte Carlo Fast-ion distribution
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: iion, igamma, ngamma, ichan, ie_neutron
     type(FastIon) :: fast_ion
     type(LocalProfiles) :: plasma
@@ -13712,7 +13716,9 @@ subroutine neutron_spec_mc
     integer :: n_thermal, itherm
     real(Float64), dimension(3) :: v_thermal
     real(Float64) :: flux_contrib
-    
+    integer :: tid, max_threads
+    real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
+
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'NEUTRON_SPEC_MC: Thermal Deuterium is not present in plasma'
         return
@@ -13742,11 +13748,33 @@ subroutine neutron_spec_mc
     flux = 0.0
     ngamma = 20
     n_thermal = 100  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
+
+    !! Allocate thread-local arrays to eliminate critical sections
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(allocated(neutron%eflux)) then
+        allocate(eflux_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        allocate(eflux_bt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        eflux_local = 0.d0
+        eflux_bt_local = 0.d0
+        eflux_tt_local = 0.d0
+    endif
+
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
     !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,flux,eb,igamma,phi,ichan, &
     !$OMP& rn,vn,r_detector,d,domega,visible,los_angle,max_angle,kappa, &
-    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib)
+    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib,tid)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
+#ifdef _OMP
+        tid = OMP_get_thread_num() + 1
+#else
+        tid = 1
+#endif
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
 
@@ -13866,14 +13894,11 @@ subroutine neutron_spec_mc
                                 ! Convert to spectral flux [neutrons/(s*keV)] by dividing by bin width
                                 flux_contrib = flux * e_weight * real(neutron%nenergy) / &
                                     (real(n_thermal) * (neutron%emax - neutron%emin))
-                                !$OMP CRITICAL
-                                ! Store in combined array
-                                neutron%eflux(ie_neutron, ichan, fast_ion%class) = &
-                                    neutron%eflux(ie_neutron, ichan, fast_ion%class) + flux_contrib
-                                ! Store in beam-thermal array
-                                neutron%eflux_bt(ie_neutron, ichan, fast_ion%class) = &
-                                    neutron%eflux_bt(ie_neutron, ichan, fast_ion%class) + flux_contrib
-                                !$OMP END CRITICAL
+                                ! Store in thread-local arrays (no critical section needed)
+                                eflux_local(ie_neutron, ichan, fast_ion%class, tid) = &
+                                    eflux_local(ie_neutron, ichan, fast_ion%class, tid) + flux_contrib
+                                eflux_bt_local(ie_neutron, ichan, fast_ion%class, tid) = &
+                                    eflux_bt_local(ie_neutron, ichan, fast_ion%class, tid) + flux_contrib
                             endif
                         endif
                     enddo thermal_loop
@@ -13883,13 +13908,42 @@ subroutine neutron_spec_mc
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
+    !! Combine thread-local results into global arrays
+    if(allocated(neutron%eflux)) then
+        do tid = 1, max_threads
+            neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_local(:,:,:,tid)
+            neutron%eflux_bt(:,:,:) = neutron%eflux_bt(:,:,:) + eflux_bt_local(:,:,:,tid)
+        enddo
+        deallocate(eflux_local, eflux_bt_local, eflux_tt_local)
+    endif
+
     !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
     if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
-        !$OMP PARALLEL DO schedule(guided) private(ichan)
+        ! Allocate thread-local arrays for thermal-thermal
+        if(allocated(neutron%eflux)) then
+            allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+            eflux_tt_local = 0.d0
+        endif
+
+        !$OMP PARALLEL DO schedule(guided) private(ichan,tid)
         do ichan = 1, nc_chords%nchan
-            call neutron_thermal_thermal(ichan)
+#ifdef _OMP
+            tid = OMP_get_thread_num() + 1
+#else
+            tid = 1
+#endif
+            call neutron_thermal_thermal(ichan, tid, eflux_tt_local)
         enddo
         !$OMP END PARALLEL DO
+
+        ! Combine thermal-thermal thread-local results
+        if(allocated(neutron%eflux)) then
+            do tid = 1, max_threads
+                neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_tt_local(:,:,:,tid)
+                neutron%eflux_tt(:,:,:) = neutron%eflux_tt(:,:,:) + eflux_tt_local(:,:,:,tid)
+            enddo
+            deallocate(eflux_tt_local)
+        endif
     endif
 
 #ifdef _MPI
@@ -14478,6 +14532,9 @@ end subroutine npa_weights
 
 subroutine neutron_spec_f
     !+ Calculate neutron collimator flux using a fast-ion distribution function F(E,p,r,z,phi)
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: ie, ip, igamma, ngamma, ichan, ie_neutron
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -14497,6 +14554,8 @@ subroutine neutron_spec_f
     integer :: n_thermal, itherm
     real(Float64), dimension(3) :: v_thermal
     real(Float64) :: flux_contrib
+    integer :: tid, max_threads
+    real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
 
     !! Check if the beam is available
     beam_available = allocated(fbm%energy) .and. allocated(fbm%pitch)
@@ -14509,11 +14568,33 @@ subroutine neutron_spec_f
     n_thermal = 256  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
     flux = 0
 
+    !! Allocate thread-local arrays to eliminate critical sections
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(allocated(neutron%eflux)) then
+        allocate(eflux_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        allocate(eflux_bt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        eflux_local = 0.d0
+        eflux_bt_local = 0.d0
+        eflux_tt_local = 0.d0
+    endif
+
     !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
     !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,tracks,kappa,track_step,&
-    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib)
+    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib,tid)
     channel_loop: do ichan=1, nc_chords%nchan
+
+#ifdef _OMP
+        tid = OMP_get_thread_num() + 1
+#else
+        tid = 1
+#endif
 
         rn = nc_chords%det(ichan)%detector%origin
         vn = nc_chords%det(ichan)%aperture%origin-rn
@@ -14613,14 +14694,11 @@ subroutine neutron_spec_f
                                         ! Properly weight flux contribution
                                         flux_contrib = flux * e_weight * real(neutron%nenergy) / &
                                                        (real(n_thermal) * (neutron%emax - neutron%emin))
-                                        !$OMP CRITICAL
-                                        ! Store in combined array
-                                        neutron%eflux(ie_neutron, ichan, 1) = &
-                                            neutron%eflux(ie_neutron, ichan, 1) + flux_contrib
-                                        ! Store in beam-thermal array
-                                        neutron%eflux_bt(ie_neutron, ichan, 1) = &
-                                            neutron%eflux_bt(ie_neutron, ichan, 1) + flux_contrib
-                                        !$OMP END CRITICAL
+                                        ! Store in thread-local arrays (no critical section needed)
+                                        eflux_local(ie_neutron, ichan, 1, tid) = &
+                                            eflux_local(ie_neutron, ichan, 1, tid) + flux_contrib
+                                        eflux_bt_local(ie_neutron, ichan, 1, tid) = &
+                                            eflux_bt_local(ie_neutron, ichan, 1, tid) + flux_contrib
                                     endif
                                 endif
                             enddo thermal_loop
@@ -14633,13 +14711,43 @@ subroutine neutron_spec_f
     enddo channel_loop
     !$OMP END PARALLEL DO
 
+    !! Combine thread-local results into global arrays
+    if(allocated(neutron%eflux)) then
+        do tid = 1, max_threads
+            neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_local(:,:,:,tid)
+            neutron%eflux_bt(:,:,:) = neutron%eflux_bt(:,:,:) + eflux_bt_local(:,:,:,tid)
+            ! Note: eflux_tt accumulation happens in neutron_thermal_thermal
+        enddo
+        deallocate(eflux_local, eflux_bt_local, eflux_tt_local)
+    endif
+
     !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
     if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
-        !$OMP PARALLEL DO schedule(guided) private(ichan)
+        ! Allocate thread-local arrays for thermal-thermal
+        if(allocated(neutron%eflux)) then
+            allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+            eflux_tt_local = 0.d0
+        endif
+
+        !$OMP PARALLEL DO schedule(guided) private(ichan,tid)
         do ichan = 1, nc_chords%nchan
-            call neutron_thermal_thermal(ichan)
+#ifdef _OMP
+            tid = OMP_get_thread_num() + 1
+#else
+            tid = 1
+#endif
+            call neutron_thermal_thermal(ichan, tid, eflux_tt_local)
         enddo
         !$OMP END PARALLEL DO
+
+        ! Combine thermal-thermal thread-local results
+        if(allocated(neutron%eflux)) then
+            do tid = 1, max_threads
+                neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_tt_local(:,:,:,tid)
+                neutron%eflux_tt(:,:,:) = neutron%eflux_tt(:,:,:) + eflux_tt_local(:,:,:,tid)
+            enddo
+            deallocate(eflux_tt_local)
+        endif
     endif
 
 #ifdef _MPI

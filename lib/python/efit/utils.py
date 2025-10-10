@@ -22,16 +22,30 @@ def fluxmap(g):
     nint = 100
     psi = np.linspace(0,psi_eqdsk[-1],100)
     q = scipy.interpolate.interp1d(psi_eqdsk, q_eqdsk,'cubic')(psi)
-    flux = 2*cumtrapz(q,psi,initial=0.0)*np.abs(dpsi)
-
+    flux = 2*cumtrapz(q,psi,initial=0.0)*dpsi #DLiu 10/13 to avoid negative flux
+    
     pts = 101
     theta = np.linspace(0,2*np.pi,pts,endpoint=False)
     # Find r,theta of psi before boundary
     psi_i = g['ssimag'] + psi_eqdsk[-1]*dpsi # unnormalized
     R,Z = np.meshgrid(g['r'],g['z'])
-    psi_v = [p for p in find_contours(g['psirz'], psi_i) if (p[0,0] == p[-1,0])][0]
+    psi_v_candidates = find_contours(g['psirz'], psi_i)    #find contours that match the psi_i value
+    psi_v_candidates = [
+        p for p in psi_v_candidates 
+        if (p[0,0] == p[-1,0])  # Only select closed contours
+        and (
+            # make sure the contour has both positive and negative z values (avoid closed contours in the diverter)
+            np.any(np.interp(p[:, 0], range(0, len(g['z'])), g['z']) - g['zmaxis'] > 0) and 
+            np.any(np.interp(p[:, 0], range(0, len(g['z'])), g['z']) - g['zmaxis'] < 0)
+        )
+    ]
+    if not psi_v_candidates:
+        raise ValueError(f"No suitable closed contour found at psi_i = {psi_i}")
+    else:
+        psi_v = psi_v_candidates[0]
+        
     x_c = np.interp(psi_v[:,1], range(0,len(g['r'])), g['r']) - g['rmaxis']
-    y_c = np.interp(psi_v[:,0], range(0,len(g['z'])), g['z']) - g['zmaxis']
+    y_c = np.interp(psi_v[:,0], range(0,len(g['z'])), g['z']) - g['zmaxis']    
     r_c = np.sqrt(x_c**2 + y_c**2)
     theta_c = np.arctan2(y_c,x_c)
     theta_c = np.where(theta_c < 0, theta_c + 2*np.pi, theta_c)
@@ -75,7 +89,7 @@ def fluxmap(g):
 
     return {'rho':rho,'psi':psi}
 
-def rho_rz(g,r_pts,z_pts,norm=True):
+def rho_rz_orig(g,r_pts,z_pts,norm=True):
 
     r = g['r']
     z = g['z']

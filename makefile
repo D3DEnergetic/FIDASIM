@@ -14,7 +14,12 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
-PYTHON_EXEC = $(shell which python)
+PYTHON_EXEC = $(shell which python3)
+
+PYTHON_EXEC = $(shell which python3 python 2> /dev/null | head -1)
+ifeq ($(PYTHON_EXEC),)
+    $(error Python3 executable was not found)
+endif
 
 #Operating Systems
 OS := $(shell uname)
@@ -38,6 +43,15 @@ HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
     $(error C++ compiler $(CXX) is not supported. Set CXX to g++)
 endif
+
+#Check for Python3
+PYTHON3_CHECK := $(shell command -v python3 2>/dev/null)
+ifeq ($(PYTHON3_CHECK),)
+	$(error Python3 not found.  Please install Python3 to continue.)
+endif
+
+PYTHON_EXEC = $(shell which python3)
+
 
 # Compiler Flags
 # User defined Flags
@@ -192,13 +206,20 @@ docs:
 
 .PHONY: python
 python:
+	@echo "Linking python executable: $(PYTHON_EXEC) --> $(DEPS_DIR)/python"
 	@ln -sf $(PYTHON_EXEC) $(DEPS_DIR)/python
 
 clean_all: clean clean_deps clean_docs
 
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim
-
+	@echo ""
+	@echo "=== CLEANING COMPLETE ==="
+	@echo "Cleaned: source files, tables, and fidasim executable"
+	@echo ""
+	@echo "NOTE: Dependencies (HDF5) and docs were NOT cleaned."
+	@echo "If switching compilers or want a complete clean, run: make clean_all"
+	@echo ""
 clean_src:
 	@cd $(SRC_DIR); make clean
 

@@ -70,15 +70,18 @@ The following settings provide a good balance between runtime and Monte Carlo no
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
-| `n_fida`            | Int32   | 0    | NA         | NA    | Number of FIDA MC particles              |
-| `n_pfida`           | Int32   | 0    | NA         | NA    | Number of passive FIDA MC particles      |
-| `n_npa`             | Int32   | 0    | NA         | NA    | Number of NPA MC particles               |
-| `n_pnpa`            | Int32   | 0    | NA         | NA    | Number of passive NPA MC particles       |
-| `n_nbi`             | Int32   | 0    | NA         | NA    | Number of NBI MC particles               |
-| `n_halo`            | Int32   | 0    | NA         | NA    | Number of HALO MC particles              |
-| `n_dcx`             | Int32   | 0    | NA         | NA    | Number of DCX MC particles               |
-| `n_birth`           | Int32   | 0    | NA         | NA    | Number of Birth particles outputed       |
-
+| `n_fida`            | Int64   | 0    | NA         | NA    | Number of FIDA MC particles              |
+| `n_pfida`           | Int64   | 0    | NA         | NA    | Number of passive FIDA MC particles      |
+| `n_npa`             | Int64   | 0    | NA         | NA    | Number of NPA MC particles               |
+| `n_pnpa`            | Int64   | 0    | NA         | NA    | Number of passive NPA MC particles       |
+| `n_nbi`             | Int64   | 0    | NA         | NA    | Number of NBI MC particles               |
+| `n_halo`            | Int64   | 0    | NA         | NA    | Number of HALO MC particles              |
+| `n_dcx`             | Int64   | 0    | NA         | NA    | Number of DCX MC particles               |
+| `n_birth`           | Int64   | 0    | NA         | NA    | Number of Birth particles outputed       |
+###NPA switch
+* `n_npa == 0`: Will deactivate the NPA calculation
+* `n_npa == 1`: Will perform the NPA calculation but just store as output the flux (per unit of energy) of neutral particle arriving to the detector
+* `n_npa == 2`: Will do the same of `n_npa == 1` but will also save the initial position and velocity (Energy and pitch) of each neutral marker. Since Nov 2024, the position and energy of the gyrocenter is also saved, if the used fast-ion distribution as input is symmetric in toroidal angle
 ##Neutral Beam Settings
 These variables define the neutral beam properties.
 Currently the mass of the beam species, `ab`, can only be the mass either protium or deuterium.

@@ -27,12 +27,12 @@ except:
 def get_arr_lim(arr):
     #+ Find the lower and upper bounds of N-dimensional `arr`
     arr_min = np.min(arr)
-    if arr_min<0: 
+    if arr_min<0:
         arr_min = arr_min*1.1
     else:
         arr_min = arr_min*0.9
     arr_max = np.max(arr)
-    if arr_max<0: 
+    if arr_max<0:
         arr_max = arr_max*0.9
     else:
         arr_max = arr_max*1.1
@@ -185,7 +185,7 @@ def main():
     if args.zplineout!=None and args.pzlineout!=None:
         print('ERROR: Cannot simultaneously plot both pz and zp line outs. Pick one.')
         raise SystemExit
-    if args.rzlineout!=None and args.zrlineout!=None: 
+    if args.rzlineout!=None and args.zrlineout!=None:
         print('ERROR: Cannot simultaneously plot both rz and zr line outs. Pick one.')
         raise SystemExit
 
@@ -194,14 +194,14 @@ def main():
     # Verticl slices
     lineouts[2,3,0] = args.rzlineout
     lineouts[1,3,0] = args.pzlineout
-    lineouts[1,2,0] = args.prlineout 
+    lineouts[1,2,0] = args.prlineout
     lineouts[0,3,0] = args.ezlineout
-    lineouts[0,2,0] = args.erlineout 
-    lineouts[0,1,0] = args.eplineout 
+    lineouts[0,2,0] = args.erlineout
+    lineouts[0,1,0] = args.eplineout
     # Horizontal slices
-    lineouts[0,3,1] = args.zelineout 
-    lineouts[1,3,1] = args.zplineout 
-    lineouts[2,3,1] = args.zrlineout 
+    lineouts[0,3,1] = args.zelineout
+    lineouts[1,3,1] = args.zplineout
+    lineouts[2,3,1] = args.zrlineout
     lineouts[0,1,1] = args.pelineout
     lineouts[0,2,1] = args.relineout
     lineouts[1,2,1] = args.rplineout
@@ -262,7 +262,7 @@ def main():
         # Plot neutral beam
         if 'nbi' in geo:
             src = geo['nbi/src'][()]
-            mag = 2000
+            mag = 2700
             t = np.linspace(0, mag, 2)
             axis = geo['nbi/axis'][()]
 
@@ -314,7 +314,8 @@ def main():
             print(iz)
         lr = r[ir[-1]]-r[ir[0]]
         lz = z[iz[-1]]-z[iz[0]]
-        rho = max(lr,lz) / 2.
+        rho_r = lr/2.0
+        rho_z = lz/2.0
 
         # Generate torus mesh
         npts = 32
@@ -322,9 +323,9 @@ def main():
         phi, theta = np.meshgrid(ph, np.linspace(0, 2*np.pi, npts))
         r_midpoint = r.mean()
 
-        X = (r_midpoint + rho * np.cos(theta)) * np.cos(phi)
-        Y = (r_midpoint + rho * np.cos(theta)) * np.sin(phi)
-        Z = rho * np.sin(theta)
+        X = (r_midpoint + rho_r * np.cos(theta)) * np.cos(phi)
+        Y = (r_midpoint + rho_r * np.cos(theta)) * np.sin(phi)
+        Z = rho_z * np.sin(theta)
 
         ax.plot_surface(X, Y, Z, color='indigo', rstride=1, cstride=1, alpha=0.25)
 
@@ -337,14 +338,15 @@ def main():
 
         if n_nchan + f_nchan > 0:
             colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan))
-        t = np.linspace(0,1e8,2)
+        t = np.linspace(0,1000,2)
 
         if 'spec' in geo:
             for i in range(f_nchan):          # FIDA loop
                 lens = geo['/spec/lens'][()][i,:]
                 axis = geo['/spec/axis'][()][i,:]
+                id = geo['/spec/id'][()][i].decode('utf-8')
                 los = lens + t.reshape(2,1)*axis
-                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i],label = "FIDA {0}".format(i+1))
+                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i],label = id)
                 ax.scatter(lens[0],lens[1],lens[2],color='k', s=1)
         if 'npa' in geo:
             for i in range(n_nchan):          # NPA loop
@@ -357,8 +359,8 @@ def main():
                 ax.scatter(d_cent[0],d_cent[1],d_cent[2],color='k', s=1)
 
         # Set axes limits for an equal aspect ratio visualization
-        X = np.array([-(r_midpoint + 2*rho), r_midpoint + 2*rho])
-        Y = np.array([-(r_midpoint + 2*rho), r_midpoint + 2*rho])
+        X = np.array([-(r_midpoint + 2*rho_r), r_midpoint + 2*rho_r])
+        Y = np.array([-(r_midpoint + 2*rho_r), r_midpoint + 2*rho_r])
         Z = np.array([-zmax,zmax])
         max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max() / 2.0
         mid_x = (X.max()+X.min()) * 0.5
@@ -391,11 +393,12 @@ def main():
 
         r = eq["/plasma/r"][()]
         z = eq["/plasma/z"][()]
-        try: 
+        try:
             phi = eq["/plasma/phi"][()]
+            iphi = np.abs(phi-args.phi).argmin()  # R lineout index
         except:
             phi = [0.0]
-        iphi = np.abs(np.array(phi)-args.phi).argmin()  # R lineout index
+            iphi = 0
 
         #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
@@ -409,6 +412,7 @@ def main():
                 plasma = eq["/plasma/"+to_plt[i]][()][:,:,args.ithermal_species]
             except:
                 plasma = eq["/plasma/"+to_plt[i]][()]
+
             plasma_masked = np.ma.array(plasma)
             plasma_masked[mask < 0.5] = np.ma.masked
             if len(phi)>1: plasma_masked = plasma_masked[iphi,:,:]
@@ -418,7 +422,7 @@ def main():
             pmin, pmax = get_arr_lim(plasma_masked) #In case data is close to, but not exactly constant
 
             levs = np.linspace(pmin, pmax, nlevs)
-            if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero plasma 
+            if (levs==0).all(): levs = [-0.1, 0.1]  #In case zero plasma
 
             if (args.rzlineout or args.zrlineout)!=None:
                 fig, ax = plt.subplots(1,2,figsize=(6.8,3.4))
@@ -478,11 +482,12 @@ def main():
 
         r = eq["/fields/r"][()]
         z = eq["/fields/z"][()]
-        try: 
+        try:
             phi = eq["/fields/phi"][()]
+            iphi = np.abs(phi-args.phi).argmin()  # R lineout index
         except:
             phi = [0.0]
-        iphi = np.abs(np.array(phi)-args.phi).argmin()  # R lineout index
+            iphi = 0
 
         #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
@@ -561,11 +566,13 @@ def main():
     if args.distribution or plot_all:
 
         f = dist["f"][()].T  # Read F
-        try: 
+        try:
             phi = dist["phi"][()]
+            iphi = np.abs(phi-args.phi).argmin()  # R lineout index
         except:
             phi = [0.0]
-        iphi = np.abs(np.array(phi)-args.phi).argmin()  # R lineout index
+            iphi = 0
+
         if f.ndim>4: f = f[:,:,:,:,iphi]
         ndim = 4
 
@@ -647,12 +654,12 @@ def main():
                                          fontsize=12)
                         unit = ax_specs[f2_labels[1]]['units']
                         #Reformat pitch labels
-                        if unit=='unity': 
+                        if unit=='unity':
                             unit = ''
                             title = 'Pitch w.r.t. B'
                         else:
                             title = f2_labels[1].capitalize()
-                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(y[iy],1)), 
+                        ax[1].set_title(r'%s $\approx$ %s %s'% (title, str(round(y[iy],1)),
                                                                 unit), fontsize=12)
 
                     ax[0].plot(linex, liney, 'w--')
@@ -671,11 +678,11 @@ def main():
                 ax[0].set_ylim(ymin,ymax)
                 #Reformat pitch labels
                 xlabel, ylabel = f2_labels
-                if xlabel=='pitch': 
+                if xlabel=='pitch':
                     xlabel = 'Pitch w.r.t. B'
                 else:
                     xlabel = f2_labels[0].capitalize()
-                if ylabel=='pitch': 
+                if ylabel=='pitch':
                     ylabel = 'Pitch w.r.t. B'
                 else:
                     ylabel = f2_labels[1].capitalize()
@@ -683,19 +690,19 @@ def main():
                 ax[0].set_ylabel(ylabel+' [%s]'%ax_specs[f2_labels[1]]['units'],fontsize=12)
 
                 ip = np.argwhere('pitch'==f2_labels.T) #R-Pitch plot
-                if len(ip)>0 and ip==0: 
+                if len(ip)>0 and ip==0:
                     ax[0].set_xticks(np.round(np.linspace(x[1], x[-2], 6), 1))
                 else:
                     plt.locator_params(axis='x', nbins=4)
 
                 if labels[i]=='energy' and labels[j]=='pitch': #R-Z plot
-                    ax[0].set_aspect('equal') 
+                    ax[0].set_aspect('equal')
 
                 if len(phi)>1: 
                     degree = r' at $\phi$=' + r'%s$\degree$'%int(phi[iphi]/np.pi*180)
                 else:
                     degree = ''
-                ax[0].set_title(r'$\left< F \right>_{%s,%s}$' %(labels[i].capitalize(),labels[j].capitalize()) 
+                ax[0].set_title(r'$\left< F \right>_{%s,%s}$' %(labels[i].capitalize(),labels[j].capitalize())
                                                                 +degree,fontsize=12)
 
                 if np.mean(f2)<10.0: #Colorbar formatting
@@ -718,11 +725,12 @@ def main():
 
         r = dist["/r"][()]
         z = dist["/z"][()]
-        try: 
+        try:
             phi = dist["phi"][()]
+            iphi = np.abs(phi-args.phi).argmin()  # R lineout index
         except:
             phi = [0.0]
-        iphi = np.abs(np.array(phi)-args.phi).argmin()  # R lineout index
+            iphi = 0
 
         #Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)

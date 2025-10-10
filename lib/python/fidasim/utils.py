@@ -15,7 +15,14 @@ import copy
 import h5py
 import efit
 from scipy.io import netcdf
-from scipy.interpolate import interp1d, interp2d, NearestNDInterpolator
+from scipy.interpolate import interp1d, NearestNDInterpolator
+try:
+    from scipy.interpolate import interp2d
+    interp2d(1,2,3)
+    oldinterp2d = True
+except NotImplementedError:
+    from scipy.interpolate import RectBivariateSpline as interp2d
+    oldinterp2d = False
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 
@@ -751,24 +758,26 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     #+>>> write_data(h5_obj, dic, desc, units)
     #+```
     """
-    for key in dic:
-        if isinstance(dic[key], dict):
+    # Make a copy of the dictionary to avoid modifying the original
+    dict2 = copy.deepcopy(dic)
+    for key in dict2:
+        if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)
-            write_data(h5_grp, dic[key])
+            write_data(h5_grp, dict2[key])
             continue
 
         # Transpose data to match expected by Fortran and historically provided by IDL
-        if isinstance(dic[key], np.ndarray):
-            if dic[key].ndim >= 2:
-                dic[key] = dic[key].T
+        if isinstance(dict2[key], np.ndarray):
+            if dict2[key].ndim >= 2:
+                dict2[key] = dict2[key].T
 
         # Make strings of fixed length as required by Fortran.
         # See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii
-        if isinstance(dic[key], str):
-            dic[key] = np.string_(dic[key])
+        if isinstance(dict2[key], str):
+            dict2[key] = np.string_(dict2[key])
 
         # Create dataset
-        ds = h5_obj.create_dataset(key, data = dic[key])
+        ds = h5_obj.create_dataset(key, data = dict2[key])
 
         # Add descrption attribute
         if key in desc:
@@ -808,7 +817,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     dims = grid['r2d'].shape
     r_pts = grid['r2d'].flatten()/100
     z_pts = grid['z2d'].flatten()/100
-    g = transform_COCOS_from_geqdsk(efit.readg(filename), ccw_phi=ccw_phi, exp_Bp=exp_Bp, **convert_COCOS_kw)
+
+    g = efit.readg(filename)
+    cc = identify_COCOS_from_geqdsk(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+
+    cc_factor = cc.sigma_RphZ*cc.sigma_Bp/((2*np.pi)**cc.exp_Bp)
+
     btipsign = np.sign(g["current"]*g["bcentr"])
 
     fpol = g["fpol"]
@@ -819,7 +833,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
 
     psi_arr = np.linspace(psiaxis, psiwall, len(fpol))
     fpol_itp = interp1d(psi_arr, fpol, 'cubic', fill_value=fpol[-1],bounds_error=False)
-    psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
+    if oldinterp2d:
+        psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
+    else:
+        psirz_itp = interp2d(r, z, g["psirz"],)
+        # 
+        # psirz_itp = interp2d((r, z), g["psirz"], fill_value=g["psirz"][-1,-1])
 
     if poloidal:
         rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
@@ -827,8 +846,8 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     else:
         rhogrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
 
-    br = np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
-    bz = np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    br = cc_factor*np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+    bz = cc_factor*np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
     bt = np.array([fpol_itp(psirz_itp(rr,zz))/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
 
     er = br*0
@@ -871,16 +890,16 @@ def transform_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     '''
     cc_out = COCOS() # cc_out = FIDASIM COCOS
     
-    cc_in = identify_COCOS(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
+    cc_in = identify_COCOS_from_geqdsk(g, ccw_phi=ccw_phi, exp_Bp=exp_Bp)
     
     if cc_in.cocos != cc_out.cocos:
         return convert_COCOS(g.copy(), cc_in, cc_out, **convert_COCOS_kw)
     else:
         return g.copy()
 
-def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
+def identify_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0):
     '''
-    #+#identify_COCOS
+    #+#identify_COCOS_from_geqdsk
     #+Identifies the COCOS index of a GEQDSK dictionary object
     #+Reference:
     #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
@@ -900,16 +919,40 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     #+##Example Usage
     #+```python
     #+>>> g = efit.readg(filename)
-    #+>>> g_cocos = identify_COCOS(g)
+    #+>>> g_cocos = identify_COCOS_from_geqdsk(g)
     #+```
     '''
     # Sauter, eq. 22    
     sigma_Bp_in = -1 * np.sign(g['pprime'][0] * g['current'])
     sigma_RphZ_in = 1 if ccw_phi else -1
     sigma_rhothph_in = np.sign(g['qpsi'][0] * g['current'] * g['bcentr'])
-    
+
     sigmas = [sigma_Bp_in, sigma_RphZ_in, sigma_rhothph_in]
- 
+    index = identify_COCOS_index(sigmas)
+
+    return COCOS(index+(10*exp_Bp))
+
+def identify_COCOS_index(sigmas):
+    """
+    #+#identify_COCOS_index
+    #+Identifies the COCOS index from sigma_Bp, sigma_{R, phi, Z}, and sigma_{rho, theta, phi}
+    #+Reference:
+    #+    O. Sauter and S. Yu. Medvedev, Tokamak Coordinate Conventions: COCOS, 
+    #+    Computer Physics Communications 184, 293 (2013).
+    #+***
+    #+##Arguments
+    #+    **sigmas**: List-like object with values for sigma_Bp, sigma_{R, phi, Z}, and sigma_{rho, theta, phi}
+    #+
+    #+##Return Value
+    #+Index for COCOS object
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> index = identify_COCOS_index([-1, 1, -1])
+    #+>>> cocos = COCOS(index)
+    #+```
+
+    """ 
     if sigmas == [1, 1, 1]:
         index = 1
     elif sigmas == [1, -1, 1]:
@@ -929,7 +972,7 @@ def identify_COCOS(g, ccw_phi=True, exp_Bp=0):
     else:
         index = FIDASIM_default_COCOS
     
-    return COCOS(index+(10*exp_Bp))
+    return index
 
 def convert_COCOS(g, cc_in, cc_out, sigma_Ip=None, sigma_B0=None, l_d=[1,1], l_B=[1,1], exp_mu0=[0,0]):
     '''
@@ -1236,7 +1279,8 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
 
     return plasma
 
-def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
+def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1,
+                renormalize=0):
     """
     #+#read_nubeam
     #+Reads NUBEAM fast-ion distribution function
@@ -1255,6 +1299,7 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     #+
     #+    **species**: Fast-ion species number. Defaults to 1
     #+
+    #+    **renormalize**: Renormalization option (int). 0 means no renormalization, just direct interpolation onto the grid. 1 means renormalize the interpolated distribution such that the total number of particles is conserved (usualliy errors of ~1% are typical with option 0). The grid limits will be check to ensure the renormalization is meaningful. 2 means to renormalize ignoring the limits of the grid. This can produce non-physical results. This option is not recommended and should be used just for testing purposes.
     #+##Return Value
     #+Distribution structure
     #+
@@ -1263,7 +1308,12 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     #+>>> dist = read_nubeam("./159245H02_fi_1.cdf",grid,btipsign=-1)
     #+```
     """
-
+    if renormalize not in [0, 1, 2]:
+        error('Renormalization option must be 0, 1 or 2. Given: {}'.format(renormalize))
+    if renormalize == 2:
+        print('WARNING: Renormalization option 2 is not recommended. It can produce non-physical results. Use only for testing purposes.')
+    
+    print('Reading file: ', filename)
     species_var = "SPECIES_{}".format(species)
     sstr = read_ncdf(filename,vars=[species_var])[species_var].tostring().decode('UTF-8')
     print("Species: "+sstr)
@@ -1285,6 +1335,16 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     energy = var["E_"+sstr]*1e-3
     fbm = var["F_"+sstr].T*1e3
     fbm = np.where(fbm > 0.0, 0.5*fbm, 0.0) #0.5 to convert to pitch instead of solid angle d_omega/4pi
+    # Get the grid limits, to deal with the renormalization latter
+    rminTRANSP = np.min(r2d)
+    rmaxTRANSP = np.max(r2d)
+    zminTRANSP = np.min(z2d)
+    zmaxTRANSP = np.max(z2d)
+    if ((grid['r'].min() > rminTRANSP) or (grid['r'].max() < rmaxTRANSP) or \
+         (grid['z'].min() > zminTRANSP) or (grid['z'].max() < zmaxTRANSP)) and renormalize==1:
+          error('Grid does not cover the TRANSP data. Renormalizing with this grid will give unphysical EP distributions.')
+          
+    
 
     if btipsign < 0:
         fbm = fbm[:,::-1,:] #reverse pitch elements
@@ -1323,7 +1383,7 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
 
     fdens = np.sum(fbm,axis=(0,1))*dE*dp
     ntot = np.sum(fdens*bmvol)
-    print('Ntotal in phase space: ',ntot)
+    print('Ntotal in phase space (before interpolatrion): ',ntot)
 
     tri = Delaunay(np.vstack((r2d,z2d)).T) # Triangulation for barycentric interpolation
     pts = np.array([xx for xx in zip(r2d,z2d)])
@@ -1383,10 +1443,11 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     fbm_grid[:,:,w] = 0.0
 
     # enforce correct normalization
-    ntot_denf = 2*np.pi*dr*dz*np.sum(r*np.sum(denf,axis=1))
-    denf = denf*(ntot/ntot_denf)
-    ntot_fbm = (2*np.pi*dE*dp*dr*dz)*np.sum(r*np.sum(fbm_grid,axis=(0,1,3)))
-    fbm_grid = fbm_grid*(ntot/ntot_denf)
+    if renormalize >0:
+        ntot_denf = 2*np.pi*dr*dz*np.sum(r*np.sum(denf,axis=1))
+        denf = denf*(ntot/ntot_denf)
+        ntot_fbm = (2*np.pi*dE*dp*dr*dz)*np.sum(r*np.sum(fbm_grid,axis=(0,1,3)))
+        fbm_grid = fbm_grid*(ntot/ntot_denf)
 
 
     fbm_dict={"type":1,"time":time,"nenergy":nenergy,"energy":energy,"npitch":npitch,

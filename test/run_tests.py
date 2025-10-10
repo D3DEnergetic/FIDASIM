@@ -109,6 +109,78 @@ def test_npa():
 
     return npa_chords
 
+def test_nc():
+    """
+    Generates test data for Neutron Collimator geometry.
+
+    Returns:
+        nc_chords: A dictionary representing the Neutron Collimator geometry.
+    """
+
+    # Chords
+    nchan = 47
+    ulens = np.arange(nchan) * 3 + 101
+    vlens = np.zeros(nchan)
+    wlens = np.full(nchan, -100.0)
+    lens = np.array([ulens, vlens, wlens]).T  # Transpose for correct shape
+
+    ulos = np.arange(nchan) * 3 + 101
+    vlos = np.zeros(nchan)
+    wlos = np.zeros(nchan)
+    radius = np.sqrt(ulos**2 + vlos**2)
+    id = np.array([b"c" + str(i).encode('utf-8') for i in range(nchan)])  # Generate IDs
+
+    # Initialize arrays for aperture and detector data
+    a_cent = np.zeros((3, nchan))
+    a_redge = np.zeros((3, nchan))
+    a_tedge = np.zeros((3, nchan))
+    d_cent = np.zeros((3, nchan))
+    d_redge = np.zeros((3, nchan))
+    d_tedge = np.zeros((3, nchan))
+
+    # Define base points for aperture and detector
+    ac = np.array([0.0, 0.0, 0.0])
+    ar = np.array([0.0, 3.0, 0.0])
+    at = np.array([0.0, 0.0, 3.0])
+    dc = np.array([-50.0, 0.0, 0.0])
+    dr = np.array([-50.0, 3.0, 0.0])
+    dt = np.array([-50.0, 0.0, 3.0])
+
+    # Loop through each channel and calculate positions
+    for i in range(nchan):
+        r0 = lens[i]  # Origin point for this channel
+        rf = np.array([ulos[i], vlos[i], wlos[i]])  # Final point for this channel
+
+        R = fs.utils.line_basis(r0,rf-r0)
+
+        # Calculate aperture and detector positions using rotation and translation
+        a_cent[:, i] = np.dot(R, ac) + r0
+        a_redge[:, i] = np.dot(R, ar) + r0
+        a_tedge[:, i] = np.dot(R, at) + r0
+
+        d_cent[:, i] = np.dot(R, dc) + r0
+        d_redge[:, i] = np.dot(R, dr) + r0
+        d_tedge[:, i] = np.dot(R, dt) + r0
+
+    # Create the Neutron Collimator geometry dictionary
+    nc_chords = {
+        'nchan': nchan,
+        'system': "NC",
+        'data_source': "run_tests.py:test_nc",
+        'id': id,
+        'a_shape': np.repeat(2,nchan),  # All apertures have shape 2
+        'd_shape': np.repeat(2,nchan),  # All detectors have shape 2
+        'a_cent': a_cent,
+        'a_redge': a_redge,
+        'a_tedge': a_tedge,
+        'd_cent': d_cent,
+        'd_redge': d_redge,
+        'd_tedge': d_tedge,
+        'radius': radius
+    }
+
+    return nc_chords
+
 def test_profiles(filename, grid, rhogrid):
     prof = fs.utils.read_ncdf(filename)
 
@@ -177,10 +249,11 @@ def run_test(args):
                     "n_halo":500000, "n_dcx":500000, "n_birth":10000,
                     "ne_wght":50, "np_wght":50,"nphi_wght":100,"emax_wght":100e0,
                     "nlambda_wght":1000,"lambdamin_wght":647e0,"lambdamax_wght":667e0,
+                    "ne_nc":40,"np_nc":40,"emax_nc":100e0,
                     "calc_npa":2, "calc_brems":1,"calc_fida":1,"calc_neutron":1,
-                    "calc_cfpd":0, "calc_res":0,
+                    "calc_cfpd":0, "calc_neut_spec":1, "calc_res":0,
                     "calc_bes":1, "calc_dcx":1, "calc_halo":1, "calc_cold":1,
-                    "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,
+                    "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,"calc_nc_wght":1,
                     "calc_pfida":1, "calc_pnpa":2,
                     "result_dir":args.path, "tables_file":fida_dir+'/tables/atomic_tables.h5'}
 
@@ -199,6 +272,7 @@ def run_test(args):
     nbi = test_beam()
     spec = test_chords()
     npa = test_npa()
+    nc = test_nc()
 
     grid = fs.utils.rz_grid(100.0, 240.0, 70, -100.0, 100.0, 100)
 
@@ -209,7 +283,7 @@ def run_test(args):
     plasma['deni'] = plasma['deni'] - fbm['denf'].reshape(1,grid['nr'],grid['nz'])
     plasma['deni'] = np.where(plasma['deni'] > 0.0, plasma['deni'], 0.0).astype('float64')
 
-    fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa)
+    fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa, nc=nc)
 
     return 0
 

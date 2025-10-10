@@ -311,6 +311,7 @@ def main():
         else:
             ir = [i for i,mr in enumerate(mask.sum((-1,0))) if mr>0]
             iz = [i for i,mz in enumerate(mask.sum((-1,1))) if mz>0]
+            print(iz)
         lr = r[ir[-1]]-r[ir[0]]
         lz = z[iz[-1]]-z[iz[0]]
         rho_r = lr/2.0
@@ -376,7 +377,7 @@ def main():
             l = ax.legend(ncol=2,loc='upper left')
             for i, txt in enumerate(l.get_texts()):
                 txt.set_color(colors[i])
-        fig.canvas.set_window_title('Geometry')
+        fig.canvas.manager.set_window_title('Geometry')
 
         #Save
         if len(args.saveimportant)>0:
@@ -457,8 +458,8 @@ def main():
             ax[0].set_ylabel("Z [cm]",fontsize=12)
             ax[0].set_aspect('equal')
 
-            if len(phi)>1:
-                degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+            if len(phi)>1: 
+                degree = r' at $\phi$=' + r'%s$\degree$'%int(phi[iphi]/np.pi*180)
             else:
                 degree = ''
             ax[0].set_title(labels[i]+degree,fontsize=12)
@@ -468,7 +469,7 @@ def main():
             else:
                 fig.colorbar(c,format='%1.1e', ax=ax[0])
 
-            fig.canvas.set_window_title(fig_labels[i])
+            fig.canvas.manager.set_window_title(fig_labels[i])
             plt.tight_layout()
 
             #Save
@@ -542,8 +543,8 @@ def main():
             ax[0].set_ylabel("Z [cm]",fontsize=12)
             ax[0].set_aspect('equal')
 
-            if len(phi)>1:
-                degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+            if len(phi)>1: 
+                degree = r' at $\phi$=' + r'%s$\degree$'%int(phi[iphi]/np.pi*180)
             else:
                 degree = ''
             ax[0].set_title(labels[i]+degree,fontsize=12)
@@ -553,7 +554,7 @@ def main():
             else:
                 fig.colorbar(c,format='%1.1e', ax=ax[0])
 
-            fig.canvas.set_window_title(fig_labels[i])
+            fig.canvas.manager.set_window_title(fig_labels[i])
             plt.tight_layout()
 
             #Save
@@ -697,8 +698,8 @@ def main():
                 if labels[i]=='energy' and labels[j]=='pitch': #R-Z plot
                     ax[0].set_aspect('equal')
 
-                if len(phi)>1:
-                    degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+                if len(phi)>1: 
+                    degree = r' at $\phi$=' + r'%s$\degree$'%int(phi[iphi]/np.pi*180)
                 else:
                     degree = ''
                 ax[0].set_title(r'$\left< F \right>_{%s,%s}$' %(labels[i].capitalize(),labels[j].capitalize())
@@ -709,7 +710,7 @@ def main():
                 else:
                     fig.colorbar(c,format='%1.1e', ax=ax[0])
 
-                fig.canvas.set_window_title('Fast-ion distribution: %s vs. %s' % (f2_labels[1].capitalize(),
+                fig.canvas.manager.set_window_title('Fast-ion distribution: %s vs. %s' % (f2_labels[1].capitalize(),
                                                                                   f2_labels[0].capitalize()))
                 plt.tight_layout()
 
@@ -781,8 +782,8 @@ def main():
         ax[0].set_ylabel("Z [cm]",fontsize=12)
         ax[0].set_aspect('equal')
 
-        if len(phi)>1:
-            degree = ' at $\phi$=' + '%s$\degree$'%int(phi[iphi]/np.pi*180)
+        if len(phi)>1: 
+            degree = r' at $\phi$=' + r'%s$\degree$'%int(phi[iphi]/np.pi*180)
         else:
             degree = ''
         ax[0].set_title('n$_F$ [cm$^{-3}$]' + degree,fontsize=12)
@@ -792,7 +793,7 @@ def main():
         else:
             fig.colorbar(c,format='%1.1e', ax=ax[0])
 
-        fig.canvas.set_window_title('Fast-ion Density')
+        fig.canvas.manager.set_window_title('Fast-ion Density')
         plt.tight_layout()
 
         #Save

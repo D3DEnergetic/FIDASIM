@@ -774,7 +774,10 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         # Make strings of fixed length as required by Fortran.
         # See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii
         if isinstance(dict2[key], str):
-            dict2[key] = np.string_(dict2[key])
+            try:
+                dict2[key] = np.string_(dict2[key])
+            except:
+                dict2[key] = np.bytes_(dict2[key])
 
         # Create dataset
         ds = h5_obj.create_dataset(key, data = dict2[key])

@@ -88,13 +88,15 @@ endif
 
 ifneq ($(findstring gfortran, $(FC)),)
         L_FLAGS = -lm
-        COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp -Wfatal-errors
+        COMMON_CFLAGS = -O3 -g -fbacktrace -cpp -Wfatal-errors -ffast-math -funroll-loops -ftree-vectorize
         DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
         OPENMP_FLAGS = -fopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
 ifneq ($(ARCH),n)
         COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(ARCH)
+else
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=native
 endif
 endif
 ifneq ($(findstring pgf90, $(FC)),)
@@ -110,13 +112,15 @@ endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
         L_FLAGS = -lm -mkl
-        COMMON_CFLAGS = -Ofast -g -traceback -fpp -D_USE_BLAS
+        COMMON_CFLAGS = -O3 -g -traceback -fpp -D_USE_BLAS -fp-model fast=2 -qopt-report=5 -qopt-report-phase=vec
         DEBUG_CFLAGS = -O0 -g -fpp -traceback -check all -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -p -D_PROF
 ifneq ($(ARCH),n)
         COMMON_CFLAGS := $(COMMON_CFLAGS) -x$(ARCH)
+else
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -xHost
 endif
 endif
 ifneq ($(findstring flang, $(FC)),)

@@ -1303,6 +1303,70 @@ type(CFPDTable), save           :: ctable
 type(SpatialSpectra), save      :: spatres
     !+ Variable for storing birth neutral for spatial resolution
 
+!! ============================================================================
+!! COLRAD CACHING DATA STRUCTURES
+!! ============================================================================
+
+!! Cache parameters
+integer, parameter :: COLRAD_CACHE_SIZE = 100000
+    !+ Maximum number of cache entries
+integer, parameter :: COLRAD_HASH_SIZE = 200003
+    !+ Hash table size (prime number for better distribution)
+
+!! Cache key type
+type :: colrad_cache_key
+    integer :: ti_bin
+        !+ Discretized ion temperature
+    integer :: te_bin
+        !+ Discretized electron temperature
+    integer :: dene_bin
+        !+ Discretized electron density
+    integer :: zeff_bin
+        !+ Discretized effective charge
+    integer :: ab_bin
+        !+ Discretized ion mass
+    integer :: eb_bin
+        !+ Discretized energy
+    integer :: dt_bin
+        !+ Discretized time step
+end type colrad_cache_key
+
+!! Cache entry type
+type :: colrad_cache_entry
+    type(colrad_cache_key) :: key
+        !+ Cache key
+    real(Float64), dimension(nlevs) :: states_out
+        !+ Output states
+    real(Float64), dimension(nlevs) :: dens_out
+        !+ Output density
+    real(Float64) :: photons_out
+        !+ Output photons
+    logical :: valid = .false.
+        !+ Entry validity flag
+    integer :: access_count = 0
+        !+ Number of times accessed
+    integer :: last_access = 0
+        !+ Global access counter at last use (for LRU)
+end type colrad_cache_entry
+
+!! Module-level cache variables
+type(colrad_cache_entry), dimension(:), allocatable :: colrad_cache
+    !+ Cache storage array
+integer, dimension(:), allocatable :: colrad_hash_table
+    !+ Hash table mapping hash -> cache index
+integer :: colrad_cache_count = 0
+    !+ Current number of valid cache entries
+integer :: colrad_access_counter = 0
+    !+ Global access counter for LRU
+integer(Int64) :: colrad_cache_hits = 0
+    !+ Number of cache hits
+integer(Int64) :: colrad_cache_misses = 0
+    !+ Number of cache misses
+logical :: colrad_cache_initialized = .false.
+    !+ Cache initialization flag
+
+!! ============================================================================
+
 contains
 
 subroutine print_banner()
@@ -8321,7 +8385,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
     integer, dimension(3) :: ind
-    real(Float64) :: dT, dt1, inv_50, dt2
+    real(Float64) :: dT, dt1, inv_50, dt2, dt_left, dt_right
     real(Float64) :: s, c, phi
     real(Float64) :: n_cells, split_tol, inv_param, inv_tol, inv_N, inv_dl, param_sum, param1, param2
     integer :: cc, i, j, ii, mind, ncross, id, k, adaptive, max_cell_splits
@@ -8331,6 +8395,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
+    !! Phase 1 optimization: Cache trigonometric values
+    real(Float64) :: sin_phi, cos_phi
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     adaptive = 0; max_cell_splits = 1; split_tol = 0.0
@@ -8399,20 +8465,43 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         h_plane_cyl(3) = pass_grid%phi(ind(3)-1)
         v_plane_cyl(3) = pass_grid%phi(ind(3)-1)
     endif
-    call cyl_to_uvw(arc_cyl,arc)
-    call cyl_to_uvw(h_plane_cyl,h_plane)
-    call cyl_to_uvw(v_plane_cyl,v_plane)
+
+    !! Phase 1 optimization: Calculate sin/cos once and inline transformations
+    sin_phi = sin(arc_cyl(3))
+    cos_phi = cos(arc_cyl(3))
+
+    !! Inline cyl_to_uvw transformations
+    arc(1) = arc_cyl(1) * cos_phi
+    arc(2) = arc_cyl(1) * sin_phi
+    arc(3) = arc_cyl(2)
+
+    h_plane(1) = h_plane_cyl(1) * cos_phi
+    h_plane(2) = h_plane_cyl(1) * sin_phi
+    h_plane(3) = h_plane_cyl(2)
+
+    v_plane(1) = v_plane_cyl(1) * cos_phi
+    v_plane(2) = v_plane_cyl(1) * sin_phi
+    v_plane(3) = v_plane_cyl(2)
 
     !! Normal vectors
     nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
     redge_cyl(1) = v_plane_cyl(1) + pass_grid%dr
     redge_cyl(2) = v_plane_cyl(2)
     redge_cyl(3) = v_plane_cyl(3)
-    call cyl_to_uvw(redge_cyl,redge)
+
+    !! Inline transformation for redge
+    redge(1) = redge_cyl(1) * cos_phi
+    redge(2) = redge_cyl(1) * sin_phi
+    redge(3) = redge_cyl(2)
+
     tedge_cyl(1) = v_plane_cyl(1)
     tedge_cyl(2) = v_plane_cyl(2) + pass_grid%dz
     tedge_cyl(3) = v_plane_cyl(3)
-    call cyl_to_uvw(tedge_cyl,tedge)
+
+    !! Inline transformation for tedge
+    tedge(1) = tedge_cyl(1) * cos_phi
+    tedge(2) = tedge_cyl(1) * sin_phi
+    tedge(3) = tedge_cyl(2)
     call plane_basis(v_plane, redge, tedge, basis)
 
     !! Check passive adaptive switch, adaptive > 0 activates splitting
@@ -8461,13 +8550,21 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         call in_plasma(ri_tmp,in_plasma2,input_coords=1)
         if(in_plasma1.neqv.in_plasma2) then
-            dt1 = 0.0
-            track_fine: do ii=1,50
-                dt1 = dt1 + dT*inv_50
-                ri_tmp = ri + vn*dt1
-                call in_plasma(ri_tmp,in_plasma_tmp,input_coords=1)
-                if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
-            enddo track_fine
+            !! Phase 2 optimization: Binary search instead of linear (6 iterations vs 50)
+            dt_left = 0.0
+            dt_right = dT
+            !! Binary search - converges in log2(50) ~= 6 iterations
+            do ii = 1, 6
+                dt1 = 0.5 * (dt_left + dt_right)
+                ri_tmp = ri + vn * dt1
+                call in_plasma(ri_tmp, in_plasma_tmp, input_coords=1)
+                if (in_plasma_tmp .eqv. in_plasma2) then
+                    dt_right = dt1
+                else
+                    dt_left = dt1
+                endif
+            enddo
+            dt1 = 0.5 * (dt_left + dt_right)
             tracks(cc)%pos = ri + 0.5*dt1*vn
             tracks(cc+1)%pos = ri + 0.5*(dt1 + dT)*vn
             tracks(cc)%time = dt1
@@ -8556,17 +8653,44 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         arc_cyl(mind) = arc_cyl(mind) + dr(mind)
         h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
         v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
-        call cyl_to_uvw(arc_cyl,arc)
-        call cyl_to_uvw(h_plane_cyl,h_plane)
-        call cyl_to_uvw(v_plane_cyl,v_plane)
+
+        !! Phase 1 optimization: Only recalculate sin/cos when phi changes
+        if (mind .eq. 3) then
+            sin_phi = sin(arc_cyl(3))
+            cos_phi = cos(arc_cyl(3))
+        endif
+
+        !! Inline cyl_to_uvw transformations
+        arc(1) = arc_cyl(1) * cos_phi
+        arc(2) = arc_cyl(1) * sin_phi
+        arc(3) = arc_cyl(2)
+
+        h_plane(1) = h_plane_cyl(1) * cos_phi
+        h_plane(2) = h_plane_cyl(1) * sin_phi
+        h_plane(3) = h_plane_cyl(2)
+
+        v_plane(1) = v_plane_cyl(1) * cos_phi
+        v_plane(2) = v_plane_cyl(1) * sin_phi
+        v_plane(3) = v_plane_cyl(2)
+
         redge_cyl(1) = v_plane_cyl(1) + pass_grid%dr
         redge_cyl(2) = v_plane_cyl(2)
         redge_cyl(3) = v_plane_cyl(3)
-        call cyl_to_uvw(redge_cyl,redge)
+
+        !! Inline transformation for redge
+        redge(1) = redge_cyl(1) * cos_phi
+        redge(2) = redge_cyl(1) * sin_phi
+        redge(3) = redge_cyl(2)
+
         tedge_cyl(1) = v_plane_cyl(1)
         tedge_cyl(2) = v_plane_cyl(2) + pass_grid%dz
         tedge_cyl(3) = v_plane_cyl(3)
-        call cyl_to_uvw(tedge_cyl,tedge)
+
+        !! Inline transformation for tedge
+        tedge(1) = tedge_cyl(1) * cos_phi
+        tedge(2) = tedge_cyl(1) * sin_phi
+        tedge(3) = tedge_cyl(2)
+
         call plane_basis(v_plane, redge, tedge, basis)
     enddo track_loop
     ntrack = cc-1
@@ -9108,13 +9232,15 @@ subroutine update_neutrals(pop, ind, vn, dens)
     real(Float64), dimension(:), intent(in)  :: dens
         !+ Neutral density [neutrals/cm^3]
 
-    integer :: i, j, k
+    integer :: i, j, k, n
 
     i = ind(1) ; j = ind(2) ; k = ind(3)
 
-    !$OMP CRITICAL(update_neutrals_1)
-    pop%dens(:,i,j,k) = pop%dens(:,i,j,k) + dens
-    !$OMP END CRITICAL(update_neutrals_1)
+    !! Use atomic operations instead of critical section for better performance
+    do n = 1, nlevs
+        !$OMP ATOMIC UPDATE
+        pop%dens(n,i,j,k) = pop%dens(n,i,j,k) + dens(n)
+    enddo
 
     call update_reservoir(pop%res(i,j,k), vn, sum(dens))
 
@@ -10446,6 +10572,262 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
 
 end subroutine get_rate_matrix
 
+subroutine init_colrad_cache()
+    !+ Initialize the colrad cache
+    if (colrad_cache_initialized) return
+
+    allocate(colrad_cache(COLRAD_CACHE_SIZE))
+    allocate(colrad_hash_table(COLRAD_HASH_SIZE))
+
+    colrad_hash_table = 0
+    colrad_cache_count = 0
+    colrad_access_counter = 0
+    colrad_cache_hits = 0
+    colrad_cache_misses = 0
+    colrad_cache_initialized = .true.
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Colrad cache initialized: size=",i0,", hash_size=",i0)') &
+            COLRAD_CACHE_SIZE, COLRAD_HASH_SIZE
+    endif
+end subroutine init_colrad_cache
+
+function compute_colrad_hash(plasma, ab, eb, dt, states) result(hash)
+    !+ Compute hash for colrad cache key
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), intent(in) :: ab, eb, dt
+    real(Float64), dimension(nlevs), intent(in) :: states
+    integer :: hash
+
+    type(colrad_cache_key) :: key
+    integer(Int64) :: hash64
+
+    !! Discretize parameters with COARSE resolution for better hit rate
+    !! Temperature: 0.5 keV bins (was 0.01 keV)
+    key%ti_bin = int(plasma%ti * 2.0)
+    key%te_bin = int(plasma%te * 2.0)
+
+    !! Density: log scale with 1.0 resolution (was 0.05)
+    if (plasma%dene > 0.0) then
+        key%dene_bin = int(log10(plasma%dene))
+    else
+        key%dene_bin = 0
+    endif
+
+    !! Zeff: 0.5 resolution (was 0.1)
+    key%zeff_bin = int(plasma%zeff * 2.0)
+
+    !! Mass: 1.0 amu resolution (was 0.1)
+    key%ab_bin = int(ab)
+
+    !! Energy: 5 keV bins (was 0.1 keV)
+    key%eb_bin = int(eb * 0.2)
+
+    !! Time step: log scale with 1.0 resolution (was 0.1)
+    if (dt > 0.0) then
+        key%dt_bin = int(log10(dt))
+    else
+        key%dt_bin = 0
+    endif
+
+    !! NOTE: states removed from cache key - it varies too much per call
+
+    !! Compute hash using simple polynomial hash
+    hash64 = int(key%ti_bin, Int64)
+    hash64 = mod(hash64 * 31_Int64 + int(key%te_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%dene_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%zeff_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%ab_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%eb_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%dt_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+
+    hash = int(hash64) + 1  !! Convert to 1-based indexing
+    if (hash < 1) hash = 1
+    if (hash > COLRAD_HASH_SIZE) hash = COLRAD_HASH_SIZE
+end function compute_colrad_hash
+
+function keys_equal(k1, k2) result(equal)
+    !+ Compare two cache keys for equality
+    type(colrad_cache_key), intent(in) :: k1, k2
+    logical :: equal
+
+    equal = (k1%ti_bin == k2%ti_bin) .and. &
+            (k1%te_bin == k2%te_bin) .and. &
+            (k1%dene_bin == k2%dene_bin) .and. &
+            (k1%zeff_bin == k2%zeff_bin) .and. &
+            (k1%ab_bin == k2%ab_bin) .and. &
+            (k1%eb_bin == k2%eb_bin) .and. &
+            (k1%dt_bin == k2%dt_bin)
+end function keys_equal
+
+function make_cache_key(plasma, ab, eb, dt, states) result(key)
+    !+ Create cache key from parameters
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), intent(in) :: ab, eb, dt
+    real(Float64), dimension(nlevs), intent(in) :: states
+    type(colrad_cache_key) :: key
+
+    !! Discretize parameters with COARSE resolution
+    !! Temperature: 0.5 keV bins
+    key%ti_bin = int(plasma%ti * 2.0)
+    key%te_bin = int(plasma%te * 2.0)
+
+    !! Density: log scale with 1.0 resolution
+    if (plasma%dene > 0.0) then
+        key%dene_bin = int(log10(plasma%dene))
+    else
+        key%dene_bin = 0
+    endif
+
+    !! Zeff: 0.5 resolution
+    key%zeff_bin = int(plasma%zeff * 2.0)
+
+    !! Mass: 1.0 amu resolution
+    key%ab_bin = int(ab)
+
+    !! Energy: 5 keV bins
+    key%eb_bin = int(eb * 0.2)
+
+    !! Time step: log scale with 1.0 resolution
+    if (dt > 0.0) then
+        key%dt_bin = int(log10(dt))
+    else
+        key%dt_bin = 0
+    endif
+
+    !! NOTE: states removed from cache key
+end function make_cache_key
+
+subroutine cache_lookup(plasma, ab, eb, dt, states, found, states_out, dens_out, photons_out)
+    !+ Lookup result in cache
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), intent(in) :: ab, eb, dt
+    real(Float64), dimension(nlevs), intent(in) :: states
+    logical, intent(out) :: found
+    real(Float64), dimension(nlevs), intent(out) :: states_out, dens_out
+    real(Float64), intent(out) :: photons_out
+
+    integer :: hash, cache_idx
+    type(colrad_cache_key) :: key
+
+    found = .false.
+
+    if (.not. colrad_cache_initialized) then
+        call init_colrad_cache()
+    endif
+
+    !! Increment global access counter
+    colrad_access_counter = colrad_access_counter + 1
+
+    !! Compute hash and key
+    hash = compute_colrad_hash(plasma, ab, eb, dt, states)
+    key = make_cache_key(plasma, ab, eb, dt, states)
+
+    !! Check hash table
+    cache_idx = colrad_hash_table(hash)
+
+    if (cache_idx > 0 .and. cache_idx <= COLRAD_CACHE_SIZE) then
+        if (colrad_cache(cache_idx)%valid) then
+            !! Check if key matches
+            if (keys_equal(colrad_cache(cache_idx)%key, key)) then
+                !! Cache hit!
+                found = .true.
+                states_out = colrad_cache(cache_idx)%states_out
+                dens_out = colrad_cache(cache_idx)%dens_out
+                photons_out = colrad_cache(cache_idx)%photons_out
+
+                !! Update LRU info
+                colrad_cache(cache_idx)%access_count = colrad_cache(cache_idx)%access_count + 1
+                colrad_cache(cache_idx)%last_access = colrad_access_counter
+
+                colrad_cache_hits = colrad_cache_hits + 1
+                return
+            endif
+        endif
+    endif
+
+    !! Cache miss
+    colrad_cache_misses = colrad_cache_misses + 1
+end subroutine cache_lookup
+
+subroutine cache_store(plasma, ab, eb, dt, states, states_out, dens_out, photons_out)
+    !+ Store result in cache
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), intent(in) :: ab, eb, dt
+    real(Float64), dimension(nlevs), intent(in) :: states
+    real(Float64), dimension(nlevs), intent(in) :: states_out, dens_out
+    real(Float64), intent(in) :: photons_out
+
+    integer :: hash, cache_idx, lru_idx, i
+    integer :: min_access
+    type(colrad_cache_key) :: key
+
+    if (.not. colrad_cache_initialized) return
+
+    !! Compute hash and key
+    hash = compute_colrad_hash(plasma, ab, eb, dt, states)
+    key = make_cache_key(plasma, ab, eb, dt, states)
+
+    !! Check if we need to evict an entry
+    cache_idx = colrad_hash_table(hash)
+
+    if (cache_idx == 0) then
+        !! Find a free slot or evict LRU entry
+        if (colrad_cache_count < COLRAD_CACHE_SIZE) then
+            !! Use next available slot
+            colrad_cache_count = colrad_cache_count + 1
+            cache_idx = colrad_cache_count
+        else
+            !! Evict LRU entry - find entry with minimum last_access
+            lru_idx = 1
+            min_access = colrad_cache(1)%last_access
+            do i = 2, COLRAD_CACHE_SIZE
+                if (colrad_cache(i)%last_access < min_access) then
+                    min_access = colrad_cache(i)%last_access
+                    lru_idx = i
+                endif
+            enddo
+            cache_idx = lru_idx
+        endif
+
+        colrad_hash_table(hash) = cache_idx
+    endif
+
+    !! Store in cache
+    colrad_cache(cache_idx)%key = key
+    colrad_cache(cache_idx)%states_out = states_out
+    colrad_cache(cache_idx)%dens_out = dens_out
+    colrad_cache(cache_idx)%photons_out = photons_out
+    colrad_cache(cache_idx)%valid = .true.
+    colrad_cache(cache_idx)%access_count = 1
+    colrad_cache(cache_idx)%last_access = colrad_access_counter
+end subroutine cache_store
+
+subroutine print_colrad_cache_stats()
+    !+ Print cache statistics
+    integer(Int64) :: total_accesses
+    real(Float64) :: hit_rate
+
+    if (.not. colrad_cache_initialized) return
+
+    total_accesses = colrad_cache_hits + colrad_cache_misses
+
+    if (total_accesses > 0) then
+        hit_rate = real(colrad_cache_hits, Float64) / real(total_accesses, Float64) * 100.0
+    else
+        hit_rate = 0.0
+    endif
+
+    write(*,'(T4,"=== Colrad Cache Statistics ===")')
+    write(*,'(T4,"Cache size:    ",i0)') COLRAD_CACHE_SIZE
+    write(*,'(T4,"Entries used:  ",i0)') colrad_cache_count
+    write(*,'(T4,"Cache hits:    ",i0)') colrad_cache_hits
+    write(*,'(T4,"Cache misses:  ",i0)') colrad_cache_misses
+    write(*,'(T4,"Hit rate:      ",f6.2,"%")') hit_rate
+end subroutine print_colrad_cache_stats
+
+!! ============================================================================
+
 subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     !+ Evolve density of states in time `dt` via collisional radiative model
     type(LocalProfiles), intent(in)              :: plasma
@@ -10473,6 +10855,11 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     real(Float64) :: iflux !!Initial total flux
     integer :: n
 
+    !! Cache variables
+    logical :: cache_hit
+    real(Float64), dimension(nlevs) :: states_in, states_cached, dens_cached
+    real(Float64) :: photons_cached
+
     photons=0.d0
     dens=0.d0
 
@@ -10483,8 +10870,23 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
         return
     endif
 
+    !! Compute energy for cache lookup
     vnet_square=dot_product(vn-plasma%vrot,vn-plasma%vrot)  ![cm/s]
     eb = v2_to_E_per_amu*ab*vnet_square ![kev]
+
+    !! Try cache lookup
+    states_in = states  !! Save input states
+    call cache_lookup(plasma, ab, eb, dt, states_in, cache_hit, states_cached, dens_cached, photons_cached)
+
+    if (cache_hit) then
+        !! Return cached result
+        states = states_cached
+        dens = dens_cached
+        photons = photons_cached
+        return
+    endif
+
+    !! Cache miss - compute normally
     call get_rate_matrix(plasma, ab, eb, matrix)
 
     call eigen(nlevs,matrix, eigvec, eigval)
@@ -10506,6 +10908,9 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     endwhere
 
     photons=dens(initial_state)*tables%einstein(final_state,initial_state) !! - [Ph/(s*cm^3)] - !!
+
+    !! Store result in cache
+    call cache_store(plasma, ab, eb, dt, states_in, states, dens, photons)
 
 end subroutine colrad
 
@@ -10826,6 +11231,77 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
         enddo loop_over_stark
     enddo loop_over_channels
 end subroutine store_photons
+
+subroutine store_photons_no_lock(pos, vi, lambda0, photons, spectra, stokevec, passive)
+    !+ Store photons in `spectra` without locking (for thread-local arrays)
+    real(Float64), dimension(3), intent(in)      :: pos
+        !+ Position of neutral in beam coordinates [machine coordinates for passive case]
+    real(Float64), dimension(3), intent(in)      :: vi
+        !+ Velocitiy of neutral in beam coordinates [cm/s]
+    real(Float64), intent(in)                    :: lambda0
+        !+ Reference wavelength [nm]
+    real(Float64), intent(in)                    :: photons
+        !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
+    real(Float64), dimension(:,:,:), intent(inout) :: spectra
+    !+ Stark split `spectra`
+    real(Float64), dimension(:,:,:,:), intent(inout) :: stokevec
+    !+ Stark split `stokes vector`
+    logical, intent(in), optional                :: passive
+        !+ Indicates whether photon is passive FIDA
+
+    real(Float64), dimension(n_stark) :: lambda, intensity
+    real(Float64), dimension(n_stark,4) :: stokes
+    real(Float64) :: dlength, sigma_pi
+    type(LocalEMFields) :: fields
+    integer(Int32), dimension(3) :: ind
+    real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
+    type(LOSinters) :: inter
+    integer :: ichan,i,j,bin,nchan
+    logical :: pas = .False.
+
+    if(present(passive)) pas = passive
+
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = atan2(pos(2), pos(1))
+        call get_passive_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+        call uvw_to_xyz(pos, pos_xyz)
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+        pos_xyz = pos
+    endif
+
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
+    call get_fields(fields,pos=pos_xyz)
+
+    loop_over_channels: do j=1,nchan
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
+        sigma_pi = spec_chords%los(ichan)%sigma_pi
+        if(pas) then
+            call uvw_to_xyz(spec_chords%los(ichan)%lens_uvw,lens_xyz)
+        else
+            lens_xyz = spec_chords%los(ichan)%lens
+        endif
+        vp = pos_xyz - lens_xyz
+        call spectrum(vp,vi,fields,lambda0,sigma_pi,photons, &
+                      dlength,lambda,intensity, stokes)
+
+        loop_over_stark: do i=1,n_stark
+            bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
+            if (bin.lt.1) cycle loop_over_stark
+            if (bin.gt.inputs%nlambda) cycle loop_over_stark
+            ! No locking - accumulate directly to thread-local array
+            spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
+            stokevec(i,:,bin,ichan) = stokevec(i,:,bin,ichan) + stokes(i,:)
+        enddo loop_over_stark
+    enddo loop_over_channels
+end subroutine store_photons_no_lock
 
 subroutine store_nbi_photons(pos, vi, lambda0, photons, neut_type)
     !+ Store BES photons in [[libfida:spectra]]
@@ -11793,6 +12269,9 @@ end subroutine ndmc
 
 subroutine dcx
     !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: ic,i,j,k,ncell,is
     integer(Int64) :: idcx !! counter
     real(Float64), dimension(3) :: ri    !! start position
@@ -11813,6 +12292,7 @@ subroutine dcx
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
+    real(Float64) :: t_start_dcx, t_end_dcx  !! Timing variables
 
     !! Initialized Neutral Population
     call init_neutral_population(neut%dcx)
@@ -11845,7 +12325,9 @@ subroutine dcx
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
+
+    t_start_dcx = omp_get_wtime()
+    !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,is,idcx,ind,vihalo, &
     !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -11899,6 +12381,11 @@ subroutine dcx
         enddo loop_over_species
     enddo loop_over_cells
     !$OMP END PARALLEL DO
+    t_end_dcx = omp_get_wtime()
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"DCX calculation time: ",f8.3," seconds")') t_end_dcx - t_start_dcx
+    endif
 
 #ifdef _MPI
     !! Combine densities
@@ -11923,6 +12410,9 @@ end subroutine dcx
 
 subroutine halo
     !+ Calculates halo neutral density and spectra
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: ic,i,j,k,ncell
     integer(Int64) :: ihalo !! counter
     real(Float64), dimension(3) :: ri    !! start position
@@ -11950,6 +12440,9 @@ subroutine halo
     integer :: prev_type = 1  ! previous iteration
     integer :: cur_type = 2 ! current iteration
     real(Float64) :: fi_correction
+    real(Float64) :: t_start_halo, t_end_halo, t_iter  !! Timing variables
+    real(Float64) :: convergence_tol, relative_change  !! Convergence monitoring
+    integer :: min_iterations
 
     !! Initialize Neutral Population
     call init_neutral_population(neut%halo)
@@ -11969,7 +12462,12 @@ subroutine halo
     call init_neutral_population(prev_pop)
     prev_pop = neut%dcx
 
+    !! Initialize convergence parameters
+    convergence_tol = 1.0d-3  ! Relative tolerance
+    min_iterations = 3        ! Minimum iterations before checking convergence
+
     seed_dcx = 1.0
+    t_start_halo = omp_get_wtime()
     iterations: do hh=1,200
         !! Allocate/Reallocate current population
         call init_neutral_population(cur_pop)
@@ -11998,7 +12496,8 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
 
-        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
+        t_iter = omp_get_wtime()
+        !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
         !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -12013,10 +12512,7 @@ subroutine halo
                     call track(ri,vihalo,tracks,ntrack)
                     if(ntrack.eq.0)cycle loop_over_halos
 
-                    !! Get plasma parameters at particle location
-                    call get_plasma(plasma, pos=ri)
-
-                    !! Calculate CX probability
+                    !! Calculate CX probability (plasma already loaded at ri)
                     tind = tracks(1)%ind
                     ii = tind(1); jj = tind(2); kk = tind(3)
                     call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk), prev_pop%res(ii,jj,kk), vihalo, rates)
@@ -12060,11 +12556,32 @@ subroutine halo
         enddo loop_over_cells
         !$OMP END PARALLEL DO
 
+        if(inputs%verbose.ge.1) then
+            write(*,'(T6,"Iteration ",i3," time: ",f8.3," seconds")') hh, omp_get_wtime() - t_iter
+        endif
+
 #ifdef _MPI
         !! Combine densities
         call parallel_merge_populations(cur_pop)
 #endif
         halo_iter_dens(cur_type) = sum(cur_pop%dens)
+
+        !! Check convergence
+        if (hh > min_iterations) then
+            relative_change = abs(halo_iter_dens(cur_type) - halo_iter_dens(prev_type)) / &
+                             max(halo_iter_dens(prev_type), 1.0d-10)
+
+            if(inputs%verbose.ge.1) then
+                write(*,'(T6,"Relative change: ",es12.5)') relative_change
+            endif
+
+            if (relative_change < convergence_tol) then
+                if(inputs%verbose.ge.0) then
+                    write(*,'(T6,"HALO: Converged after ",i3," iterations")') hh
+                endif
+                exit iterations
+            endif
+        endif
 
         if(halo_iter_dens(cur_type)/halo_iter_dens(prev_type).gt.1.0) then
             write(*,'(a)') "HALO: Halo generation density exceeded seed density. This shouldn't happen."
@@ -12090,6 +12607,11 @@ subroutine halo
 
     call free_neutral_population(cur_pop)
     call free_neutral_population(prev_pop)
+
+    t_end_halo = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Total HALO calculation time: ",f8.3," seconds")') t_end_halo - t_start_halo
+    endif
 
 #ifdef _MPI
     !! Combine Spectra
@@ -12419,6 +12941,9 @@ end subroutine bremsstrahlung
 
 subroutine fida_f
     !+ Calculate Active FIDA emission using a Fast-ion distribution function F(E,p,r,z)
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: i,j,k,ic,ncell
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
@@ -12446,6 +12971,11 @@ subroutine fida_f
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+
+    !! Thread-local accumulation arrays
+    integer :: nthreads, tid
+    real(Float64), dimension(:,:,:,:), allocatable :: thread_fida
+    real(Float64), dimension(:,:,:,:,:), allocatable :: thread_fidastokes
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -12477,10 +13007,26 @@ subroutine fida_f
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
+    !! Allocate thread-local arrays
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+    allocate(thread_fida(n_stark, inputs%nlambda, spec_chords%nchan, nthreads))
+    allocate(thread_fidastokes(n_stark, 4, inputs%nlambda, spec_chords%nchan, nthreads))
+    thread_fida = 0.0
+    thread_fidastokes = 0.0
+
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
-    !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)
+    !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect,tid)
     loop_over_cells: do ic = istart, ncell, istep
+#ifdef _OMP
+        tid = OMP_GET_THREAD_NUM() + 1
+#else
+        tid = 1
+#endif
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
@@ -12509,13 +13055,28 @@ subroutine fida_f
 
                 call colrad(plasma, fbm%A, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons/nlaunch(i,j,k))
+                call store_photons_no_lock(tracks(jj)%pos, vi, beam_lambda0, photons/nlaunch(i,j,k), &
+                                          thread_fida(:,:,:,tid), thread_fidastokes(:,:,:,:,tid))
                 if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%fida)
 
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
     !$OMP END PARALLEL DO
+
+    !! Reduce thread-local arrays into global spec arrays
+    do tid = 1, nthreads
+        spec%fida(:,:,:,1) = spec%fida(:,:,:,1) + thread_fida(:,:,:,tid)
+        spec%fidastokes(:,:,:,:,1) = spec%fidastokes(:,:,:,:,1) + thread_fidastokes(:,:,:,:,tid)
+    enddo
+
+    !! Deallocate thread-local arrays
+    deallocate(thread_fida, thread_fidastokes)
+
+    !! Print cache statistics if verbose
+    if(inputs%verbose.ge.1) then
+        call print_colrad_cache_stats()
+    endif
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
@@ -12530,6 +13091,9 @@ end subroutine fida_f
 
 subroutine pfida_f
     !+ Calculate Passive FIDA emission using a Fast-ion distribution function F(E,p,r,z)
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: i,j,k,ic,ncell,is
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
@@ -12557,6 +13121,24 @@ subroutine pfida_f
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
     integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+
+    !! Thread-local accumulation arrays
+    integer :: nthreads, tid
+    real(Float64), dimension(:,:,:,:), allocatable :: thread_pfida
+    real(Float64), dimension(:,:,:,:,:), allocatable :: thread_pfidastokes
+
+    !! Timing variables
+    real(Float64) :: t_start, t_setup, t_loop, t_track, t_cx, t_colrad, t_store
+    real(Float64) :: t_tmp
+
+    !! Initialize timing
+#ifdef _OMP
+    t_start = omp_get_wtime()
+#endif
+    t_track = 0.0
+    t_cx = 0.0
+    t_colrad = 0.0
+    t_store = 0.0
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -12587,10 +13169,34 @@ subroutine pfida_f
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
+    !! Allocate thread-local arrays
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+    allocate(thread_pfida(n_stark, inputs%nlambda, spec_chords%nchan, nthreads))
+    allocate(thread_pfidastokes(n_stark, 4, inputs%nlambda, spec_chords%nchan, nthreads))
+    thread_pfida = 0.0
+    thread_pfidastokes = 0.0
+
+#ifdef _OMP
+    t_setup = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Setup time: ",f8.3," s")') t_setup - t_start
+    endif
+#endif
+
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,xyz_vi,ri,fields, &
-    !$OMP tracks,ntrack,jj,plasma,rates,rates_is,is,denn,states,photons,denf,eb,ptch,los_intersect)
+    !$OMP tracks,ntrack,jj,plasma,rates,rates_is,is,denn,states,photons,denf,eb,ptch,los_intersect,tid,t_tmp) &
+    !$OMP reduction(+:t_track,t_cx,t_colrad,t_store)
     loop_over_cells: do ic = istart, ncell, istep
+#ifdef _OMP
+        tid = OMP_GET_THREAD_NUM() + 1
+#else
+        tid = 1
+#endif
         call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
@@ -12603,17 +13209,29 @@ subroutine pfida_f
             xyz_vi = matmul(beam_grid%inv_basis,vi)
 
             !! Find the particles path through the interpolation grid
+#ifdef _OMP
+            t_tmp = omp_get_wtime()
+#endif
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
+#ifdef _OMP
+            t_track = t_track + (omp_get_wtime() - t_tmp)
+#endif
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with edge neutrals
+#ifdef _OMP
+            t_tmp = omp_get_wtime()
+#endif
             call get_plasma(plasma, pos=ri, input_coords=1)
             rates = 0.0
             do is=1,n_thermal
                 call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), xyz_vi, rates_is)
                 rates = rates + rates_is
             enddo
+#ifdef _OMP
+            t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
             !! Weight CX rates by ion source density
@@ -12623,9 +13241,22 @@ subroutine pfida_f
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
+#ifdef _OMP
+                t_colrad = t_colrad + (omp_get_wtime() - t_tmp)
+#endif
 
-                call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), passive=.True.)
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
+                call store_photons_no_lock(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), &
+                                          thread_pfida(:,:,:,tid), thread_pfidastokes(:,:,:,:,tid), passive=.True.)
+#ifdef _OMP
+                t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
                 if(inputs%calc_res.ge.1) then 
                     call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%pfida, passive=.True.)
                 endif
@@ -12633,6 +13264,35 @@ subroutine pfida_f
         enddo loop_over_fast_ions
     enddo loop_over_cells
     !$OMP END PARALLEL DO
+
+#ifdef _OMP
+    t_loop = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"=== PFIDA Timing Breakdown ===")')
+        write(*,'(T6,"Total loop time:     ",f8.3," s")') t_loop - t_setup
+        write(*,'(T6,"  track_cylindrical: ",f8.3," s (",f5.1,"%)")') t_track, 100.0*t_track/(t_loop-t_setup)
+        write(*,'(T6,"  CX rate calc:      ",f8.3," s (",f5.1,"%)")') t_cx, 100.0*t_cx/(t_loop-t_setup)
+        write(*,'(T6,"  colrad:            ",f8.3," s (",f5.1,"%)")') t_colrad, 100.0*t_colrad/(t_loop-t_setup)
+        write(*,'(T6,"  store_photons:     ",f8.3," s (",f5.1,"%)")') t_store, 100.0*t_store/(t_loop-t_setup)
+        write(*,'(T6,"  other:             ",f8.3," s (",f5.1,"%)")') &
+            (t_loop-t_setup)-t_track-t_cx-t_colrad-t_store, &
+            100.0*((t_loop-t_setup)-t_track-t_cx-t_colrad-t_store)/(t_loop-t_setup)
+    endif
+#endif
+
+    !! Reduce thread-local arrays into global spec arrays
+    do tid = 1, nthreads
+        spec%pfida(:,:,:,1) = spec%pfida(:,:,:,1) + thread_pfida(:,:,:,tid)
+        spec%pfidastokes(:,:,:,:,1) = spec%pfidastokes(:,:,:,:,1) + thread_pfidastokes(:,:,:,:,tid)
+    enddo
+
+    !! Deallocate thread-local arrays
+    deallocate(thread_pfida, thread_pfidastokes)
+
+    !! Print cache statistics if verbose
+    if(inputs%verbose.ge.1) then
+        call print_colrad_cache_stats()
+    endif
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)

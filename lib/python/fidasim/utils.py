@@ -15,14 +15,7 @@ import copy
 import h5py
 import efit
 from scipy.io import netcdf
-from scipy.interpolate import interp1d, NearestNDInterpolator
-try:
-    from scipy.interpolate import interp2d
-    interp2d(1,2,3)
-    oldinterp2d = True
-except NotImplementedError:
-    from scipy.interpolate import RectBivariateSpline as interp2d
-    oldinterp2d = False
+from scipy.interpolate import interp1d, RectBivariateSpline, NearestNDInterpolator
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 
@@ -836,12 +829,7 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
 
     psi_arr = np.linspace(psiaxis, psiwall, len(fpol))
     fpol_itp = interp1d(psi_arr, fpol, 'cubic', fill_value=fpol[-1],bounds_error=False)
-    if oldinterp2d:
-        psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
-    else:
-        psirz_itp = interp2d(r, z, g["psirz"],)
-        # 
-        # psirz_itp = interp2d((r, z), g["psirz"], fill_value=g["psirz"][-1,-1])
+    psirz_itp = RectBivariateSpline(r, z, g["psirz"])
 
     if poloidal:
         rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)

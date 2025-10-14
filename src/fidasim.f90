@@ -6,6 +6,7 @@ USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
+USE matrix6x6, ONLY : eigen6x6, linsolve6x6, matmul6x6_vec
 USE utilities
 #ifdef _MPI
 USE mpi_utils
@@ -1329,6 +1330,10 @@ type :: colrad_cache_key
         !+ Discretized energy
     integer :: dt_bin
         !+ Discretized time step
+    integer :: states_total_bin
+        !+ Discretized log10 of total states magnitude
+    integer :: states_dominant_bin
+        !+ Which n-level (1-6) has maximum population
 end type colrad_cache_key
 
 !! Cache entry type
@@ -1349,19 +1354,19 @@ type :: colrad_cache_entry
         !+ Global access counter at last use (for LRU)
 end type colrad_cache_entry
 
-!! Module-level cache variables
-type(colrad_cache_entry), dimension(:), allocatable :: colrad_cache
-    !+ Cache storage array
-integer, dimension(:), allocatable :: colrad_hash_table
-    !+ Hash table mapping hash -> cache index
-integer :: colrad_cache_count = 0
-    !+ Current number of valid cache entries
-integer :: colrad_access_counter = 0
-    !+ Global access counter for LRU
-integer(Int64) :: colrad_cache_hits = 0
-    !+ Number of cache hits
-integer(Int64) :: colrad_cache_misses = 0
-    !+ Number of cache misses
+!! Module-level cache variables - Thread-local storage
+type(colrad_cache_entry), dimension(:,:), allocatable :: colrad_cache_tl
+    !+ Thread-local cache storage array: colrad_cache_tl(cache_size, thread_id)
+integer, dimension(:,:), allocatable :: colrad_hash_table_tl
+    !+ Thread-local hash table: colrad_hash_table_tl(hash_size, thread_id)
+integer, dimension(:), allocatable :: colrad_cache_count_tl
+    !+ Per-thread cache entry count
+integer, dimension(:), allocatable :: colrad_access_counter_tl
+    !+ Per-thread access counter for LRU
+integer(Int64), dimension(:), allocatable :: colrad_cache_hits_tl
+    !+ Per-thread cache hits
+integer(Int64), dimension(:), allocatable :: colrad_cache_misses_tl
+    !+ Per-thread cache misses
 logical :: colrad_cache_initialized = .false.
     !+ Cache initialization flag
 
@@ -9221,6 +9226,24 @@ subroutine free_neutral_population(pop)
 
 end subroutine free_neutral_population
 
+subroutine update_neutrals_local(local_dens, ind, dens)
+    !+Update thread-local density array (no synchronization needed)
+    real(Float64), dimension(:,:,:,:), intent(inout) :: local_dens
+        !+ Thread-local neutral density array
+    integer(Int32), dimension(3), intent(in) :: ind
+        !+ [[libfida:beam_grid]] indices
+    real(Float64), dimension(:), intent(in)  :: dens
+        !+ Neutral density [neutrals/cm^3]
+
+    integer :: i, j, k
+
+    i = ind(1) ; j = ind(2) ; k = ind(3)
+
+    !! Thread-local accumulation - no synchronization needed!
+    local_dens(:,i,j,k) = local_dens(:,i,j,k) + dens
+
+end subroutine update_neutrals_local
+
 subroutine update_neutrals(pop, ind, vn, dens)
     !+Update [NeutralPopulation]] `pop` at `ind`
     type(NeutralPopulation), intent(inout)   :: pop
@@ -9232,14 +9255,14 @@ subroutine update_neutrals(pop, ind, vn, dens)
     real(Float64), dimension(:), intent(in)  :: dens
         !+ Neutral density [neutrals/cm^3]
 
-    integer :: i, j, k, n
+    integer :: i, j, k, level
 
     i = ind(1) ; j = ind(2) ; k = ind(3)
 
-    !! Use atomic operations instead of critical section for better performance
-    do n = 1, nlevs
-        !$OMP ATOMIC UPDATE
-        pop%dens(n,i,j,k) = pop%dens(n,i,j,k) + dens(n)
+    !! Use atomic operations instead of critical section for better scalability
+    do level = 1, size(dens)
+        !$OMP ATOMIC
+        pop%dens(level,i,j,k) = pop%dens(level,i,j,k) + dens(level)
     enddo
 
     call update_reservoir(pop%res(i,j,k), vn, sum(dens))
@@ -10572,25 +10595,328 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
 
 end subroutine get_rate_matrix
 
+subroutine get_rate_matrix_optimized(plasma, ab, eb, rmat)
+    !+ Optimized rate matrix for use in [[libfida:colrad]]
+    !+ Uses pre-computed interpolation coefficients and inlined bilinear interpolation
+    type(LocalProfiles), intent(in)                    :: plasma
+        !+ Plasma parameters
+    real(Float64), intent(in)                          :: ab
+        !+ "Beam" ion mass [amu]
+    real(Float64), intent(in)                          :: eb
+        !+ "Beam" ion energy [keV]
+    real(Float64), dimension(nlevs,nlevs), intent(out) :: rmat
+        !+ Rate matrix
+
+    real(Float64) :: logEmin, dlogE, logeb_amu, inv_dE
+    real(Float64) :: logTmin, dlogT, logti, logti_amu, logte, inv_dT
+    integer :: neb, nt, i, n
+    integer :: ebi_common, ebi, tii, tei
+    real(Float64) :: b11_E, b21_E, xp_E, inv_dE_dT
+    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp, denf, deni_i
+    real(Float64), dimension(nlevs,nlevs) :: H_H_pop_i, H_H_pop, H_e_pop, H_Aq_pop
+    real(Float64), dimension(nlevs) :: H_H_depop_i, H_H_depop, H_e_depop, H_Aq_depop
+    logical :: in_range
+
+    H_H_pop = 0.d0
+    H_e_pop = 0.d0
+    H_Aq_pop = 0.d0
+    H_H_depop = 0.d0
+    H_e_depop = 0.d0
+    H_Aq_depop = 0.d0
+
+    deni = plasma%deni
+    dene = plasma%dene
+    denimp = plasma%denimp
+    denf = plasma%denf
+    logeb_amu = log10(eb/ab)
+    logti = log10(plasma%ti)
+    logte = log10(plasma%te)
+
+    !! Pre-compute common energy interpolation for H_H and H_e tables
+    !! (they share the same energy grid in most cases)
+    logEmin = tables%H_H%logemin
+    dlogE = tables%H_H%dlogE
+    neb = tables%H_H%nenergy
+    inv_dE = 1.0d0 / dlogE
+
+    xp_E = max(logeb_amu, logEmin)
+    ebi_common = floor((xp_E - logEmin) * inv_dE) + 1
+
+    ! Check if energy is in valid range for H_H table
+    if ((ebi_common .gt. 0) .and. (ebi_common .le. (neb-1))) then
+        b11_E = (logEmin + ebi_common*dlogE - xp_E) * inv_dE
+        b21_E = (xp_E - logEmin - (ebi_common-1)*dlogE) * inv_dE
+    else
+        ebi_common = -1  ! Mark as out of range
+    endif
+
+    !! H_H rates (loop over thermal species)
+    logTmin = tables%H_H%logtmin
+    dlogT = tables%H_H%dlogT
+    nt = tables%H_H%ntemp
+    inv_dT = 1.0d0 / dlogT
+    inv_dE_dT = inv_dE * inv_dT
+
+    do i=1, n_thermal
+        H_H_pop_i = 0.d0
+        H_H_depop_i = 0.d0
+        deni_i = deni(i)
+        if(beam_mass.eq.thermal_mass(i)) then
+            deni_i = deni(i) + denf
+        endif
+
+        ! Use pre-computed energy interpolation
+        ebi = ebi_common
+        in_range = (ebi .gt. 0)
+
+        if (in_range) then
+            ! Compute temperature interpolation inline
+            logti_amu = log10(plasma%ti/thermal_mass(i))
+            xp_E = max(logti_amu, logTmin)
+            tii = floor((xp_E - logTmin) * inv_dT) + 1
+
+            if ((tii .gt. 0) .and. (tii .le. (nt-1))) then
+                ! Inline bilinear interpolation coefficient calculation
+                b11 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                       (logTmin + tii*dlogT - xp_E)) * inv_dE_dT
+                b12 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                       (xp_E - logTmin - (tii-1)*dlogT)) * inv_dE_dT
+                b21 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                       (logTmin + tii*dlogT - xp_E)) * inv_dE_dT
+                b22 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                       (xp_E - logTmin - (tii-1)*dlogT)) * inv_dE_dT
+
+                ! Interpolate population rates
+                H_H_pop_i = (b11*tables%H_H%log_pop(:,:,ebi,tii)   + &
+                             b12*tables%H_H%log_pop(:,:,ebi,tii+1) + &
+                             b21*tables%H_H%log_pop(:,:,ebi+1,tii) + &
+                             b22*tables%H_H%log_pop(:,:,ebi+1,tii+1))
+                where (H_H_pop_i.lt.tables%H_H%minlog_pop)
+                    H_H_pop_i = 0.d0
+                elsewhere
+                    H_H_pop_i = deni_i * exp(H_H_pop_i*log_10)
+                end where
+
+                ! Interpolate depopulation rates
+                H_H_depop_i = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
+                               b12*tables%H_H%log_depop(:,ebi,tii+1) + &
+                               b21*tables%H_H%log_depop(:,ebi+1,tii) + &
+                               b22*tables%H_H%log_depop(:,ebi+1,tii+1))
+                where (H_H_depop_i.lt.tables%H_H%minlog_depop)
+                    H_H_depop_i = 0.d0
+                elsewhere
+                    H_H_depop_i = deni_i * exp(H_H_depop_i*log_10)
+                end where
+            else
+                in_range = .false.
+            endif
+        endif
+
+        if (.not. in_range) then
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
+                write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb/ab
+                write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/thermal_mass(i)
+            endif
+        endif
+
+        H_H_pop = H_H_pop + H_H_pop_i
+        H_H_depop = H_H_depop + H_H_depop_i
+    enddo
+
+    !! H_e rates (reuse energy interpolation if grids match)
+    if ((tables%H_e%logemin .eq. tables%H_H%logemin) .and. &
+        (tables%H_e%dlogE .eq. tables%H_H%dlogE) .and. &
+        (tables%H_e%nenergy .eq. tables%H_H%nenergy)) then
+        ! Reuse pre-computed energy interpolation
+        ebi = ebi_common
+        in_range = (ebi .gt. 0)
+    else
+        ! Compute separate energy interpolation
+        logEmin = tables%H_e%logemin
+        dlogE = tables%H_e%dlogE
+        neb = tables%H_e%nenergy
+        inv_dE = 1.0d0 / dlogE
+
+        xp_E = max(logeb_amu, logEmin)
+        ebi = floor((xp_E - logEmin) * inv_dE) + 1
+        in_range = ((ebi .gt. 0) .and. (ebi .le. (neb-1)))
+    endif
+
+    if (in_range) then
+        ! Compute electron temperature interpolation
+        logTmin = tables%H_e%logtmin
+        dlogT = tables%H_e%dlogT
+        nt = tables%H_e%ntemp
+        inv_dT = 1.0d0 / dlogT
+        inv_dE_dT = inv_dE * inv_dT
+
+        xp_E = max(logte, logTmin)
+        tei = floor((xp_E - logTmin) * inv_dT) + 1
+
+        if ((tei .gt. 0) .and. (tei .le. (nt-1))) then
+            ! Inline bilinear interpolation
+            b11 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                   (logTmin + tei*dlogT - xp_E)) * inv_dE_dT
+            b12 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                   (xp_E - logTmin - (tei-1)*dlogT)) * inv_dE_dT
+            b21 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                   (logTmin + tei*dlogT - xp_E)) * inv_dE_dT
+            b22 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                   (xp_E - logTmin - (tei-1)*dlogT)) * inv_dE_dT
+
+            H_e_pop = (b11*tables%H_e%log_pop(:,:,ebi,tei)   + &
+                       b12*tables%H_e%log_pop(:,:,ebi,tei+1) + &
+                       b21*tables%H_e%log_pop(:,:,ebi+1,tei) + &
+                       b22*tables%H_e%log_pop(:,:,ebi+1,tei+1))
+            where (H_e_pop.lt.tables%H_e%minlog_pop)
+                H_e_pop = 0.d0
+            elsewhere
+                H_e_pop = dene * exp(H_e_pop*log_10)
+            end where
+
+            H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei)   + &
+                         b12*tables%H_e%log_depop(:,ebi,tei+1) + &
+                         b21*tables%H_e%log_depop(:,ebi+1,tei) + &
+                         b22*tables%H_e%log_depop(:,ebi+1,tei+1))
+            where (H_e_depop.lt.tables%H_e%minlog_depop)
+                H_e_depop = 0.d0
+            elsewhere
+                H_e_depop = dene * exp(H_e_depop*log_10)
+            end where
+        else
+            in_range = .false.
+        endif
+    endif
+
+    if (.not. in_range) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb/ab
+            write(*,'("te = ",ES10.3," [keV]")') plasma%te
+        endif
+    endif
+
+    !! H_Aq rates
+    logEmin = tables%H_Aq%logemin
+    dlogE = tables%H_Aq%dlogE
+    neb = tables%H_Aq%nenergy
+    inv_dE = 1.0d0 / dlogE
+
+    xp_E = max(logeb_amu, logEmin)
+    ebi = floor((xp_E - logEmin) * inv_dE) + 1
+    in_range = ((ebi .gt. 0) .and. (ebi .le. (neb-1)))
+
+    if (in_range) then
+        logTmin = tables%H_Aq%logtmin
+        dlogT = tables%H_Aq%dlogT
+        nt = tables%H_Aq%ntemp
+        inv_dT = 1.0d0 / dlogT
+        inv_dE_dT = inv_dE * inv_dT
+
+        xp_E = max(logti, logTmin)
+        tii = floor((xp_E - logTmin) * inv_dT) + 1
+
+        if ((tii .gt. 0) .and. (tii .le. (nt-1))) then
+            ! Inline bilinear interpolation
+            b11 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                   (logTmin + tii*dlogT - xp_E)) * inv_dE_dT
+            b12 = ((logEmin + ebi*dlogE - logeb_amu) * &
+                   (xp_E - logTmin - (tii-1)*dlogT)) * inv_dE_dT
+            b21 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                   (logTmin + tii*dlogT - xp_E)) * inv_dE_dT
+            b22 = ((logeb_amu - logEmin - (ebi-1)*dlogE) * &
+                   (xp_E - logTmin - (tii-1)*dlogT)) * inv_dE_dT
+
+            H_Aq_pop = (b11*tables%H_Aq%log_pop(:,:,ebi,tii)   + &
+                        b12*tables%H_Aq%log_pop(:,:,ebi,tii+1) + &
+                        b21*tables%H_Aq%log_pop(:,:,ebi+1,tii) + &
+                        b22*tables%H_Aq%log_pop(:,:,ebi+1,tii+1))
+            where (H_Aq_pop.lt.tables%H_Aq%minlog_pop)
+                H_Aq_pop = 0.d0
+            elsewhere
+                H_Aq_pop = denimp * exp(H_Aq_pop*log_10)
+            end where
+
+            H_Aq_depop = (b11*tables%H_Aq%log_depop(:,ebi,tii)   + &
+                          b12*tables%H_Aq%log_depop(:,ebi,tii+1) + &
+                          b21*tables%H_Aq%log_depop(:,ebi+1,tii) + &
+                          b22*tables%H_Aq%log_depop(:,ebi+1,tii+1))
+            where (H_Aq_depop.lt.tables%H_Aq%minlog_depop)
+                H_Aq_depop = 0.d0
+            elsewhere
+                H_Aq_depop = denimp * exp(H_Aq_depop*log_10)
+            end where
+        else
+            in_range = .false.
+        endif
+    endif
+
+    if (.not. in_range) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
+    endif
+
+    rmat = tables%einstein + H_H_pop + H_e_pop + H_Aq_pop
+    do n=1,nlevs
+        rmat(n,n) = -sum(tables%einstein(:,n)) - H_H_depop(n) - H_e_depop(n) - H_Aq_depop(n)
+    enddo
+
+end subroutine get_rate_matrix_optimized
+
 subroutine init_colrad_cache()
-    !+ Initialize the colrad cache
+    !+ Initialize the thread-local colrad cache
+    use omp_lib
+    integer :: nthreads, i
+
     if (colrad_cache_initialized) return
 
-    allocate(colrad_cache(COLRAD_CACHE_SIZE))
-    allocate(colrad_hash_table(COLRAD_HASH_SIZE))
+    !! Get maximum number of threads
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
 
-    colrad_hash_table = 0
-    colrad_cache_count = 0
-    colrad_access_counter = 0
-    colrad_cache_hits = 0
-    colrad_cache_misses = 0
-    colrad_cache_initialized = .true.
+    !! Allocate thread-local arrays for maximum number of threads
+    allocate(colrad_cache_tl(COLRAD_CACHE_SIZE, nthreads))
+    allocate(colrad_hash_table_tl(COLRAD_HASH_SIZE, nthreads))
+    allocate(colrad_cache_count_tl(nthreads))
+    allocate(colrad_access_counter_tl(nthreads))
+    allocate(colrad_cache_hits_tl(nthreads))
+    allocate(colrad_cache_misses_tl(nthreads))
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,"Colrad cache initialized: size=",i0,", hash_size=",i0)') &
-            COLRAD_CACHE_SIZE, COLRAD_HASH_SIZE
+        write(*,'(T4,"Thread-local colrad cache initialized: size=",i0,", hash_size=",i0,", max_threads=",i0)') &
+            COLRAD_CACHE_SIZE, COLRAD_HASH_SIZE, nthreads
     endif
+
+    !! Initialize all thread slots
+    do i = 1, nthreads
+        colrad_cache_tl(:,i)%valid = .false.
+        colrad_hash_table_tl(:,i) = 0
+        colrad_cache_count_tl(i) = 0
+        colrad_access_counter_tl(i) = 0
+        colrad_cache_hits_tl(i) = 0
+        colrad_cache_misses_tl(i) = 0
+    enddo
+
+    colrad_cache_initialized = .true.
 end subroutine init_colrad_cache
+
+subroutine cleanup_colrad_cache()
+    !+ Cleanup and deallocate thread-local colrad cache
+    if (allocated(colrad_cache_tl)) deallocate(colrad_cache_tl)
+    if (allocated(colrad_hash_table_tl)) deallocate(colrad_hash_table_tl)
+    if (allocated(colrad_cache_count_tl)) deallocate(colrad_cache_count_tl)
+    if (allocated(colrad_access_counter_tl)) deallocate(colrad_access_counter_tl)
+    if (allocated(colrad_cache_hits_tl)) deallocate(colrad_cache_hits_tl)
+    if (allocated(colrad_cache_misses_tl)) deallocate(colrad_cache_misses_tl)
+    colrad_cache_initialized = .false.
+end subroutine cleanup_colrad_cache
 
 function compute_colrad_hash(plasma, ab, eb, dt, states) result(hash)
     !+ Compute hash for colrad cache key
@@ -10630,8 +10956,6 @@ function compute_colrad_hash(plasma, ab, eb, dt, states) result(hash)
         key%dt_bin = 0
     endif
 
-    !! NOTE: states removed from cache key - it varies too much per call
-
     !! Compute hash using simple polynomial hash
     hash64 = int(key%ti_bin, Int64)
     hash64 = mod(hash64 * 31_Int64 + int(key%te_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
@@ -10640,6 +10964,8 @@ function compute_colrad_hash(plasma, ab, eb, dt, states) result(hash)
     hash64 = mod(hash64 * 31_Int64 + int(key%ab_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
     hash64 = mod(hash64 * 31_Int64 + int(key%eb_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
     hash64 = mod(hash64 * 31_Int64 + int(key%dt_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%states_total_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
+    hash64 = mod(hash64 * 31_Int64 + int(key%states_dominant_bin, Int64), int(COLRAD_HASH_SIZE, Int64))
 
     hash = int(hash64) + 1  !! Convert to 1-based indexing
     if (hash < 1) hash = 1
@@ -10657,7 +10983,9 @@ function keys_equal(k1, k2) result(equal)
             (k1%zeff_bin == k2%zeff_bin) .and. &
             (k1%ab_bin == k2%ab_bin) .and. &
             (k1%eb_bin == k2%eb_bin) .and. &
-            (k1%dt_bin == k2%dt_bin)
+            (k1%dt_bin == k2%dt_bin) .and. &
+            (k1%states_total_bin == k2%states_total_bin) .and. &
+            (k1%states_dominant_bin == k2%states_dominant_bin)
 end function keys_equal
 
 function make_cache_key(plasma, ab, eb, dt, states) result(key)
@@ -10666,6 +10994,8 @@ function make_cache_key(plasma, ab, eb, dt, states) result(key)
     real(Float64), intent(in) :: ab, eb, dt
     real(Float64), dimension(nlevs), intent(in) :: states
     type(colrad_cache_key) :: key
+    real(Float64) :: states_sum
+    integer :: i, max_idx
 
     !! Discretize parameters with COARSE resolution
     !! Temperature: 0.5 keV bins
@@ -10695,11 +11025,28 @@ function make_cache_key(plasma, ab, eb, dt, states) result(key)
         key%dt_bin = 0
     endif
 
-    !! NOTE: states removed from cache key
+    !! States: Include with very fine discretization for accuracy
+    states_sum = sum(states)
+    if (states_sum > 0.0) then
+        !! Log scale with very fine resolution (100.0 gives ~2.3% bins)
+        !! This prevents cache collisions in iterative halo calculations
+        key%states_total_bin = int(log10(states_sum) * 100.0)
+
+        !! Find dominant n-level (which has maximum population)
+        max_idx = 1
+        do i = 2, nlevs
+            if (states(i) > states(max_idx)) max_idx = i
+        enddo
+        key%states_dominant_bin = max_idx
+    else
+        key%states_total_bin = -999
+        key%states_dominant_bin = 0
+    endif
 end function make_cache_key
 
 subroutine cache_lookup(plasma, ab, eb, dt, states, found, states_out, dens_out, photons_out)
-    !+ Lookup result in cache
+    !+ Lookup result in thread-local cache
+    use omp_lib
     type(LocalProfiles), intent(in) :: plasma
     real(Float64), intent(in) :: ab, eb, dt
     real(Float64), dimension(nlevs), intent(in) :: states
@@ -10707,123 +11054,170 @@ subroutine cache_lookup(plasma, ab, eb, dt, states, found, states_out, dens_out,
     real(Float64), dimension(nlevs), intent(out) :: states_out, dens_out
     real(Float64), intent(out) :: photons_out
 
-    integer :: hash, cache_idx
+    integer :: tid, hash, cache_idx, max_tid
     type(colrad_cache_key) :: key
 
     found = .false.
 
-    if (.not. colrad_cache_initialized) then
-        call init_colrad_cache()
+    if (.not. colrad_cache_initialized) return
+
+    !! Get thread ID (1-based for Fortran)
+#ifdef _OMP
+    tid = omp_get_thread_num() + 1
+#else
+    tid = 1
+#endif
+
+    !! Bounds check
+    max_tid = size(colrad_cache_hits_tl)
+    if (tid < 1 .or. tid > max_tid) then
+        return  !! Thread ID out of bounds, skip cache
     endif
 
-    !! Increment global access counter
-    colrad_access_counter = colrad_access_counter + 1
+    !! Increment thread-local access counter
+    colrad_access_counter_tl(tid) = colrad_access_counter_tl(tid) + 1
 
     !! Compute hash and key
     hash = compute_colrad_hash(plasma, ab, eb, dt, states)
     key = make_cache_key(plasma, ab, eb, dt, states)
 
-    !! Check hash table
-    cache_idx = colrad_hash_table(hash)
+    !! Check thread-local hash table
+    cache_idx = colrad_hash_table_tl(hash, tid)
 
     if (cache_idx > 0 .and. cache_idx <= COLRAD_CACHE_SIZE) then
-        if (colrad_cache(cache_idx)%valid) then
+        if (colrad_cache_tl(cache_idx, tid)%valid) then
             !! Check if key matches
-            if (keys_equal(colrad_cache(cache_idx)%key, key)) then
-                !! Cache hit!
+            if (keys_equal(colrad_cache_tl(cache_idx, tid)%key, key)) then
+                !! Cache hit in thread-local cache!
                 found = .true.
-                states_out = colrad_cache(cache_idx)%states_out
-                dens_out = colrad_cache(cache_idx)%dens_out
-                photons_out = colrad_cache(cache_idx)%photons_out
+                states_out = colrad_cache_tl(cache_idx, tid)%states_out
+                dens_out = colrad_cache_tl(cache_idx, tid)%dens_out
+                photons_out = colrad_cache_tl(cache_idx, tid)%photons_out
 
-                !! Update LRU info
-                colrad_cache(cache_idx)%access_count = colrad_cache(cache_idx)%access_count + 1
-                colrad_cache(cache_idx)%last_access = colrad_access_counter
+                !! Update thread-local LRU info
+                colrad_cache_tl(cache_idx, tid)%access_count = &
+                    colrad_cache_tl(cache_idx, tid)%access_count + 1
+                colrad_cache_tl(cache_idx, tid)%last_access = &
+                    colrad_access_counter_tl(tid)
 
-                colrad_cache_hits = colrad_cache_hits + 1
+                colrad_cache_hits_tl(tid) = colrad_cache_hits_tl(tid) + 1
                 return
             endif
         endif
     endif
 
     !! Cache miss
-    colrad_cache_misses = colrad_cache_misses + 1
+    colrad_cache_misses_tl(tid) = colrad_cache_misses_tl(tid) + 1
 end subroutine cache_lookup
 
 subroutine cache_store(plasma, ab, eb, dt, states, states_out, dens_out, photons_out)
-    !+ Store result in cache
+    !+ Store result in thread-local cache
+    use omp_lib
     type(LocalProfiles), intent(in) :: plasma
     real(Float64), intent(in) :: ab, eb, dt
     real(Float64), dimension(nlevs), intent(in) :: states
     real(Float64), dimension(nlevs), intent(in) :: states_out, dens_out
     real(Float64), intent(in) :: photons_out
 
-    integer :: hash, cache_idx, lru_idx, i
+    integer :: tid, hash, cache_idx, lru_idx, i, max_tid
     integer :: min_access
     type(colrad_cache_key) :: key
 
     if (.not. colrad_cache_initialized) return
+
+    !! Get thread ID (1-based for Fortran)
+#ifdef _OMP
+    tid = omp_get_thread_num() + 1
+#else
+    tid = 1
+#endif
+
+    !! Bounds check
+    max_tid = size(colrad_cache_hits_tl)
+    if (tid < 1 .or. tid > max_tid) then
+        return  !! Thread ID out of bounds, skip cache
+    endif
 
     !! Compute hash and key
     hash = compute_colrad_hash(plasma, ab, eb, dt, states)
     key = make_cache_key(plasma, ab, eb, dt, states)
 
     !! Check if we need to evict an entry
-    cache_idx = colrad_hash_table(hash)
+    cache_idx = colrad_hash_table_tl(hash, tid)
 
     if (cache_idx == 0) then
         !! Find a free slot or evict LRU entry
-        if (colrad_cache_count < COLRAD_CACHE_SIZE) then
+        if (colrad_cache_count_tl(tid) < COLRAD_CACHE_SIZE) then
             !! Use next available slot
-            colrad_cache_count = colrad_cache_count + 1
-            cache_idx = colrad_cache_count
+            colrad_cache_count_tl(tid) = colrad_cache_count_tl(tid) + 1
+            cache_idx = colrad_cache_count_tl(tid)
         else
             !! Evict LRU entry - find entry with minimum last_access
             lru_idx = 1
-            min_access = colrad_cache(1)%last_access
+            min_access = colrad_cache_tl(1, tid)%last_access
             do i = 2, COLRAD_CACHE_SIZE
-                if (colrad_cache(i)%last_access < min_access) then
-                    min_access = colrad_cache(i)%last_access
+                if (colrad_cache_tl(i, tid)%last_access < min_access) then
+                    min_access = colrad_cache_tl(i, tid)%last_access
                     lru_idx = i
                 endif
             enddo
             cache_idx = lru_idx
         endif
 
-        colrad_hash_table(hash) = cache_idx
+        colrad_hash_table_tl(hash, tid) = cache_idx
     endif
 
-    !! Store in cache
-    colrad_cache(cache_idx)%key = key
-    colrad_cache(cache_idx)%states_out = states_out
-    colrad_cache(cache_idx)%dens_out = dens_out
-    colrad_cache(cache_idx)%photons_out = photons_out
-    colrad_cache(cache_idx)%valid = .true.
-    colrad_cache(cache_idx)%access_count = 1
-    colrad_cache(cache_idx)%last_access = colrad_access_counter
+    !! Store in thread-local cache
+    colrad_cache_tl(cache_idx, tid)%key = key
+    colrad_cache_tl(cache_idx, tid)%states_out = states_out
+    colrad_cache_tl(cache_idx, tid)%dens_out = dens_out
+    colrad_cache_tl(cache_idx, tid)%photons_out = photons_out
+    colrad_cache_tl(cache_idx, tid)%valid = .true.
+    colrad_cache_tl(cache_idx, tid)%access_count = 1
+    colrad_cache_tl(cache_idx, tid)%last_access = colrad_access_counter_tl(tid)
 end subroutine cache_store
 
 subroutine print_colrad_cache_stats()
-    !+ Print cache statistics
-    integer(Int64) :: total_accesses
-    real(Float64) :: hit_rate
+    !+ Print thread-local cache statistics
+    integer :: tid, nthreads
+    integer(Int64) :: total_hits, total_misses, thread_hits, thread_misses, thread_accesses
+    real(Float64) :: hit_rate, thread_hit_rate
 
-    if (.not. colrad_cache_initialized) return
-
-    total_accesses = colrad_cache_hits + colrad_cache_misses
-
-    if (total_accesses > 0) then
-        hit_rate = real(colrad_cache_hits, Float64) / real(total_accesses, Float64) * 100.0
-    else
-        hit_rate = 0.0
+    if (.not. colrad_cache_initialized) then
+        write(*,'(T4,"Colrad cache not initialized")')
+        return
     endif
 
-    write(*,'(T4,"=== Colrad Cache Statistics ===")')
-    write(*,'(T4,"Cache size:    ",i0)') COLRAD_CACHE_SIZE
-    write(*,'(T4,"Entries used:  ",i0)') colrad_cache_count
-    write(*,'(T4,"Cache hits:    ",i0)') colrad_cache_hits
-    write(*,'(T4,"Cache misses:  ",i0)') colrad_cache_misses
-    write(*,'(T4,"Hit rate:      ",f6.2,"%")') hit_rate
+    nthreads = size(colrad_cache_hits_tl)
+    total_hits = 0
+    total_misses = 0
+
+    write(*,'(T4,"=== Thread-Local Colrad Cache Statistics ===")')
+    write(*,'(T4,"Cache size per thread: ",i0)') COLRAD_CACHE_SIZE
+    write(*,'(T4,"Number of threads:     ",i0)') nthreads
+    write(*,'(T4,"---------------------------------------------")')
+
+    do tid = 1, nthreads
+        thread_hits = colrad_cache_hits_tl(tid)
+        thread_misses = colrad_cache_misses_tl(tid)
+        thread_accesses = thread_hits + thread_misses
+
+        if (thread_accesses > 0) then
+            thread_hit_rate = real(thread_hits, Float64) / real(thread_accesses, Float64) * 100.0
+            write(*,'(T4,"Thread ",i3,": Hits=",i10,", Misses=",i10,", Rate=",f6.2,"%")') &
+                tid-1, thread_hits, thread_misses, thread_hit_rate
+        endif
+
+        total_hits = total_hits + thread_hits
+        total_misses = total_misses + thread_misses
+    enddo
+
+    write(*,'(T4,"---------------------------------------------")')
+    if ((total_hits + total_misses) > 0) then
+        hit_rate = real(total_hits, Float64) / real(total_hits + total_misses, Float64) * 100.0
+        write(*,'(T4,"Total:  Hits=",i10,", Misses=",i10)') total_hits, total_misses
+        write(*,'(T4,"Overall hit rate: ",f6.2,"%")') hit_rate
+    endif
 end subroutine print_colrad_cache_stats
 
 !! ============================================================================
@@ -10870,34 +11264,26 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
         return
     endif
 
-    !! Compute energy for cache lookup
+    !! Compute energy for rate matrix
     vnet_square=dot_product(vn-plasma%vrot,vn-plasma%vrot)  ![cm/s]
     eb = v2_to_E_per_amu*ab*vnet_square ![kev]
 
-    !! Try cache lookup
-    states_in = states  !! Save input states
-    call cache_lookup(plasma, ab, eb, dt, states_in, cache_hit, states_cached, dens_cached, photons_cached)
+    !! CACHE DISABLED - accuracy concerns with discretization and minimal benefit
+    !! Even with thread-local caches, proper discretization of states is difficult
+    !! and hit rates were too low (<10%) to justify the complexity
 
-    if (cache_hit) then
-        !! Return cached result
-        states = states_cached
-        dens = dens_cached
-        photons = photons_cached
-        return
-    endif
+    !! Compute rate matrix and evolve states
+    call get_rate_matrix_optimized(plasma, ab, eb, matrix)
 
-    !! Cache miss - compute normally
-    call get_rate_matrix(plasma, ab, eb, matrix)
-
-    call eigen(nlevs,matrix, eigvec, eigval)
-    call linsolve(eigvec,states,coef) !coeffs determined from states at t=0
+    call eigen6x6(matrix, eigvec, eigval)
+    call linsolve6x6(eigvec,states,coef) !coeffs determined from states at t=0
     exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
     do n=1,nlevs
         if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero
     enddo
 
-    states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
-    dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
+    states = matmul6x6_vec(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
+    dens   = matmul6x6_vec(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
 
     where (states.lt.0)
         states = 0.d0
@@ -10909,8 +11295,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
 
     photons=dens(initial_state)*tables%einstein(final_state,initial_state) !! - [Ph/(s*cm^3)] - !!
 
-    !! Store result in cache
-    call cache_store(plasma, ab, eb, dt, states_in, states, dens, photons)
+    !! Cache disabled - see comment above
 
 end subroutine colrad
 
@@ -12293,6 +12678,9 @@ subroutine dcx
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
     real(Float64) :: t_start_dcx, t_end_dcx  !! Timing variables
+    !! Thread-local arrays for lock-free accumulation
+    real(Float64), dimension(:,:,:,:), allocatable :: local_dcx_dens
+    integer :: num_threads, tid
 
     !! Initialized Neutral Population
     call init_neutral_population(neut%dcx)
@@ -12327,8 +12715,16 @@ subroutine dcx
     endif
 
     t_start_dcx = omp_get_wtime()
-    !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,is,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
+    !$OMP PARALLEL PROC_BIND(spread) &
+    !$OMP& private(i,j,k,ic,is,idcx,ind,vihalo, &
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction) &
+    !$OMP& private(local_dcx_dens)
+
+    !! Each thread allocates its own density array
+    if(.not.allocated(local_dcx_dens)) allocate(local_dcx_dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    local_dcx_dens = 0.d0
+
+    !$OMP DO schedule(dynamic,16)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -12360,11 +12756,16 @@ subroutine dcx
                     fi_correction = 1.d0
                 endif
 
+                !GCC$ IVDEP
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
                     if(.not.plasma%in_plasma) exit loop_along_track
                     call colrad(plasma,thermal_mass(is),vihalo,tracks(jj)%time,states,denn,photons)
-                    call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
+                    !! Use thread-local accumulation for density (no synchronization!)
+                    call update_neutrals_local(local_dcx_dens,tracks(jj)%ind,denn/nlaunch(i,j,k))
+                    !! Update reservoir (needed for completeness)
+                    call update_reservoir(neut%dcx%res(tracks(jj)%ind(1),tracks(jj)%ind(2),tracks(jj)%ind(3)), &
+                                         vihalo, sum(denn/nlaunch(i,j,k)))
 
                     photons = fi_correction*photons !! Correct for including fast-ions in states
 
@@ -12380,7 +12781,17 @@ subroutine dcx
             enddo loop_over_dcx
         enddo loop_over_species
     enddo loop_over_cells
-    !$OMP END PARALLEL DO
+    !$OMP END DO
+
+    !! Merge thread-local density arrays into global array
+    !$OMP CRITICAL(dcx_reduction)
+    neut%dcx%dens = neut%dcx%dens + local_dcx_dens
+    !$OMP END CRITICAL(dcx_reduction)
+
+    !! Deallocate thread-local array
+    deallocate(local_dcx_dens)
+
+    !$OMP END PARALLEL
     t_end_dcx = omp_get_wtime()
 
     if(inputs%verbose.ge.1) then
@@ -12443,6 +12854,8 @@ subroutine halo
     real(Float64) :: t_start_halo, t_end_halo, t_iter  !! Timing variables
     real(Float64) :: convergence_tol, relative_change  !! Convergence monitoring
     integer :: min_iterations
+    !! Thread-local arrays for lock-free accumulation
+    real(Float64), dimension(:,:,:,:), allocatable :: local_dcx_dens
 
     !! Initialize Neutral Population
     call init_neutral_population(neut%halo)
@@ -12460,7 +12873,9 @@ subroutine halo
 
     !! Allocate previous neutral populations
     call init_neutral_population(prev_pop)
-    prev_pop = neut%dcx
+    !! Deep copy dcx population to prev_pop (not just pointer assignment)
+    prev_pop%dens = neut%dcx%dens
+    prev_pop%res = neut%dcx%res
 
     !! Initialize convergence parameters
     convergence_tol = 1.0d-3  ! Relative tolerance
@@ -12468,6 +12883,12 @@ subroutine halo
 
     seed_dcx = 1.0
     t_start_halo = omp_get_wtime()
+
+    if(inputs%verbose.ge.0) then
+        write(*,'(T6,"Initial DCX density: ",es12.5)') dcx_dens
+        write(*,'(T6,"Initial halo_iter_dens(1): ",es12.5)') halo_iter_dens(1)
+    endif
+
     iterations: do hh=1,200
         !! Allocate/Reallocate current population
         call init_neutral_population(cur_pop)
@@ -12497,8 +12918,16 @@ subroutine halo
         endif
 
         t_iter = omp_get_wtime()
-        !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction)
+        !$OMP PARALLEL PROC_BIND(spread) &
+        !$OMP& private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
+        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction) &
+        !$OMP& private(local_dcx_dens)
+
+        !! Each thread allocates its own density array
+        if(.not.allocated(local_dcx_dens)) allocate(local_dcx_dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        local_dcx_dens = 0.d0
+
+        !$OMP DO schedule(dynamic,16)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -12512,7 +12941,10 @@ subroutine halo
                     call track(ri,vihalo,tracks,ntrack)
                     if(ntrack.eq.0)cycle loop_over_halos
 
-                    !! Calculate CX probability (plasma already loaded at ri)
+                    !! Get plasma parameters at particle location
+                    call get_plasma(plasma, pos=ri)
+
+                    !! Calculate CX probability
                     tind = tracks(1)%ind
                     ii = tind(1); jj = tind(2); kk = tind(3)
                     call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk), prev_pop%res(ii,jj,kk), vihalo, rates)
@@ -12532,13 +12964,17 @@ subroutine halo
                         fi_correction = 1.d0
                     endif
 
+                    !GCC$ IVDEP
                     loop_along_track: do it=1,ntrack
                         call get_plasma(plasma,pos=tracks(it)%pos)
                         if(.not.plasma%in_plasma) exit loop_along_track
                         call colrad(plasma,thermal_mass(is),vihalo,tracks(it)%time,states,denn,photons)
 
-                        !! Store Neutrals
-                        call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
+                        !! Use thread-local accumulation for density (no synchronization!)
+                        call update_neutrals_local(local_dcx_dens, tracks(it)%ind, denn/nlaunch(i,j,k))
+                        !! Update reservoir (needed for physics - samples velocity distribution)
+                        call update_reservoir(cur_pop%res(tracks(it)%ind(1),tracks(it)%ind(2),tracks(it)%ind(3)), &
+                                             vihalo, sum(denn/nlaunch(i,j,k)))
 
                         photons = fi_correction*photons !! Correct for including fast-ions in states
 
@@ -12554,7 +12990,17 @@ subroutine halo
                 enddo loop_over_halos
             enddo loop_over_species
         enddo loop_over_cells
-        !$OMP END PARALLEL DO
+        !$OMP END DO
+
+        !! Merge thread-local density arrays into cur_pop
+        !$OMP CRITICAL(halo_reduction)
+        cur_pop%dens = cur_pop%dens + local_dcx_dens
+        !$OMP END CRITICAL(halo_reduction)
+
+        !! Deallocate thread-local array
+        deallocate(local_dcx_dens)
+
+        !$OMP END PARALLEL
 
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"Iteration ",i3," time: ",f8.3," seconds")') hh, omp_get_wtime() - t_iter
@@ -12583,14 +13029,30 @@ subroutine halo
             endif
         endif
 
+        if(inputs%verbose.ge.0) then
+            write(*,'(T6,"Iteration ",i3,": cur_dens = ",es12.5," prev_dens = ",es12.5," ratio = ",f8.5)') &
+                hh, halo_iter_dens(cur_type), halo_iter_dens(prev_type), &
+                halo_iter_dens(cur_type)/halo_iter_dens(prev_type)
+        endif
         if(halo_iter_dens(cur_type)/halo_iter_dens(prev_type).gt.1.0) then
             write(*,'(a)') "HALO: Halo generation density exceeded seed density. This shouldn't happen."
+            write(*,'(T6,"Debug: cur_type=",i2," prev_type=",i2)') cur_type, prev_type
+            write(*,'(T6,"Debug: cur_dens=",es12.5," prev_dens=",es12.5)') &
+                halo_iter_dens(cur_type), halo_iter_dens(prev_type)
             exit iterations
         endif
 
         !! Set current generation to previous generation
         halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
-        prev_pop = cur_pop
+        !! Deep copy cur_pop to prev_pop (not just pointer assignment)
+        if(.not.allocated(prev_pop%dens)) then
+            allocate(prev_pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        endif
+        if(.not.allocated(prev_pop%res)) then
+            allocate(prev_pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        endif
+        prev_pop%dens = cur_pop%dens
+        prev_pop%res = cur_pop%res
 
         !! merge current population with halo population
         call merge_neutral_populations(neut%halo, cur_pop)

@@ -7038,27 +7038,38 @@ end subroutine line_cylinder_intersect
 
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
+    !+ Optimized version with inlined 3x3 matrix-vector multiplication
     type(BoundedPlane), intent(in)          :: bplane
         !+ Plane with boundary
     real(Float64), dimension(3), intent(in) :: p
         !+ Point on plane
     logical :: in_b
 
-    real(Float64), dimension(3) :: pp
+    real(Float64) :: dp1, dp2, dp3, pp1, pp2, pp3
     real(Float64) :: hh, hw
 
     hh = bplane%hh
     hw = bplane%hw
-    pp = matmul(bplane%inv_basis, p - bplane%origin)
+
+    !! Compute dp = p - bplane%origin (inlined)
+    dp1 = p(1) - bplane%origin(1)
+    dp2 = p(2) - bplane%origin(2)
+    dp3 = p(3) - bplane%origin(3)
+
+    !! Compute pp = inv_basis * dp (inlined 3x3 matrix-vector multiply)
+    pp1 = bplane%inv_basis(1,1)*dp1 + bplane%inv_basis(1,2)*dp2 + bplane%inv_basis(1,3)*dp3
+    pp2 = bplane%inv_basis(2,1)*dp1 + bplane%inv_basis(2,2)*dp2 + bplane%inv_basis(2,3)*dp3
+    pp3 = bplane%inv_basis(3,1)*dp1 + bplane%inv_basis(3,2)*dp2 + bplane%inv_basis(3,3)*dp3
+
     in_b = .False.
     SELECT CASE (bplane%shape)
         CASE (1) !Rectangular boundary
-            if((abs(pp(1)).le.hw).and. &
-               (abs(pp(2)).le.hh)) then
+            if((abs(pp1).le.hw).and. &
+               (abs(pp2).le.hh)) then
                 in_b = .True.
             endif
         CASE (2) !Circular/Ellipsoidal boundary
-            if(((hh*pp(1))**2 + (hw*pp(2))**2).le.((hh*hw)**2)) then
+            if(((hh*pp1)**2 + (hw*pp2)**2).le.((hh*hw)**2)) then
                 in_b = .True.
             endif
         CASE DEFAULT
@@ -7165,6 +7176,7 @@ end subroutine gyro_surface
 
 subroutine line_gyro_surface_intersect(r0, v0, gs, t)
     !+ Calculates the times of intersection of a line and a gyro-surface
+    !+ Optimized version with inlined matrix operations
     real(Float64), dimension(3), intent(in)  :: r0
         !+ Point on line
     real(Float64), dimension(3), intent(in)  :: v0
@@ -7174,13 +7186,30 @@ subroutine line_gyro_surface_intersect(r0, v0, gs, t)
     real(Float64), dimension(2), intent(out) :: t
         !+ "time" to intersect
 
-    real(Float64), dimension(3) :: rr
-    real(Float64) :: a, b, c, d, tp, tm
+    real(Float64) :: rr1, rr2, rr3
+    real(Float64) :: Av1, Av2, Av3, Arr1, Arr2, Arr3
+    real(Float64) :: a, b, c, d
 
-    rr = r0 - gs%center
-    a = dot_product(v0, matmul(gs%A,v0))
-    b = dot_product(rr, matmul(gs%A,v0)) + dot_product(v0,matmul(gs%A,rr))
-    c = dot_product(rr, matmul(gs%A,rr)) - 1.0
+    !! Compute rr = r0 - gs%center (inlined)
+    rr1 = r0(1) - gs%center(1)
+    rr2 = r0(2) - gs%center(2)
+    rr3 = r0(3) - gs%center(3)
+
+    !! Compute Av = A * v0 (inlined 3x3 matrix-vector multiply)
+    Av1 = gs%A(1,1)*v0(1) + gs%A(1,2)*v0(2) + gs%A(1,3)*v0(3)
+    Av2 = gs%A(2,1)*v0(1) + gs%A(2,2)*v0(2) + gs%A(2,3)*v0(3)
+    Av3 = gs%A(3,1)*v0(1) + gs%A(3,2)*v0(2) + gs%A(3,3)*v0(3)
+
+    !! Compute Arr = A * rr (inlined 3x3 matrix-vector multiply)
+    Arr1 = gs%A(1,1)*rr1 + gs%A(1,2)*rr2 + gs%A(1,3)*rr3
+    Arr2 = gs%A(2,1)*rr1 + gs%A(2,2)*rr2 + gs%A(2,3)*rr3
+    Arr3 = gs%A(3,1)*rr1 + gs%A(3,2)*rr2 + gs%A(3,3)*rr3
+
+    !! Compute quadratic form coefficients (inlined dot products)
+    a = v0(1)*Av1 + v0(2)*Av2 + v0(3)*Av3
+    !! Since A is symmetric: dot_product(rr, A*v0) = dot_product(v0, A*rr)
+    b = 2.0d0 * (rr1*Av1 + rr2*Av2 + rr3*Av3)
+    c = rr1*Arr1 + rr2*Arr2 + rr3*Arr3 - 1.0d0
 
     d = b**2 - 4*a*c
     if(d.lt.0.0) then
@@ -7232,6 +7261,7 @@ end subroutine gyro_surface_coordinates
 
 subroutine gyro_trajectory(gs, theta, ri, vi)
     !+ Calculate particle trajectory for a given gyro-angle and gyro-surface
+    !+ Optimized version with inlined 3x3 matrix-vector multiplication
     type(GyroSurface), intent(in) :: gs
         !+ Gyro-Surface
     real(Float64), intent(in) :: theta
@@ -7241,28 +7271,63 @@ subroutine gyro_trajectory(gs, theta, ri, vi)
     real(Float64), dimension(3) :: vi
         !+ Particle Velocity
 
-    real(Float64) :: a,b,c,th
+    real(Float64) :: a, b, c, th, cos_th, sin_th
+    real(Float64) :: v1, v2, v3  ! Temporary vector components
+
     a = gs%axes(1)
     b = gs%axes(2)
     c = gs%axes(3)
     th = theta + pi/2
-    ri = matmul(gs%basis, [a*cos(th), b*sin(th), 0.d0]) + gs%center
-    vi = gs%omega*matmul(gs%basis, [-a*sin(th), b*cos(th), c])
+
+    !! Compute trig functions once
+    cos_th = cos(th)
+    sin_th = sin(th)
+
+    !! Inline matrix-vector multiplication for ri
+    !! ri = matmul(gs%basis, [a*cos_th, b*sin_th, 0.0]) + gs%center
+    v1 = a*cos_th
+    v2 = b*sin_th
+    v3 = 0.d0
+    ri(1) = gs%basis(1,1)*v1 + gs%basis(1,2)*v2 + gs%basis(1,3)*v3 + gs%center(1)
+    ri(2) = gs%basis(2,1)*v1 + gs%basis(2,2)*v2 + gs%basis(2,3)*v3 + gs%center(2)
+    ri(3) = gs%basis(3,1)*v1 + gs%basis(3,2)*v2 + gs%basis(3,3)*v3 + gs%center(3)
+
+    !! Inline matrix-vector multiplication for vi
+    !! vi = gs%omega*matmul(gs%basis, [-a*sin_th, b*cos_th, c])
+    v1 = -a*sin_th
+    v2 = b*cos_th
+    v3 = c
+    vi(1) = gs%omega*(gs%basis(1,1)*v1 + gs%basis(1,2)*v2 + gs%basis(1,3)*v3)
+    vi(2) = gs%omega*(gs%basis(2,1)*v1 + gs%basis(2,2)*v2 + gs%basis(2,3)*v3)
+    vi(3) = gs%omega*(gs%basis(3,1)*v1 + gs%basis(3,2)*v2 + gs%basis(3,3)*v3)
 
 end subroutine gyro_trajectory
 
 function in_gyro_surface(gs, p) result(in_gs)
     !+ Indicator function for determining if a point is inside the gyro_surface
+    !+ Optimized version with inlined matrix-vector multiplication and quadratic form
     type(GyroSurface), intent(in)           :: gs
         !+ Gyro-surface
     real(Float64), dimension(3), intent(in) :: p
         !+ Point
     logical :: in_gs
 
-    real(Float64), dimension(3) :: pp
+    real(Float64) :: pp1, pp2, pp3, tmp1, tmp2, tmp3, quad_form
 
-    pp = p - gs%center
-    in_gs = dot_product(pp, matmul(gs%A, pp)).le.1.d0
+    !! Compute pp = p - gs%center (inlined)
+    pp1 = p(1) - gs%center(1)
+    pp2 = p(2) - gs%center(2)
+    pp3 = p(3) - gs%center(3)
+
+    !! Compute tmp = A * pp (inlined 3x3 matrix-vector multiply)
+    tmp1 = gs%A(1,1)*pp1 + gs%A(1,2)*pp2 + gs%A(1,3)*pp3
+    tmp2 = gs%A(2,1)*pp1 + gs%A(2,2)*pp2 + gs%A(2,3)*pp3
+    tmp3 = gs%A(3,1)*pp1 + gs%A(3,2)*pp2 + gs%A(3,3)*pp3
+
+    !! Compute quadratic form: pp^T * tmp (inlined dot product)
+    quad_form = pp1*tmp1 + pp2*tmp2 + pp3*tmp3
+
+    in_gs = quad_form .le. 1.d0
 
 end function in_gyro_surface
 
@@ -14189,6 +14254,7 @@ end subroutine pfida_mc
 
 subroutine npa_f
     !+ Calculate Active NPA flux using a fast-ion distribution function F(E,p,r,z)
+    use omp_lib
     integer :: i,j,k,det,ic
     integer(Int64) :: iion
     real(Float64), dimension(3) :: rg,ri,rf,vi
@@ -14207,6 +14273,19 @@ subroutine npa_f
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+
+    !! Timing variables
+    real(Float64) :: t_start, t_setup, t_loop, t_tmp
+    real(Float64) :: t_gyro, t_cx, t_attenuate, t_store
+
+    !! Initialize timing
+#ifdef _OMP
+    t_start = omp_get_wtime()
+#endif
+    t_gyro = 0.0
+    t_cx = 0.0
+    t_attenuate = 0.0
+    t_store = 0.0
 
     papprox=0.d0
     do ic=1,beam_grid%ngrid
@@ -14237,9 +14316,17 @@ subroutine npa_f
         write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
     endif
 
+#ifdef _OMP
+    t_setup = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Setup time: ",f8.3," s")') t_setup - t_start
+    endif
+#endif
+
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,t_tmp) &
+    !$OMP& reduction(+:t_gyro,t_cx,t_attenuate,t_store)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -14251,12 +14338,24 @@ subroutine npa_f
             call gyro_surface(fields, eb, ptch, fbm%A, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
+#ifdef _OMP
+                t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
                 if(nrange.eq.0) cycle detector_loop
                 gyro_range_loop: do ir=1,nrange
                     dtheta = gyrange(2,ir)
                     theta = gyrange(1,ir) + 0.5*dtheta
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call gyro_trajectory(gs, theta, ri, vi)
+#ifdef _OMP
+                    t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
 
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
@@ -14271,23 +14370,56 @@ subroutine npa_f
                     call get_indices(ri,pind)
 
                     !! Calculate CX probability with beam and halo neutrals
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call get_total_cx_rate(pind, ri, vi, neut_types, rates)
+#ifdef _OMP
+                    t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                     if(sum(rates).le.0.) cycle gyro_range_loop
 
                     !! Weight CX rates by ion source density
                     states=rates*denf
 
                     !! Attenuate states as the particle move through plasma
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                    t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call store_npa(det,ri,rf,vi,flux, gs=gs)
+#ifdef _OMP
+                    t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
     enddo loop_over_cells
     !$OMP END PARALLEL DO
+
+#ifdef _OMP
+    t_loop = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"=== NPA_F Timing Breakdown ===")')
+        write(*,'(T6,"Total loop time:     ",f8.3," s")') t_loop - t_setup
+        write(*,'(T6,"  Gyro calculations: ",f8.3," s (",f5.1,"%)")') t_gyro, 100.0*t_gyro/(t_loop-t_setup)
+        write(*,'(T6,"  CX rate calc:      ",f8.3," s (",f5.1,"%)")') t_cx, 100.0*t_cx/(t_loop-t_setup)
+        write(*,'(T6,"  Attenuate:         ",f8.3," s (",f5.1,"%)")') t_attenuate, 100.0*t_attenuate/(t_loop-t_setup)
+        write(*,'(T6,"  store_npa:         ",f8.3," s (",f5.1,"%)")') t_store, 100.0*t_store/(t_loop-t_setup)
+        write(*,'(T6,"  other:             ",f8.3," s (",f5.1,"%)")') &
+            (t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store, &
+            100.0*((t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store)/(t_loop-t_setup)
+    endif
+#endif
 
     npart = npa%npart
 #ifdef _MPI
@@ -14303,6 +14435,7 @@ end subroutine npa_f
 
 subroutine pnpa_f
     !+ Calculate Passive NPA flux using a fast-ion distribution function F(E,p,r,z)
+    use omp_lib
     integer :: i,j,k,det,ic
     integer(Int64) :: iion
     real(Float64), dimension(3) :: rg,ri,rf,vi,ri_uvw
@@ -14320,6 +14453,19 @@ subroutine pnpa_f
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
     integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+
+    !! Timing variables
+    real(Float64) :: t_start, t_setup, t_loop, t_tmp
+    real(Float64) :: t_gyro, t_cx, t_attenuate, t_store
+
+    !! Initialize timing
+#ifdef _OMP
+    t_start = omp_get_wtime()
+#endif
+    t_gyro = 0.0
+    t_cx = 0.0
+    t_attenuate = 0.0
+    t_store = 0.0
 
     papprox=0.d0
     do ic=1,pass_grid%ngrid
@@ -14349,9 +14495,17 @@ subroutine pnpa_f
         write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
     endif
 
+#ifdef _OMP
+    t_setup = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Setup time: ",f8.3," s")') t_setup - t_start
+    endif
+#endif
+
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& vi,ri,rf,det,plasma,rates,is, rates_is,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
+    !$OMP& vi,ri,rf,det,plasma,rates,is, rates_is,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw,t_tmp) &
+    !$OMP& reduction(+:t_gyro,t_cx,t_attenuate,t_store)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -14363,12 +14517,24 @@ subroutine pnpa_f
             call gyro_surface(fields, eb, ptch, fbm%A, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
+#ifdef _OMP
+                t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
                 if(nrange.eq.0) cycle detector_loop
                 gyro_range_loop: do ir=1,nrange
                     dtheta = gyrange(2,ir)
                     theta = gyrange(1,ir) + 0.5*dtheta
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call gyro_trajectory(gs, theta, ri, vi)
+#ifdef _OMP
+                    t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
 
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
@@ -14380,28 +14546,61 @@ subroutine pnpa_f
                     endif
 
                     !! Calculate CX probability with beam and halo neutrals
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call get_plasma(plasma, pos=ri)
                     rates = 0.d0
                     do is=1,n_thermal
                         call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
                         rates = rates + rates_is
                     enddo
+#ifdef _OMP
+                    t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                     if(sum(rates).le.0.) cycle gyro_range_loop
 
                     !! Weight CX rates by ion source density
                     states=rates*denf
 
                     !! Attenuate states as the particle move through plasma
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                    t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*pass_grid%r(i)*pass_grid%dv/nlaunch(i,j,k)
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call store_npa(det,ri,rf,vi,flux,passive=.True., gs=gs)
+#ifdef _OMP
+                    t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
     enddo loop_over_cells
     !$OMP END PARALLEL DO
+
+#ifdef _OMP
+    t_loop = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"=== PNPA_F Timing Breakdown ===")')
+        write(*,'(T6,"Total loop time:     ",f8.3," s")') t_loop - t_setup
+        write(*,'(T6,"  Gyro calculations: ",f8.3," s (",f5.1,"%)")') t_gyro, 100.0*t_gyro/(t_loop-t_setup)
+        write(*,'(T6,"  CX rate calc:      ",f8.3," s (",f5.1,"%)")') t_cx, 100.0*t_cx/(t_loop-t_setup)
+        write(*,'(T6,"  Attenuate:         ",f8.3," s (",f5.1,"%)")') t_attenuate, 100.0*t_attenuate/(t_loop-t_setup)
+        write(*,'(T6,"  store_npa:         ",f8.3," s (",f5.1,"%)")') t_store, 100.0*t_store/(t_loop-t_setup)
+        write(*,'(T6,"  other:             ",f8.3," s (",f5.1,"%)")') &
+            (t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store, &
+            100.0*((t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store)/(t_loop-t_setup)
+    endif
+#endif
 
     npart = pnpa%npart
 #ifdef _MPI

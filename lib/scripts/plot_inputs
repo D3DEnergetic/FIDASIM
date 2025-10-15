@@ -329,15 +329,17 @@ def main():
 
         ax.plot_surface(X, Y, Z, color='indigo', rstride=1, cstride=1, alpha=0.25)
 
-        # Plot FIDA and NPA
-        n_nchan = 0 ; f_nchan = 0
+        # Plot FIDA, NPA, and NC
+        n_nchan = 0 ; f_nchan = 0 ; nc_nchan = 0
         if 'npa' in geo:
             n_nchan = geo['/npa/nchan'][()]
         if 'spec' in geo:
             f_nchan = geo['/spec/nchan'][()]
+        if 'nc' in geo:
+            nc_nchan = geo['/nc/nchan'][()]
 
-        if n_nchan + f_nchan > 0:
-            colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan))
+        if n_nchan + f_nchan + nc_nchan > 0:
+            colors = plt.cm.gist_heat(np.linspace(.15,.85,n_nchan+f_nchan+nc_nchan))
         t = np.linspace(0,1000,2)
 
         if 'spec' in geo:
@@ -357,6 +359,15 @@ def main():
                 los = d_cent + t.reshape(2,1)*axis
                 ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan],label = "NPA {0}".format(i+1))
                 ax.scatter(d_cent[0],d_cent[1],d_cent[2],color='k', s=1)
+        if 'nc' in geo:
+            for i in range(nc_nchan):          # NC loop
+                d_cent = geo['/nc/d_cent'][()][i,:]
+                a_cent = geo['/nc/a_cent'][()][i,:]
+                axis = a_cent - d_cent
+                axis /= np.sqrt(axis[0]**2 + axis[1]**2 + axis[2]**2)
+                los = d_cent + t.reshape(2,1)*axis
+                ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan+n_nchan],label = "NC {0}".format(i+1))
+                ax.scatter(d_cent[0],d_cent[1],d_cent[2],color='k', s=1)
 
         # Set axes limits for an equal aspect ratio visualization
         X = np.array([-(r_midpoint + 2*rho_r), r_midpoint + 2*rho_r])
@@ -373,7 +384,7 @@ def main():
         ax.set_xlabel('X [cm]')
         ax.set_ylabel('Y [cm]')
         ax.set_zlabel('Z [cm]')
-        if n_nchan + f_nchan > 0 and args.legend:
+        if n_nchan + f_nchan + nc_nchan > 0 and args.legend:
             l = ax.legend(ncol=2,loc='upper left')
             for i, txt in enumerate(l.get_texts()):
                 txt.set_color(colors[i])

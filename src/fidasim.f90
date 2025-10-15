@@ -3389,7 +3389,7 @@ subroutine read_neutron_collimator
                             beam_grid%nz) )
     nc_chords%hit = .False.
 
-    dims = [3,spec_chords%nchan]
+    dims = [3,nc_chords%nchan]
     call h5ltread_dataset_double_f(gid,"/nc/radius", nc_chords%radius, dims(2:2), error)
     call h5ltread_dataset_int_f(gid, "/nc/a_shape", a_shape, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/nc/a_tedge", a_tedge, dims, error)

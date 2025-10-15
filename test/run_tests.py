@@ -122,7 +122,7 @@ def test_nc():
     ulens = np.arange(nchan) * 3 + 101
     vlens = np.zeros(nchan)
     wlens = np.full(nchan, -100.0)
-    lens = np.array([ulens, vlens, wlens]).T  # Transpose for correct shape
+    lens = np.vstack((ulens, vlens, wlens))
 
     ulos = np.arange(nchan) * 3 + 101
     vlos = np.zeros(nchan)
@@ -148,8 +148,8 @@ def test_nc():
 
     # Loop through each channel and calculate positions
     for i in range(nchan):
-        r0 = lens[i]  # Origin point for this channel
-        rf = np.array([ulos[i], vlos[i], wlos[i]])  # Final point for this channel
+        r0 = np.array([ulens[i], vlens[i], wlens[i]])
+        rf = np.array([ulos[i], vlos[i], wlos[i]])
 
         R = fs.utils.line_basis(r0,rf-r0)
 

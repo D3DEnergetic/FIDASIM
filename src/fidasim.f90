@@ -14932,6 +14932,7 @@ end subroutine pnpa_f
 
 subroutine npa_mc
     !+ Calculate Active NPA flux using a Monte Carlo fast-ion distribution
+    use omp_lib
     integer :: iion,igamma,ngamma,npart
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
@@ -14949,6 +14950,19 @@ subroutine npa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
+    !! Timing variables
+    real(Float64) :: t_start, t_setup, t_loop, t_tmp
+    real(Float64) :: t_gyro, t_cx, t_attenuate, t_store
+
+    !! Initialize timing
+#ifdef _OMP
+    t_start = omp_get_wtime()
+#endif
+    t_gyro = 0.0
+    t_cx = 0.0
+    t_attenuate = 0.0
+    t_store = 0.0
+
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
         ngamma = ceiling(dble(inputs%n_npa)/particles%nparticle)
@@ -14958,8 +14972,16 @@ subroutine npa_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
+#ifdef _OMP
+    t_setup = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Setup time: ",f8.3," s")') t_setup - t_start
+    endif
+#endif
+
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta,t_tmp) &
+    !$OMP& reduction(+:t_gyro,t_cx,t_attenuate,t_store)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -14991,13 +15013,25 @@ subroutine npa_mc
                 call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
 
                 detector_loop: do ichan=1,npa_chords%nchan
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call npa_gyro_range(ichan, gs, gyrange, nrange)
+#ifdef _OMP
+                    t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
                     if(nrange.eq.0) cycle detector_loop
 
                     gyro_range_loop: do ir=1,nrange
                         dtheta = gyrange(2,ir)
                         theta = gyrange(1,ir) + 0.5*dtheta
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call gyro_trajectory(gs, theta, ri, vi)
+#ifdef _OMP
+                        t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
 
                         !! Check if particle hits a NPA detector
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
@@ -15012,14 +15046,26 @@ subroutine npa_mc
                         call get_indices(ri,ind)
 
                         !! Calculate CX probability with beam and halo neutrals
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call get_total_cx_rate(ind, ri, vi, neut_types, rates)
+#ifdef _OMP
+                        t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
                         states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                         !! Attenuate states as the particle move through plasma
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                        t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
@@ -15033,7 +15079,13 @@ subroutine npa_mc
                                 endif
                                 cycle spread_loop
                             endif
+#ifdef _OMP
+                            t_tmp = omp_get_wtime()
+#endif
                             call store_npa(det,ri,rf,vi,flux/25,fast_ion%class)
+#ifdef _OMP
+                            t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
                         enddo spread_loop
                     enddo gyro_range_loop
                 enddo detector_loop
@@ -15055,22 +15107,55 @@ subroutine npa_mc
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call get_total_cx_rate(ind, ri, vi, neut_types, rates)
+#ifdef _OMP
+                t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
                 states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                 !! Attenuate states as the particle moves though plasma
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                 !! Store NPA Flux
                 flux = sum(states)*beam_grid%dv
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class)
+#ifdef _OMP
+                t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
             endif
         enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
+
+#ifdef _OMP
+    t_loop = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"=== NPA_MC Timing Breakdown ===")')
+        write(*,'(T6,"Total loop time:     ",f8.3," s")') t_loop - t_setup
+        write(*,'(T6,"  Gyro calculations: ",f8.3," s (",f5.1,"%)")') t_gyro, 100.0*t_gyro/(t_loop-t_setup)
+        write(*,'(T6,"  CX rate calc:      ",f8.3," s (",f5.1,"%)")') t_cx, 100.0*t_cx/(t_loop-t_setup)
+        write(*,'(T6,"  Attenuate:         ",f8.3," s (",f5.1,"%)")') t_attenuate, 100.0*t_attenuate/(t_loop-t_setup)
+        write(*,'(T6,"  store_npa:         ",f8.3," s (",f5.1,"%)")') t_store, 100.0*t_store/(t_loop-t_setup)
+        write(*,'(T6,"  other:             ",f8.3," s (",f5.1,"%)")') &
+            (t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store, &
+            100.0*((t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store)/(t_loop-t_setup)
+    endif
+#endif
 
     npart = npa%npart
 #ifdef _MPI
@@ -15086,6 +15171,7 @@ end subroutine npa_mc
 
 subroutine pnpa_mc
     !+ Calculate Passive NPA flux using a Monte Carlo fast-ion distribution
+    use omp_lib
     integer :: iion,igamma,ngamma,npart
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
@@ -15103,6 +15189,19 @@ subroutine pnpa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
+    !! Timing variables
+    real(Float64) :: t_start, t_setup, t_loop, t_tmp
+    real(Float64) :: t_gyro, t_cx, t_attenuate, t_store
+
+    !! Initialize timing
+#ifdef _OMP
+    t_start = omp_get_wtime()
+#endif
+    t_gyro = 0.0
+    t_cx = 0.0
+    t_attenuate = 0.0
+    t_store = 0.0
+
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
         ngamma = ceiling(dble(inputs%n_pnpa)/particles%nparticle)
@@ -15112,8 +15211,16 @@ subroutine pnpa_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
+#ifdef _OMP
+    t_setup = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"Setup time: ",f8.3," s")') t_setup - t_start
+    endif
+#endif
+
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,rates_is,is,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,rates_is,is,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta,t_tmp) &
+    !$OMP& reduction(+:t_gyro,t_cx,t_attenuate,t_store)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -15141,13 +15248,25 @@ subroutine pnpa_mc
                 call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
 
                 detector_loop: do ichan=1,npa_chords%nchan
+#ifdef _OMP
+                    t_tmp = omp_get_wtime()
+#endif
                     call npa_gyro_range(ichan, gs, gyrange, nrange)
+#ifdef _OMP
+                    t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
                     if(nrange.eq.0) cycle detector_loop
 
                     gyro_range_loop: do ir=1,nrange
                         dtheta = gyrange(2,ir)
                         theta = gyrange(1,ir) + 0.5*dtheta
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call gyro_trajectory(gs, theta, ri, vi)
+#ifdef _OMP
+                        t_gyro = t_gyro + (omp_get_wtime() - t_tmp)
+#endif
 
                         !! Check if particle hits a NPA detector
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
@@ -15159,12 +15278,18 @@ subroutine pnpa_mc
                         endif
 
                         !! Calculate CX probability with beam and halo neutrals
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call get_plasma(plasma, pos=ri)
                         rates = 0.d0
                         do is=1,n_thermal
                             call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
                             rates = rates + rates_is
                         enddo
+#ifdef _OMP
+                        t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
@@ -15176,7 +15301,13 @@ subroutine pnpa_mc
                         endif
 
                         !! Attenuate states as the particle move through plasma
+#ifdef _OMP
+                        t_tmp = omp_get_wtime()
+#endif
                         call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                        t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*(fast_ion%r*pass_grid%dv)
@@ -15209,12 +15340,18 @@ subroutine pnpa_mc
                 if(det.eq.0) cycle gamma_loop
 
                 !! Calculate CX probability with edge neutrals
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call get_plasma(plasma, pos=ri)
                 rates = 0.d0
                 do is=1, n_thermal
                     call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
                     rates = rates + rates_is
                 enddo
+#ifdef _OMP
+                t_cx = t_cx + (omp_get_wtime() - t_tmp)
+#endif
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
@@ -15226,15 +15363,42 @@ subroutine pnpa_mc
                 endif
 
                 !! Attenuate states as the particle moves though plasma
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call attenuate(ri,rf,vi,states)
+#ifdef _OMP
+                t_attenuate = t_attenuate + (omp_get_wtime() - t_tmp)
+#endif
 
                 !! Store NPA Flux
                 flux = sum(states)*(fast_ion%r*pass_grid%dv)
+#ifdef _OMP
+                t_tmp = omp_get_wtime()
+#endif
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
+#ifdef _OMP
+                t_store = t_store + (omp_get_wtime() - t_tmp)
+#endif
             endif
         enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
+
+#ifdef _OMP
+    t_loop = omp_get_wtime()
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"=== PNPA_MC Timing Breakdown ===")')
+        write(*,'(T6,"Total loop time:     ",f8.3," s")') t_loop - t_setup
+        write(*,'(T6,"  Gyro calculations: ",f8.3," s (",f5.1,"%)")') t_gyro, 100.0*t_gyro/(t_loop-t_setup)
+        write(*,'(T6,"  CX rate calc:      ",f8.3," s (",f5.1,"%)")') t_cx, 100.0*t_cx/(t_loop-t_setup)
+        write(*,'(T6,"  Attenuate:         ",f8.3," s (",f5.1,"%)")') t_attenuate, 100.0*t_attenuate/(t_loop-t_setup)
+        write(*,'(T6,"  store_npa:         ",f8.3," s (",f5.1,"%)")') t_store, 100.0*t_store/(t_loop-t_setup)
+        write(*,'(T6,"  other:             ",f8.3," s (",f5.1,"%)")') &
+            (t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store, &
+            100.0*((t_loop-t_setup)-t_gyro-t_cx-t_attenuate-t_store)/(t_loop-t_setup)
+    endif
+#endif
 
     npart = pnpa%npart
 #ifdef _MPI

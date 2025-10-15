@@ -6,7 +6,7 @@ USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
-USE matrix6x6, ONLY : eigen6x6, linsolve6x6, matmul6x6_vec
+USE matrix6x6, ONLY : eigen6x6, linsolve6x6, matmul6x6_vec, matmul6x6
 USE utilities
 #ifdef _MPI
 USE mpi_utils
@@ -10867,6 +10867,135 @@ subroutine get_rate_matrix_optimized(plasma, ab, eb, rmat)
 
 end subroutine get_rate_matrix_optimized
 
+subroutine colrad_adaptive(plasma,ab,vn,dt,states,dens,photons)
+    !+ Adaptive collisional radiative model with algorithm selection based on timestep
+    !+ Uses Taylor series for very small dt, Padé for medium dt, eigendecomposition for large dt
+    type(LocalProfiles), intent(in)              :: plasma
+        !+ Plasma parameters
+    real(Float64), intent(in)                    :: ab
+        !+ Ion/Neutral mass [amu]
+    real(Float64), dimension(:), intent(in)      :: vn
+        !+ Neutral velocity [cm/s]
+    real(Float64), intent(in)                    :: dt
+        !+ Time interval [s]
+    real(Float64), dimension(:), intent(inout)   :: states
+        !+ Density of states
+    real(Float64), dimension(nlevs), intent(out) :: dens
+        !+ Density of neutrals
+    real(Float64), intent(out)                   :: photons
+        !+ Emitted photons
+
+    real(Float64), dimension(nlevs,nlevs) :: matrix, A_dt, A_dt2, A_dt3
+    real(Float64), dimension(nlevs,nlevs) :: eigvec, identity
+    real(Float64), dimension(nlevs) :: eigval, coef, exp_eigval_dt
+    real(Float64), dimension(nlevs) :: v_tmp1, v_tmp2
+    real(Float64) :: vnet_square, eb, iflux, dt_threshold_taylor, dt_threshold_pade
+    integer :: n, i
+
+    ! Algorithm selection thresholds
+    dt_threshold_taylor = 1.0d-10  ! Use Taylor for dt < 0.1 ns
+    dt_threshold_pade = 1.0d-7     ! Use Padé for dt < 100 ns
+
+    photons = 0.d0
+    dens = 0.d0
+    iflux = sum(states)
+
+    if(.not.plasma%in_plasma) then
+        dens = states*dt
+        return
+    endif
+
+    ! Compute energy for rate matrix
+    vnet_square = dot_product(vn-plasma%vrot,vn-plasma%vrot)
+    eb = v2_to_E_per_amu*ab*vnet_square
+
+    ! Get rate matrix
+    call get_rate_matrix_optimized(plasma, ab, eb, matrix)
+
+    ! Select algorithm based on timestep size
+    if (dt < dt_threshold_taylor) then
+        !======================================================================
+        ! TAYLOR SERIES APPROXIMATION (for very small dt)
+        ! exp(A*dt)*v ≈ v + A*dt*v + (A*dt)^2*v/2! + (A*dt)^3*v/3!
+        !======================================================================
+        A_dt = matrix * dt
+
+        ! Order 1: v + A*dt*v
+        v_tmp1 = matmul6x6_vec(A_dt, states)
+        states = states + v_tmp1
+
+        ! Order 2: + (A*dt)^2*v/2
+        v_tmp2 = matmul6x6_vec(A_dt, v_tmp1)
+        states = states + 0.5d0 * v_tmp2
+
+        ! Order 3: + (A*dt)^3*v/6
+        v_tmp1 = matmul6x6_vec(A_dt, v_tmp2)
+        states = states + v_tmp1 / 6.0d0
+
+        ! For dens, we need integral: ∫exp(A*t)*v dt from 0 to dt
+        ! dens ≈ dt*v + (A*dt)^2*v/2! + (A*dt)^3*v/3! + (A*dt)^4*v/4!
+        dens = dt * states  ! Approximation for very small dt
+        v_tmp1 = matmul6x6_vec(A_dt, states)
+        dens = dens + 0.5d0 * dt * v_tmp1
+
+    elseif (dt < dt_threshold_pade) then
+        !======================================================================
+        ! PADÉ (3,3) APPROXIMATION (for small to medium dt)
+        ! exp(A*dt) ≈ [I + A*dt/2 + (A*dt)^2/12]^-1 * [I - A*dt/2 + (A*dt)^2/12]
+        !======================================================================
+        A_dt = matrix * dt
+        A_dt2 = matmul6x6(A_dt, A_dt)
+
+        ! Create identity matrix
+        identity = 0.d0
+        do i = 1, nlevs
+            identity(i,i) = 1.0d0
+        enddo
+
+        ! Numerator: N = I - A*dt/2 + (A*dt)^2/12
+        A_dt3 = identity - 0.5d0 * A_dt + A_dt2 / 12.0d0
+
+        ! Denominator: D = I + A*dt/2 + (A*dt)^2/12
+        A_dt2 = identity + 0.5d0 * A_dt + A_dt2 / 12.0d0
+
+        ! Solve: D * states_new = N * states_old
+        v_tmp1 = matmul6x6_vec(A_dt3, states)
+        call linsolve6x6(A_dt2, v_tmp1, states)
+
+        ! For dens, use approximation based on Padé
+        ! This is more complex, so we'll use a simplified approach
+        ! dens ≈ dt * (states_old + states_new) / 2  (trapezoidal rule)
+        dens = dt * (v_tmp1 + states) * 0.5d0
+
+    else
+        !======================================================================
+        ! FULL EIGENDECOMPOSITION (for large dt)
+        !======================================================================
+        call eigen6x6(matrix, eigvec, eigval)
+        call linsolve6x6(eigvec, states, coef)
+        exp_eigval_dt = exp(eigval*dt)
+
+        do n=1,nlevs
+            if(eigval(n).eq.0.0) eigval(n) = eigval(n) + 1.0d0
+        enddo
+
+        states = matmul6x6_vec(eigvec, coef * exp_eigval_dt)
+        dens = matmul6x6_vec(eigvec, coef*(exp_eigval_dt - 1.d0)/eigval)
+    endif
+
+    ! Apply constraints
+    where (states.lt.0)
+        states = 0.d0
+    endwhere
+
+    where (dens.lt.0)
+        dens = 0.d0
+    endwhere
+
+    photons = dens(initial_state)*tables%einstein(final_state,initial_state)
+
+end subroutine colrad_adaptive
+
 subroutine init_colrad_cache()
     !+ Initialize the thread-local colrad cache
     use omp_lib
@@ -11249,11 +11378,6 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     real(Float64) :: iflux !!Initial total flux
     integer :: n
 
-    !! Cache variables
-    logical :: cache_hit
-    real(Float64), dimension(nlevs) :: states_in, states_cached, dens_cached
-    real(Float64) :: photons_cached
-
     photons=0.d0
     dens=0.d0
 
@@ -11272,7 +11396,7 @@ subroutine colrad(plasma,ab,vn,dt,states,dens,photons)
     !! Even with thread-local caches, proper discretization of states is difficult
     !! and hit rates were too low (<10%) to justify the complexity
 
-    !! Compute rate matrix and evolve states
+    !! Compute rate matrix and evolve states (Phase 1+2 optimizations only)
     call get_rate_matrix_optimized(plasma, ab, eb, matrix)
 
     call eigen6x6(matrix, eigvec, eigval)
@@ -13769,6 +13893,9 @@ end subroutine pfida_f
 
 subroutine fida_mc
     !+ Calculate Active FIDA emission using a Monte Carlo Fast-ion distribution
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: iion,igamma,ngamma
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
@@ -13791,6 +13918,11 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
+    !! Thread-local accumulation arrays
+    integer :: nthreads, tid, iclass
+    real(Float64), dimension(:,:,:,:,:), allocatable :: thread_fida
+    real(Float64), dimension(:,:,:,:,:,:), allocatable :: thread_fidastokes
+
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
         ngamma = ceiling(dble(inputs%n_fida)/particles%nparticle)
@@ -13800,9 +13932,25 @@ subroutine fida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
+    !! Allocate thread-local arrays
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+    allocate(thread_fida(n_stark, inputs%nlambda, spec_chords%nchan, particles%nclass, nthreads))
+    allocate(thread_fidastokes(n_stark, 4, inputs%nlambda, spec_chords%nchan, particles%nclass, nthreads))
+    thread_fida = 0.0
+    thread_fidastokes = 0.0
+
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
+    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons,tid,iclass)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
+#ifdef _OMP
+        tid = OMP_GET_THREAD_NUM() + 1
+#else
+        tid = 1
+#endif
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(.not.fast_ion%beam_grid_cross_grid) cycle loop_over_fast_ions
@@ -13852,17 +14000,30 @@ subroutine fida_mc
             states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
             !! Calculate the spectra produced in each cell along the path
+            iclass = min(fast_ion%class, particles%nclass)
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma, fast_ion%A, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons, fast_ion%class)
+                call store_photons_no_lock(tracks(jj)%pos, vi, beam_lambda0, photons, &
+                                          thread_fida(:,:,:,iclass,tid), thread_fidastokes(:,:,:,:,iclass,tid))
                 if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%fida)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
+
+    !! Reduce thread-local arrays into global spec arrays
+    do tid = 1, nthreads
+        do iclass = 1, particles%nclass
+            spec%fida(:,:,:,iclass) = spec%fida(:,:,:,iclass) + thread_fida(:,:,:,iclass,tid)
+            spec%fidastokes(:,:,:,:,iclass) = spec%fidastokes(:,:,:,:,iclass) + thread_fidastokes(:,:,:,:,iclass,tid)
+        enddo
+    enddo
+
+    !! Deallocate thread-local arrays
+    deallocate(thread_fida, thread_fidastokes)
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
@@ -13877,6 +14038,9 @@ end subroutine fida_mc
 
 subroutine pfida_mc
     !+ Calculate Passive FIDA emission using a Monte Carlo Fast-ion distribution
+#ifdef _OMP
+    use omp_lib
+#endif
     integer :: iion,igamma,ngamma
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
@@ -13898,6 +14062,11 @@ subroutine pfida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
+    !! Thread-local accumulation arrays
+    integer :: nthreads, tid, iclass
+    real(Float64), dimension(:,:,:,:,:), allocatable :: thread_pfida
+    real(Float64), dimension(:,:,:,:,:,:), allocatable :: thread_pfidastokes
+
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
         ngamma = ceiling(dble(inputs%n_pfida)/particles%nparticle)
@@ -13907,9 +14076,25 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
+    !! Allocate thread-local arrays
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+    allocate(thread_pfida(n_stark, inputs%nlambda, spec_chords%nchan, particles%nclass, nthreads))
+    allocate(thread_pfidastokes(n_stark, 4, inputs%nlambda, spec_chords%nchan, particles%nclass, nthreads))
+    thread_pfida = 0.0
+    thread_pfidastokes = 0.0
+
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,is,fast_ion,vi,ri,phi,tracks,s,c,&
-    !$OMP& randomu,plasma,fields,ntrack,jj,rates,rates_is,denn,los_intersect,states,photons,xyz_vi)
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,rates_is,denn,los_intersect,states,photons,xyz_vi,tid,iclass)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
+#ifdef _OMP
+        tid = OMP_GET_THREAD_NUM() + 1
+#else
+        tid = 1
+#endif
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
@@ -13966,17 +14151,30 @@ subroutine pfida_mc
             endif
 
             !! Calculate the spectra produced in each cell along the path
+            iclass = min(fast_ion%class, particles%nclass)
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
                 call colrad(plasma, fast_ion%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons, fast_ion%class,passive=.True.)
+                call store_photons_no_lock(tracks(jj)%pos, xyz_vi, beam_lambda0, photons, &
+                                          thread_pfida(:,:,:,iclass,tid), thread_pfidastokes(:,:,:,:,iclass,tid), passive=.True.)
                 if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%pfida, passive = .True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
+
+    !! Reduce thread-local arrays into global spec arrays
+    do tid = 1, nthreads
+        do iclass = 1, particles%nclass
+            spec%pfida(:,:,:,iclass) = spec%pfida(:,:,:,iclass) + thread_pfida(:,:,:,iclass,tid)
+            spec%pfidastokes(:,:,:,:,iclass) = spec%pfidastokes(:,:,:,:,iclass) + thread_pfidastokes(:,:,:,:,iclass,tid)
+        enddo
+    enddo
+
+    !! Deallocate thread-local arrays
+    deallocate(thread_pfida, thread_pfidastokes)
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)

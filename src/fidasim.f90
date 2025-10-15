@@ -1371,6 +1371,60 @@ logical :: colrad_cache_initialized = .false.
     !+ Cache initialization flag
 
 !! ============================================================================
+!! BT_CX_RATES CACHING
+!! ============================================================================
+
+!! Cache parameters
+integer, parameter :: BT_CX_CACHE_SIZE = 100000
+    !+ Maximum number of cache entries per thread
+integer, parameter :: BT_CX_HASH_SIZE = 200003
+    !+ Hash table size (prime number for better distribution)
+
+!! Cache key type for bt_cx_rates
+type :: bt_cx_cache_key
+    integer :: eb_amu_bin
+        !+ Discretized beam energy per amu
+    integer :: ti_amu_bin
+        !+ Discretized ion temperature per amu
+    integer :: an_bin
+        !+ Discretized atomic mass
+    integer :: vrel_bin
+        !+ Discretized relative velocity
+    integer :: denn_hash
+        !+ Hash of neutral density array
+end type bt_cx_cache_key
+
+!! Cache entry type
+type :: bt_cx_cache_entry
+    type(bt_cx_cache_key) :: key
+        !+ Cache key
+    real(Float64), dimension(nlevs) :: rates_out
+        !+ Output rates
+    logical :: valid = .false.
+        !+ Entry validity flag
+    integer :: access_count = 0
+        !+ Number of times accessed
+    integer :: last_access = 0
+        !+ Global access counter at last use (for LRU)
+end type bt_cx_cache_entry
+
+!! Module-level cache variables - Thread-local storage
+type(bt_cx_cache_entry), dimension(:,:), allocatable :: bt_cx_cache_tl
+    !+ Thread-local cache storage: bt_cx_cache_tl(cache_size, thread_id)
+integer, dimension(:,:), allocatable :: bt_cx_hash_table_tl
+    !+ Thread-local hash table: bt_cx_hash_table_tl(hash_size, thread_id)
+integer, dimension(:), allocatable :: bt_cx_cache_count_tl
+    !+ Per-thread cache entry count
+integer, dimension(:), allocatable :: bt_cx_access_counter_tl
+    !+ Per-thread access counter for LRU
+integer(Int64), dimension(:), allocatable :: bt_cx_cache_hits_tl
+    !+ Per-thread cache hits
+integer(Int64), dimension(:), allocatable :: bt_cx_cache_misses_tl
+    !+ Per-thread cache misses
+logical :: bt_cx_cache_initialized = .false.
+    !+ Cache initialization flag
+
+!! ============================================================================
 
 contains
 
@@ -9667,7 +9721,7 @@ subroutine bb_cx_rates(denn, vn, vi, rates)
 end subroutine bb_cx_rates
 
 subroutine bt_cx_rates(plasma, denn, an, vi, rates)
-    !+ Get beam-target neutralization/cx rates
+    !+ Get beam-target neutralization/cx rates with caching
     type(LocalProfiles), intent(in)              :: plasma
         !+ Plasma parameters (for neutral temperature and vrot)
     real(Float64), dimension(nlevs), intent(in)  :: denn
@@ -9686,6 +9740,11 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
     real(Float64) :: b11, b12, b21, b22
     real(Float64), dimension(nlevs,nlevs) :: H_H_rate
     integer :: ebi, tii, n, err_status
+    logical :: cache_hit
+
+    !! Try cache lookup first
+    call bt_cx_cache_lookup(plasma, denn, an, vi, cache_hit, rates)
+    if (cache_hit) return
 
     H_H_rate = 0.d0
 
@@ -9733,6 +9792,9 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
     end where
 
     rates=matmul(H_H_rate,denn) !1/s
+
+    !! Store result in cache for future use
+    call bt_cx_cache_store(plasma, denn, an, vi, rates)
 
 end subroutine bt_cx_rates
 
@@ -11413,6 +11475,260 @@ subroutine print_colrad_cache_stats()
         write(*,'(T4,"Overall hit rate: ",f6.2,"%")') hit_rate
     endif
 end subroutine print_colrad_cache_stats
+
+!! ============================================================================
+!! BT_CX_RATES CACHE FUNCTIONS
+!! ============================================================================
+
+subroutine init_bt_cx_cache()
+    !+ Initialize the thread-local bt_cx_rates cache
+    use omp_lib
+    integer :: nthreads, i
+
+    if (bt_cx_cache_initialized) return
+
+    !! Get maximum number of threads
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+
+    !! Allocate thread-local arrays
+    allocate(bt_cx_cache_tl(BT_CX_CACHE_SIZE, nthreads))
+    allocate(bt_cx_hash_table_tl(BT_CX_HASH_SIZE, nthreads))
+    allocate(bt_cx_cache_count_tl(nthreads))
+    allocate(bt_cx_access_counter_tl(nthreads))
+    allocate(bt_cx_cache_hits_tl(nthreads))
+    allocate(bt_cx_cache_misses_tl(nthreads))
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Thread-local bt_cx_rates cache initialized: size=",i0,", hash_size=",i0,", max_threads=",i0)') &
+            BT_CX_CACHE_SIZE, BT_CX_HASH_SIZE, nthreads
+    endif
+
+    !! Initialize all thread slots
+    do i = 1, nthreads
+        bt_cx_cache_tl(:,i)%valid = .false.
+        bt_cx_hash_table_tl(:,i) = 0
+        bt_cx_cache_count_tl(i) = 0
+        bt_cx_access_counter_tl(i) = 0
+        bt_cx_cache_hits_tl(i) = 0
+        bt_cx_cache_misses_tl(i) = 0
+    enddo
+
+    bt_cx_cache_initialized = .true.
+end subroutine init_bt_cx_cache
+
+function hash_denn(denn) result(hash)
+    !+ Compute hash of neutral density array
+    real(Float64), dimension(nlevs), intent(in) :: denn
+    integer :: hash
+    integer :: i
+    integer :: denn_bin
+
+    hash = 0
+    do i = 1, nlevs
+        if (denn(i) > 1.0d-10) then
+            denn_bin = int(log10(denn(i)) * 2.0)  !! 0.5 decade bins
+        else
+            denn_bin = -999
+        endif
+        hash = ieor(hash, denn_bin * (i * 17))  !! Mix with position
+    enddo
+    hash = abs(hash)
+end function hash_denn
+
+function hash_bt_cx_key(key) result(hash)
+    !+ Compute hash of bt_cx cache key
+    type(bt_cx_cache_key), intent(in) :: key
+    integer :: hash
+
+    !! Simple hash combining all bins
+    hash = key%eb_amu_bin * 7919 + &
+           key%ti_amu_bin * 7907 + &
+           key%an_bin * 7901 + &
+           key%vrel_bin * 7877 + &
+           key%denn_hash * 7853
+    hash = abs(hash)
+    hash = modulo(hash, BT_CX_HASH_SIZE) + 1
+end function hash_bt_cx_key
+
+function keys_equal_bt_cx(k1, k2) result(equal)
+    !+ Check if two bt_cx cache keys are equal
+    type(bt_cx_cache_key), intent(in) :: k1, k2
+    logical :: equal
+
+    equal = (k1%eb_amu_bin == k2%eb_amu_bin) .and. &
+            (k1%ti_amu_bin == k2%ti_amu_bin) .and. &
+            (k1%an_bin == k2%an_bin) .and. &
+            (k1%vrel_bin == k2%vrel_bin) .and. &
+            (k1%denn_hash == k2%denn_hash)
+end function keys_equal_bt_cx
+
+subroutine bt_cx_cache_lookup(plasma, denn, an, vi, hit, rates_out)
+    !+ Look up bt_cx_rates result in thread-local cache
+    use omp_lib
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), dimension(nlevs), intent(in) :: denn
+    real(Float64), intent(in) :: an
+    real(Float64), dimension(3), intent(in) :: vi
+    logical, intent(out) :: hit
+    real(Float64), dimension(nlevs), intent(out) :: rates_out
+
+    integer :: tid, hash, cache_idx, max_tid
+    type(bt_cx_cache_key) :: key
+    real(Float64) :: vrel, eb_amu, ti_amu
+
+    hit = .false.
+    rates_out = 0.0
+
+    if (.not. bt_cx_cache_initialized) return
+
+    !! Get thread ID (1-based for Fortran)
+#ifdef _OMP
+    tid = omp_get_thread_num() + 1
+#else
+    tid = 1
+#endif
+
+    !! Compute key parameters
+    vrel = norm2(vi - plasma%vrot)
+    eb_amu = v2_to_E_per_amu * vrel**2
+    ti_amu = plasma%ti / an
+
+    !! Discretize parameters (coarse bins for high hit rate)
+    key%eb_amu_bin = int(log10(max(eb_amu, 1.0d-10)) * 5.0)  !! 0.2 decade bins
+    key%ti_amu_bin = int(log10(max(ti_amu, 1.0d-10)) * 2.0)  !! 0.5 keV bins
+    key%an_bin = int(an * 1.0)  !! 1 amu bins
+    key%vrel_bin = int(log10(max(vrel, 1.0d3)) * 5.0)  !! 0.2 decade bins
+    key%denn_hash = hash_denn(denn)
+
+    !! Compute hash
+    hash = hash_bt_cx_key(key)
+
+    !! Check hash table
+    cache_idx = bt_cx_hash_table_tl(hash, tid)
+    if (cache_idx > 0 .and. cache_idx <= BT_CX_CACHE_SIZE) then
+        if (bt_cx_cache_tl(cache_idx, tid)%valid) then
+            if (keys_equal_bt_cx(bt_cx_cache_tl(cache_idx, tid)%key, key)) then
+                !! Cache hit!
+                rates_out = bt_cx_cache_tl(cache_idx, tid)%rates_out
+                bt_cx_cache_tl(cache_idx, tid)%access_count = &
+                    bt_cx_cache_tl(cache_idx, tid)%access_count + 1
+                bt_cx_access_counter_tl(tid) = bt_cx_access_counter_tl(tid) + 1
+                bt_cx_cache_tl(cache_idx, tid)%last_access = bt_cx_access_counter_tl(tid)
+
+                hit = .true.
+                bt_cx_cache_hits_tl(tid) = bt_cx_cache_hits_tl(tid) + 1
+                return
+            endif
+        endif
+    endif
+
+    !! Cache miss
+    bt_cx_cache_misses_tl(tid) = bt_cx_cache_misses_tl(tid) + 1
+end subroutine bt_cx_cache_lookup
+
+subroutine bt_cx_cache_store(plasma, denn, an, vi, rates_out)
+    !+ Store bt_cx_rates result in thread-local cache
+    use omp_lib
+    type(LocalProfiles), intent(in) :: plasma
+    real(Float64), dimension(nlevs), intent(in) :: denn
+    real(Float64), intent(in) :: an
+    real(Float64), dimension(3), intent(in) :: vi
+    real(Float64), dimension(nlevs), intent(in) :: rates_out
+
+    integer :: tid, hash, cache_idx, lru_idx, i
+    integer :: min_access
+    type(bt_cx_cache_key) :: key
+    real(Float64) :: vrel, eb_amu, ti_amu
+
+    if (.not. bt_cx_cache_initialized) return
+
+    !! Get thread ID (1-based for Fortran)
+#ifdef _OMP
+    tid = omp_get_thread_num() + 1
+#else
+    tid = 1
+#endif
+
+    !! Compute key parameters
+    vrel = norm2(vi - plasma%vrot)
+    eb_amu = v2_to_E_per_amu * vrel**2
+    ti_amu = plasma%ti / an
+
+    !! Discretize parameters
+    key%eb_amu_bin = int(log10(max(eb_amu, 1.0d-10)) * 5.0)
+    key%ti_amu_bin = int(log10(max(ti_amu, 1.0d-10)) * 2.0)
+    key%an_bin = int(an * 1.0)
+    key%vrel_bin = int(log10(max(vrel, 1.0d3)) * 5.0)
+    key%denn_hash = hash_denn(denn)
+
+    !! Compute hash
+    hash = hash_bt_cx_key(key)
+
+    !! Find cache slot (LRU replacement if full)
+    if (bt_cx_cache_count_tl(tid) < BT_CX_CACHE_SIZE) then
+        !! Cache not full, use next available slot
+        bt_cx_cache_count_tl(tid) = bt_cx_cache_count_tl(tid) + 1
+        cache_idx = bt_cx_cache_count_tl(tid)
+    else
+        !! Cache full, find LRU entry
+        cache_idx = bt_cx_hash_table_tl(hash, tid)
+        if (cache_idx == 0) cache_idx = 1  !! Fallback
+
+        !! Simple LRU: find entry with oldest last_access
+        lru_idx = 1
+        min_access = bt_cx_cache_tl(1, tid)%last_access
+        do i = 2, BT_CX_CACHE_SIZE
+            if (bt_cx_cache_tl(i, tid)%last_access < min_access) then
+                min_access = bt_cx_cache_tl(i, tid)%last_access
+                lru_idx = i
+            endif
+        enddo
+        cache_idx = lru_idx
+    endif
+
+    !! Store in cache
+    bt_cx_cache_tl(cache_idx, tid)%key = key
+    bt_cx_cache_tl(cache_idx, tid)%rates_out = rates_out
+    bt_cx_cache_tl(cache_idx, tid)%valid = .true.
+    bt_cx_cache_tl(cache_idx, tid)%access_count = 0
+    bt_cx_access_counter_tl(tid) = bt_cx_access_counter_tl(tid) + 1
+    bt_cx_cache_tl(cache_idx, tid)%last_access = bt_cx_access_counter_tl(tid)
+
+    !! Update hash table
+    bt_cx_hash_table_tl(hash, tid) = cache_idx
+end subroutine bt_cx_cache_store
+
+subroutine print_bt_cx_cache_stats()
+    !+ Print thread-local bt_cx cache statistics
+    use omp_lib
+    integer :: tid, nthreads
+    integer(Int64) :: total_hits, total_misses
+    real(Float64) :: hit_rate
+
+    if (.not. bt_cx_cache_initialized) return
+
+#ifdef _OMP
+    nthreads = OMP_GET_MAX_THREADS()
+#else
+    nthreads = 1
+#endif
+
+    total_hits = sum(bt_cx_cache_hits_tl)
+    total_misses = sum(bt_cx_cache_misses_tl)
+
+    if ((total_hits + total_misses) > 0) then
+        hit_rate = 100.0 * real(total_hits, Float64) / real(total_hits + total_misses, Float64)
+
+        write(*,'(T4,"=== BT_CX_RATES Cache Statistics ===")')
+        write(*,'(T4,"Total cache hits:   ",i12)') total_hits
+        write(*,'(T4,"Total cache misses: ",i12)') total_misses
+        write(*,'(T4,"Hit rate:           ",f6.2,"%")') hit_rate
+    endif
+end subroutine print_bt_cx_cache_stats
 
 !! ============================================================================
 
@@ -17219,6 +17535,11 @@ program fidasim
     !! -----------------------------------------------------------------------
     !! ----------------------- CALCULATE the NPA FLUX ------------------------
     !! -----------------------------------------------------------------------
+    !! Initialize BT_CX cache before NPA calculations
+    if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
+        call init_bt_cx_cache()
+    endif
+
     if(inputs%calc_npa.ge.1)then
         if(inputs%verbose.ge.1) then
             write(*,*) 'npa:     ' ,time_string(time_start)
@@ -17241,6 +17562,13 @@ program fidasim
             call pnpa_mc()
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    !! Print BT_CX cache statistics after NPA calculations
+    if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
+        if(inputs%verbose.ge.1) then
+            call print_bt_cx_cache_stats()
+        endif
     endif
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then

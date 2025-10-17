@@ -1,5 +1,5 @@
 #!/bin/sh
-"exec" "$/home/prechelg/Work/FIDASIM/deps/python" "$0" "$@"
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
 
 import argparse
 import numpy as np

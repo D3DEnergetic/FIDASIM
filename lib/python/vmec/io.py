@@ -33,10 +33,8 @@ def read_vmec(file_name):
     """
     if file_name[-3:] == '.nc': # netCDF file
         f = read_vmec_nc(file_name)
-        nc_flag = True
     else: # text file
         f = read_vmec_txt(file_name)
-        nc_flag = False
 
     if 'lrfplogical' not in f:
         f['lrfplogical'] = 0

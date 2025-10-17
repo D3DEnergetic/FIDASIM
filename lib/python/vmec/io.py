@@ -36,8 +36,8 @@ def read_vmec(file_name):
     else: # text file
         f = read_vmec_txt(file_name)
 
-    if 'lrfplogical' not in f:
-        f['lrfplogical'] = 0
+    if 'lrfp__logical__' not in f:
+        f['lrfp__logical__'] = 0
 
     if 'xm_nyq' not in f:
         f['xm_nyq'] = f['xm']
@@ -48,15 +48,8 @@ def read_vmec(file_name):
     if 'mnmax_nyq' not in f:
         f['mnmax_nyq'] = f['mnmax']
 
-    for key in ['buco', 'bvco', 'vp', 'specw']:
+    for key in ['buco', 'bvco', 'vp', 'over_r', 'specw']:
         f[key] = h2f(f[key])
-    
-    try:
-        f['overr'] = h2f(f['overr'])
-        lasym = f['lasym']
-    except:
-        f['over_r'] = h2f(f['over_r'])
-        lasym = f['lasym__logical__']
     
     for mn in range(f['mnmax']):
         f['lmns'][:, mn] = h2f(f['lmns'][:, mn])
@@ -64,7 +57,7 @@ def read_vmec(file_name):
         for key in ['bmnc', 'gmnc', 'bsupumnc', 'bsupvmnc', 'bsubsmns', 'bsubumnc', 'bsubvmnc']:
             f[key][:, mn] = h2f(f[key][:, mn])
 
-    if lasym:
+    if f['lasym__logical__']:
         for mn in range(f['mnmax']):
             f['lmnc'][:, mn] = h2f(f['lmnc'][:, mn])
         for mn in range(f['mnmax_nyq']):
@@ -244,7 +237,7 @@ def read_vmec_txt(file_name):
         f[key] = type_id(data[0])
         del data[0]
 
-    f['lasym'] = bool(f['iasym'] > 0)
+    f['lasym__logical__'] = bool(f['iasym'] > 0)
 
     if f['ierr_vmec'] and f['ierr_vmec'] != 4:
         raise Exception(f'ierr_vmec: {f["ierr_vmec"]}')
@@ -257,7 +250,7 @@ def read_vmec_txt(file_name):
     del data[0]
 
     if vers <= 8.00:
-        if f['lasym']:
+        if f['lasym__logical__']:
             d1_x, d2_x = 16, 14
         else:
             d1_x, d2_x = 13, 11
@@ -270,7 +263,7 @@ def read_vmec_txt(file_name):
         f['xn'] = np.array(data1[1, :], dtype=int)
 
         keys = ['rmnc', 'zmns', 'lmns', 'bmnc', 'gmnc', 'bsubumnc', 'bsubvmnc', 'bsubsmns', 'bsupumnc', 'bsupvmnc', 'currvmnc']
-        if f['lasym'] and vers > 6.50:
+        if f['lasym__logical__'] and vers > 6.50:
             keys.extend(['rmns', 'zmnc', 'lmnc'])
         for ikey, key in enumerate(keys):
             f[key] = np.vstack([data1[ikey+2, :], np.array(data2[ikey, :]).reshape((f['ns']-1, f['mnmax']))])
@@ -281,7 +274,7 @@ def read_vmec_txt(file_name):
         f['xm_nyq'], f['xn_nyq'] = np.zeros(f['mnmax_nyq']), np.zeros(f['mnmax_nyq'])
         f['bmnc'], f['gmnc'] = np.zeros(xyshape2), np.zeros(xyshape2)
         f['bsubumnc'], f['bsubvmnc'], f['bsubsmns'], f['bsupumnc'], f['bsupvmnc'] = np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2)
-        if f['lasym']:
+        if f['lasym__logical__']:
             f['rmns'], f['zmnc'], f['lmnc'] = np.zeros(xyshape1), np.zeros(xyshape1), np.zeros(xyshape1)
             f['bmns'], f['gmns'] = np.zeros(xyshape2), np.zeros(xyshape2)
             f['bsubumns'], f['bsubvmns'], f['bsubsmnc'], f['bsupumns'], f['bsupvmns'] = np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2), np.zeros(xyshape2)
@@ -294,7 +287,7 @@ def read_vmec_txt(file_name):
                 for key in ['rmnc', 'zmns', 'lmns']:
                     f[key][i, j] = data[0]
                     del data[0]
-                if f['lasym']:
+                if f['lasym__logical__']:
                     for key in ['rmns', 'zmnc', 'lmnc']:
                         f[key][i, j] = data[0]
                         del data[0]
@@ -306,7 +299,7 @@ def read_vmec_txt(file_name):
                 for key in ['bmnc', 'gmnc', 'bsubumnc', 'bsubvmnc', 'bsubsmns', 'bsupumnc', 'bsupvmnc']:
                     f[key][j] = data[0]
                     del data[0]
-                if f['lasym']:
+                if f['lasym__logical__']:
                     for key in ['bmns', 'gmns', 'bsubumns', 'bsubvmns', 'bsubsmnc', 'bsupumns', 'bsupvmns']:
                         f[key][i, j] = data[0]
                         del data[0]
@@ -351,7 +344,7 @@ def read_vmec_txt(file_name):
         f['currumnc'] = f['currumnc'] / mu0
         f['currvmnc'] = f['currvmnc'] / mu0
 
-        if f['lasym']:
+        if f['lasym__logical__']:
             f['currvmns'] = np.zeros((f['ns'], f['mnmax_nyq']))
             f['currumns'] = np.zeros((f['ns'], f['mnmax_nyq']))
             for mn in range(f['mnmax_nyq']):
@@ -401,7 +394,7 @@ def read_vmec_txt(file_name):
         data3_shape[1] = 10
     data3 = np.array(data[:np.prod(data3_shape)]).reshape(data3_shape).T
     del data[:data3.size]
-    keys = ['iotas', 'mass', 'pres', 'beta_vol', 'phip', 'buco', 'bvco', 'phi', 'vp', 'overr', 'jcuru', 'jcurv', 'specw']
+    keys = ['iotas', 'mass', 'pres', 'beta_vol', 'phip', 'buco', 'bvco', 'phi', 'vp', 'over_r', 'jcuru', 'jcurv', 'specw']
     if vers <= 6.05:
         keys.remove('beta_vol')
     elif vers > 6.95:

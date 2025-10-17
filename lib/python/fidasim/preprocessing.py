@@ -1651,7 +1651,19 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                      'aoffz': 'cm',
                      'adist': 'cm'}
 
-        write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units, name='nbi')
+        # Define dimension names for xarray/pandas compatibility
+        nbi_dim_names = {'src': ['cartesian_component'],
+                        'axis': ['cartesian_component'],
+                        'divy': ['energy_component'],
+                        'divz': ['energy_component'],
+                        'awidy': ['aperture'],
+                        'awidz': ['aperture'],
+                        'aoffy': ['aperture'],
+                        'aoffz': ['aperture'],
+                        'adist': ['aperture']}
+
+        write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units,
+                  dim_names=nbi_dim_names, name='nbi')
 
         if spec is not None:
             # Create spec group
@@ -1677,7 +1689,15 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                           'radius': 'cm',
                           'spot_size': 'cm'}
 
-            write_data(g_spec, spec, desc=spec_description, units=spec_units, name='spec')
+            # Define dimension names for xarray/pandas compatibility
+            spec_dim_names = {'lens': ['cartesian_component', 'channel'],
+                             'axis': ['cartesian_component', 'channel'],
+                             'radius': ['channel'],
+                             'spot_size': ['channel'],
+                             'sigma_pi': ['channel']}
+
+            write_data(g_spec, spec, desc=spec_description, units=spec_units,
+                      dim_names=spec_dim_names, name='spec')
 
         if npa is not None:
             # Create npa group
@@ -1710,7 +1730,17 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'radius': 'cm',
                          'a_redge': 'cm'}
 
-            write_data(g_npa, npa, desc = npa_description, units = npa_units, name='npa')
+            # Define dimension names for xarray/pandas compatibility
+            npa_dim_names = {'d_cent': ['cartesian_component', 'channel'],
+                            'd_tedge': ['cartesian_component', 'channel'],
+                            'd_redge': ['cartesian_component', 'channel'],
+                            'a_cent': ['cartesian_component', 'channel'],
+                            'a_tedge': ['cartesian_component', 'channel'],
+                            'a_redge': ['cartesian_component', 'channel'],
+                            'radius': ['channel']}
+
+            write_data(g_npa, npa, desc = npa_description, units = npa_units,
+                      dim_names=npa_dim_names, name='npa')
         
         if nc is not None:
             # Create npa group
@@ -1743,7 +1773,17 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'radius': 'cm',
                          'a_redge': 'cm'}
 
-            write_data(g_nc, nc, desc = nc_description, units = nc_units, name='nc')
+            # Define dimension names for xarray/pandas compatibility
+            nc_dim_names = {'d_cent': ['cartesian_component', 'channel'],
+                           'd_tedge': ['cartesian_component', 'channel'],
+                           'd_redge': ['cartesian_component', 'channel'],
+                           'a_cent': ['cartesian_component', 'channel'],
+                           'a_tedge': ['cartesian_component', 'channel'],
+                           'a_redge': ['cartesian_component', 'channel'],
+                           'radius': ['channel']}
+
+            write_data(g_nc, nc, desc = nc_description, units = nc_units,
+                      dim_names=nc_dim_names, name='nc')
 
         if cfpd is not None:
             # Create cfpd group
@@ -1786,7 +1826,22 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'sightline': 'cm/s and cm',
                          'daomega': 'cm^2'}
 
-            write_data(g_cfpd, cfpd, desc = cfpd_description, units = cfpd_units, name='cfpd')
+            # Define dimension names for xarray/pandas compatibility
+            cfpd_dim_names = {'d_cent': ['cartesian_component', 'channel'],
+                             'd_tedge': ['cartesian_component', 'channel'],
+                             'd_redge': ['cartesian_component', 'channel'],
+                             'a_cent': ['cartesian_component', 'channel'],
+                             'a_tedge': ['cartesian_component', 'channel'],
+                             'a_redge': ['cartesian_component', 'channel'],
+                             'radius': ['channel'],
+                             'earray': ['energy'],
+                             'sightline': ['component', 'step', 'ray', 'channel'],
+                             'daomega': ['step', 'ray', 'channel']}
+
+            cfpd_coord_scales = {'earray': 'energy'}
+
+            write_data(g_cfpd, cfpd, desc = cfpd_description, units = cfpd_units,
+                      dim_names=cfpd_dim_names, coord_scales=cfpd_coord_scales, name='cfpd')
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)
@@ -1862,7 +1917,27 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units, name='plasma')
+        # Define dimension names for xarray/pandas compatibility
+        plasma_dim_names = {'dene': ['r', 'z'],
+                           'denimp': ['r', 'z'],
+                           'deni': ['species', 'r', 'z'],
+                           'te': ['r', 'z'],
+                           'ti': ['r', 'z'],
+                           'zeff': ['r', 'z'],
+                           'denn': ['r', 'z'],
+                           'vr': ['r', 'z'],
+                           'vt': ['r', 'z'],
+                           'vz': ['r', 'z'],
+                           'r2d': ['r', 'z'],
+                           'z2d': ['r', 'z'],
+                           'mask': ['r', 'z'],
+                           'species_mass': ['species']}
+
+        # Mark coordinate arrays as dimension scales
+        plasma_coord_scales = {'r': 'r', 'z': 'z'}
+
+        write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units,
+                   dim_names=plasma_dim_names, coord_scales=plasma_coord_scales, name='plasma')
 
         # Create fields group
         g_fields = hf.create_group('fields')
@@ -1901,7 +1976,21 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_fields, fields, desc = fields_description, units = fields_units, name='fields')
+        # Define dimension names for xarray/pandas compatibility
+        fields_dim_names = {'br': ['r', 'z'],
+                           'bt': ['r', 'z'],
+                           'bz': ['r', 'z'],
+                           'er': ['r', 'z'],
+                           'et': ['r', 'z'],
+                           'ez': ['r', 'z'],
+                           'r2d': ['r', 'z'],
+                           'z2d': ['r', 'z']}
+
+        # Mark coordinate arrays as dimension scales
+        fields_coord_scales = {'r': 'r', 'z': 'z'}
+
+        write_data(g_fields, fields, desc = fields_description, units = fields_units,
+                   dim_names=fields_dim_names, coord_scales=fields_coord_scales, name='fields')
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)
@@ -1982,7 +2071,33 @@ def write_distribution(filename, distri):
         hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
         hf.attrs['coordinate_system'] = 'Cylindrical'
 
-        write_data(hf, distri, desc = description, units=units, name='distribution')
+        # Define dimension names for xarray/pandas compatibility
+        dim_names = {}
+        coord_scales = {}
+
+        if distri['type'] == 1:
+            # Guiding Center Density Function
+            dim_names['f'] = ['energy', 'pitch', 'r', 'z']
+            dim_names['denf'] = ['r', 'z']
+            dim_names['r2d'] = ['r', 'z']
+            dim_names['z2d'] = ['r', 'z']
+            coord_scales = {'r': 'r', 'z': 'z', 'energy': 'energy', 'pitch': 'pitch'}
+        else:
+            # Monte Carlo distributions
+            dim_names['r'] = ['particle']
+            dim_names['z'] = ['particle']
+            dim_names['weight'] = ['particle']
+            dim_names['class'] = ['particle']
+            if distri['type'] == 2:
+                dim_names['energy'] = ['particle']
+                dim_names['pitch'] = ['particle']
+            else:
+                dim_names['vr'] = ['particle']
+                dim_names['vt'] = ['particle']
+                dim_names['vz'] = ['particle']
+
+        write_data(hf, distri, desc = description, units=units,
+                   dim_names=dim_names, coord_scales=coord_scales, name='distribution')
 
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)

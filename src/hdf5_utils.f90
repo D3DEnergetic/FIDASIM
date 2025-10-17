@@ -4,6 +4,7 @@ MODULE hdf5_utils
 
 USE H5LT
 USE HDF5
+USE H5DS
 
 IMPLICIT NONE
 
@@ -26,6 +27,9 @@ public :: h5ltmake_compressed_dataset_int_f_7
 public :: h5ltread_dataset_int_scalar_f
 public :: h5ltread_dataset_double_scalar_f
 public :: check_compression_availability
+public :: h5_set_dimension_name
+public :: h5_make_dimension_scale
+public :: h5_attach_dimension_scale
 
 integer, parameter, private   :: Int32   = 4 !bytes = 32 bits (-2,147,483,648 to 2,147,483,647)
 integer, parameter, private   :: Int64   = 8 !bytes = 64 bits (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)
@@ -1088,5 +1092,104 @@ subroutine h5ltmake_compressed_dataset_int_f_7(loc_id,&
     endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_7
+
+subroutine h5_set_dimension_name(loc_id, dset_name, dim_idx, dim_name, error)
+    !+ Set a label/name for a specific dimension of a dataset
+    !+ This uses the HDF5 Dimension Scale API (H5DSset_label)
+
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: loc_id
+        !+ HDF5 file or group identifier
+    character(len=*), intent(in) :: dset_name
+        !+ Name of the dataset
+    integer, intent(in)          :: dim_idx
+        !+ Dimension index (0-based in HDF5)
+    character(len=*), intent(in) :: dim_name
+        !+ Name/label for the dimension
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    integer(HID_T) :: dset_id
+
+    ! Open the dataset
+    call h5dopen_f(loc_id, dset_name, dset_id, error)
+    if (error .ne. 0) return
+
+    ! Set the dimension label
+    call h5dsset_label_f(dset_id, dim_idx, dim_name, error)
+
+    ! Close the dataset
+    call h5dclose_f(dset_id, error)
+
+end subroutine h5_set_dimension_name
+
+subroutine h5_make_dimension_scale(loc_id, dset_name, scale_name, error)
+    !+ Convert a dataset into a dimension scale
+    !+ This marks a 1D coordinate array as a dimension scale that can be attached to other datasets
+
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: loc_id
+        !+ HDF5 file or group identifier
+    character(len=*), intent(in) :: dset_name
+        !+ Name of the dataset to convert to a dimension scale
+    character(len=*), intent(in) :: scale_name
+        !+ Name for this dimension scale (can be same as dset_name)
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    integer(HID_T) :: dset_id
+
+    ! Open the dataset
+    call h5dopen_f(loc_id, dset_name, dset_id, error)
+    if (error .ne. 0) return
+
+    ! Make it a dimension scale
+    call h5dsset_scale_f(dset_id, error, scale_name)
+
+    ! Close the dataset
+    call h5dclose_f(dset_id, error)
+
+end subroutine h5_make_dimension_scale
+
+subroutine h5_attach_dimension_scale(loc_id, dset_name, scale_name, dim_idx, error)
+    !+ Attach a dimension scale to a specific dimension of a dataset
+    !+ This creates the link between a data array and its coordinate array
+
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: loc_id
+        !+ HDF5 file or group identifier
+    character(len=*), intent(in) :: dset_name
+        !+ Name of the dataset to attach scale to
+    character(len=*), intent(in) :: scale_name
+        !+ Name of the dimension scale dataset
+    integer, intent(in)          :: dim_idx
+        !+ Dimension index (0-based in HDF5)
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    integer(HID_T) :: dset_id, scale_id
+
+    ! Open the dataset
+    call h5dopen_f(loc_id, dset_name, dset_id, error)
+    if (error .ne. 0) return
+
+    ! Open the dimension scale dataset
+    call h5dopen_f(loc_id, scale_name, scale_id, error)
+    if (error .ne. 0) then
+        call h5dclose_f(dset_id, error)
+        return
+    endif
+
+    ! Attach the scale to the dimension
+    call h5dsattach_scale_f(dset_id, scale_id, dim_idx, error)
+
+    ! Close both datasets
+    call h5dclose_f(scale_id, error)
+    call h5dclose_f(dset_id, error)
+
+end subroutine h5_attach_dimension_scale
 
 END MODULE hdf5_utils

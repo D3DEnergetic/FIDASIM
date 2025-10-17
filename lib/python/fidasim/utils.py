@@ -729,7 +729,7 @@ def detector_aperture_geometry(g,wn):
 
     return {'rdist':RDist,'zdist':ZDist,'v':v,'d':D,'rc':RC}
 
-def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
+def write_data(h5_obj, dic, desc=dict(), units=dict(), name='', dim_names=dict(), coord_scales=dict()):
     """
     #+#write_data
     #+ Write h5 datasets with attributes 'description' and 'units'
@@ -746,9 +746,15 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     #+
     #+     **units**: Dict with same keys as dic providing units of data in dic, doesn't have to be all keys of dic.
     #+
+    #+     **dim_names**: Dict mapping dataset names to lists of dimension names for xarray/pandas compatibility
+    #+
+    #+     **coord_scales**: Dict mapping coordinate dataset names to their scale names
+    #+
     #+##Example Usage
     #+```python
-    #+>>> write_data(h5_obj, dic, desc, units)
+    #+>>> dim_names = {'dene': ['r', 'z'], 'deni': ['species', 'r', 'z']}
+    #+>>> coord_scales = {'r': 'r', 'z': 'z'}
+    #+>>> write_data(h5_obj, dic, desc, units, dim_names=dim_names, coord_scales=coord_scales)
     #+```
     """
     # Make a copy of the dictionary to avoid modifying the original
@@ -782,6 +788,33 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         # Add units attribute (if present)
         if key in units:
             ds.attrs['units'] = units[key]
+
+        # Add dimension names for xarray/pandas compatibility
+        if key in dim_names and isinstance(dict2[key], np.ndarray):
+            dims = dim_names[key]
+            # Set dimension labels using HDF5 dimension scale API
+            for i, dim_name in enumerate(dims):
+                if dim_name:  # Only set if dimension name is provided
+                    ds.dims[i].label = dim_name
+
+        # Mark coordinate arrays as dimension scales
+        if key in coord_scales:
+            ds.make_scale(coord_scales[key])
+
+    # After all datasets created, attach dimension scales
+    for key in dict2:
+        if key in dim_names and isinstance(dict2[key], np.ndarray):
+            dims = dim_names[key]
+            for i, dim_name in enumerate(dims):
+                # Try to find and attach matching coordinate scale
+                if dim_name in coord_scales.values():
+                    # Find the dataset with this scale name
+                    for coord_key, scale_name in coord_scales.items():
+                        if scale_name == dim_name and coord_key in h5_obj:
+                            try:
+                                h5_obj[key].dims[i].attach_scale(h5_obj[coord_key])
+                            except:
+                                pass  # Scale attachment is optional
 
 def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     """

@@ -119,6 +119,9 @@ def main():
     parser.add_argument('-si','--saveimportant',
                         default='', type=str,
                         help='Indicates the path where important plots will be saved')
+    parser.add_argument('-wo','--wout-file',
+                        default='', type=str,
+                        help='Filepath for VMEC wout file to use when plotting geometry')
 
     args = parser.parse_args()
 
@@ -139,6 +142,16 @@ def main():
         except:
             print('ERROR: Check your directory, runid or path. The *_geometry.h5 file was not found')
             raise SystemExit
+        use_wout = False
+        wout_file = args.wout_file
+        if len(wout_file)>0:
+            try:
+                from vmec import read_vmec
+                wout = read_vmec(wout_file)
+                use_wout = True
+            except FileNotFoundError:
+                print(f'WARNING: Missing VMEC wout file')
+                print('Using default boundary surface settings')
 
     if args.distribution or args.plasma or args.fields or args.geometry or plot_all:
         try:
@@ -303,29 +316,48 @@ def main():
                 ax.add_collection3d(Poly3DCollection(verts, facecolors='lime', linewidths=1, edgecolors='darkgreen',
                                                      alpha=0.1))
 
-        # Approximate plasma with a torus, where minor radius = max(max_length_R, max_length_Z)/2
         # Find first and last nonzero index in R and Z
         if axisym:
             ir = [i for i,mr in enumerate(mask.sum(0)) if mr>0]
             iz = [i for i,mz in enumerate(mask.sum(1)) if mz>0]
         else:
-            ir = [i for i,mr in enumerate(mask.sum((-1,0))) if mr>0]
-            iz = [i for i,mz in enumerate(mask.sum((-1,1))) if mz>0]
-            print(iz)
+            # Shape of mask should be (nphi, nz, nr)
+            # To find ir, sum over phi (0) and z (1)
+            # To find iz, sum over phi (0) and r (2)
+            ir = [i for i,mr in enumerate(mask.sum((0,1))) if mr>0]
+            iz = [i for i,mz in enumerate(mask.sum((0,2))) if mz>0]
         lr = r[ir[-1]]-r[ir[0]]
         lz = z[iz[-1]]-z[iz[0]]
         rho_r = lr/2.0
         rho_z = lz/2.0
-
-        # Generate torus mesh
-        npts = 32
-        ph = np.linspace(phimin, phimax, npts) #depends on user inputs, phimin and phimax
-        phi, theta = np.meshgrid(ph, np.linspace(0, 2*np.pi, npts))
         r_midpoint = r.mean()
+        if use_wout:
+            ixm = wout['f']['xm']
+            ixn = wout['f']['xn']
+            rmnc = wout['f']['rmnc'][-1] * 100 # Select s=1 boundary surface, convert to cm
+            zmns = wout['f']['zmns'][-1] * 100
 
-        X = (r_midpoint + rho_r * np.cos(theta)) * np.cos(phi)
-        Y = (r_midpoint + rho_r * np.cos(theta)) * np.sin(phi)
-        Z = rho_z * np.sin(theta)
+            theta = np.linspace(0, 2*np.pi, 157)
+            pol, tor = np.meshgrid(theta, phi)
+            pol_m = np.dot(ixm[:, None], pol.flatten()[None, :])
+            tor_n = np.dot(ixn[:, None], tor.flatten()[None, :])
+            cos_mu_nv = np.cos(pol_m - tor_n)
+            sin_mu_nv = np.sin(pol_m - tor_n)
+
+            r3d = np.dot(rmnc, cos_mu_nv).reshape(*pol.shape)
+            X = r3d * np.cos(tor)
+            Y = r3d * np.sin(tor)
+            Z = np.dot(zmns, sin_mu_nv).reshape(*pol.shape)
+        else:
+            # Approximate plasma with a torus, where minor radius = max(max_length_R, max_length_Z)/2
+            # Generate torus mesh
+            npts = 32
+            ph = np.linspace(phimin, phimax, npts) #depends on user inputs, phimin and phimax
+            phi, theta = np.meshgrid(ph, np.linspace(0, 2*np.pi, npts))
+
+            X = (r_midpoint + rho_r * np.cos(theta)) * np.cos(phi)
+            Y = (r_midpoint + rho_r * np.cos(theta)) * np.sin(phi)
+            Z = rho_z * np.sin(theta)
 
         ax.plot_surface(X, Y, Z, color='indigo', rstride=1, cstride=1, alpha=0.25)
 
@@ -419,9 +451,9 @@ def main():
         labels = ['T$_{e}$ [keV]','T$_{i}$ [keV]','n$_i$ [cm$^{-3}$]','n$_e$ [cm$^{-3}$]','n$_n$ [cm$^{-3}$]','Z$_{eff}$']
         fig_labels = ['Te','Ti','Ni','Ne','Nn','Zeff']
         for i in range(len(to_plt)):
-            try: #Account mixed species (H!,H2,H3)
-                plasma = eq["/plasma/"+to_plt[i]][()][:,:,args.ithermal_species]
-            except:
+            if to_plt[i] == 'deni': #Account mixed species (H1,H2,H3)
+                plasma = eq["/plasma/"+to_plt[i]][()][..., args.ithermal_species]
+            else:
                 plasma = eq["/plasma/"+to_plt[i]][()]
 
             plasma_masked = np.ma.array(plasma)

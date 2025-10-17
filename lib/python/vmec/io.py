@@ -50,8 +50,15 @@ def read_vmec(file_name):
     if 'mnmax_nyq' not in f:
         f['mnmax_nyq'] = f['mnmax']
 
-    for key in ['buco', 'bvco', 'vp', 'overr', 'specw']:
+    for key in ['buco', 'bvco', 'vp', 'specw']:
         f[key] = h2f(f[key])
+    
+    try:
+        f['overr'] = h2f(f['overr'])
+        lasym = f['lasym']
+    except:
+        f['over_r'] = h2f(f['over_r'])
+        lasym = f['lasym__logical__']
     
     for mn in range(f['mnmax']):
         f['lmns'][:, mn] = h2f(f['lmns'][:, mn])
@@ -59,7 +66,7 @@ def read_vmec(file_name):
         for key in ['bmnc', 'gmnc', 'bsupumnc', 'bsupvmnc', 'bsubsmns', 'bsubumnc', 'bsubvmnc']:
             f[key][:, mn] = h2f(f[key][:, mn])
 
-    if f['lasym']:
+    if lasym:
         for mn in range(f['mnmax']):
             f['lmnc'][:, mn] = h2f(f['lmnc'][:, mn])
         for mn in range(f['mnmax_nyq']):
@@ -151,7 +158,6 @@ def read_vmec_nc(file_name):
     wout_netcdf = netcdf_file(file_name, mode='r', version=4)
     f = {}
     for key, var in wout_netcdf.variables.items():
-        print(key)
         if var.data.ndim == 0:
             val = np.array([var.data])[0]
             if float(val).is_integer():

@@ -800,6 +800,10 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='', dim_names=dict()
         # Mark coordinate arrays as dimension scales
         if key in coord_scales:
             ds.make_scale(coord_scales[key])
+            # Also label the coordinate array's own dimension if it's 1D
+            if isinstance(dict2[key], np.ndarray) and dict2[key].ndim == 1:
+                if key not in dim_names:  # Only if not already labeled
+                    ds.dims[0].label = coord_scales[key]
 
     # After all datasets created, attach dimension scales
     for key in dict2:

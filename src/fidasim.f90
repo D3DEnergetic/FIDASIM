@@ -4730,6 +4730,10 @@ subroutine write_beam_grid(id, error)
          "Right-handed cartesian",error)
 
     !Mark coordinate arrays as dimension scales for xarray/netCDF compatibility
+    !Also label the 1D coordinate arrays themselves
+    call h5_set_dimension_name(gid, "x", 1, "x", error)
+    call h5_set_dimension_name(gid, "y", 1, "y", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
     call h5_make_dimension_scale(gid, "x", "x", error)
     call h5_make_dimension_scale(gid, "y", "y", error)
     call h5_make_dimension_scale(gid, "z", "z", error)
@@ -5298,7 +5302,9 @@ subroutine write_npa
         call h5ltset_attribute_string_f(fid,"/count","description", &
              "Number of particles that hit the detector: count(chan)", error)
 
-        !Mark coordinate arrays as dimension scales
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
         call h5_make_dimension_scale(fid, "/energy", "energy", error)
         call h5_make_dimension_scale(fid, "/radius", "channel", error)
 
@@ -6080,7 +6086,9 @@ subroutine write_spectra
          "Spectra calculated by FIDASIM", error)
 
     !Add dimension names for xarray/pandas compatibility
-    !Mark coordinate arrays as dimension scales
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
     call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
     call h5_make_dimension_scale(fid, "/radius", "channel", error)
 
@@ -6402,7 +6410,12 @@ subroutine write_neutrons
     endif
 
     if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.2)) then
-        !Mark coordinate arrays as dimension scales
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/r", 1, "r", error)
+        call h5_set_dimension_name(fid, "/z", 1, "z", error)
+        call h5_set_dimension_name(fid, "/phi", 1, "phi", error)
         call h5_make_dimension_scale(fid, "/energy", "energy", error)
         call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
         call h5_make_dimension_scale(fid, "/r", "r", error)
@@ -6441,7 +6454,8 @@ subroutine write_neutrons
         endif
 
         if(allocated(neutron%energy)) then
-            !Mark neutron energy as dimension scale
+            !Mark neutron energy as dimension scale and label its dimension
+            call h5_set_dimension_name(fid, "/energy_nc", 1, "neutron_energy", error)
             call h5_make_dimension_scale(fid, "/energy_nc", "neutron_energy", error)
 
             if(particles%nclass.gt.1) then
@@ -6560,7 +6574,10 @@ subroutine write_cfpd_weights
 
     !Add dimension names for xarray/pandas compatibility
     if(inputs%dist_type.eq.1) then
-        !Mark coordinate arrays as dimension scales
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/earray", 1, "detector_energy", error)
         call h5_make_dimension_scale(fid, "/energy", "energy", error)
         call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
         call h5_make_dimension_scale(fid, "/earray", "detector_energy", error)
@@ -6752,7 +6769,11 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
 
     !Add dimension names for xarray/pandas compatibility
-    !Mark coordinate arrays as dimension scales
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
     call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
     call h5_make_dimension_scale(fid, "/energy", "energy", error)
     call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
@@ -6966,7 +6987,10 @@ subroutine write_npa_weights
     endif
 
     !Add dimension names for xarray/pandas compatibility
-    !Mark coordinate arrays as dimension scales
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
     call h5_make_dimension_scale(fid, "/energy", "energy", error)
     call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
     call h5_make_dimension_scale(fid, "/radius", "channel", error)
@@ -7052,7 +7076,11 @@ subroutine write_nc_weights
     call h5ltmake_dataset_double_f(gid, "z", 1, dim1, inter_grid%z, error)
     
     !Add dimension names for xarray/pandas compatibility
-    !Mark coordinate arrays as dimension scales
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(gid, "energy", 1, "energy", error)
+    call h5_set_dimension_name(gid, "pitch", 1, "pitch", error)
+    call h5_set_dimension_name(gid, "r", 1, "r", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
     call h5_make_dimension_scale(gid, "energy", "energy", error)
     call h5_make_dimension_scale(gid, "pitch", "pitch", error)
     call h5_make_dimension_scale(gid, "r", "r", error)

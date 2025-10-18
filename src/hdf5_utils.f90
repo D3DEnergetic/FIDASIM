@@ -1104,7 +1104,7 @@ subroutine h5_set_dimension_name(loc_id, dset_name, dim_idx, dim_name, error)
     character(len=*), intent(in) :: dset_name
         !+ Name of the dataset
     integer, intent(in)          :: dim_idx
-        !+ Dimension index (0-based in HDF5)
+        !+ Dimension index (1-based Fortran indexing)
     character(len=*), intent(in) :: dim_name
         !+ Name/label for the dimension
     integer, intent(out)         :: error
@@ -1116,7 +1116,7 @@ subroutine h5_set_dimension_name(loc_id, dset_name, dim_idx, dim_name, error)
     call h5dopen_f(loc_id, dset_name, dset_id, error)
     if (error .ne. 0) return
 
-    ! Set the dimension label
+    ! Set the dimension label (HDF5 Fortran API uses 1-based indexing)
     call h5dsset_label_f(dset_id, dim_idx, dim_name, error)
 
     ! Close the dataset
@@ -1166,7 +1166,7 @@ subroutine h5_attach_dimension_scale(loc_id, dset_name, scale_name, dim_idx, err
     character(len=*), intent(in) :: scale_name
         !+ Name of the dimension scale dataset
     integer, intent(in)          :: dim_idx
-        !+ Dimension index (0-based in HDF5)
+        !+ Dimension index (1-based Fortran indexing)
     integer, intent(out)         :: error
         !+ HDF5 error code
 
@@ -1183,7 +1183,7 @@ subroutine h5_attach_dimension_scale(loc_id, dset_name, scale_name, dim_idx, err
         return
     endif
 
-    ! Attach the scale to the dimension
+    ! Attach the scale to the dimension (HDF5 Fortran API uses 1-based indexing)
     call h5dsattach_scale_f(dset_id, scale_id, dim_idx, error)
 
     ! Close both datasets

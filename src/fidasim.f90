@@ -106,7 +106,7 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-integer, parameter :: reservoir_size = 50
+integer, parameter :: reservoir_size = 250
     !+ Size of Neutral Particle Reservoir
 
 !!Loop Parallization Settings
@@ -1373,7 +1373,11 @@ type SimulationInputs
         !+ Enable the use of the fast ion distribution for beam deposition calculations
     Integer(Int32) :: calc_sink
         !+ Calculate ion sink profile: 0 = off, 1=on
-
+    !! >>> [JFCM, 2025_10_02] >>>
+    integer(Int32) :: enable_halo
+    	!+ Enable calculation of halo process
+    !! <<< [JFCM, 2025_10_02] <<<
+    
     !! Distribution settings
     integer(Int32) :: dist_type
         !+ Type of fast-ion distribution
@@ -2306,7 +2310,7 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
-    integer            :: enable_nonthermal_calc, calc_sink
+    integer            :: enable_nonthermal_calc, calc_sink, enable_halo
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2321,7 +2325,7 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
-        enable_nonthermal_calc, calc_sink
+        enable_nonthermal_calc, calc_sink, enable_halo
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2404,6 +2408,7 @@ subroutine read_inputs
     ! Default values for non-thermal calculation if not included in namelist:
     enable_nonthermal_calc=0
     calc_sink=0
+    enable_halo=0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2482,7 +2487,8 @@ subroutine read_inputs
     !! Non-thermal beam deposition switches
     inputs%enable_nonthermal_calc = enable_nonthermal_calc
     inputs%calc_sink = calc_sink
-
+    inputs%enable_halo = enable_halo
+    
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
     inputs%output_neutral_reservoir=output_neutral_reservoir
@@ -17016,7 +17022,11 @@ subroutine calculate_halo_process
   !! Also we need to clear all sink and birth files at the start of a new run
   !! this is importnat if we happen to reduce the number of iterations from one run to another
   !! This will prevent carrying old source point files incorrecly
-  n_iter = 4
+  
+  !! >>> [JFCM, 2025-10-20] >>>
+  !! n_iter = 4
+  n_iter = 3
+  !! <<< [JFCM, 2025-10-20] <<<
   seed_dcx = 1.0
   iterations: do hh = 1,n_iter
 
@@ -17207,7 +17217,7 @@ subroutine calculate_halo_process
     if (halo_iter_dens(cur_type)/halo_iter_dens(prev_type) .gt. 1.0) then
         write(*,'(a)') "CALCULATE_HALO_PROCESS: Halo generation density exceeds the seed density. This should not happen"
         print *, "ratio: ", halo_iter_dens(cur_type)/halo_iter_dens(prev_type)
-        exit iterations
+        !!exit iterations
     end if
 
     !! Set current generation to previous generation:
@@ -17997,7 +18007,7 @@ program fidasim
                 !! TODO: Incorporate write_<src>_profile into calculate_dcx_process
                 !! TODO: Fix the photon accumulation in dcx and halo process subroutines to mimic orignal dcx and halo subroutines, then add switch to skip or enable calc_spec so what we can move dcx and halo process subroutines to where dcx and halo are located.
                 !! TODO: Bring the wall condition inputs to the user interface
-                if (inputs%calc_birth.eq.1 .and. inputs%calc_sink.ge.1 .and. .TRUE. ) then
+                if (inputs%calc_birth.eq.1 .and. inputs%calc_sink.ge.1 .and. inputs%enable_halo.ge.1 ) then
                   if(inputs%verbose.ge.1) then
                       write(*,*) 'CALCULATE_HALO_PROCESS:    ' , time_string(time_start)
                   endif

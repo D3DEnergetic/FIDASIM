@@ -2680,13 +2680,18 @@ subroutine make_passive_grid
 
     pass_grid%dphi = 2*pi/100 !TODO: make this user input
     pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
+    if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
         pass_grid%phi(i) = extrema(1,3) + (i-1)*pass_grid%dphi
     enddo
 
-    pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
+    if(pass_grid%nphi.eq.1) then
+        pass_grid%dv = pass_grid%dr*pass_grid%dz  ! Axisymmetric case
+    else
+        pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
+    endif
     pass_grid%dims = [pass_grid%nr, pass_grid%nz, pass_grid%nphi]
 
     pass_grid%ntrack = (pass_grid%nr+pass_grid%nz+pass_grid%nphi)*inputs%max_cell_splits
@@ -2732,16 +2737,16 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
-    if((inputs%calc_pfida+inputs%calc_pnpa.gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
+    if(((inputs%calc_pfida+inputs%calc_pnpa).gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
         else
             call make_passive_grid()
         endif
-    endif
 
-    !! Spectral line-of-sight passive neutral grid intersection calculations
-    allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
+        !! Spectral line-of-sight passive neutral grid intersection calculations
+        allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
+    endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
         allocate(tracks(pass_grid%ntrack))
         allocate(dlength(pass_grid%nr, &
@@ -2831,7 +2836,8 @@ subroutine make_diagnostic_grids
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
-    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
+    !! Only needed when beam grid exists for active measurements
+    if((inputs%calc_beam.ge.1).and.((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0)) then
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -2919,17 +2925,19 @@ subroutine make_diagnostic_grids
     endif
 
     !! NPA probability calculations
-    allocate(xd(50),yd(50))
-    allocate(probs(beam_grid%ngrid))
-    allocate(eff_rds(3,beam_grid%ngrid))
-    allocate(npa_chords%phit(beam_grid%nx, &
-                             beam_grid%ny, &
-                             beam_grid%nz, &
-                             npa_chords%nchan) )
-    allocate(npa_chords%hit(beam_grid%nx, &
-                            beam_grid%ny, &
-                            beam_grid%nz) )
-    npa_chords%hit = .False.
+    !! Only needed when beam grid exists for active NPA measurements
+    if(inputs%calc_beam.ge.1) then
+        allocate(xd(50),yd(50))
+        allocate(probs(beam_grid%ngrid))
+        allocate(eff_rds(3,beam_grid%ngrid))
+        allocate(npa_chords%phit(beam_grid%nx, &
+                                 beam_grid%ny, &
+                                 beam_grid%nz, &
+                                 npa_chords%nchan) )
+        allocate(npa_chords%hit(beam_grid%nx, &
+                                beam_grid%ny, &
+                                beam_grid%nz) )
+        npa_chords%hit = .False.
 
     npa_chan_loop: do ichan=1,npa_chords%nchan
         v0 = npa_chords%det(ichan)%aperture%origin - npa_chords%det(ichan)%detector%origin
@@ -3008,7 +3016,8 @@ subroutine make_diagnostic_grids
             endif
         endif
     enddo npa_chan_loop
-    deallocate(probs,eff_rds,xd,yd)
+        deallocate(probs,eff_rds,xd,yd)
+    endif  !! End of calc_beam conditional for NPA probability calculations
 
 end subroutine make_diagnostic_grids
 
@@ -5117,7 +5126,7 @@ subroutine write_npa
     npart = npa%npart
     if(npart.gt.0) then
         do i=1,npa_chords%nchan
-            dcount(i) = count(npa%part%detector.eq.i)
+            dcount(i) = count(npa%part(1:npa%npart)%detector.eq.i)
         enddo
     else
         dcount = 0
@@ -5284,7 +5293,7 @@ subroutine write_npa
     npart = pnpa%npart
     if(npart.gt.0) then
         do i=1,npa_chords%nchan
-            dcount(i) = count(pnpa%part%detector.eq.i)
+            dcount(i) = count(pnpa%part(1:pnpa%npart)%detector.eq.i)
         enddo
     else
         dcount = 0
@@ -9337,7 +9346,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive, gs)
         if(pnpa%npart.gt.pnpa%nmax) then
             pnpa%nmax = int(pnpa%nmax*2)
             allocate(parts(pnpa%nmax))
-            parts(1:(pnpa%npart-1)) = pnpa%part
+            parts(1:(pnpa%npart-1)) = pnpa%part(1:(pnpa%npart-1))
             deallocate(pnpa%part)
             call move_alloc(parts, pnpa%part)
         endif
@@ -9367,7 +9376,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive, gs)
         if(npa%npart.gt.npa%nmax) then
             npa%nmax = int(npa%nmax*2)
             allocate(parts(npa%nmax))
-            parts(1:(npa%npart-1)) = npa%part
+            parts(1:(npa%npart-1)) = npa%part(1:(npa%npart-1))
             deallocate(npa%part)
             call move_alloc(parts, npa%part)
         endif
@@ -15297,6 +15306,9 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer               :: i,narg,nthreads,max_threads,seed
+    logical               :: nbi_exists
+    integer(HID_T)        :: geo_fid
+    integer               :: h5_error
 
 #ifdef _VERSION
     version = _VERSION
@@ -15386,14 +15398,75 @@ program fidasim
     call read_plasma()
     call read_tables()
     call read_equilibrium()
-    call make_beam_grid()
-    if(inputs%calc_beam.ge.1) call read_beam()
+
+    !! Check if beam geometry is needed and available BEFORE trying to use it
+    !! Beam grid only needed for active measurements
+    !! Passive measurements (PFIDA, PNPA, neutrons) use pass_grid instead
+    if(inputs%calc_beam.ge.1) then
+        !! Check if /nbi group exists in geometry file before trying to read it
+        call h5open_f(h5_error)
+        call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, geo_fid, h5_error)
+        call h5ltpath_valid_f(geo_fid, "/nbi", .True., nbi_exists, h5_error)
+        call h5fclose_f(geo_fid, h5_error)
+        call h5close_f(h5_error)
+
+        if(.not.nbi_exists) then
+            !! Active diagnostics requested but no beam geometry available
+            if((inputs%calc_fida.ge.1).or.(inputs%calc_npa.ge.1).or.(inputs%calc_bes.ge.1).or. &
+               (inputs%calc_dcx.ge.1).or.(inputs%calc_halo.ge.1).or.(inputs%calc_birth.ge.1).or. &
+               (inputs%calc_fida_wght.ge.1).or.(inputs%calc_npa_wght.ge.1)) then
+                if(inputs%verbose.ge.0) then
+                    write(*,*)
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,'(a)') '!! ERROR: ACTIVE DIAGNOSTIC REQUESTED WITHOUT BEAM GEOMETRY'
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,*)
+                    write(*,'(a)') 'One or more ACTIVE diagnostics have been enabled, but no beam'
+                    write(*,'(a)') 'geometry is available (missing /nbi group in geometry file).'
+                    write(*,*)
+                    write(*,'(a)') 'Active diagnostics that require beam geometry:'
+                    if(inputs%calc_fida.ge.1)       write(*,'(a)') '  - calc_fida      = 1  (FIDA spectroscopy)'
+                    if(inputs%calc_npa.ge.1)        write(*,'(a)') '  - calc_npa       = 1  (Active NPA)'
+                    if(inputs%calc_bes.ge.1)        write(*,'(a)') '  - calc_bes       = 1  (Beam emission spectroscopy)'
+                    if(inputs%calc_dcx.ge.1)        write(*,'(a)') '  - calc_dcx       = 1  (Direct charge exchange)'
+                    if(inputs%calc_halo.ge.1)       write(*,'(a)') '  - calc_halo      = 1  (Halo radiation)'
+                    if(inputs%calc_birth.ge.1)      write(*,'(a)') '  - calc_birth     = 1  (Birth profile)'
+                    if(inputs%calc_fida_wght.ge.1)  write(*,'(a)') '  - calc_fida_wght = 1  (FIDA weight functions)'
+                    if(inputs%calc_npa_wght.ge.1)   write(*,'(a)') '  - calc_npa_wght  = 1  (NPA weight functions)'
+                    write(*,*)
+                    write(*,'(a)') 'SOLUTIONS:'
+                    write(*,'(a)') '  1. Provide beam geometry in your preprocessing script:'
+                    write(*,'(a)') '     prefida(inputs, grid, plasma, equil, fbm, nbi=nbi_geometry, ...)'
+                    write(*,'(a)') '  2. Set all active diagnostic flags to 0 in your inputs'
+                    write(*,'(a)') '  3. Use only passive diagnostics (calc_pfida, calc_pnpa, calc_neutron)'
+                    write(*,*)
+                    write(*,'(a)') 'For passive-only runs, set calc_beam=0 and only enable:'
+                    write(*,'(a)') '  - calc_pfida     (Passive FIDA)'
+                    write(*,'(a)') '  - calc_pnpa      (Passive NPA)'
+                    write(*,'(a)') '  - calc_neutron   (Neutron rates)'
+                    write(*,'(a)') '  - calc_neut_spec (Neutron spectra)'
+                    write(*,*)
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,*)
+                endif
+                stop 'ERROR: Active diagnostics require beam geometry. Exiting.'
+            endif
+        endif
+
+        call make_beam_grid()
+        call read_beam()
+    endif
+
     call read_distribution()
 
     call quasineutrality_check()
 
-    allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
+    !! Allocate intersection arrays only if beam grid exists
+    if(inputs%calc_beam.ge.1) then
+        allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    !! Read spectral chords for active or passive FIDA measurements
+    if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1).or.(inputs%calc_pfida.ge.1)) then
         call read_chords()
     endif
 

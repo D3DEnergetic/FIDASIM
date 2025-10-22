@@ -729,7 +729,9 @@ def detector_aperture_geometry(g,wn):
 
     return {'rdist':RDist,'zdist':ZDist,'v':v,'d':D,'rc':RC}
 
-def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
+def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
+               dim_names=dict(), coord_scales=dict(),
+               create_softlinks=False, coord_group_path=None):
     """
     #+#write_data
     #+ Write h5 datasets with attributes 'description' and 'units'
@@ -746,13 +748,48 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     #+
     #+     **units**: Dict with same keys as dic providing units of data in dic, doesn't have to be all keys of dic.
     #+
+    #+     **dim_names**: Dict mapping dataset names to lists of dimension names for xarray/pandas compatibility
+    #+
+    #+     **coord_scales**: Dict mapping coordinate dataset names to their scale names
+    #+
     #+##Example Usage
     #+```python
-    #+>>> write_data(h5_obj, dic, desc, units)
+    #+>>> dim_names = {'dene': ['r', 'z'], 'deni': ['species', 'r', 'z']}
+    #+>>> coord_scales = {'r': 'r', 'z': 'z'}
+    #+>>> write_data(h5_obj, dic, desc, units, dim_names=dim_names, coord_scales=coord_scales)
     #+```
     """
     # Make a copy of the dictionary to avoid modifying the original
     dict2 = copy.deepcopy(dic)
+
+    # If creating softlinks and we have a group (not file root)
+    if create_softlinks and isinstance(h5_obj, h5py.Group) and h5_obj.name != '/':
+        # Create soft links for common coordinates
+        if coord_group_path:
+            # Get the file object to check if coordinates exist
+            file_obj = h5_obj.file
+
+            # Check which coordinates are referenced in dim_names
+            referenced_coords = set()
+            for dims in dim_names.values():
+                if isinstance(dims, list):
+                    referenced_coords.update(dims)
+
+            # Create soft links for referenced coordinates
+            for coord_name in referenced_coords:
+                coord_path = f"{coord_group_path}/{coord_name}"
+                if coord_path in file_obj and coord_name not in h5_obj:
+                    try:
+                        # Create soft link in the current group
+                        h5_obj[coord_name] = h5py.SoftLink(coord_path)
+
+                        # Mark the soft link as a dimension scale
+                        if coord_name in coord_scales:
+                            # Note: marking soft links as scales happens after creation
+                            pass
+                    except:
+                        pass  # Ignore if link already exists or fails
+
     for key in dict2:
         if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)
@@ -782,6 +819,37 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         # Add units attribute (if present)
         if key in units:
             ds.attrs['units'] = units[key]
+
+        # Add dimension names for xarray/pandas compatibility
+        if key in dim_names and isinstance(dict2[key], np.ndarray):
+            dims = dim_names[key]
+            # Set dimension labels using HDF5 dimension scale API
+            for i, dim_name in enumerate(dims):
+                if dim_name:  # Only set if dimension name is provided
+                    ds.dims[i].label = dim_name
+
+        # Mark coordinate arrays as dimension scales
+        if key in coord_scales:
+            ds.make_scale(coord_scales[key])
+            # Also label the coordinate array's own dimension if it's 1D
+            if isinstance(dict2[key], np.ndarray) and dict2[key].ndim == 1:
+                if key not in dim_names:  # Only if not already labeled
+                    ds.dims[0].label = coord_scales[key]
+
+    # After all datasets created, attach dimension scales
+    for key in dict2:
+        if key in dim_names and isinstance(dict2[key], np.ndarray):
+            dims = dim_names[key]
+            for i, dim_name in enumerate(dims):
+                # Try to find and attach matching coordinate scale
+                if dim_name in coord_scales.values():
+                    # Find the dataset with this scale name
+                    for coord_key, scale_name in coord_scales.items():
+                        if scale_name == dim_name and coord_key in h5_obj:
+                            try:
+                                h5_obj[key].dims[i].attach_scale(h5_obj[coord_key])
+                            except:
+                                pass  # Scale attachment is optional
 
 def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     """

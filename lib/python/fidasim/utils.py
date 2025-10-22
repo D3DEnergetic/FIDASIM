@@ -729,7 +729,9 @@ def detector_aperture_geometry(g,wn):
 
     return {'rdist':RDist,'zdist':ZDist,'v':v,'d':D,'rc':RC}
 
-def write_data(h5_obj, dic, desc=dict(), units=dict(), name='', dim_names=dict(), coord_scales=dict()):
+def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
+               dim_names=dict(), coord_scales=dict(),
+               create_softlinks=False, coord_group_path=None):
     """
     #+#write_data
     #+ Write h5 datasets with attributes 'description' and 'units'
@@ -759,6 +761,35 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='', dim_names=dict()
     """
     # Make a copy of the dictionary to avoid modifying the original
     dict2 = copy.deepcopy(dic)
+
+    # If creating softlinks and we have a group (not file root)
+    if create_softlinks and isinstance(h5_obj, h5py.Group) and h5_obj.name != '/':
+        # Create soft links for common coordinates
+        if coord_group_path:
+            # Get the file object to check if coordinates exist
+            file_obj = h5_obj.file
+
+            # Check which coordinates are referenced in dim_names
+            referenced_coords = set()
+            for dims in dim_names.values():
+                if isinstance(dims, list):
+                    referenced_coords.update(dims)
+
+            # Create soft links for referenced coordinates
+            for coord_name in referenced_coords:
+                coord_path = f"{coord_group_path}/{coord_name}"
+                if coord_path in file_obj and coord_name not in h5_obj:
+                    try:
+                        # Create soft link in the current group
+                        h5_obj[coord_name] = h5py.SoftLink(coord_path)
+
+                        # Mark the soft link as a dimension scale
+                        if coord_name in coord_scales:
+                            # Note: marking soft links as scales happens after creation
+                            pass
+                    except:
+                        pass  # Ignore if link already exists or fails
+
     for key in dict2:
         if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)

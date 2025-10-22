@@ -1652,15 +1652,9 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                      'adist': 'cm'}
 
         # Define dimension names for xarray/pandas compatibility
-        nbi_dim_names = {'src': ['cartesian_component'],
-                        'axis': ['cartesian_component'],
-                        'divy': ['energy_component'],
-                        'divz': ['energy_component'],
-                        'awidy': ['aperture'],
-                        'awidz': ['aperture'],
-                        'aoffy': ['aperture'],
-                        'aoffz': ['aperture'],
-                        'adist': ['aperture']}
+        # Note: Removing dimension labels for small configuration arrays to avoid xarray issues
+        # These are parameter arrays, not data on coordinate grids
+        nbi_dim_names = {}
 
         write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units,
                   dim_names=nbi_dim_names, name='nbi')
@@ -1690,11 +1684,8 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                           'spot_size': 'cm'}
 
             # Define dimension names for xarray/pandas compatibility
-            spec_dim_names = {'lens': ['cartesian_component', 'channel'],
-                             'axis': ['cartesian_component', 'channel'],
-                             'radius': ['channel'],
-                             'spot_size': ['channel'],
-                             'sigma_pi': ['channel']}
+            # Note: Removing dimension labels for configuration arrays to avoid xarray issues
+            spec_dim_names = {}
 
             write_data(g_spec, spec, desc=spec_description, units=spec_units,
                       dim_names=spec_dim_names, name='spec')
@@ -1731,13 +1722,8 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'a_redge': 'cm'}
 
             # Define dimension names for xarray/pandas compatibility
-            npa_dim_names = {'d_cent': ['cartesian_component', 'channel'],
-                            'd_tedge': ['cartesian_component', 'channel'],
-                            'd_redge': ['cartesian_component', 'channel'],
-                            'a_cent': ['cartesian_component', 'channel'],
-                            'a_tedge': ['cartesian_component', 'channel'],
-                            'a_redge': ['cartesian_component', 'channel'],
-                            'radius': ['channel']}
+            # Note: Removing dimension labels for configuration arrays to avoid xarray issues
+            npa_dim_names = {}
 
             write_data(g_npa, npa, desc = npa_description, units = npa_units,
                       dim_names=npa_dim_names, name='npa')
@@ -1774,13 +1760,8 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'a_redge': 'cm'}
 
             # Define dimension names for xarray/pandas compatibility
-            nc_dim_names = {'d_cent': ['cartesian_component', 'channel'],
-                           'd_tedge': ['cartesian_component', 'channel'],
-                           'd_redge': ['cartesian_component', 'channel'],
-                           'a_cent': ['cartesian_component', 'channel'],
-                           'a_tedge': ['cartesian_component', 'channel'],
-                           'a_redge': ['cartesian_component', 'channel'],
-                           'radius': ['channel']}
+            # Note: Removing dimension labels for configuration arrays to avoid xarray issues
+            nc_dim_names = {}
 
             write_data(g_nc, nc, desc = nc_description, units = nc_units,
                       dim_names=nc_dim_names, name='nc')
@@ -1827,16 +1808,8 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
                          'daomega': 'cm^2'}
 
             # Define dimension names for xarray/pandas compatibility
-            cfpd_dim_names = {'d_cent': ['cartesian_component', 'channel'],
-                             'd_tedge': ['cartesian_component', 'channel'],
-                             'd_redge': ['cartesian_component', 'channel'],
-                             'a_cent': ['cartesian_component', 'channel'],
-                             'a_tedge': ['cartesian_component', 'channel'],
-                             'a_redge': ['cartesian_component', 'channel'],
-                             'radius': ['channel'],
-                             'earray': ['energy'],
-                             'sightline': ['component', 'step', 'ray', 'channel'],
-                             'daomega': ['step', 'ray', 'channel']}
+            # Note: Only keeping dimension labels where we have proper scales
+            cfpd_dim_names = {'earray': ['energy']}
 
             cfpd_coord_scales = {'earray': 'energy'}
 
@@ -1934,7 +1907,8 @@ def write_equilibrium(filename, plasma, fields):
                            'species_mass': ['species']}
 
         # Mark coordinate arrays as dimension scales
-        plasma_coord_scales = {'r': 'r', 'z': 'z'}
+        # Include species_mass as the scale for the species dimension
+        plasma_coord_scales = {'r': 'r', 'z': 'z', 'species_mass': 'species'}
 
         write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units,
                    dim_names=plasma_dim_names, coord_scales=plasma_coord_scales, name='plasma')
@@ -1984,7 +1958,8 @@ def write_equilibrium(filename, plasma, fields):
                            'et': ['r', 'z'],
                            'ez': ['r', 'z'],
                            'r2d': ['r', 'z'],
-                           'z2d': ['r', 'z']}
+                           'z2d': ['r', 'z'],
+                           'mask': ['r', 'z']}  # Added mask to ensure consistency
 
         # Mark coordinate arrays as dimension scales
         fields_coord_scales = {'r': 'r', 'z': 'z'}

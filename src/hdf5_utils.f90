@@ -1192,4 +1192,117 @@ subroutine h5_attach_dimension_scale(loc_id, dset_name, scale_name, dim_idx, err
 
 end subroutine h5_attach_dimension_scale
 
+subroutine h5_create_soft_link(loc_id, target_path, link_name, error)
+    !+ Create a soft (symbolic) link to an existing dataset
+    !+ This allows coordinates to appear in multiple groups without data duplication
+
+    use hdf5
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: loc_id
+        !+ HDF5 file or group identifier
+    character(len=*), intent(in) :: target_path
+        !+ Path to the target dataset (e.g., "/grid/x")
+    character(len=*), intent(in) :: link_name
+        !+ Name of the link to create (e.g., "x")
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    integer(HID_T) :: lcpl_id, lapl_id
+
+    ! Create link creation property list
+    call h5pcreate_f(H5P_LINK_CREATE_F, lcpl_id, error)
+    if (error .ne. 0) return
+
+    ! Create link access property list
+    call h5pcreate_f(H5P_LINK_ACCESS_F, lapl_id, error)
+    if (error .ne. 0) then
+        call h5pclose_f(lcpl_id, error)
+        return
+    endif
+
+    ! Create the soft link
+    call h5lcreate_soft_f(target_path, loc_id, link_name, error, lcpl_id, lapl_id)
+
+    ! Close property lists
+    call h5pclose_f(lapl_id, error)
+    call h5pclose_f(lcpl_id, error)
+
+end subroutine h5_create_soft_link
+
+subroutine h5_create_coordinate_links(group_id, grid_path, error)
+    !+ Create soft links to grid coordinates within a group
+    !+ This makes the group self-contained for xarray compatibility
+
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: group_id
+        !+ HDF5 group identifier where links will be created
+    character(len=*), intent(in) :: grid_path
+        !+ Path to grid group (e.g., "/grid")
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    ! Create soft links for standard grid coordinates
+    call h5_create_soft_link(group_id, trim(grid_path)//"/x", "x", error)
+    if (error .ne. 0) return
+
+    call h5_create_soft_link(group_id, trim(grid_path)//"/y", "y", error)
+    if (error .ne. 0) return
+
+    call h5_create_soft_link(group_id, trim(grid_path)//"/z", "z", error)
+
+end subroutine h5_create_coordinate_links
+
+subroutine h5_attach_local_scales(group_id, dset_name, dim_names, ndims, error)
+    !+ Attach dimension scales that are local to the group
+    !+ Assumes coordinate arrays exist as soft links in the same group
+
+    use H5DS
+    IMPLICIT NONE
+
+    integer(HID_T), intent(in)   :: group_id
+        !+ HDF5 group identifier
+    character(len=*), intent(in) :: dset_name
+        !+ Name of the dataset (relative to group)
+    character(len=*), intent(in) :: dim_names(:)
+        !+ Names of dimensions to attach
+    integer, intent(in)          :: ndims
+        !+ Number of dimensions
+    integer, intent(out)         :: error
+        !+ HDF5 error code
+
+    integer(HID_T) :: dset_id, scale_id
+    integer :: i
+    character(len=128) :: coord_name
+
+    ! Open the dataset
+    call h5dopen_f(group_id, dset_name, dset_id, error)
+    if (error .ne. 0) return
+
+    ! Attach each dimension scale
+    do i = 1, ndims
+        coord_name = trim(dim_names(i))
+
+        ! Skip if dimension name is empty or not a coordinate
+        if (len_trim(coord_name) == 0) cycle
+        if (coord_name == 'atomic_level' .or. &
+            coord_name == 'beam_component' .or. &
+            coord_name == 'particle' .or. &
+            coord_name == 'channel') cycle
+
+        ! Try to open and attach the coordinate
+        call h5dopen_f(group_id, coord_name, scale_id, error)
+        if (error == 0) then
+            call h5dsattach_scale_f(dset_id, scale_id, i, error)
+            call h5dclose_f(scale_id, error)
+        endif
+    enddo
+
+    ! Close the dataset
+    call h5dclose_f(dset_id, error)
+    error = 0  ! Reset error since some scales might not exist
+
+end subroutine h5_attach_local_scales
+
 END MODULE hdf5_utils

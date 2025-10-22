@@ -196,7 +196,31 @@ def check_inputs(inputs, use_abs_path=True):
     inputs.setdefault('max_cell_splits', 1)
     inputs.setdefault('max_crossings', 2)
 
-    err = check_dict_schema(schema, inputs, desc="simulation settings")
+    # Determine if this is a passive-only run
+    is_passive_only = (inputs.get('calc_npa', 0) == 0 and
+                       inputs.get('calc_fida', 0) == 0 and
+                       inputs.get('calc_bes', 0) == 0 and
+                       inputs.get('calc_dcx', 0) == 0 and
+                       inputs.get('calc_halo', 0) == 0 and
+                       inputs.get('calc_birth', 0) == 0 and
+                       inputs.get('calc_nbi', 0) == 0 and
+                       inputs.get('calc_fida_wght', 0) == 0 and
+                       inputs.get('calc_npa_wght', 0) == 0)
+
+    # For passive-only runs, beam parameters are optional
+    if is_passive_only:
+        # Create a modified schema without beam parameters
+        passive_schema = schema.copy()
+        # Remove beam-specific required parameters
+        beam_params = ['nx', 'ny', 'nz', 'xmin', 'xmax', 'ymin', 'ymax', 'zmin', 'zmax',
+                      'alpha', 'beta', 'gamma', 'origin', 'current_fractions', 'pinj', 'einj']
+        for param in beam_params:
+            if param in passive_schema:
+                del passive_schema[param]
+        err = check_dict_schema(passive_schema, inputs, desc="simulation settings")
+    else:
+        err = check_dict_schema(schema, inputs, desc="simulation settings")
+
     if err:
         error('Invalid simulation settings. Exiting...', halt=True)
 
@@ -204,10 +228,36 @@ def check_inputs(inputs, use_abs_path=True):
     if use_abs_path:
         inputs['result_dir'] = os.path.abspath(inputs['result_dir'])
 
-    if (inputs['alpha'] > 2. * np.pi) or (inputs['beta'] > 2. * np.pi) or (inputs['gamma'] > 2. * np.pi):
-        error('Angles must be in radians')
-        err = True
+    # Only validate beam parameters if not in passive-only mode
+    if not is_passive_only:
+        if (inputs['alpha'] > 2. * np.pi) or (inputs['beta'] > 2. * np.pi) or (inputs['gamma'] > 2. * np.pi):
+            error('Angles must be in radians')
+            err = True
 
+        if inputs['xmin'] >= inputs['xmax']:
+            error('Invalid x range. Expected xmin < xmax')
+            err = True
+
+        if inputs['ymin'] >= inputs['ymax']:
+            error('Invalid y range. Expected ymin < ymax')
+            err = True
+
+        if inputs['zmin'] >= inputs['zmax']:
+            error('Invalid z range. Expected zmin < zmax')
+            err = True
+
+        if (inputs['pinj'] <= 0.) or (inputs['einj'] <= 0.0):
+            error('The selected source is not on')
+            print('einj = {}'.format(inputs['einj']))
+            print('pinj = {}'.format(inputs['pinj']))
+            err = True
+
+        if np.abs(np.sum(inputs['current_fractions']) - 1.0) > 1e-3:
+            error('current_fractions do not sum to 1.0')
+            print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
+            err = True
+
+    # These validations apply to both active and passive runs
     if inputs['lambdamin'] >= inputs['lambdamax']:
         error('Invalid wavelength range. Expected lambdamin < lamdbdamax')
         err = True
@@ -218,29 +268,6 @@ def check_inputs(inputs, use_abs_path=True):
 
     if inputs['emin_nc'] >= inputs['emax_nc']:
         error('Invalid neutron energy range. Expected emin_nc < emax_nc')
-        err = True
-
-    if inputs['xmin'] >= inputs['xmax']:
-        error('Invalid x range. Expected xmin < xmax')
-        err = True
-
-    if inputs['ymin'] >= inputs['ymax']:
-        error('Invalid y range. Expected ymin < ymax')
-        err = True
-
-    if inputs['zmin'] >= inputs['zmax']:
-        error('Invalid z range. Expected zmin < zmax')
-        err = True
-
-    if (inputs['pinj'] <= 0.) or (inputs['einj'] <= 0.0):
-        error('The selected source is not on')
-        print('einj = {}'.format(inputs['einj']))
-        print('pinj = {}'.format(inputs['pinj']))
-        err = True
-
-    if np.abs(np.sum(inputs['current_fractions']) - 1.0) > 1e-3:
-        error('current_fractions do not sum to 1.0')
-        print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
     if (inputs['adaptive'] < 0):
@@ -1021,36 +1048,45 @@ def check_spec(inputs, chords):
     uvw_lens = chords['lens']
     uvw_axis = chords['axis']
 
-    # ROTATE CHORDS INTO BEAM GRID COORDINATES
-    xyz_lens = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_lens, origin=inputs['origin'])
-    xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
+    # Check if beam parameters are present (not passive-only mode)
+    has_beam_params = all(key in inputs for key in ['alpha', 'beta', 'gamma', 'origin', 'xmin', 'xmax', 'ymin', 'ymax', 'zmin', 'zmax'])
 
-    # Calculate grid center rc and sides length dr
-    dr = np.array([inputs['xmax'] - inputs['xmin'], inputs['ymax'] - inputs['ymin'], inputs['zmax'] - inputs['zmin']], dtype=float)
-    rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=float) + 0.5 * dr
+    if has_beam_params:
+        # ROTATE CHORDS INTO BEAM GRID COORDINATES
+        xyz_lens = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_lens, origin=inputs['origin'])
+        xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
+
+        # Calculate grid center rc and sides length dr
+        dr = np.array([inputs['xmax'] - inputs['xmin'], inputs['ymax'] - inputs['ymin'], inputs['zmax'] - inputs['zmin']], dtype=float)
+        rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=float) + 0.5 * dr
 
     for i in range(nchan):
         if not np.isclose(np.linalg.norm(uvw_axis[:, i]), 1, rtol=1e-03):
             error('Invalid optical axis for chord "' + str(chords['id'][i]) + '". Expected norm(axis) == 1')
             print(np.sum(uvw_axis[:, i] ** 2.))
 
-        # Check if viewing chord intersects beam grid
-        length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_lens[:, i], xyz_axis[:, i])
-        if length <= 0.0:
-            cross_arr[i] = 1
+        if has_beam_params:
+            # Check if viewing chord intersects beam grid
+            length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_lens[:, i], xyz_axis[:, i])
+            if length <= 0.0:
+                cross_arr[i] = 1
 
-    wbad = (cross_arr == 1)
-    nbad = cross_arr[wbad].size
-    if nbad > 0:
-        warn('The following {} chords do not cross the beam grid:'.format(nbad))
-        warn('Chord ID: {}'.format(chords['id'][wbad]))
+    if has_beam_params:
+        wbad = (cross_arr == 1)
+        nbad = cross_arr[wbad].size
+        if nbad > 0:
+            warn('The following {} chords do not cross the beam grid:'.format(nbad))
+            warn('Chord ID: {}'.format(chords['id'][wbad]))
 
-    wgood = (cross_arr == 0)
-    ngood = cross_arr[wgood].size
-    print('{} out of {} chords crossed the beam grid'.format(ngood, nchan))
-    if ngood == 0:
-        error('No channels intersect the beam grid')
-        err = True
+        wgood = (cross_arr == 0)
+        ngood = cross_arr[wgood].size
+        print('{} out of {} chords crossed the beam grid'.format(ngood, nchan))
+        if ngood == 0:
+            error('No channels intersect the beam grid')
+            err = True
+    else:
+        # For passive-only runs, skip beam grid intersection check
+        info('Passive-only mode: skipping beam grid intersection check for spectral chords')
 
     if err:
         error('Invalid FIDA/BES geometry. Exiting...', halt=True)
@@ -1135,10 +1171,11 @@ def check_npa(inp, npa):
         print('Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w]))
         err = True
 
-    # Calculate grid center rc and sides length dr
-    dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']])
-    rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']]) + 0.5 * dr
+    # Check if beam parameters are present (not passive-only mode)
+    has_beam_params = all(key in inp for key in ['alpha', 'beta', 'gamma', 'origin', 'xmin', 'xmax', 'ymin', 'ymax', 'zmin', 'zmax'])
+
     err_arr = np.zeros(nchan, dtype=int)
+
     for i in range(nchan):
         uvw_det = npa['d_cent'][:, i]
         d_e1 = npa['d_redge'][:, i] - uvw_det
@@ -1150,22 +1187,28 @@ def check_npa(inp, npa):
 
         uvw_dir = uvw_aper - uvw_det
 
-        #Rotate chords into beam grid coordinates
-        xyz_aper = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_aper, origin=inp['origin'])
-        xyz_det = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_det, origin=inp['origin'])
-        xyz_dir = xyz_aper - xyz_det
-        xyz_dir = xyz_dir / np.sqrt(np.sum(xyz_dir * xyz_dir))
+        if has_beam_params:
+            # Calculate grid center rc and sides length dr (only once)
+            if i == 0:
+                dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']])
+                rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']]) + 0.5 * dr
 
-        # Check if npa chord intersects beam grid
-        length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_det, xyz_dir)
-        if length <= 0.:
-            err_arr[i] = 1
+            #Rotate chords into beam grid coordinates
+            xyz_aper = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_aper, origin=inp['origin'])
+            xyz_det = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_det, origin=inp['origin'])
+            xyz_dir = xyz_aper - xyz_det
+            xyz_dir = xyz_dir / np.sqrt(np.sum(xyz_dir * xyz_dir))
 
-        # Check if NPA detector is pointing in the right direction
-        d_enter = np.sqrt(np.sum((r_enter - xyz_aper)**2))
-        d_exit = np.sqrt(np.sum((r_exit - xyz_aper)**2))
-        if d_exit < d_enter:
-            err_arr[i] = 1
+            # Check if npa chord intersects beam grid
+            length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_det, xyz_dir)
+            if length <= 0.:
+                err_arr[i] = 1
+            else:
+                # Check if NPA detector is pointing in the right direction
+                d_enter = np.sqrt(np.sum((r_enter - xyz_aper)**2))
+                d_exit = np.sqrt(np.sum((r_exit - xyz_aper)**2))
+                if d_exit < d_enter:
+                    err_arr[i] = 1
 
         # Check that the detector and aperture point in the same direction
         d_e3 = np.cross(d_e1, d_e2)
@@ -1177,20 +1220,24 @@ def check_npa(inp, npa):
             error('The detector and/or aperture plane normal vectors are pointing in the wrong direction. The NPA definition is incorrect.')
             err_arr[i] = 1
 
-    w = (err_arr == 0)
-    nw = err_arr[w].size
-    ww = (err_arr != 0)
-    nww = err_arr[ww].size
-    print('{} out of {} channels crossed the beam grid'.format(nw, nchan))
-    if nw == 0:
-        error('No channels intersect the beam grid')
-        err = True
+    if has_beam_params:
+        w = (err_arr == 0)
+        nw = err_arr[w].size
+        ww = (err_arr != 0)
+        nww = err_arr[ww].size
+        print('{} out of {} channels crossed the beam grid'.format(nw, nchan))
+        if nw == 0:
+            error('No channels intersect the beam grid')
+            err = True
 
-    if nww > 0:
-        warn('Some channels did not intersect the beam grid')
-        print('Number missed: {}'.format(nww))
-        print('Missed channels:')
-        print('    {}'.format(npa['id'][ww]))
+        if nww > 0:
+            warn('Some channels did not intersect the beam grid')
+            print('Number missed: {}'.format(nww))
+            print('Missed channels:')
+            print('    {}'.format(npa['id'][ww]))
+    else:
+        # For passive-only mode, skip the beam grid intersection message
+        info('Passive-only mode: skipping beam grid intersection check for NPA detectors')
 
     if err:
         error('Invalid NPA geometry. Exiting...', halt=True)
@@ -1522,34 +1569,43 @@ def write_namelist(filename, inputs):
         f.write("n_dcx = {:d}     !! Number of DCX mc particles\n".format(inputs['n_dcx']))
         f.write("n_birth = {:d}    !! Number of BIRTH mc particles\n\n".format(inputs['n_birth']))
 
-        f.write("!! Neutral Beam Settings\n")
-        f.write("ab = {:f}     !! Beam Species mass [amu]\n".format(inputs['ab']))
-        f.write("pinj = {:f}     !! Beam Power [MW]\n".format(inputs['pinj']))
-        f.write("einj = {:f}     !! Beam Energy [keV]\n".format(inputs['einj']))
-        f.write("current_fractions(1) = {:f} !! Current Fractions (Full component)\n".format(inputs['current_fractions'][0]))
-        f.write("current_fractions(2) = {:f} !! Current Fractions (Half component)\n".format(inputs['current_fractions'][1]))
-        f.write("current_fractions(3) = {:f} !! Current Fractions (Third component)\n\n".format(inputs['current_fractions'][2]))
+        # Check if this is a passive-only run
+        is_passive_only = ('pinj' not in inputs or 'einj' not in inputs or
+                          'current_fractions' not in inputs or 'nx' not in inputs)
 
-        f.write("!! Beam Grid Settings\n")
-        f.write("nx = {:d}    !! Number of cells in X direction (Into Plasma)\n".format(inputs['nx']))
-        f.write("ny = {:d}    !! Number of cells in Y direction\n".format(inputs['ny']))
-        f.write("nz = {:d}    !! Number of cells in Z direction\n".format(inputs['nz']))
-        f.write("xmin = {:f}     !! Minimum X value [cm]\n".format(inputs['xmin']))
-        f.write("xmax = {:f}     !! Maximum X value [cm]\n".format(inputs['xmax']))
-        f.write("ymin = {:f}     !! Minimum Y value [cm]\n".format(inputs['ymin']))
-        f.write("ymax = {:f}     !! Maximum Y value [cm]\n".format(inputs['ymax']))
-        f.write("zmin = {:f}     !! Minimum Z value [cm]\n".format(inputs['zmin']))
-        f.write("zmax = {:f}     !! Maximum Z value [cm]\n\n".format(inputs['zmax']))
+        if not is_passive_only:
+            f.write("!! Neutral Beam Settings\n")
+            f.write("ab = {:f}     !! Beam Species mass [amu]\n".format(inputs['ab']))
+            f.write("pinj = {:f}     !! Beam Power [MW]\n".format(inputs['pinj']))
+            f.write("einj = {:f}     !! Beam Energy [keV]\n".format(inputs['einj']))
+            f.write("current_fractions(1) = {:f} !! Current Fractions (Full component)\n".format(inputs['current_fractions'][0]))
+            f.write("current_fractions(2) = {:f} !! Current Fractions (Half component)\n".format(inputs['current_fractions'][1]))
+            f.write("current_fractions(3) = {:f} !! Current Fractions (Third component)\n\n".format(inputs['current_fractions'][2]))
 
-        f.write("!! Tait-Bryan Angles for z-y`-x`` rotation\n")
-        f.write("alpha = {:f}     !! Rotation about z-axis [rad]\n".format(inputs['alpha']))
-        f.write("beta  = {:f}     !! Rotation about y`-axis [rad]\n".format(inputs['beta']))
-        f.write("gamma = {:f}     !! Rotation about x``-axis [rad]\n\n".format(inputs['gamma']))
+            f.write("!! Beam Grid Settings\n")
+            f.write("nx = {:d}    !! Number of cells in X direction (Into Plasma)\n".format(inputs['nx']))
+            f.write("ny = {:d}    !! Number of cells in Y direction\n".format(inputs['ny']))
+            f.write("nz = {:d}    !! Number of cells in Z direction\n".format(inputs['nz']))
+            f.write("xmin = {:f}     !! Minimum X value [cm]\n".format(inputs['xmin']))
+            f.write("xmax = {:f}     !! Maximum X value [cm]\n".format(inputs['xmax']))
+            f.write("ymin = {:f}     !! Minimum Y value [cm]\n".format(inputs['ymin']))
+            f.write("ymax = {:f}     !! Maximum Y value [cm]\n".format(inputs['ymax']))
+            f.write("zmin = {:f}     !! Minimum Z value [cm]\n".format(inputs['zmin']))
+            f.write("zmax = {:f}     !! Maximum Z value [cm]\n\n".format(inputs['zmax']))
 
-        f.write("!! Beam Grid origin in machine coordinates (cartesian)\n")
-        f.write("origin(1) = {:f}     !! U value [cm]\n".format(inputs['origin'][0]))
-        f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
-        f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
+            f.write("!! Tait-Bryan Angles for z-y`-x`` rotation\n")
+            f.write("alpha = {:f}     !! Rotation about z-axis [rad]\n".format(inputs['alpha']))
+            f.write("beta  = {:f}     !! Rotation about y`-axis [rad]\n".format(inputs['beta']))
+            f.write("gamma = {:f}     !! Rotation about x``-axis [rad]\n\n".format(inputs['gamma']))
+
+            f.write("!! Beam Grid origin in machine coordinates (cartesian)\n")
+            f.write("origin(1) = {:f}     !! U value [cm]\n".format(inputs['origin'][0]))
+            f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
+            f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
+        else:
+            f.write("!! Passive-only run - no beam parameters needed\n")
+            f.write("!! Fast-ion Species mass\n")
+            f.write("ab = {:f}     !! Fast-ion Species mass [amu]\n\n".format(inputs['ab']))
 
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))
@@ -1582,7 +1638,7 @@ def write_namelist(filename, inputs):
 
     success("Namelist file created: {}\n".format(filename))
 
-def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
+def write_geometry(filename, nbi=None, spec=None, npa=None, nc=None, cfpd=None):
     """
     #+#write_geometry
     #+Write geometry values to a HDF5 file
@@ -1590,9 +1646,9 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
     #+##Input Arguments
     #+     **filename**: Name of the geometry file
     #+
-    #+     **nbi**: NBI geometry structure
-    #+
     #+##Keyword Arguments
+    #+     **nbi**: Optional, NBI geometry structure (not needed for passive-only runs)
+    #+
     #+     **spec**: Optional, Spectral geometry structure
     #+
     #+     **npa**: Optional, NPA geometry structure
@@ -1601,7 +1657,10 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
     #+
     #+##Example Usage
     #+```python
-    #+>>> write_geometry(filename, nbi, spec=spec, npa=npa, cfpd=cfpd)
+    #+>>> # With beam
+    #+>>> write_geometry(filename, nbi=nbi, spec=spec, npa=npa, cfpd=cfpd)
+    #+>>> # Passive-only (no beam)
+    #+>>> write_geometry(filename, spec=spec, npa=npa, nc=nc)
     #+```
     """
     info('Writing geometry file...')
@@ -1611,52 +1670,53 @@ def write_geometry(filename, nbi, spec=None, npa=None, nc=None, cfpd=None):
         # File attributes
         hf.attrs['description'] = 'Geometric quantities for FIDASIM'
 
-        # Create nbi group
-        g_nbi = hf.create_group('nbi')
+        # Create nbi group only if nbi geometry is provided
+        if nbi is not None:
+            g_nbi = hf.create_group('nbi')
 
-        # nbi att
-        g_nbi.attrs['description'] = 'Neutral Beam Geometry'
-        g_nbi.attrs['coordinate_system'] = 'Right-handed cartesian'
+            # nbi att
+            g_nbi.attrs['description'] = 'Neutral Beam Geometry'
+            g_nbi.attrs['coordinate_system'] = 'Right-handed cartesian'
 
-        nbi_description = {'data_source': 'Source of the NBI geometry',
-                           'name': 'Beam name',
-                           'src': 'Position of the center of the beam source grid',
-                           'axis':'Axis of the beam centerline: Centerline(t) = src + axis*t ',
-                           'focy': 'Horizonal focal length of the beam',
-                           'focz': 'Vertical focal length of the beam',
-                           'divy': 'Horizonal divergences of the beam. One for each energy component',
-                           'divz': 'Vertical divergences of the beam. One for each energy component',
-                           'widy': 'Half width of the beam source grid',
-                           'widz': 'Half height of the beam source grid',
-                           'shape':'Shape of the beam source grid: 1="rectangular", 2="circular"',
-                           'naperture': 'Number of apertures',
-                           'ashape': 'Shape of the aperture(s): 1="rectangular", 2="circular"',
-                           'awidy': 'Half width of the aperture(s)',
-                           'awidz': 'Half height of the aperture(s)',
-                           'aoffy': 'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline',
-                           'aoffz': 'Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline',
-                           'adist': 'Distance from the center of the beam source grid to the aperture(s) plane'}
+            nbi_description = {'data_source': 'Source of the NBI geometry',
+                               'name': 'Beam name',
+                               'src': 'Position of the center of the beam source grid',
+                               'axis':'Axis of the beam centerline: Centerline(t) = src + axis*t ',
+                               'focy': 'Horizonal focal length of the beam',
+                               'focz': 'Vertical focal length of the beam',
+                               'divy': 'Horizonal divergences of the beam. One for each energy component',
+                               'divz': 'Vertical divergences of the beam. One for each energy component',
+                               'widy': 'Half width of the beam source grid',
+                               'widz': 'Half height of the beam source grid',
+                               'shape':'Shape of the beam source grid: 1="rectangular", 2="circular"',
+                               'naperture': 'Number of apertures',
+                               'ashape': 'Shape of the aperture(s): 1="rectangular", 2="circular"',
+                               'awidy': 'Half width of the aperture(s)',
+                               'awidz': 'Half height of the aperture(s)',
+                               'aoffy': 'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline',
+                               'aoffz': 'Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline',
+                               'adist': 'Distance from the center of the beam source grid to the aperture(s) plane'}
 
-        nbi_units = {'src': 'cm',
-                     'axis': 'cm',
-                     'focy': 'cm',
-                     'focz': 'cm',
-                     'divy': 'radians',
-                     'divz': 'radians',
-                     'widy': 'cm',
-                     'widz': 'cm',
-                     'awidy': 'cm',
-                     'awidz': 'cm',
-                     'aoffy': 'cm',
-                     'aoffz': 'cm',
-                     'adist': 'cm'}
+            nbi_units = {'src': 'cm',
+                         'axis': 'cm',
+                         'focy': 'cm',
+                         'focz': 'cm',
+                         'divy': 'radians',
+                         'divz': 'radians',
+                         'widy': 'cm',
+                         'widz': 'cm',
+                         'awidy': 'cm',
+                         'awidz': 'cm',
+                         'aoffy': 'cm',
+                         'aoffz': 'cm',
+                         'adist': 'cm'}
+            
+            # Define dimension names for xarray/pandas compatibility
+            # Note: Removing dimension labels for small configuration arrays to avoid xarray issues
+            # These are parameter arrays, not data on coordinate grids             
+            nbi_dim_names = {}
 
-        # Define dimension names for xarray/pandas compatibility
-        # Note: Removing dimension labels for small configuration arrays to avoid xarray issues
-        # These are parameter arrays, not data on coordinate grids
-        nbi_dim_names = {}
-
-        write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units,
+            write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units,
                   dim_names=nbi_dim_names, name='nbi')
 
         if spec is not None:
@@ -2079,7 +2139,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
+def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -2089,8 +2149,6 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None
     #+
     #+     **grid**: Interpolation grid structure
     #+
-    #+     **nbi**: Neutral beam geometry structure
-    #+
     #+     **plasma**: Plasma parameters structure
     #+
     #+     **fields**: Electromagnetic fields structure
@@ -2098,6 +2156,8 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None
     #+     **fbm**: Fast-ion distribution structure
     #+
     #+##Keyword Arguments
+    #+     **nbi**: Optional, Neutral beam geometry structure (not needed for passive-only runs)
+    #+
     #+     **spec**: Optional, Spectral geometry structure
     #+
     #+     **npa**: Optional, NPA geometry structure
@@ -2108,7 +2168,10 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None
     #+
     #+##Example Usage
     #+```python
-    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, nc=nc, cfpd=cfpd)
+    #+>>> # With beam (active measurements)
+    #+>>> prefida(inputs, grid, plasma, fields, fbm, nbi=nbi, spec=spec, npa=npa, nc=nc)
+    #+>>> # Passive-only (no beam)
+    #+>>> prefida(inputs, grid, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
     #+```
     """
     # CHECK INPUTS
@@ -2121,8 +2184,22 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None
     # CHECK INTERPOLATION GRID
     check_grid(grid)
 
-    # CHECK BEAM INPUTS
-    nbi = check_beam(inputs, nbi)
+    # CHECK BEAM INPUTS (optional for passive-only runs)
+    if nbi is not None:
+        nbi = check_beam(inputs, nbi)
+    else:
+        # Check if beam parameters are present in inputs
+        has_beam_params = all(key in inputs for key in ['nx', 'ny', 'nz', 'einj', 'pinj', 'current_fractions'])
+        if not has_beam_params:
+            warn('='*70)
+            warn('PASSIVE-ONLY MODE DETECTED')
+            warn('No beam geometry provided (nbi=None) and no beam parameters in inputs.')
+            warn('Only passive diagnostics will be calculated:')
+            warn('  - Passive FIDA (calc_pfida)')
+            warn('  - Passive NPA (calc_pnpa)')
+            warn('  - Neutron rates (calc_neutron)')
+            warn('Active diagnostics (FIDA, NPA, BES, DCX, HALO) will NOT be available.')
+            warn('='*70)
 
     # CHECK PLASMA PARAMETERS
     plasma = check_plasma(inputs, grid, plasma)

@@ -4729,6 +4729,15 @@ subroutine write_beam_grid(id, error)
     call h5ltset_attribute_string_f(id,"grid","coordinate_system", &
          "Right-handed cartesian",error)
 
+    !Mark coordinate arrays as dimension scales for xarray/netCDF compatibility
+    !Also label the 1D coordinate arrays themselves
+    call h5_set_dimension_name(gid, "x", 1, "x", error)
+    call h5_set_dimension_name(gid, "y", 1, "y", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
+    call h5_make_dimension_scale(gid, "x", "x", error)
+    call h5_make_dimension_scale(gid, "y", "y", error)
+    call h5_make_dimension_scale(gid, "z", "z", error)
+
     !Close grid group
     call h5gclose_f(gid, error)
 
@@ -4900,6 +4909,117 @@ subroutine write_birth_profile
         call h5ltset_attribute_string_f(fid, "/", "description", &
              "Birth density and particles calculated by FIDASIM", error)
 
+        !Add dimension names for xarray/pandas compatibility
+        ! Create soft links at root level for coordinates
+        call h5_create_soft_link(fid, "/grid/x", "x", error)
+        call h5_create_soft_link(fid, "/grid/y", "y", error)
+        call h5_create_soft_link(fid, "/grid/z", "z", error)
+
+        ! Mark soft links as dimension scales
+        call h5_make_dimension_scale(fid, "x", "x", error)
+        call h5_make_dimension_scale(fid, "y", "y", error)
+        call h5_make_dimension_scale(fid, "z", "z", error)
+
+        ! Create beam_component dimension scale (1=Full, 2=Half, 3=Third)
+        block
+            integer, dimension(3) :: beam_comp_idx
+            beam_comp_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/beam_component", 1, [3_HSIZE_T], beam_comp_idx, error)
+            call h5ltset_attribute_string_f(fid, "/beam_component", "description", &
+                 "Beam energy component index (1=Full, 2=Half, 3=Third)", error)
+            call h5_set_dimension_name(fid, "/beam_component", 1, "beam_component", error)
+            call h5_make_dimension_scale(fid, "/beam_component", "beam_component", error)
+        end block
+
+        ! Create particle dimension scale (particle indices)
+        if(npart.gt.0) then
+            block
+                integer, dimension(:), allocatable :: particle_idx
+                integer :: ip
+                allocate(particle_idx(npart))
+                do ip = 1, npart
+                    particle_idx(ip) = ip
+                enddo
+                call h5ltmake_dataset_int_f(fid, "/particle", 1, [int(npart,HSIZE_T)], particle_idx, error)
+                call h5ltset_attribute_string_f(fid, "/particle", "description", &
+                     "Particle index", error)
+                call h5_set_dimension_name(fid, "/particle", 1, "particle", error)
+                call h5_make_dimension_scale(fid, "/particle", "particle", error)
+                deallocate(particle_idx)
+            end block
+        endif
+
+        ! Create cylindrical_component dimension scale (1=R, 2=Phi, 3=Z)
+        block
+            integer, dimension(3) :: cyl_comp_idx
+            cyl_comp_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/cylindrical_component", 1, [3_HSIZE_T], cyl_comp_idx, error)
+            call h5ltset_attribute_string_f(fid, "/cylindrical_component", "description", &
+                 "Cylindrical coordinate component (1=R, 2=Phi, 3=Z)", error)
+            call h5_set_dimension_name(fid, "/cylindrical_component", 1, "cylindrical_component", error)
+            call h5_make_dimension_scale(fid, "/cylindrical_component", "cylindrical_component", error)
+        end block
+
+        ! Create grid_index dimension scale (1=ix, 2=iy, 3=iz)
+        block
+            integer, dimension(3) :: grid_idx
+            grid_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/grid_index", 1, [3_HSIZE_T], grid_idx, error)
+            call h5ltset_attribute_string_f(fid, "/grid_index", "description", &
+                 "Grid index component (1=ix, 2=iy, 3=iz)", error)
+            call h5_set_dimension_name(fid, "/grid_index", 1, "grid_index", error)
+            call h5_make_dimension_scale(fid, "/grid_index", "grid_index", error)
+        end block
+
+        ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+        ! Fortran: dens(beam_comp,x,y,z) = (3,50,60,70) → HDF5: (70,60,50,3) = (z,y,x,beam_comp)
+        call h5_set_dimension_name(fid, "/dens", 1, "z", error)
+        call h5_set_dimension_name(fid, "/dens", 2, "y", error)
+        call h5_set_dimension_name(fid, "/dens", 3, "x", error)
+        call h5_set_dimension_name(fid, "/dens", 4, "beam_component", error)
+
+        ! Attach scales using local soft links
+        call h5_attach_dimension_scale(fid, "/dens", "z", 1, error)
+        call h5_attach_dimension_scale(fid, "/dens", "y", 2, error)
+        call h5_attach_dimension_scale(fid, "/dens", "x", 3, error)
+        call h5_attach_dimension_scale(fid, "/dens", "/beam_component", 4, error)
+
+        ! Fortran: ri_gc(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/ri_gc", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ri_gc", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/ri_gc", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ri_gc", "/cylindrical_component", 2, error)
+
+        ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/ri", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ri", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/ri", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ri", "/cylindrical_component", 2, error)
+
+        ! Fortran: vi(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/vi", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/vi", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/vi", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/vi", "/cylindrical_component", 2, error)
+
+        ! Fortran: ind(3,particle) → HDF5: (particle,3) = (particle,grid_index)
+        call h5_set_dimension_name(fid, "/ind", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ind", 2, "grid_index", error)
+        call h5_attach_dimension_scale(fid, "/ind", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ind", "/grid_index", 2, error)
+
+        call h5_set_dimension_name(fid, "/energy", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/energy", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/pitch", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/pitch", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/weight", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/type", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/type", "/particle", 1, error)
+
         !!Close file
         call h5fclose_f(fid, error)
 
@@ -4926,7 +5046,7 @@ subroutine write_neutral_population(id, pop, error)
     integer, intent(out)                :: error
         !+ Error code
 
-    integer(HID_T) :: gid
+    integer(HID_T) :: gid, fid_local
     integer(HSIZE_T), dimension(1) :: d
     integer(HSIZE_T), dimension(4) :: dims4
     integer(HSIZE_T), dimension(5) :: dims5
@@ -4934,8 +5054,11 @@ subroutine write_neutral_population(id, pop, error)
     real(Float64), dimension(:,:,:,:,:), allocatable :: v
     real(Float64), dimension(:,:,:,:), allocatable   :: w
     integer(Int32), dimension(:,:,:), allocatable    :: n
+    integer(Int32), dimension(:), allocatable        :: level_array
 
     integer :: ic, ir, i, j, k, ind(3), nx, ny, nz, nk
+    integer(SIZE_T) :: name_size
+    character(256) :: group_name, dset_path
 
     nx = beam_grid%nx
     ny = beam_grid%ny
@@ -4947,10 +5070,55 @@ subroutine write_neutral_population(id, pop, error)
     call h5ltset_attribute_string_f(id,"nlevel","description", &
          "Number of atomic energy levels", error)
 
+    ! Create atomic level index array for xarray compatibility
+    dims4(1) = nlevs
+    allocate(level_array(nlevs))
+    do i=1,nlevs
+        level_array(i) = i
+    enddo
+    call h5ltmake_compressed_dataset_int_f(id, "level", 1, dims4(1:1), level_array, error)
+    call h5ltset_attribute_string_f(id,"level","description", &
+         "Atomic energy level index", error)
+    deallocate(level_array)
+
+    dims4 = [nlevs, nx, ny, nz]
     call h5ltmake_compressed_dataset_double_f(id, "dens", 4, dims4, pop%dens, error)
     call h5ltset_attribute_string_f(id,"dens","units","neutrals*cm^-3",error)
     call h5ltset_attribute_string_f(id,"dens","description", &
          "Neutral density dens(level,x,y,z)", error)
+
+    !Set dimension names for xarray/pandas compatibility
+    !Get file ID and construct full path to dataset since id is a group ID
+    call h5iget_file_id_f(id, fid_local, error)
+    call h5iget_name_f(id, group_name, 256_SIZE_T, name_size, error)
+    dset_path = trim(group_name) // "/dens"
+
+    ! Create soft links to grid coordinates within this group for xarray compatibility
+    call h5_create_coordinate_links(id, "/grid", error)
+
+    ! Mark level array as dimension scale and attach it to dens
+    dset_path = trim(group_name) // "/level"
+    call h5_set_dimension_name(fid_local, trim(dset_path), 1, "atomic_level", error)
+    call h5_make_dimension_scale(fid_local, trim(dset_path), "atomic_level", error)
+
+    ! Mark the local coordinate soft links as dimension scales
+    call h5_make_dimension_scale(id, "x", "x", error)
+    call h5_make_dimension_scale(id, "y", "y", error)
+    call h5_make_dimension_scale(id, "z", "z", error)
+
+    ! NOTE: Dimension labels are in HDF5 storage order (reversed from Fortran declaration)
+    ! Fortran: dens(level,x,y,z) = (6,50,60,70) → HDF5 file: (70,60,50,6) = (z,y,x,level)
+    dset_path = trim(group_name) // "/dens"
+    call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 4, "atomic_level", error)
+
+    !Attach coordinate scales using local soft links (not cross-group references)
+    call h5_attach_dimension_scale(id, "dens", "z", 1, error)
+    call h5_attach_dimension_scale(id, "dens", "y", 2, error)
+    call h5_attach_dimension_scale(id, "dens", "x", 3, error)
+    call h5_attach_dimension_scale(id, "dens", "level", 4, error)
 
     dims5 = [3, reservoir_size, nx, ny, nz]
     allocate(v(3,reservoir_size, nx, ny, nz))
@@ -4980,18 +5148,82 @@ subroutine write_neutral_population(id, pop, error)
        call h5ltset_attribute_string_f(gid,"k","description", &
             "Reservoir Size", error)
 
+       ! Create dimension scale arrays for particle and cartesian_component dimensions
+       ! This ensures all dimensions have scales, avoiding xarray "mixed dimensions" error
+       block
+           integer, dimension(:), allocatable :: particle_idx
+           integer, dimension(3) :: cart_comp_idx
+           integer :: ip
+
+           ! Particle index dimension (1 to reservoir_size)
+           allocate(particle_idx(reservoir_size))
+           do ip = 1, reservoir_size
+               particle_idx(ip) = ip
+           enddo
+           call h5ltmake_dataset_int_f(gid, "particle", 1, [int(reservoir_size,HSIZE_T)], particle_idx, error)
+           call h5ltset_attribute_string_f(gid, "particle", "description", &
+                "Particle index in reservoir", error)
+           call h5_set_dimension_name(gid, "particle", 1, "particle", error)
+           call h5_make_dimension_scale(gid, "particle", "particle", error)
+           deallocate(particle_idx)
+
+           ! Cartesian component dimension (1=x, 2=y, 3=z)
+           cart_comp_idx = [1, 2, 3]
+           call h5ltmake_dataset_int_f(gid, "cartesian_component", 1, [3_HSIZE_T], cart_comp_idx, error)
+           call h5ltset_attribute_string_f(gid, "cartesian_component", "description", &
+                "Cartesian velocity component (1=x, 2=y, 3=z)", error)
+           call h5_set_dimension_name(gid, "cartesian_component", 1, "cartesian_component", error)
+           call h5_make_dimension_scale(gid, "cartesian_component", "cartesian_component", error)
+       end block
+
        call h5ltmake_compressed_dataset_int_f(gid, "n", 3, dims4(2:4), n, error)
        call h5ltset_attribute_string_f(gid, "n", "description", &
             "Number of particles in each reservoir", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: n(x,y,z) = (50,60,70) → HDF5: (70,60,50) = (z,y,x)
+       dset_path = trim(group_name) // "/reservoir/n"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/x", 3, error)
 
        call h5ltmake_compressed_dataset_double_f(gid, "w", 4, dims5(2:5), w, error, compress=.False.)
        call h5ltset_attribute_string_f(gid, "w", "description", &
             "Neutral Particle Weight", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: w(particle,x,y,z) = (res,50,60,70) → HDF5: (70,60,50,res) = (z,y,x,particle)
+       dset_path = trim(group_name) // "/reservoir/w"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 4, "particle", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/x", 3, error)
+       call h5_attach_dimension_scale(gid, "w", "particle", 4, error)
 
        call h5ltmake_compressed_dataset_double_f(gid, "v", 5, dims5, v, error, compress=.False.)
        call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
        call h5ltset_attribute_string_f(gid,"v","description", &
             "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: v(3,particle,x,y,z) = (3,res,50,60,70) → HDF5: (70,60,50,res,3) = (z,y,x,particle,component)
+       dset_path = trim(group_name) // "/reservoir/v"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 4, "particle", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 5, "cartesian_component", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/x", 3, error)
+       call h5_attach_dimension_scale(gid, "v", "particle", 4, error)
+       call h5_attach_dimension_scale(gid, "v", "cartesian_component", 5, error)
        !Close reservoir group
        call h5gclose_f(gid, error)
     endif
@@ -5222,6 +5454,33 @@ subroutine write_npa
         call h5ltset_attribute_string_f(fid,"/count","description", &
              "Number of particles that hit the detector: count(chan)", error)
 
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+        !Add dimension names to flux dataset
+        ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+        if(particles%nclass.gt.1) then
+            ! Fortran: flux(energy,chan,class) → HDF5: (class,chan,energy)
+            call h5_set_dimension_name(fid, "/flux", 1, "particle_class", error)
+            call h5_set_dimension_name(fid, "/flux", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/flux", 3, "energy", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/flux", "/energy", 3, error)
+        else
+            ! Fortran: flux(energy,chan) → HDF5: (chan,energy)
+            call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/flux", 2, "energy", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/flux", "/energy", 2, error)
+        endif
+
+        !Add dimension name to count
+        call h5_set_dimension_name(fid, "/count", 1, "channel", error)
+        call h5_attach_dimension_scale(fid, "/count", "/radius", 1, error)
+
 
         if((npart.gt.0).and.(inputs%calc_npa.ge.2)) then
             !Create Group
@@ -5267,6 +5526,21 @@ subroutine write_npa
                  "Right-handed cartesian",error)
             call h5ltset_attribute_string_f(fid,"/particles","description", &
                  "Active NPA Monte Carlo particles",error)
+
+            !Add dimension names to particle arrays
+            ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+            ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cartesian_component)
+            call h5_set_dimension_name(gid, "ri", 1, "particle", error)
+            call h5_set_dimension_name(gid, "ri", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "rf", 1, "particle", error)
+            call h5_set_dimension_name(gid, "rf", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "gci", 1, "particle", error)
+            call h5_set_dimension_name(gid, "gci", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "pitch", 1, "particle", error)
+            call h5_set_dimension_name(gid, "energy", 1, "particle", error)
+            call h5_set_dimension_name(gid, "weight", 1, "particle", error)
+            call h5_set_dimension_name(gid, "detector", 1, "particle", error)
+            call h5_set_dimension_name(gid, "class", 1, "particle", error)
 
             !Close group
             call h5gclose_f(gid, error)
@@ -5439,6 +5713,28 @@ subroutine write_npa
             !Close group
             call h5gclose_f(gid, error)
         endif
+
+        ! Add dimension labels for passive NPA flux and count
+        if(inputs%calc_pnpa.ge.1) then
+            ! pcount(chan)
+            call h5_set_dimension_name(fid, "/pcount", 1, "channel", error)
+            call h5_attach_dimension_scale(fid, "/pcount", "/radius", 1, error)
+
+            if(particles%nclass.gt.1) then
+                ! pflux(energy,chan,class) → HDF5: (class,chan,energy)
+                call h5_set_dimension_name(fid, "/pflux", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pflux", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pflux", 3, "energy", error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/energy", 3, error)
+            else
+                ! pflux(energy,chan) → HDF5: (chan,energy)
+                call h5_set_dimension_name(fid, "/pflux", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pflux", 2, "energy", error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/energy", 2, error)
+            endif
+        endif
     endif
 
     if(do_write) then
@@ -5524,6 +5820,17 @@ subroutine write_spectra
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(3:3), &
          spec_chords%radius, error)
+
+    ! Create stokes_parameter dimension scale array (1=I, 2=Q, 3=U, 4=V)
+    block
+        integer, dimension(4) :: stokes_idx
+        integer(HSIZE_T), dimension(1) :: stokes_dims
+        stokes_idx = [1, 2, 3, 4]
+        stokes_dims(1) = 4
+        call h5ltmake_dataset_int_f(fid, "/stokes_parameter", 1, stokes_dims, stokes_idx, error)
+        call h5ltset_attribute_string_f(fid, "/stokes_parameter", "description", &
+             "Stokes parameter index (1=I, 2=Q, 3=U, 4=V)", error)
+    end block
 
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
@@ -5714,6 +6021,14 @@ subroutine write_spectra
        call h5ltset_attribute_string_f(fid,"/thermal_lambda0","description", &
             "Rest wavelength of the thermal species lines: thermal_lambda0(species)", error)
        call h5ltset_attribute_string_f(fid,"/thermal_lambda0", "units", "nm", error)
+
+       ! Mark thermal_mass as dimension scale for thermal_species
+       call h5_set_dimension_name(fid, "/thermal_mass", 1, "thermal_species", error)
+       call h5_make_dimension_scale(fid, "/thermal_mass", "thermal_species", error)
+
+       ! Label thermal_lambda0 dimension and attach to thermal_mass scale
+       call h5_set_dimension_name(fid, "/thermal_lambda0", 1, "thermal_species", error)
+       call h5_attach_dimension_scale(fid, "/thermal_lambda0", "/thermal_mass", 1, error)
     endif
 
 
@@ -5968,6 +6283,280 @@ subroutine write_spectra
     call h5ltset_attribute_string_f(fid,"/","description",&
          "Spectra calculated by FIDASIM", error)
 
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
+    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+    ! Mark stokes_parameter as dimension scale (already created earlier)
+    call h5_set_dimension_name(fid, "/stokes_parameter", 1, "stokes_parameter", error)
+    call h5_make_dimension_scale(fid, "/stokes_parameter", "stokes_parameter", error)
+
+    !Add dimension names to spectral datasets
+    ! NOTE: All dimension labels in HDF5 storage order (reversed from Fortran)
+    if(inputs%calc_brems.ge.1) then
+        ! Fortran: brems(lambda,chan) → HDF5: (chan,lambda)
+        call h5_set_dimension_name(fid, "/brems", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/brems", 2, "wavelength", error)
+        call h5_attach_dimension_scale(fid, "/brems", "/radius", 1, error)
+        call h5_attach_dimension_scale(fid, "/brems", "/lambda", 2, error)
+    endif
+
+    if(inputs%calc_bes.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !Fortran: full/half/third(lambda,chan) → HDF5: (chan,lambda)
+            call h5_set_dimension_name(fid, "/full", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/half", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/third", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
+            !3D stokes datasets: (4,lambda,chan) -> HDF5: (chan,lambda,4)
+            call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
+        else
+            !3D datasets with stark: (stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/full", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/full", 3, "channel", error)
+            call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 3, error)
+            call h5_set_dimension_name(fid, "/half", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/half", 3, "channel", error)
+            call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 3, error)
+            call h5_set_dimension_name(fid, "/third", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/third", 3, "channel", error)
+            call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 3, error)
+            !4D stokes datasets with stark: (stark,4,lambda,chan)
+            call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 4, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 3, error)
+            call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 4, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 3, error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 4, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_dcx.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !3D: dcx(lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcx", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcx", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcx", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/lambda", 3, error)
+            !4D: dcxstokes(4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcxstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/stokes_parameter", 4, error)
+        else
+            !4D: dcx(stark,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcx", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcx", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcx", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcx", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/lambda", 3, error)
+            !5D: dcxstokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcxstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/lambda", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_halo.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !3D: halo(lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halo", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halo", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halo", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/halo", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/lambda", 3, error)
+            !4D: halostokes(4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halostokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halostokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halostokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halostokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/stokes_parameter", 4, error)
+        else
+            !4D: halo(stark,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halo", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halo", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halo", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halo", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halo", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/lambda", 3, error)
+            !5D: halostokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halostokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halostokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halostokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halostokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/halostokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/lambda", 3, error)
+        endif
+    endif
+
+    ! Add missing dimension labels for cold, fida, pfida
+    if(inputs%calc_cold.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            ! 3D: cold(lambda,chan,species) -> HDF5: (species,chan,lambda) = (thermal_species,channel,wavelength)
+            call h5_set_dimension_name(fid, "/cold", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/cold", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/cold", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/cold", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/lambda", 3, error)
+            ! 4D: coldstokes(4,lambda,chan,species) -> HDF5: (species,chan,lambda,4) = (thermal_species,channel,wavelength,stokes_parameter)
+            call h5_set_dimension_name(fid, "/coldstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/stokes_parameter", 4, error)
+        else
+            ! 4D: cold(stark,lambda,chan,species) -> HDF5: (species,chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/cold", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/cold", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/cold", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/cold", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/cold", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/lambda", 3, error)
+            ! 5D: coldstokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/coldstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/lambda", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_fida.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+            ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+        else
+            ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+            ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+        endif
+    endif
+
+    if(inputs%calc_pfida.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+            ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+        else
+            ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+            ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+        endif
+    endif
+
     !Close file
     call h5fclose_f(fid, error)
 
@@ -6061,6 +6650,24 @@ subroutine write_neutrons
     endif
     
     if((inputs%dist_type.eq.1).and.(inputs%calc_neut_spec.ge.1)) then
+        ! Create channel index array for dimension scale
+        block
+            integer :: nchan_nc, i_nc
+            integer, dimension(:), allocatable :: chan_idx
+            nchan_nc = size(neutron%flux, 2)
+            allocate(chan_idx(nchan_nc))
+            do i_nc = 1, nchan_nc
+                chan_idx(i_nc) = i_nc
+            enddo
+            dim1(1) = nchan_nc
+            call h5ltmake_dataset_int_f(fid, "/channel", 1, dim1, chan_idx, error)
+            call h5ltset_attribute_string_f(fid, "/channel", "description", &
+                 "Neutron detector channel index", error)
+            call h5_set_dimension_name(fid, "/channel", 1, "channel", error)
+            call h5_make_dimension_scale(fid, "/channel", "channel", error)
+            deallocate(chan_idx)
+        end block
+
         if(particles%nclass.gt.1) then
             dim1(1) = 1
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
@@ -6070,10 +6677,14 @@ subroutine write_neutrons
             call h5ltset_attribute_string_f(fid,"/flux","description", &
                  "Neutron flux: flux(orbit_class,chan)", error)
         else
-            dim2 = shape(neutron%flux)
-            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, neutron%flux, error)
+            ! For single class, write as 1D array
+            dim1(1) = size(neutron%flux, 2)  ! Number of channels
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 1, dim1, neutron%flux(1,:), error)
             call h5ltset_attribute_string_f(fid,"/flux","description", &
                  "Neutron flux: flux(chan)", error)
+            ! Label flux dimension and attach channel scale
+            call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/channel", 1, error)
         endif
         call h5ltset_attribute_string_f(fid,"/flux","units","neutrons/s",error )
 
@@ -6133,6 +6744,94 @@ subroutine write_neutrons
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
          "Neutron rate calculated by FIDASIM", error)
+
+    !Add dimension names for xarray/pandas compatibility
+    if(particles%nclass.gt.1) then
+        call h5_set_dimension_name(fid, "/rate", 1, "orbit_class", error)
+    endif
+
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.2)) then
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/r", 1, "r", error)
+        call h5_set_dimension_name(fid, "/z", 1, "z", error)
+        call h5_set_dimension_name(fid, "/phi", 1, "phi", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+        call h5_make_dimension_scale(fid, "/r", "r", error)
+        call h5_make_dimension_scale(fid, "/z", "z", error)
+        call h5_make_dimension_scale(fid, "/phi", "phi", error)
+
+        !Add dimension names to weight function: weight(E,p,R,Z,Phi)
+        call h5_set_dimension_name(fid, "/weight", 1, "phi", error)
+        call h5_set_dimension_name(fid, "/weight", 2, "z", error)
+        call h5_set_dimension_name(fid, "/weight", 3, "r", error)
+        call h5_set_dimension_name(fid, "/weight", 4, "pitch", error)
+        call h5_set_dimension_name(fid, "/weight", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/phi", 5, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/r", 3, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/pitch", 2, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/energy", 1, error)
+
+        !Add dimension names to emissivity: emissivity(R,Z,Phi)
+        call h5_set_dimension_name(fid, "/emissivity", 1, "phi", error)
+        call h5_set_dimension_name(fid, "/emissivity", 2, "z", error)
+        call h5_set_dimension_name(fid, "/emissivity", 3, "r", error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/phi", 3, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/z", 2, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/r", 1, error)
+    endif
+
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neut_spec.ge.1)) then
+        if(particles%nclass.gt.1) then
+            !flux(orbit_class,chan) in Fortran -> HDF5: (chan, orbit_class) after transpose
+            ! Note: Not setting dimension labels as we don't have scales for these
+            ! call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            ! call h5_set_dimension_name(fid, "/flux", 2, "orbit_class", error)
+        else
+            !flux(1,chan) in Fortran -> HDF5: (chan, 1) after transpose
+            ! Note: Not setting dimension labels as we don't have scales for these
+        endif
+
+        if(allocated(neutron%energy)) then
+            !Mark neutron energy as dimension scale and label its dimension
+            call h5_set_dimension_name(fid, "/energy_nc", 1, "neutron_energy", error)
+            call h5_make_dimension_scale(fid, "/energy_nc", "neutron_energy", error)
+
+            if(particles%nclass.gt.1) then
+                !3D: nc_spectra(energy,orbit_class,chan) -> HDF5: (chan,orbit_class,energy)
+                call h5_set_dimension_name(fid, "/nc_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_spectra", "/energy_nc", 1, error)
+
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_bt_spectra", "/energy_nc", 1, error)
+
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_tt_spectra", "/energy_nc", 1, error)
+            else
+                !2D: nc_spectra(energy,chan) -> HDF5: (chan,energy)
+                call h5_set_dimension_name(fid, "/nc_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_spectra", "/energy_nc", 2, error)
+
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_bt_spectra", "/energy_nc", 2, error)
+
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_tt_spectra", "/energy_nc", 2, error)
+            endif
+        endif
+    endif
 
     !Close file
     call h5fclose_f(fid, error)
@@ -6214,6 +6913,39 @@ subroutine write_cfpd_weights
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
          "CFPD signals calculated by FIDASIM", error)
+
+    !Add dimension names for xarray/pandas compatibility
+    if(inputs%dist_type.eq.1) then
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/earray", 1, "detector_energy", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+        call h5_make_dimension_scale(fid, "/earray", "detector_energy", error)
+
+        !Add dimension names to flux/prob/gam: (energy,chan)
+        call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/flux", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/flux", "/earray", 1, error)
+
+        call h5_set_dimension_name(fid, "/prob", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/prob", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/prob", "/earray", 1, error)
+
+        call h5_set_dimension_name(fid, "/gam", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/gam", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/gam", "/earray", 1, error)
+
+        !Add dimension names to weight: weight(Ch,E3,E,p) -> (detector_energy,channel,energy,pitch)
+        call h5_set_dimension_name(fid, "/weight", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/weight", 2, "energy", error)
+        call h5_set_dimension_name(fid, "/weight", 3, "channel", error)
+        call h5_set_dimension_name(fid, "/weight", 4, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/pitch", 4, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/energy", 3, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/earray", 1, error)
+    endif
 
     !Close file
     call h5fclose_f(fid, error)
@@ -6378,6 +7110,67 @@ subroutine write_fida_weights
          "2D parallel velocity grid", error)
     call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
 
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
+    call h5_make_dimension_scale(fid, "/energy", "energy", error)
+    call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+    !Add dimension names to weight: weight(lambda,energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/weight", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
+    call h5_set_dimension_name(fid, "/weight", 4, "wavelength", error)
+    call h5_attach_dimension_scale(fid, "/weight", "/radius", 4, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/pitch", 3, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/energy", 2, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/lambda", 1, error)
+
+    !Add dimension names to fida: fida(lambda,chan)
+    call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+    call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+    call h5_attach_dimension_scale(fid, "/fida", "/lambda", 1, error)
+
+    !Add dimension names to mean_f: mean_f(energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/mean_f", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/mean_f", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/mean_f", 3, "energy", error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/radius", 3, error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/energy", 1, error)
+
+    !Add dimension names to 2D grids: (energy,pitch)
+    call h5_set_dimension_name(fid, "/jacobian", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/jacobian", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/jacobian", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/jacobian", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/vpe_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/vpe_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/vpe_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/vpe_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/vpa_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/vpa_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/vpa_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/vpa_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/e_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/e_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/e_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/e_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/p_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/p_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/p_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/p_grid", "/energy", 1, error)
+
     !Close file
     call h5fclose_f(fid, error)
 
@@ -6492,7 +7285,71 @@ subroutine write_npa_weights
              "Attenuation factor i.e. survival probability: attenuation(energy,x,y,z,chan)", error)
         call h5ltset_attribute_string_f(fid,"/phit","description", &
              "Probability of hitting the detector given an isotropic source: phit(x,y,z,chan)", error)
+
+        !Add dimension names to diagnostic arrays
+        !emissivity(x,y,z,chan)
+        call h5_set_dimension_name(fid, "/emissivity", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/emissivity", 2, "z", error)
+        call h5_set_dimension_name(fid, "/emissivity", 3, "y", error)
+        call h5_set_dimension_name(fid, "/emissivity", 4, "x", error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/z", 3, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/y", 2, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/x", 1, error)
+
+        !attenuation(energy,x,y,z,chan)
+        call h5_set_dimension_name(fid, "/attenuation", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/attenuation", 2, "z", error)
+        call h5_set_dimension_name(fid, "/attenuation", 3, "y", error)
+        call h5_set_dimension_name(fid, "/attenuation", 4, "x", error)
+        call h5_set_dimension_name(fid, "/attenuation", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/y", 3, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/x", 2, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/energy", 1, error)
+
+        !cx(energy,x,y,z,chan)
+        call h5_set_dimension_name(fid, "/cx", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/cx", 2, "z", error)
+        call h5_set_dimension_name(fid, "/cx", 3, "y", error)
+        call h5_set_dimension_name(fid, "/cx", 4, "x", error)
+        call h5_set_dimension_name(fid, "/cx", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/y", 3, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/x", 2, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/energy", 1, error)
+
+        !phit(x,y,z,chan)
+        call h5_set_dimension_name(fid, "/phit", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/phit", 2, "z", error)
+        call h5_set_dimension_name(fid, "/phit", 3, "y", error)
+        call h5_set_dimension_name(fid, "/phit", 4, "x", error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/z", 3, error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/y", 2, error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/x", 1, error)
     endif
+
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_make_dimension_scale(fid, "/energy", "energy", error)
+    call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+    !Add dimension names to flux: flux(energy,chan)
+    call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/flux", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/flux", "/radius", 2, error)
+    call h5_attach_dimension_scale(fid, "/flux", "/energy", 1, error)
+
+    !Add dimension names to weight: weight(energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/weight", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
+    call h5_attach_dimension_scale(fid, "/weight", "/radius", 3, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/energy", 1, error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -6560,9 +7417,41 @@ subroutine write_nc_weights
     dim1(1) = inter_grid%nz  
     call h5ltmake_dataset_double_f(gid, "z", 1, dim1, inter_grid%z, error)
     
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(gid, "energy", 1, "energy", error)
+    call h5_set_dimension_name(gid, "pitch", 1, "pitch", error)
+    call h5_set_dimension_name(gid, "r", 1, "r", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
+    call h5_make_dimension_scale(gid, "energy", "energy", error)
+    call h5_make_dimension_scale(gid, "pitch", "pitch", error)
+    call h5_make_dimension_scale(gid, "r", "r", error)
+    call h5_make_dimension_scale(gid, "z", "z", error)
+
+    !Add dimension names to weight: weight(energy,pitch,chan)
+    call h5_set_dimension_name(gid, "weight", 1, "channel", error)
+    call h5_set_dimension_name(gid, "weight", 2, "pitch", error)
+    call h5_set_dimension_name(gid, "weight", 3, "energy", error)
+    call h5_attach_dimension_scale(gid, "weight", "pitch", 2, error)
+    call h5_attach_dimension_scale(gid, "weight", "energy", 1, error)
+
+    !Add dimension names to flux: flux(energy,chan)
+    call h5_set_dimension_name(gid, "flux", 1, "channel", error)
+    call h5_set_dimension_name(gid, "flux", 2, "energy", error)
+    call h5_attach_dimension_scale(gid, "flux", "energy", 1, error)
+
+    !Add dimension names to emissivity if present: emissivity(r,z,chan)
+    if(inputs%calc_nc_wght.ge.2) then
+        call h5_set_dimension_name(gid, "emissivity", 1, "channel", error)
+        call h5_set_dimension_name(gid, "emissivity", 2, "z", error)
+        call h5_set_dimension_name(gid, "emissivity", 3, "r", error)
+        call h5_attach_dimension_scale(gid, "emissivity", "z", 2, error)
+        call h5_attach_dimension_scale(gid, "emissivity", "r", 1, error)
+    endif
+
     !Close ncweight group
     call h5gclose_f(gid, error)
-    
+
     !Close HDF5 file
     call h5fclose_f(fid, error)
     

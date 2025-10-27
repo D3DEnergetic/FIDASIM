@@ -106,8 +106,12 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-integer, parameter :: reservoir_size = 250
+
+!! >>> [JFCM, 2025-10-27] >>>
+! integer, parameter :: reservoir_size = 250
+integer :: reservoir_size = 250
     !+ Size of Neutral Particle Reservoir
+!! <<< [JFCM, 2025-10-27] <<<
 
 !!Loop Parallization Settings
 integer :: istart = 1
@@ -1312,6 +1316,11 @@ type SimulationInputs
     integer(Int64) :: n_birth
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
 
+    !! >>> [JFCM, 2025-10-27] >>>
+    integer(Int64) :: reservoir_size
+        !+ Neutral reservoir size requested by user
+    !! <<< [JFCM, 2025-10-27] <<<
+
     !! Simulation switches
     integer(Int32) :: calc_spec
         !+ Calculate spectra: 0 = off, 1=on
@@ -1377,7 +1386,7 @@ type SimulationInputs
     integer(Int32) :: enable_halo
     	!+ Enable calculation of halo process
     !! <<< [JFCM, 2025_10_02] <<<
-    
+
     !! Distribution settings
     integer(Int32) :: dist_type
         !+ Type of fast-ion distribution
@@ -2310,7 +2319,7 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
-    integer            :: enable_nonthermal_calc, calc_sink, enable_halo
+    integer            :: enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2325,7 +2334,7 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
-        enable_nonthermal_calc, calc_sink, enable_halo
+        enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2409,6 +2418,7 @@ subroutine read_inputs
     enable_nonthermal_calc=0
     calc_sink=0
     enable_halo=0
+    reservoir_size = 50
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2488,7 +2498,7 @@ subroutine read_inputs
     inputs%enable_nonthermal_calc = enable_nonthermal_calc
     inputs%calc_sink = calc_sink
     inputs%enable_halo = enable_halo
-    
+
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
     inputs%output_neutral_reservoir=output_neutral_reservoir
@@ -2507,6 +2517,9 @@ subroutine read_inputs
     inputs%n_halo=max(10,n_halo)
     inputs%n_dcx=max(10,n_dcx)
     inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
+    !! >>> [JFCM, 2025-10-27] >>>
+    inputs%reservoir_size=reservoir_size
+    !! <<< [JFCM, 2025-10-27] <<<
 
     !!Neutral Beam Settings
     beam_mass=ab
@@ -17022,7 +17035,7 @@ subroutine calculate_halo_process
   !! Also we need to clear all sink and birth files at the start of a new run
   !! this is importnat if we happen to reduce the number of iterations from one run to another
   !! This will prevent carrying old source point files incorrecly
-  
+
   !! >>> [JFCM, 2025-10-20] >>>
   !! n_iter = 4
   n_iter = 3
@@ -17693,6 +17706,12 @@ program fidasim
     call date_and_time (values=time_start)
 
     call read_inputs()
+    !! >>> [JFCM, 2025-10-27] >>>
+    ! Update reservour size:
+    reservoir_size = inputs%reservoir_size
+    write(*,*) "RESERVOIR_SIZE modified and set to ",reservoir_size
+    write(*,*) ""
+    !! <<< [JFCM, 2025-10-27] <<<
 
 #ifdef _OMP
     max_threads = OMP_get_num_procs()

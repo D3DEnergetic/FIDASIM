@@ -11033,6 +11033,10 @@ subroutine init_neutral_population(pop)
 
         ! >>> [JFCM, 2025-07-03] >>>
         !! Allocate reservoir memory only where plasma exists.
+        !! [JFCM, 2025-10-28]: in_plasma is 1 whenever mask > 0.5 in that cell
+        !! [JFCM, 2025-10-28]: This is defined in make_beam_grid using in_plasma
+        !! [JFCM, 2025-10-28]: This was done to optimize the use of memory to where only it is needed
+        !! [JFCM, 2025-10-28]: This is specially true for the work that includes the vacuum vessel
         ! This will affect neut%full,half,third,dcx,halo%R (Modifications taken to deal with this properly)
         ! We have yet to correct subroutine read_neutral_population to account for this change
         ! I will also affect spatres%dcx,halo,fida,pfida%R (Action not yet taken to deal with this)
@@ -16318,6 +16322,11 @@ subroutine mc_sample_ion_f4d_gc(ind_gc,is,rgc,deni_gc,fields_gc,rp,vp,ind_p,denf
     eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5) ! [keV]
     ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
     denf4d = 0.d0 ! Not needed anymore
+
+    !! >>> [JFCM, 2025_10_29] >>>
+    call get_plasma(plasma,pos=rgc)
+    deni_gc = plasma%deni(is)
+    !! <<< [JFCM, 2025_10_29] <<<
   else
     ! Sample thermal ion:
     call get_plasma(plasma,pos=rgc)

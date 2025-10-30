@@ -6720,12 +6720,6 @@ subroutine write_neutrons
 
         !Write energy-resolved neutron flux
         if(allocated(neutron%energy)) then
-            ! Debug output
-            if(inputs%verbose.ge.1) then
-                write(*,'(T6,"Writing eflux: allocated=",L1," max=",E12.4," nonzero=",I8)') &
-                    allocated(neutron%eflux), maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-            endif
-
             dim1(1) = neutron%nenergy
             call h5ltmake_dataset_double_f(fid,"/energy_nc", 1, dim1, neutron%energy, error)
             call h5ltset_attribute_string_f(fid,"/energy_nc","description", &
@@ -9361,9 +9355,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
-    !! DEBUG variables
-    real(Float64) :: R_start, R_tangent
-    logical :: debug_this_track
     !! Variables for handling rays starting outside grid
     logical :: enters_grid_flag
     real(Float64), dimension(3) :: ri_entry
@@ -9371,17 +9362,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     adaptive = 0; max_cell_splits = 1; split_tol = 0.0
 
-    !! DEBUG: Check if this is a problematic sightline
-    R_start = sqrt(rin(1)**2 + rin(2)**2)
-    debug_this_track = (R_start > 368.0 .and. R_start < 370.0)  ! Target Channel 19 area
-
     los_inter=.False.
     if(.not.present(los_intersect)) then
         los_inter = .True. !avoids computation if not needed
     endif
 
     if(dot_product(vn,vn).eq.0.0) then
-        if(inputs%verbose.ge.1 .and. debug_this_track) write(*,'(A,F8.2)') '  DEBUG_TRACK: Zero velocity, R_start=', R_start
         return
     endif
 
@@ -9394,21 +9380,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ri_cyl(2) = ri(3)
     ri_cyl(3) = atan2(ri(2), ri(1))
 
-    !! Print debug info when verbose is on to diagnose the issue
-    if (inputs%verbose.ge.1) then
-        write(*,'(A)') '  === TRACK_CYLINDRICAL DEBUG ==='
-        write(*,'(A,3F10.2)') '  Input position ri(x,y,z)=', ri(1), ri(2), ri(3)
-        write(*,'(A,3F10.2)') '  Cylindrical ri_cyl(R,Z,Phi)=', ri_cyl
-        write(*,'(A,F10.2,A,F10.2,A)') '  Pass grid R: [', pass_grid%r(1), ' to ', pass_grid%r(pass_grid%nr), ']'
-        write(*,'(A,F10.2,A,F10.2,A)') '  Pass grid Z: [', pass_grid%z(1), ' to ', pass_grid%z(pass_grid%nz), ']'
-        write(*,'(A,L1)') '  R outside grid? ', (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. ri_cyl(1) < pass_grid%r(1))
-        write(*,'(A,L1)') '  Z outside grid? ', (ri_cyl(2) > pass_grid%z(pass_grid%nz) .or. ri_cyl(2) < pass_grid%z(1))
-        write(*,'(A,L1)') '  Overall outside? ', (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. &
-                                                   ri_cyl(1) < pass_grid%r(1) .or. &
-                                                   ri_cyl(2) > pass_grid%z(pass_grid%nz) .or. &
-                                                   ri_cyl(2) < pass_grid%z(1))
-    endif
-
     !! Check if we're starting outside the grid boundaries
     if (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. &
         ri_cyl(1) < pass_grid%r(1) .or. &
@@ -9416,16 +9387,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri_cyl(2) < pass_grid%z(1)) then
 
         !! Ray starts outside grid - find entry point
-        if(inputs%verbose.ge.1) then
-            write(*,'(A,3F10.2)') '  TRACK_DEBUG: Starting outside grid at (R,Z,Phi)=', ri_cyl
-            write(*,'(A,2F10.2,A,2F10.2)') '    Grid bounds: R=[', pass_grid%r(1), pass_grid%r(pass_grid%nr), &
-                                            '] Z=[', pass_grid%z(1), pass_grid%z(pass_grid%nz), ']'
-        endif
-
         call find_grid_entry(ri, vn, ri_entry, enters_grid_flag)
 
         if (.not. enters_grid_flag) then
-            if(inputs%verbose.ge.1) write(*,'(A)') '  TRACK_DEBUG: Ray does not enter grid'
             ntrack = 0
             return
         endif
@@ -9435,10 +9399,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
         ri_cyl(2) = ri(3)
         ri_cyl(3) = atan2(ri(2), ri(1))
-
-        if(inputs%verbose.ge.1) then
-            write(*,'(A,3F10.2)') '  TRACK_DEBUG: Adjusted to grid entry at (R,Z,Phi)=', ri_cyl
-        endif
     endif
 
     phi = atan2(ri(2),ri(1))
@@ -9527,23 +9487,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tracks%flux = 0.d0
     ncross = 0
     call in_plasma(ri,in_plasma1,input_coords=1)
-    if(inputs%verbose.ge.1 .and. debug_this_track) then
-        write(*,'(A,F8.2,A,L)') '  DEBUG_TRACK: R_start=', R_start, ' in_plasma1=', in_plasma1
-        write(*,'(A,3F10.2)') '    ri_cyl(R,Z,Phi)=', sqrt(ri(1)**2+ri(2)**2), ri(3), atan2(ri(2),ri(1))
-    endif
     track_loop: do i=1,pass_grid%ntrack
         if(cc.gt.pass_grid%ntrack) then
-            if(inputs%verbose.ge.1) then
-                write(*,'(A,I5,A,I5)') '  DEBUG_TRACK: Exit - cc > ntrack_max. cc=', cc, &
-                    ' max=', pass_grid%ntrack
-            endif
             exit track_loop
-        endif
-
-        !! Debug: Print loop iteration details when verbose is on
-        if(inputs%verbose.ge.2 .and. (i.le.3 .or. mod(i,100).eq.0)) then
-            write(*,'(A,I5,A,3I5,A,3F10.2)') '    Loop i=', i, ' ind=', ind, ' ri_cyl(R,Z,Phi)=', &
-                sqrt(ri(1)**2+ri(2)**2), ri(3), atan2(ri(2),ri(1))
         endif
 
         call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
@@ -9555,20 +9501,11 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         !! Check if no valid forward intersection found
         if(mind.eq.0) then
-            if(inputs%verbose.ge.1) write(*,'(A,I5,A,3E12.4)') '  DEBUG_TRACK: Exit at i=', i, &
-                ' - no forward intersection, dt_arr=', dt_arr
             exit track_loop
         endif
 
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
-
-        !! Debug: Show intersection details for problematic iterations
-        if(inputs%verbose.ge.2 .and. (i.le.5 .or. i.ge.40 .or. mod(i,10).eq.0)) then
-            write(*,'(A,I5,A,3E12.4,A,I2,A,E12.4)') '      i=', i, ' dt_arr=', dt_arr, ' mind=', mind, ' dT=', dT
-            write(*,'(A,3F10.2,A,3F10.2)') '        ri=', ri, ' -> ri_tmp=', ri_tmp
-            write(*,'(A,3I5,A,3F10.2)') '        ind=', ind, ' R_cyl=', sqrt(ri(1)**2+ri(2)**2)
-        endif
 
         !! Check if velocity intersects LOS and produces wavelength in the right region
         inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
@@ -9670,26 +9607,17 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
 
-        !! Check for invalid mind value (should not happen after earlier check, but be safe)
         if (mind.lt.1 .or. mind.gt.3) then
-            if(inputs%verbose.ge.1) write(*,'(A,I5,A,I3)') '  DEBUG_TRACK: Exit at i=', i, &
-                ' - invalid mind=', mind
             exit track_loop
         endif
 
         if (ind(mind).gt.gdims(mind)) then
-            if(inputs%verbose.ge.1) write(*,'(A,I5,A,3I5,A,3I5,A,I3)') '  DEBUG_TRACK: Exit at i=', i, &
-                ' ind=', ind, ' > gdims=', gdims, ' mind=', mind
             exit track_loop
         endif
         if (ind(mind).lt.1) then
-            if(inputs%verbose.ge.1) write(*,'(A,I5,A,3I5,A,I3)') '  DEBUG_TRACK: Exit at i=', i, &
-                ' ind(mind) < 1, ind=', ind, ' mind=', mind
             exit track_loop
         endif
         if (ncross.ge.inputs%max_crossings) then
-            if(inputs%verbose.ge.1) write(*,'(A,I5,A,I5)') '  DEBUG_TRACK: Exit at i=', i, &
-                ' ncross=', ncross
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -9711,10 +9639,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call plane_basis(v_plane, redge, tedge, basis)
     enddo track_loop
     ntrack = cc-1
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(A,I5,A,I5)') '  DEBUG_TRACK: Final ntrack=', ntrack, ' (cc-1), loop exited at i=', i
-    endif
 
     if(present(los_intersect)) then
         los_intersect = los_inter
@@ -15916,28 +15840,10 @@ subroutine neutron_spec_f
         vn = nc_chords%det(ichan)%aperture%origin - rn
         vn = vn/norm2(vn)
 
-        !! Enhanced debug output before calling track_cylindrical
-        if(inputs%verbose.ge.1) then
-            write(*,'(A)') '  ================================'
-            write(*,'(A,I3,A,F8.2,A)') '  NC Channel ', ichan, ' (R_tang=', nc_chords%radius(ichan), ' cm)'
-            write(*,'(A,3F10.2)') '    Detector origin:', rn
-            write(*,'(A,3F10.2)') '    Aperture origin:', nc_chords%det(ichan)%aperture%origin
-            write(*,'(A,3F10.2)') '    Ray direction vn:', vn
-            write(*,'(A,F10.2,A)') '    Detector R=', sqrt(rn(1)**2 + rn(2)**2), ' cm'
-        endif
-
         call track_cylindrical(rn, vn, tracks, ntrack)
         all_ntrack(ichan) = ntrack
         if(ntrack > 0) then
             all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
-        endif
-
-        !! Print track result
-        if(inputs%verbose.ge.1) then
-            write(*,'(A,I5)') '    Result: ntrack=', ntrack
-            if(ntrack < 100) then
-                write(*,'(A)') '    WARNING: Low track count!'
-            endif
         endif
     enddo
 
@@ -16972,19 +16878,11 @@ program fidasim
             call neutron_f()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_f
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_f: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         else
             call neutron_mc()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_mc
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_mc: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''

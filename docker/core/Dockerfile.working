@@ -1,0 +1,97 @@
+# Working FIDASIM Core Dockerfile
+# Handles HDF5 libraries properly using multi-stage build
+
+# Stage 1: Prepare files
+FROM ubuntu:24.04 AS preparer
+
+WORKDIR /prepare
+
+# Copy all necessary files
+COPY fidasim ./fidasim
+COPY tables/atomic_tables.h5 ./tables/atomic_tables.h5
+COPY deps/hdf5/lib ./hdf5-lib
+COPY docker/core/api.py ./api.py
+COPY docker/core/entrypoint.sh ./entrypoint.sh
+
+# Stage 2: Runtime
+FROM ubuntu:24.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    gfortran \
+    libgomp1 \
+    zlib1g \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    libhdf5-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages for the API
+# Ubuntu 24.04 requires --break-system-packages flag
+# Updated versions for Python 3.12 compatibility
+RUN pip3 install --no-cache-dir --break-system-packages \
+    fastapi==0.104.1 \
+    uvicorn[standard]==0.24.0 \
+    h5py==3.11.0 \
+    numpy==1.26.4 \
+    python-multipart==0.0.6 \
+    aiofiles==23.2.1
+
+# Create non-root user with configurable UID/GID
+# Default to 1000, but can be overridden at build time
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+# Delete existing ubuntu user if it has UID 1000, then create fidasim user
+RUN if id -u ${USER_ID} >/dev/null 2>&1; then \
+        userdel -r $(id -un ${USER_ID}) 2>/dev/null || true; \
+    fi && \
+    if getent group ${GROUP_ID} >/dev/null 2>&1; then \
+        groupdel $(getent group ${GROUP_ID} | cut -d: -f1) 2>/dev/null || true; \
+    fi && \
+    groupadd -g ${GROUP_ID} fidasim && \
+    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash fidasim
+
+# Set working directory
+WORKDIR /app
+
+# Copy from preparer stage
+COPY --from=preparer /prepare/fidasim ./fidasim
+COPY --from=preparer /prepare/tables/atomic_tables.h5 ./tables/atomic_tables.h5
+COPY --from=preparer /prepare/hdf5-lib/*.so* /usr/local/lib/
+COPY --from=preparer /prepare/api.py ./api.py
+COPY --from=preparer /prepare/entrypoint.sh ./entrypoint.sh
+
+# Update library cache
+RUN ldconfig
+
+# Create data directory for shared volume
+RUN mkdir -p /data && chown fidasim:fidasim /data
+
+# Make executables
+RUN chmod +x ./entrypoint.sh ./fidasim
+
+# Set ownership
+RUN chown -R fidasim:fidasim /app
+
+# Switch to non-root user
+USER fidasim
+
+# Environment variables
+ENV OMP_NUM_THREADS=4
+ENV FIDASIM_DIR=/app
+ENV DATA_DIR=/data
+ENV PYTHONUNBUFFERED=1
+
+# Expose FastAPI port
+EXPOSE 8001
+
+# Entry point
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["api"]

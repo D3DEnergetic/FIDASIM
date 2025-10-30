@@ -1,0 +1,201 @@
+version: '3.8'
+
+services:
+  # FIDASIM Core - Using pre-built image
+  fidasim-core:
+    build:
+      context: .
+      dockerfile: docker/core/Dockerfile.working
+      args:
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_ID=${GROUP_ID:-1000}
+    image: fidasim-core:latest
+    container_name: fidasim-core
+    hostname: fidasim-core
+    ports:
+      - "8001:8001"
+    volumes:
+      - fidasim-data:/data
+      - web-uploads:/data/uploads
+      - ./test:/test
+    environment:
+      - MAX_CORES=32
+      - OMP_NUM_THREADS=4
+      - DATA_DIR=/data
+    networks:
+      - fidasim-network
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # FIDASIM Preprocessor - Using pre-built image
+  fidasim-preprocessor:
+    image: fidasim-preprocessor:latest
+    container_name: fidasim-preprocessor
+    hostname: fidasim-preprocessor
+    ports:
+      - "8002:8002"
+    volumes:
+      - fidasim-data:/data
+      - ./lib/python:/app/lib/python:ro
+    environment:
+      - DATA_DIR=/data
+      - PYTHONPATH=/app/lib/python
+    networks:
+      - fidasim-network
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - fidasim-core
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fidasim-postgres
+    hostname: postgres
+    ports:
+      - "5433:5432"  # Changed to 5433 to avoid conflict
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      - POSTGRES_DB=fidasim
+      - POSTGRES_USER=fidasim
+      - POSTGRES_PASSWORD=fidasim_secure_password_change_me
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8
+    networks:
+      - fidasim-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fidasim"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache and Queue
+  redis:
+    image: redis:7-alpine
+    container_name: fidasim-redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    networks:
+      - fidasim-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FIDASIM Web Backend API
+  fidasim-web-backend:
+    build:
+      context: ./docker/web/backend
+      dockerfile: Dockerfile
+    image: fidasim-web-backend:latest
+    container_name: fidasim-web-backend
+    hostname: fidasim-web-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - fidasim-data:/data
+      - web-uploads:/data/uploads
+    environment:
+      # Application
+      - APP_NAME=FIDASIM Web
+      - APP_VERSION=1.0.0
+      - DEBUG=false
+      # Security - CHANGE IN PRODUCTION!
+      - SECRET_KEY=${SECRET_KEY:-your-super-secret-key-change-this-in-production}
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      # Database
+      - DATABASE_URL=postgresql://fidasim:fidasim_secure_password_change_me@postgres:5432/fidasim
+      # Redis
+      - REDIS_URL=redis://redis:6379
+      # External Services
+      - CORE_API_URL=http://fidasim-core:8001
+      - PREPROCESSOR_API_URL=http://fidasim-preprocessor:8002
+      # CORS - Update for production
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:80","http://localhost"]
+      # File uploads
+      - MAX_UPLOAD_SIZE=1073741824
+      - UPLOAD_DIR=/data/uploads
+      # Job configuration
+      - MAX_CORES=32
+      - DEFAULT_CORES=4
+      - MAX_CONCURRENT_JOBS=10
+    networks:
+      - fidasim-network
+    depends_on:
+      - postgres
+      - redis
+      - fidasim-core
+      - fidasim-preprocessor
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # FIDASIM Web Frontend
+  fidasim-web-frontend:
+    build:
+      context: ./docker/web/frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+        - VITE_WS_URL=ws://localhost:8000
+        - VITE_APP_NAME=FIDASIM Web
+        - VITE_APP_VERSION=1.0.0
+    image: fidasim-web-frontend:latest
+    container_name: fidasim-web-frontend
+    hostname: fidasim-web-frontend
+    ports:
+      - "3000:80"
+    environment:
+      # Runtime environment variables (injected by entrypoint)
+      - VITE_API_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000
+      - VITE_APP_NAME=FIDASIM Web
+      - VITE_APP_VERSION=1.0.0
+    networks:
+      - fidasim-network
+    depends_on:
+      - fidasim-web-backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "--prefer-family=IPv4", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+networks:
+  fidasim-network:
+    driver: bridge
+
+volumes:
+  fidasim-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/data
+      o: bind
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  web-uploads:
+    driver: local

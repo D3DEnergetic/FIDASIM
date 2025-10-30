@@ -171,7 +171,13 @@ FIDASIM/
 │   │       ├── Dockerfile
 │   │       └── package.json
 │   ├── core/                 # FIDASIM simulation service
+│   │   ├── Dockerfile        # (Python deps installed inline)
+│   │   ├── api.py
+│   │   └── entrypoint.sh
 │   ├── preprocessor/         # Preprocessing service
+│   │   ├── Dockerfile
+│   │   ├── api.py
+│   │   └── requirements.txt
 │   └── postgres/             # Database
 ├── scripts/
 │   ├── deploy-web.sh

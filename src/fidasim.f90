@@ -10650,8 +10650,7 @@ subroutine get_ddnhe_anisotropy(plasma, v1, v3, kappa)
 end subroutine get_ddnhe_anisotropy
 
 subroutine get_dd_neutron_energy(v1, v2, v_detector, e_neutron, weight)
-    !+ Calculate precise neutron energy from DD reaction kinematics
-    !+ Based on relativistic two-body kinematics with proper Lorentz boost
+    !+ Calculate classical neutron energy from DD reaction kinematics
     real(Float64), dimension(3), intent(in) :: v1
         !+ First reactant velocity [cm/s]
     real(Float64), dimension(3), intent(in) :: v2

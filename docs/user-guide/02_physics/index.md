@@ -7,5 +7,6 @@ title: Physics
 * [Neutral Beam and Halo](./04_neutrals.html)
 * [Spectroscopy](./05_spectra.html)
 * [Neutral Particle Analyzer](./06_npa.html)
-* [Phase-space Sensitivities](./07_weights.html)
-* [Cold Neutrals and Passive Signals](./08_passive.html)
+* [Neutron Collimation Systems](./07_neutrons.html)
+* [Phase-space Sensitivities](./08_weights.html)
+* [Cold Neutrals and Passive Signals](./09_passive.html)

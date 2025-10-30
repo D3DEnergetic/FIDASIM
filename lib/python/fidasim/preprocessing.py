@@ -2139,7 +2139,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
+def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -2149,6 +2149,8 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+
     #+     **grid**: Interpolation grid structure
     #+
+    #+     **nbi**: Neutral beam geometry structure (can be None or empty dict for passive-only runs)
+    #+
     #+     **plasma**: Plasma parameters structure
     #+
     #+     **fields**: Electromagnetic fields structure
@@ -2156,8 +2158,6 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+     **fbm**: Fast-ion distribution structure
     #+
     #+##Keyword Arguments
-    #+     **nbi**: Optional, Neutral beam geometry structure (not needed for passive-only runs)
-    #+
     #+     **spec**: Optional, Spectral geometry structure
     #+
     #+     **npa**: Optional, NPA geometry structure
@@ -2169,9 +2169,9 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+##Example Usage
     #+```python
     #+>>> # With beam (active measurements)
-    #+>>> prefida(inputs, grid, plasma, fields, fbm, nbi=nbi, spec=spec, npa=npa, nc=nc)
-    #+>>> # Passive-only (no beam)
-    #+>>> prefida(inputs, grid, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
+    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
+    #+>>> # Passive-only (no beam) - pass None or empty dict
+    #+>>> prefida(inputs, grid, None, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
     #+```
     """
     # CHECK INPUTS
@@ -2185,15 +2185,17 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     check_grid(grid)
 
     # CHECK BEAM INPUTS (optional for passive-only runs)
-    if nbi is not None:
+    # Accept None or empty dict for passive-only mode
+    if nbi is not None and nbi:  # Check if nbi exists and is not empty
         nbi = check_beam(inputs, nbi)
     else:
+        # Passive-only mode: nbi is None or empty dict
         # Check if beam parameters are present in inputs
         has_beam_params = all(key in inputs for key in ['nx', 'ny', 'nz', 'einj', 'pinj', 'current_fractions'])
         if not has_beam_params:
             warn('='*70)
             warn('PASSIVE-ONLY MODE DETECTED')
-            warn('No beam geometry provided (nbi=None) and no beam parameters in inputs.')
+            warn('No beam geometry provided (nbi=None or {}) and no beam parameters in inputs.')
             warn('Only passive diagnostics will be calculated:')
             warn('  - Passive FIDA (calc_pfida)')
             warn('  - Passive NPA (calc_pnpa)')

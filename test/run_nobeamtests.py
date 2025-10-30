@@ -249,9 +249,10 @@ def run_test(args):
     plasma['deni'] = plasma['deni'] - fbm['denf'].reshape(1,grid['nr'],grid['nz'])
     plasma['deni'] = np.where(plasma['deni'] > 0.0, plasma['deni'], 0.0).astype('float64')
 
-    # Call prefida WITHOUT nbi parameter - this is the critical test
+    # Call prefida with nbi=None for passive-only mode - this is the critical test
+    # Pass None as 3rd argument to maintain backward compatibility
     # geometry.h5 will be created WITHOUT any /nbi group
-    fs.prefida(inputs, grid, plasma, equil, fbm, spec=spec, npa=npa, nc=nc)
+    fs.prefida(inputs, grid, None, plasma, equil, fbm, spec=spec, npa=npa, nc=nc)
 
     return 0
 

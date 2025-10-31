@@ -2589,10 +2589,10 @@ end subroutine make_beam_grid
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
-    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr, a_cent
-    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
-    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
-    logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
+    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: r0_arr, v0_arr, a_cent
+    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: xy_enter, xy_exit
+    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan))   :: yle, ygt
+    logical, dimension(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan)         :: skip
     real(Float64), dimension(:), allocatable  :: xarr, yarr
     real(Float64), dimension(3,8) :: vertices_xyz, vertices_uvw
     real(Float64), dimension(2,3) :: extrema
@@ -2658,7 +2658,7 @@ subroutine make_passive_grid
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
         call get_plasma_extrema(r0_arr(:,:spec_chords%nchan),v0_arr(:,:spec_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
-    else !pnpa>=1 case
+    else if(inputs%calc_pnpa.gt.0) then
         do i=1, npa_chords%nchan
             call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
             call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
@@ -2666,6 +2666,26 @@ subroutine make_passive_grid
             v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
         call get_plasma_extrema(r0_arr(:,:npa_chords%nchan),v0_arr(:,:npa_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+    else if((inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
+        ! Neutron collimator case: trace NC sight lines from detector through aperture
+        do i=1, nc_chords%nchan
+            r0_arr(:,i) = nc_chords%det(i)%detector%origin
+            v0_arr(:,i) = nc_chords%det(i)%aperture%origin - nc_chords%det(i)%detector%origin
+        enddo
+        call get_plasma_extrema(r0_arr(:,:nc_chords%nchan),v0_arr(:,:nc_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+        ! Extend phi range to capture NC tangency points beyond plasma boundary
+        extrema(2,3) = extrema(2,3) + 0.5
+    else
+        ! No passive diagnostics - use beam grid boundaries as fallback
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"WARNING: No passive diagnostics, using beam grid for passive grid boundaries")')
+        endif
+        extrema(1,1) = minval(inter_grid%r)
+        extrema(2,1) = maxval(inter_grid%r)
+        extrema(1,2) = minval(inter_grid%z)
+        extrema(2,2) = maxval(inter_grid%z)
+        extrema(1,3) = minval(xarr_beam_grid)
+        extrema(2,3) = maxval(yarr_beam_grid)
     endif
 
     !! Store the passive neutral grid
@@ -3424,13 +3444,14 @@ subroutine read_neutron_collimator
     nc_chords%det%aperture%shape = a_shape
 
     chan_loop: do ichan=1,nc_chords%nchan
-        ! Convert to beam grid coordinates
-        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
-        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
-        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
-        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
-        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
-        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
+        ! Keep NC geometry in machine coordinates for track_cylindrical
+        ! DO NOT convert to beam grid coordinates - this breaks tangency radii!
+        xyz_a_cent = a_cent(:,ichan)    ! Keep as machine coords
+        xyz_a_redge = a_redge(:,ichan)
+        xyz_a_tedge = a_tedge(:,ichan)
+        xyz_d_cent = d_cent(:,ichan)    ! Keep as machine coords
+        xyz_d_redge = d_redge(:,ichan)
+        xyz_d_tedge = d_tedge(:,ichan)
 
         ! Define detector/aperture hh/hw
         nc_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
@@ -6699,12 +6720,6 @@ subroutine write_neutrons
 
         !Write energy-resolved neutron flux
         if(allocated(neutron%energy)) then
-            ! Debug output
-            if(inputs%verbose.ge.1) then
-                write(*,'(T6,"Writing eflux: allocated=",L1," max=",E12.4," nonzero=",I8)') &
-                    allocated(neutron%eflux), maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-            endif
-
             dim1(1) = neutron%nenergy
             call h5ltmake_dataset_double_f(fid,"/energy_nc", 1, dim1, neutron%energy, error)
             call h5ltset_attribute_string_f(fid,"/energy_nc","description", &
@@ -9192,6 +9207,117 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
 end subroutine track
 
+subroutine find_grid_entry(r_start, v_ray, r_entry, enters_grid)
+    !+ Finds where a ray starting outside the grid enters the grid boundaries
+    real(Float64), dimension(3), intent(in)  :: r_start
+        !+ Starting position in machine coordinates [cm]
+    real(Float64), dimension(3), intent(in)  :: v_ray
+        !+ Ray direction vector (normalized)
+    real(Float64), dimension(3), intent(out) :: r_entry
+        !+ Entry point into grid in machine coordinates [cm]
+    logical, intent(out)                     :: enters_grid
+        !+ Whether ray enters the grid
+
+    real(Float64), dimension(3) :: r_cyl_start, r_cyl_current
+    real(Float64), dimension(3) :: p_temp
+    real(Float64) :: t_min, t_temp, t_r_min, t_r_max, t_z_min, t_z_max
+    real(Float64) :: r_start_mag, r_current, z_current
+    real(Float64) :: vr, vz
+    integer :: i
+
+    ! Convert start position to cylindrical for checking
+    r_start_mag = sqrt(r_start(1)**2 + r_start(2)**2)
+    r_cyl_start(1) = r_start_mag
+    r_cyl_start(2) = r_start(3)  ! z
+    r_cyl_start(3) = atan2(r_start(2), r_start(1))  ! phi
+
+    ! Get velocity components in cylindrical frame at starting position
+    vr = (r_start(1)*v_ray(1) + r_start(2)*v_ray(2))/r_start_mag
+    vz = v_ray(3)
+
+    enters_grid = .false.
+    t_min = huge(t_min)
+
+    ! Check intersection with outer R boundary (cylinder at R_max)
+    if (r_cyl_start(1) > pass_grid%r(pass_grid%nr)) then
+        ! Outside, need to check if we hit outer cylinder going inward
+        if (vr < 0.0) then  ! Moving inward
+            r_cyl_current(1) = pass_grid%r(pass_grid%nr)
+            r_cyl_current(2) = 0.0  ! Will be updated
+            r_cyl_current(3) = 0.0  ! Will be updated
+            call cyl_to_uvw(r_cyl_current, p_temp)
+            call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+            if (t_temp > 0.0 .and. t_temp < t_min) then
+                r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+                z_current = p_temp(3)
+                ! Check if z is within bounds at this R
+                if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                    t_min = t_temp
+                    r_entry = p_temp
+                    enters_grid = .true.
+                endif
+            endif
+        endif
+    endif
+
+    ! Check intersection with inner R boundary if within tokamak
+    if (r_cyl_start(1) < pass_grid%r(1) .and. vr > 0.0) then
+        r_cyl_current(1) = pass_grid%r(1)
+        r_cyl_current(2) = 0.0
+        r_cyl_current(3) = 0.0
+        call cyl_to_uvw(r_cyl_current, p_temp)
+        call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            z_current = p_temp(3)
+            if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! Check intersection with Z boundaries (top and bottom planes)
+    if (r_cyl_start(2) > pass_grid%z(pass_grid%nz) .and. vz < 0.0) then
+        ! Above grid, moving down
+        t_temp = (pass_grid%z(pass_grid%nz) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    if (r_cyl_start(2) < pass_grid%z(1) .and. vz > 0.0) then
+        ! Below grid, moving up
+        t_temp = (pass_grid%z(1) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! If starting point is already inside, just return it
+    if (r_cyl_start(1) >= pass_grid%r(1) .and. &
+        r_cyl_start(1) <= pass_grid%r(pass_grid%nr) .and. &
+        r_cyl_start(2) >= pass_grid%z(1) .and. &
+        r_cyl_start(2) <= pass_grid%z(pass_grid%nz)) then
+        r_entry = r_start
+        enters_grid = .true.
+    endif
+
+end subroutine find_grid_entry
+
 subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:pass_grid]]
     real(Float64), dimension(3), intent(in)          :: rin
@@ -9229,6 +9355,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
+    !! Variables for handling rays starting outside grid
+    logical :: enters_grid_flag
+    real(Float64), dimension(3) :: ri_entry
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     adaptive = 0; max_cell_splits = 1; split_tol = 0.0
@@ -9246,7 +9375,33 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = pass_grid%nz
     gdims(3) = pass_grid%nphi
 
-    phi = atan2(rin(2),rin(1))
+    !! Check if starting position is outside the grid
+    ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+    ri_cyl(2) = ri(3)
+    ri_cyl(3) = atan2(ri(2), ri(1))
+
+    !! Check if we're starting outside the grid boundaries
+    if (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. &
+        ri_cyl(1) < pass_grid%r(1) .or. &
+        ri_cyl(2) > pass_grid%z(pass_grid%nz) .or. &
+        ri_cyl(2) < pass_grid%z(1)) then
+
+        !! Ray starts outside grid - find entry point
+        call find_grid_entry(ri, vn, ri_entry, enters_grid_flag)
+
+        if (.not. enters_grid_flag) then
+            ntrack = 0
+            return
+        endif
+
+        !! Update starting position to grid entry point
+        ri = ri_entry
+        ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+        ri_cyl(2) = ri(3)
+        ri_cyl(3) = atan2(ri(2), ri(1))
+    endif
+
+    phi = atan2(ri(2),ri(1))
     s = sin(phi) ; c = cos(phi)
     vn_cyl(1) = c*vn(1) + s*vn(2)
     vn_cyl(3) = -s*vn(1) + c*vn(2)
@@ -9333,7 +9488,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ncross = 0
     call in_plasma(ri,in_plasma1,input_coords=1)
     track_loop: do i=1,pass_grid%ntrack
-        if(cc.gt.pass_grid%ntrack) exit track_loop
+        if(cc.gt.pass_grid%ntrack) then
+            exit track_loop
+        endif
 
         call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
         call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
@@ -9341,6 +9498,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
         mind = minpos(1)
+
+        !! Check if no valid forward intersection found
+        if(mind.eq.0) then
+            exit track_loop
+        endif
+
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
 
@@ -9444,8 +9607,16 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
 
-        if (ind(mind).gt.gdims(mind)) exit track_loop
-        if (ind(mind).lt.1) exit track_loop
+        if (mind.lt.1 .or. mind.gt.3) then
+            exit track_loop
+        endif
+
+        if (ind(mind).gt.gdims(mind)) then
+            exit track_loop
+        endif
+        if (ind(mind).lt.1) then
+            exit track_loop
+        endif
         if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
@@ -9468,6 +9639,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call plane_basis(v_plane, redge, tedge, basis)
     enddo track_loop
     ntrack = cc-1
+
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
@@ -15666,6 +15838,7 @@ subroutine neutron_spec_f
         rn = nc_chords%det(ichan)%detector%origin
         vn = nc_chords%det(ichan)%aperture%origin - rn
         vn = vn/norm2(vn)
+
         call track_cylindrical(rn, vn, tracks, ntrack)
         all_ntrack(ichan) = ntrack
         if(ntrack > 0) then
@@ -16361,8 +16534,8 @@ program fidasim
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
-    
-     if(inputs%calc_neut_spec.ge.1) then
+
+    if((inputs%calc_neutron.ge.1).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
         call read_neutron_collimator()
     endif
 
@@ -16704,19 +16877,11 @@ program fidasim
             call neutron_f()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_f
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_f: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         else
             call neutron_mc()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_mc
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_mc: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''

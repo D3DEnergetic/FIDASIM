@@ -384,26 +384,31 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
     #+
     #+    **nz**: Number of Z values
     #+
-    #+    **phimin**: Minimum Phi value [rad]
+    #+    **phimin**: Minimum Phi value [rad] (default: 0.0)
     #+
-    #+    **phimax**: Maximum Phi value [rad]
+    #+    **phimax**: Maximum Phi value [rad] (default: 0.0)
     #+
-    #+    **nphi**: Number of Phi values 
+    #+    **nphi**: Number of Phi values (default: 1)
+    #+
+    #+##Notes
+    #+    - If nphi > 1 with phimin=phimax=0.0 (defaults), only nphi is stored (for passive grid resolution)
+    #+    - If nphi > 1 with non-zero phimin or phimax, both nphi and phi array are created (3D geometry)
     #+
     #+##Return Value
     #+Interpolation grid dictionary
     #+
     #+##Example Usage
     #+```python
+    #+>>> # 3D geometry with phi array
     #+>>> grid = rz_grid(0,200.0,200,-100,100,200,phimin=4*np.pi/3,phimax=5*np.pi/3,nphi=5)
+    #+>>> # Passive grid nphi only (no phi array)
+    #+>>> grid = rz_grid(0,200.0,200,-100,100,200,nphi=50)
     #+```
     """
     dr = (rmax - rmin) / nr
     dz = (zmax - zmin) / nz
-    dphi = (phimax - phimin) / nphi
     r = rmin + dr * np.arange(nr, dtype=np.float64)
     z = zmin + dz * np.arange(nz, dtype=np.float64)
-    phi = phimin + dphi * np.arange(nphi, dtype=np.float64)
 
     r2d = np.tile(r, (nz, 1)).T
     z2d = np.tile(z, (nr, 1))
@@ -415,9 +420,15 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
             'nr': nr,
             'nz': nz}
 
+    # Check if we're specifying nphi for passive grid only (no phi extent specified)
+    # or for full 3D geometry (phi extent specified)
     if nphi > 1:
-        grid.setdefault('nphi',nphi)
-        grid.setdefault('phi', phi)
+        grid.setdefault('nphi', nphi)
+        # Only create phi array if phimin or phimax are non-zero (indicating 3D geometry)
+        if phimin != 0.0 or phimax != 0.0:
+            dphi = (phimax - phimin) / nphi
+            phi = phimin + dphi * np.arange(nphi, dtype=np.float64)
+            grid.setdefault('phi', phi)
 
     return grid
 

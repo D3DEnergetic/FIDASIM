@@ -342,12 +342,15 @@ def check_grid(grid):
 
     if 'nphi' not in grid:
         info('"nphi" is missing from the interpolation grid, assuming axisymmetry')
-        nphi =1
+        nphi = 1
     else:
         nphi = grid['nphi']
-        if nphi < 3:
-            error('"phi" must have at least 3 elements')
+        # Check if phi array exists (for 3D geometry)
+        if 'phi' in grid and nphi < 3:
+            error('"phi" must have at least 3 elements when phi array is specified')
             error('Invalid interpolation grid. Exiting...', halt=True)
+        elif 'phi' not in grid and nphi > 1:
+            info('nphi={} specified without phi array - will be used for passive grid only'.format(nphi))
 
 
     nr = grid['nr']
@@ -370,8 +373,10 @@ def check_grid(grid):
 
     if 'nphi' in grid:
         schema.setdefault('nphi',zero_int)
-        schema.setdefault('phi', {'dims': [nphi],
-                                  'type': [float, np.float64]})
+        # Only include phi in schema if it exists in the grid
+        if 'phi' in grid:
+            schema.setdefault('phi', {'dims': [nphi],
+                                      'type': [float, np.float64]})
 
     err = check_dict_schema(schema, grid, desc="interpolation grid")
     if err:
@@ -601,11 +606,15 @@ def check_plasma(inputs, grid, plasma):
 
     nr = grid['nr']
     nz = grid['nz']
-    if 'nphi' not in grid:
-        info('"nphi" is missing from the plasma, assuming axisymmetry')
-        nphi =1
-    else:
+
+    # Check for phi array to determine if we're truly 3D
+    # nphi without phi array means passive grid only (plasma stays 2D)
+    is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+    if is_3d:
         nphi = grid['nphi']
+    else:
+        nphi = 1  # Treat as 2D for plasma arrays
 
     nthermal = plasma['nthermal']
 
@@ -621,7 +630,7 @@ def check_plasma(inputs, grid, plasma):
     nthermal_double = {'dims': [nthermal],
                        'type':[float, np.float64]}
 
-    if nphi>1:
+    if is_3d:
         nrnznphi_double = {'dims': [nr, nz, nphi],
                            'type': [float, np.float64]}
 
@@ -728,11 +737,14 @@ def check_fields(inputs, grid, fields):
 
     nr = grid['nr']
     nz = grid['nz']
-    if 'nphi' not in grid:
-        info('"nphi" is missing from the fields, assuming axisymmetry')
-        nphi =1
-    else:
+    # Check for phi array to determine if we're truly 3D
+    # nphi without phi array means passive grid only (fields stay 2D)
+    is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+    if is_3d:
         nphi = grid['nphi']
+    else:
+        nphi = 1  # Treat as 2D for field arrays
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -740,7 +752,7 @@ def check_fields(inputs, grid, fields):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    if nphi>1:
+    if is_3d:
         nrnznphi_double = {'dims': [nr, nz, nphi],
                            'type': [float, np.float64, np.float64]}
 
@@ -831,11 +843,15 @@ def check_distribution(inputs, grid, dist):
         nen = dist['nenergy']
         nr = grid['nr']
         nz = grid['nz']
-        if 'nphi' not in grid:
-            info('"nphi" is missing from the fast-ion distribution, assuming axisymmetry')
-            nphi =1
-        else:
+
+        # Check for phi array to determine if we're truly 3D
+        # nphi without phi array means passive grid only (distribution stays 2D)
+        is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+        if is_3d:
             nphi = grid['nphi']
+        else:
+            nphi = 1  # Treat as 2D for distribution arrays
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -846,7 +862,7 @@ def check_distribution(inputs, grid, dist):
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
 
-        if nphi>1:
+        if is_3d:
             nrnznphi_double = {'dims': [nr, nz, nphi],
                                'type': [float, np.float64, np.float64]}
         else:
@@ -863,7 +879,7 @@ def check_distribution(inputs, grid, dist):
                   'denf': nrnznphi_double,
                   'time': zero_double,
                   'data_source': zero_string}
-        if nphi>1:
+        if is_3d:
             schema['f'] = {'dims': [nen, npitch, nr, nz, nphi],
                            'type': [float, np.float64]}
         else:

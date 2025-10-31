@@ -1970,6 +1970,38 @@ def write_equilibrium(filename, plasma, fields):
         # Include species_mass as the scale for the species dimension
         plasma_coord_scales = {'r': 'r', 'z': 'z', 'species_mass': 'species'}
 
+        # Add dimension names for profiles subgroup if it might exist
+        # These will use the nested key format that write_data now supports
+        plasma_dim_names.update({
+            'profiles/dene': ['rho'],
+            'profiles/te': ['rho'],
+            'profiles/ti': ['rho'],
+            'profiles/zeff': ['rho'],
+            'profiles/omega': ['rho'],
+            'profiles/rho': ['rho']
+        })
+
+        # Mark rho as a coordinate scale for the profiles
+        plasma_coord_scales['profiles/rho'] = 'rho'
+
+        # Add descriptions for profiles subgroup (if it exists)
+        plasma_description.update({
+            'profiles/dene': 'Electron density profile',
+            'profiles/te': 'Electron temperature profile',
+            'profiles/ti': 'Ion temperature profile',
+            'profiles/zeff': 'Effective charge profile',
+            'profiles/omega': 'Toroidal rotation profile',
+            'profiles/rho': 'Normalized radial coordinate'
+        })
+
+        # Add units for profiles subgroup (if it exists)
+        plasma_units.update({
+            'profiles/dene': 'cm^-3',
+            'profiles/te': 'keV',
+            'profiles/ti': 'keV',
+            'profiles/omega': 'rad/s'
+        })
+
         write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units,
                    dim_names=plasma_dim_names, coord_scales=plasma_coord_scales, name='plasma')
 

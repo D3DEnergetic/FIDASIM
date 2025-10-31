@@ -5740,6 +5740,21 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/passive_particles","description", &
                  "Passive NPA Monte Carlo particles",error)
 
+            !Add dimension names to passive particle arrays
+            ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+            ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cartesian_component)
+            call h5_set_dimension_name(gid, "ri", 1, "particle", error)
+            call h5_set_dimension_name(gid, "ri", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "rf", 1, "particle", error)
+            call h5_set_dimension_name(gid, "rf", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "gci", 1, "particle", error)
+            call h5_set_dimension_name(gid, "gci", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "pitch", 1, "particle", error)
+            call h5_set_dimension_name(gid, "energy", 1, "particle", error)
+            call h5_set_dimension_name(gid, "weight", 1, "particle", error)
+            call h5_set_dimension_name(gid, "detector", 1, "particle", error)
+            call h5_set_dimension_name(gid, "class", 1, "particle", error)
+
             !Close group
             call h5gclose_f(gid, error)
         endif
@@ -5836,6 +5851,8 @@ subroutine write_spectra
         call h5ltmake_compressed_dataset_int_f(fid, "/stark_sign", 1, dims(1:1), stark_sign, error)
         call h5ltset_attribute_string_f(fid,"/stark_sign", "description", &
          "Stark line indicator: 1=sigma, -1=pi ", error)
+        ! Add dimension label immediately after creation
+        call h5_set_dimension_name(fid, "/stark_sign", 1, "stark_component", error)
     endif
     dims(1) = n_stark
     dims(2) = inputs%nlambda
@@ -6117,7 +6134,7 @@ subroutine write_spectra
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                      dims(1:3), spec%fida(:,:,:,1), error)
-                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 4, &
                      dims_stokes(1:4), spec%fidastokes(:,:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
@@ -6305,6 +6322,45 @@ subroutine write_spectra
                 "Number of photons produced by neutral: pfida_photons(sample,channel)",error)
        endif
 
+       ! Add dimension labels for spatial group datasets
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       if(inputs%calc_dcx.ge.1) then
+           ! dcx_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "dcx_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 3, "cartesian_component", error)
+           ! dcx_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "dcx_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_halo.ge.1) then
+           ! halo_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "halo_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 3, "cartesian_component", error)
+           ! halo_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "halo_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_fida.ge.1) then
+           ! fida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "fida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 3, "cartesian_component", error)
+           ! fida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "fida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_pfida.ge.1) then
+           ! pfida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "pfida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 3, "cartesian_component", error)
+           ! pfida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "pfida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_photons", 2, "sample", error)
+       endif
+
        !Close spatial group
        call h5gclose_f(gid, error)
     endif
@@ -6370,40 +6426,43 @@ subroutine write_spectra
             call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
         else
             !3D datasets with stark: (stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/full", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/full", 1, "channel", error)
             call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/full", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/full", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/full", "/radius", 3, error)
-            call h5_set_dimension_name(fid, "/half", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/half", 1, "channel", error)
             call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/half", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/half", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/half", "/radius", 3, error)
-            call h5_set_dimension_name(fid, "/third", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/third", 1, "channel", error)
             call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/third", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/third", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/third", "/radius", 3, error)
-            !4D stokes datasets with stark: (stark,4,lambda,chan)
+            !4D stokes datasets with stark: (stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
             call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/fullstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/stokes_parameter", 3, error)
             call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/halfstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/stokes_parameter", 3, error)
             call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
         endif
     endif
 
@@ -6526,64 +6585,140 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_fida.ge.1) then
-        if(inputs%stark_components.eq.0) then
-            ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
-            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
-            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
-            ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
-            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            endif
         else
-            ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
-            ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
-            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: fida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 4D: fidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: fida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 5D: fidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            endif
         endif
     endif
 
     if(inputs%calc_pfida.ge.1) then
-        if(inputs%stark_components.eq.0) then
-            ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
-            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
-            ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
-            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            endif
         else
-            ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
-            ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
-            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: pfida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 4D: pfidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: pfida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 5D: pfidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            endif
         endif
     endif
 

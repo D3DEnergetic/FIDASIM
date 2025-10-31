@@ -793,7 +793,29 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
     for key in dict2:
         if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)
-            write_data(h5_grp, dict2[key])
+            # Recursively handle nested dictionaries
+            # Extract nested descriptions, units, dim_names, and coord_scales if they exist
+            nested_desc = {}
+            nested_units = {}
+            nested_dim_names = {}
+            nested_coord_scales = {}
+
+            # Check if we have nested configuration for this group
+            for nested_key in dict2[key]:
+                full_key = f"{key}/{nested_key}"
+                if full_key in desc:
+                    nested_desc[nested_key] = desc[full_key]
+                if full_key in units:
+                    nested_units[nested_key] = units[full_key]
+                if full_key in dim_names:
+                    nested_dim_names[nested_key] = dim_names[full_key]
+                if full_key in coord_scales:
+                    nested_coord_scales[nested_key] = coord_scales[full_key]
+
+            # Pass along the nested configurations
+            write_data(h5_grp, dict2[key], desc=nested_desc, units=nested_units,
+                      dim_names=nested_dim_names, coord_scales=nested_coord_scales,
+                      name=f"{name}/{key}" if name else key)
             continue
 
         # Transpose data to match expected by Fortran and historically provided by IDL
@@ -835,6 +857,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
             if isinstance(dict2[key], np.ndarray) and dict2[key].ndim == 1:
                 if key not in dim_names:  # Only if not already labeled
                     ds.dims[0].label = coord_scales[key]
+                # Note: Self-attachment is not allowed in HDF5 (dimension scales cannot attach to themselves)
 
     # After all datasets created, attach dimension scales
     for key in dict2:

@@ -2750,6 +2750,7 @@ subroutine make_passive_grid
               pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
+        write(*,*) 'Passive grid created:    ', time_string(time_start)
     endif
 
 end subroutine make_passive_grid
@@ -2777,6 +2778,10 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Creating diagnostic grids ----'
+    endif
+
     if(((inputs%calc_pfida+inputs%calc_pnpa).gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
         if(inter_grid%nphi.gt.1 .and. pass_grid_nphi_override.le.0) then
             ! Only copy inter_grid if it's truly 3D (has phi array)
@@ -2791,6 +2796,10 @@ subroutine make_diagnostic_grids
         allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral passive grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
         !$OMP PARALLEL DO schedule(dynamic) private(i,r0,v0,basis,length,r_enter,r_exit, &
         !$OMP& nc,ic,randomu,sqrt_rho,theta,j,tracks,ntrack,ind,kk,jj,ii,dl,los_elem,dlength)
         pass_grid_chan_loop: do i=1,spec_chords%nchan
@@ -2878,11 +2887,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cyl_cell(nc) = ic
             endif
         enddo
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral passive grid intersections complete'
+        endif
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
     !! Only needed when beam grid exists for active measurements
     if((inputs%calc_beam.ge.1).and.((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0)) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral beam grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -2964,11 +2980,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cell(nc) = ic
             endif
         enddo
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral beam grid intersections complete'
+        endif
     endif
 
     !! NPA probability calculations
     !! Only needed when beam grid exists for active NPA measurements
     if(inputs%calc_beam.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing NPA beam grid probabilities for ', &
+                  npa_chords%nchan, ' channels...'
+        endif
         allocate(xd(50),yd(50))
         allocate(probs(beam_grid%ngrid))
         allocate(eff_rds(3,beam_grid%ngrid))
@@ -3059,7 +3082,14 @@ subroutine make_diagnostic_grids
         endif
     enddo npa_chan_loop
         deallocate(probs,eff_rds,xd,yd)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NPA beam grid probabilities complete'
+        endif
     endif  !! End of calc_beam conditional for NPA probability calculations
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Diagnostic grids complete ----'
+    endif
 
 end subroutine make_diagnostic_grids
 
@@ -3504,7 +3534,10 @@ subroutine read_neutron_collimator
         endif
     enddo chan_loop
 
-    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+    if(inputs%verbose.ge.1) then
+        write(*,'(50X,a)') ""
+        write(*,*) 'NC geometry read:    ', time_string(time_start)
+    endif
 
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
@@ -8935,6 +8968,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     dlength = 3.0 !cm
     skip = .False.
 
+    !$OMP PARALLEL DO schedule(dynamic) private(i,ri,vi,inp,max_length)
     loop_over_channels: do i=1, nlines
         ri = r0(:,i)
         vi = v0(:,i)
@@ -8966,6 +9000,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
         call uvw_to_cyl(ri, cyl_out(:,i))
 
     enddo loop_over_channels
+    !$OMP END PARALLEL DO
 
     dim = 2*count(.not.skip) ! 2 for enter and exit
 

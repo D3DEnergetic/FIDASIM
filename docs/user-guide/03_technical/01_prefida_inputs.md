@@ -141,7 +141,9 @@ Click [here](../02_physics/07_weights.html) for more information.
 | `lambdamax_wght`    | Float64 | 0    | NA         | nm    | Maximum weight function wavelength       |
 
 #Interpolation Grid Structure
-The `grid` structure contains the definition of the 2D/3D cylindrical grid that the plasma parameters and electromagnetic fields are mapped onto. 
+The `grid` structure contains the definition of the 2D/3D cylindrical grid that the plasma parameters and electromagnetic fields are mapped onto.
+
+**Note:** If `nphi` is specified without the `phi` array, the grid remains 2D for plasma/field interpolation, but `nphi` is used to set the toroidal resolution of the passive grid. This allows finer toroidal resolution for passive diagnostics without the computational overhead of full 3D plasma calculations.
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:-----------------------------------------|

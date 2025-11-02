@@ -35,7 +35,25 @@ FIDASIM can calculate passive signals for the following diagnostics
 
 By default, FIDASIM will define the passive grid to encompass the beam grid and the entire viewable plasma volume.
 If the interpolation grid is 3D, then the passive grid is the interpolation grid.
-FIDASIM writes the passive grid settings are printed to the [standard output](../01_getting_started/03_running.html#running-interactively)
+
+## Controlling Passive Grid Toroidal Resolution
+
+For axisymmetric cases, you can specify a custom toroidal resolution for the passive grid without making the plasma calculations 3D. This is done by specifying `nphi` in `rz_grid()` without phi extent:
+
+```python
+>>> from fidasim.utils import rz_grid
+>>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,nphi=50)
+```
+
+This creates an interpolation grid where nphi=50 is used only for the passive grid. The plasma parameters and fields remain 2D (axisymmetric), but passive diagnostics use the finer toroidal resolution. This is particularly useful for:
+
+* Non-axisymmetric diagnostic geometries
+* Neutron collimator systems with wide toroidal coverage
+* Improving accuracy of passive diagnostics without 3D computational cost
+
+The passive grid toroidal spacing (dphi) will be automatically calculated to cover the diagnostic geometry with the specified nphi.
+
+FIDASIM writes the passive grid settings to the [standard output](../01_getting_started/03_running.html#running-interactively), including the dphi value in both radians and degrees
 
 # Relevant Namelist Settings
 

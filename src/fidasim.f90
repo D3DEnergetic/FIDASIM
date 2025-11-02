@@ -2748,6 +2748,8 @@ subroutine make_passive_grid
               pass_grid%z(1),pass_grid%z(pass_grid%nz)
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') &
               pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
+        write(*,'(T2,"dPhi: ", f8.5, " rad (", f6.2, " degrees)")') &
+              pass_grid%dphi, pass_grid%dphi*180.d0/pi
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
         write(*,*) 'Passive grid created:    ', time_string(time_start)

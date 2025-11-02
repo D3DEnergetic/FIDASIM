@@ -2738,6 +2738,7 @@ subroutine make_passive_grid
         write(*,'(T2,"Nz: ", i3)') pass_grid%nz
         if(pass_grid_nphi_override > 0) then
             write(*,'(T2,"Nphi: ", i3, " (from equilibrium file)")') pass_grid%nphi
+            write(*,'(T2,"dPhi: ", f8.5, " rad")') pass_grid%dphi
         else
             write(*,'(T2,"Nphi: ", i3, " (default dphi = 2*pi/100)")') pass_grid%nphi
         endif
@@ -2790,11 +2791,12 @@ subroutine make_diagnostic_grids
         allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
-        allocate(tracks(pass_grid%ntrack))
-        allocate(dlength(pass_grid%nr, &
-                         pass_grid%nz, &
-                         pass_grid%nphi) )
+        !$OMP PARALLEL DO schedule(dynamic) private(i,r0,v0,basis,length,r_enter,r_exit, &
+        !$OMP& nc,ic,randomu,sqrt_rho,theta,j,tracks,ntrack,ind,kk,jj,ii,dl,los_elem,dlength)
         pass_grid_chan_loop: do i=1,spec_chords%nchan
+            ! Allocate thread-local arrays
+            allocate(tracks(pass_grid%ntrack))
+            allocate(dlength(pass_grid%nr, pass_grid%nz, pass_grid%nphi))
             r0 = spec_chords%los(i)%lens_uvw
             v0 = spec_chords%los(i)%axis_uvw
             v0 = v0/norm2(v0)
@@ -2815,8 +2817,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2832,18 +2833,16 @@ subroutine make_diagnostic_grids
                 pass_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
                     !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo pass_grid_track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,pass_grid%nphi
                 do jj=1,pass_grid%nz
                     rloop: do ii=1, pass_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
                             dl = dlength(ii,jj,kk)
+                            !$OMP CRITICAL
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
                                 allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
@@ -2856,11 +2855,16 @@ subroutine make_diagnostic_grids
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                            !$OMP END CRITICAL
                         endif
                     enddo rloop
                 enddo
             enddo
+
+            ! Deallocate thread-local arrays
+            deallocate(tracks, dlength)
         enddo pass_grid_chan_loop
+        !$OMP END PARALLEL DO
 
         spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
         allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
@@ -2874,7 +2878,6 @@ subroutine make_diagnostic_grids
                 spec_chords%cyl_cell(nc) = ic
             endif
         enddo
-        deallocate(dlength, tracks)
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
@@ -2905,8 +2908,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2925,10 +2927,8 @@ subroutine make_diagnostic_grids
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,beam_grid%nz
                 do jj=1,beam_grid%ny
                     xloop: do ii=1, beam_grid%nx
@@ -15886,6 +15886,7 @@ subroutine neutron_spec_f
     allocate(all_tracks(pass_grid%ntrack, nc_chords%nchan))
     allocate(all_ntrack(nc_chords%nchan))
 
+    !$OMP PARALLEL DO schedule(dynamic) firstprivate(tracks) private(ichan,rn,vn,ntrack)
     do ichan = 1, nc_chords%nchan
         rn = nc_chords%det(ichan)%detector%origin
         vn = nc_chords%det(ichan)%aperture%origin - rn
@@ -15897,6 +15898,7 @@ subroutine neutron_spec_f
             all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
         endif
     enddo
+    !$OMP END PARALLEL DO
 
     !! Allocate thread-local arrays to eliminate critical sections
 #ifdef _OMP

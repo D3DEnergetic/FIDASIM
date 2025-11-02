@@ -403,6 +403,24 @@ def check_grid(grid):
     else:
         success('Interpolation grid is valid')
 
+        # Calculate and display grid resolution
+        nr = grid['nr']
+        nz = grid['nz']
+        dr = (grid['r'][-1] - grid['r'][0]) / (nr - 1) if nr > 1 else 0.0
+        dz = (grid['z'][-1] - grid['z'][0]) / (nz - 1) if nz > 1 else 0.0
+
+        info('Grid resolution:')
+        print('  Nr = {}, dR = {:.3f} cm'.format(nr, dr))
+        print('  Nz = {}, dZ = {:.3f} cm'.format(nz, dz))
+
+        if 'phi' in grid and 'nphi' in grid:
+            nphi = grid['nphi']
+            dphi = (grid['phi'][-1] - grid['phi'][0]) / (nphi - 1) if nphi > 1 else 0.0
+            dphi_deg = np.degrees(dphi)
+            print('  Nphi = {}, dPhi = {:.5f} rad ({:.2f} degrees)'.format(nphi, dphi, dphi_deg))
+        elif 'nphi' in grid and grid['nphi'] > 1:
+            info('  Nphi = {} specified without phi array - will be used for passive grid only'.format(grid['nphi']))
+
 def check_beam(inputs, nbi):
     """
     #+#check_beam

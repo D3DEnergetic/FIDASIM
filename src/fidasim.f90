@@ -1260,6 +1260,8 @@ type(InterpolationGrid), save   :: inter_grid
     !+ Variable containing interpolation grid definition
 type(InterpolationGrid), save   :: pass_grid
     !+ Variable containing passive neutral grid definition
+integer(Int32), save             :: pass_grid_nphi_override = -1
+    !+ Override value for passive grid nphi from equilibrium file (-1 = use default)
 type(FastIonDistribution), save :: fbm
     !+ Variable containing the fast-ion distribution function
 type(FastIonParticles), save    :: particles
@@ -2698,9 +2700,22 @@ subroutine make_passive_grid
     pass_grid%z = inter_grid%z
     pass_grid%da = pass_grid%dr*pass_grid%dz
 
-    pass_grid%dphi = 2*pi/100 !TODO: make this user input
-    pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
-    if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
+    ! Use nphi override from equilibrium file if provided, otherwise use default
+    if(pass_grid_nphi_override > 0) then
+        ! User specified nphi in equilibrium file without phi array
+        pass_grid%nphi = pass_grid_nphi_override
+        if((extrema(2,3)-extrema(1,3)) > 0) then
+            pass_grid%dphi = (extrema(2,3)-extrema(1,3))/pass_grid%nphi
+        else
+            ! No phi extent from diagnostics, assume full torus
+            pass_grid%dphi = 2*pi/pass_grid%nphi
+        endif
+    else
+        ! Default behavior: use hardcoded dphi
+        pass_grid%dphi = 2*pi/100
+        pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
+        if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
+    endif
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
@@ -2721,15 +2736,23 @@ subroutine make_passive_grid
         write(*,'(a)') "---- Passive grid settings ----"
         write(*,'(T2,"Nr: ", i3)') pass_grid%nr
         write(*,'(T2,"Nz: ", i3)') pass_grid%nz
-        write(*,'(T2,"Nphi: ", i3)') pass_grid%nphi
+        if(pass_grid_nphi_override > 0) then
+            write(*,'(T2,"Nphi: ", i3, " (from equilibrium file)")') pass_grid%nphi
+            write(*,'(T2,"dPhi: ", f8.5, " rad")') pass_grid%dphi
+        else
+            write(*,'(T2,"Nphi: ", i3, " (default dphi = 2*pi/100)")') pass_grid%nphi
+        endif
         write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') &
               pass_grid%r(1),pass_grid%r(pass_grid%nr)
         write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') &
               pass_grid%z(1),pass_grid%z(pass_grid%nz)
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') &
               pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
+        write(*,'(T2,"dPhi: ", f8.5, " rad (", f6.2, " degrees)")') &
+              pass_grid%dphi, pass_grid%dphi*180.d0/pi
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
+        write(*,*) 'Passive grid created:    ', time_string(time_start)
     endif
 
 end subroutine make_passive_grid
@@ -2757,10 +2780,17 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Creating diagnostic grids ----'
+    endif
+
     if(((inputs%calc_pfida+inputs%calc_pnpa).gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
-        if(inter_grid%nphi.gt.1) then
+        if(inter_grid%nphi.gt.1 .and. pass_grid_nphi_override.le.0) then
+            ! Only copy inter_grid if it's truly 3D (has phi array)
+            ! If pass_grid_nphi_override > 0, it means nphi was provided without phi array
             pass_grid = inter_grid
         else
+            ! Use separate passive grid (either axisymmetric or with override nphi)
             call make_passive_grid()
         endif
 
@@ -2768,11 +2798,16 @@ subroutine make_diagnostic_grids
         allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
-        allocate(tracks(pass_grid%ntrack))
-        allocate(dlength(pass_grid%nr, &
-                         pass_grid%nz, &
-                         pass_grid%nphi) )
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral passive grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
+        !$OMP PARALLEL DO schedule(dynamic) private(i,r0,v0,basis,length,r_enter,r_exit, &
+        !$OMP& nc,ic,randomu,sqrt_rho,theta,j,tracks,ntrack,ind,kk,jj,ii,dl,los_elem,dlength)
         pass_grid_chan_loop: do i=1,spec_chords%nchan
+            ! Allocate thread-local arrays
+            allocate(tracks(pass_grid%ntrack))
+            allocate(dlength(pass_grid%nr, pass_grid%nz, pass_grid%nphi))
             r0 = spec_chords%los(i)%lens_uvw
             v0 = spec_chords%los(i)%axis_uvw
             v0 = v0/norm2(v0)
@@ -2793,8 +2828,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2810,18 +2844,16 @@ subroutine make_diagnostic_grids
                 pass_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
                     !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo pass_grid_track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,pass_grid%nphi
                 do jj=1,pass_grid%nz
                     rloop: do ii=1, pass_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
                             dl = dlength(ii,jj,kk)
+                            !$OMP CRITICAL
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
                                 allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
@@ -2834,11 +2866,16 @@ subroutine make_diagnostic_grids
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                            !$OMP END CRITICAL
                         endif
                     enddo rloop
                 enddo
             enddo
+
+            ! Deallocate thread-local arrays
+            deallocate(tracks, dlength)
         enddo pass_grid_chan_loop
+        !$OMP END PARALLEL DO
 
         spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
         allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
@@ -2852,12 +2889,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cyl_cell(nc) = ic
             endif
         enddo
-        deallocate(dlength, tracks)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral passive grid intersections complete'
+        endif
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
     !! Only needed when beam grid exists for active measurements
     if((inputs%calc_beam.ge.1).and.((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0)) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral beam grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -2883,8 +2926,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2903,10 +2945,8 @@ subroutine make_diagnostic_grids
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,beam_grid%nz
                 do jj=1,beam_grid%ny
                     xloop: do ii=1, beam_grid%nx
@@ -2942,11 +2982,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cell(nc) = ic
             endif
         enddo
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral beam grid intersections complete'
+        endif
     endif
 
     !! NPA probability calculations
     !! Only needed when beam grid exists for active NPA measurements
     if(inputs%calc_beam.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing NPA beam grid probabilities for ', &
+                  npa_chords%nchan, ' channels...'
+        endif
         allocate(xd(50),yd(50))
         allocate(probs(beam_grid%ngrid))
         allocate(eff_rds(3,beam_grid%ngrid))
@@ -3037,7 +3084,14 @@ subroutine make_diagnostic_grids
         endif
     enddo npa_chan_loop
         deallocate(probs,eff_rds,xd,yd)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NPA beam grid probabilities complete'
+        endif
     endif  !! End of calc_beam conditional for NPA probability calculations
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Diagnostic grids complete ----'
+    endif
 
 end subroutine make_diagnostic_grids
 
@@ -3482,7 +3536,10 @@ subroutine read_neutron_collimator
         endif
     enddo chan_loop
 
-    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+    if(inputs%verbose.ge.1) then
+        write(*,'(50X,a)') ""
+        write(*,*) 'NC geometry read:    ', time_string(time_start)
+    endif
 
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
@@ -3675,6 +3732,8 @@ subroutine read_equilibrium
     integer :: error
     integer :: n = 50
     logical :: path_valid
+    logical :: nphi_exists, phi_exists
+    integer(Int32) :: nphi_value
 
     integer, dimension(:,:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:,:), allocatable :: denn3d
@@ -3692,11 +3751,25 @@ subroutine read_equilibrium
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
+
+    !! Check for nphi and phi array separately to handle passive grid override case
+    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., nphi_exists, error)
+    call h5ltpath_valid_f(gid, "/plasma/phi", .True., phi_exists, error)
+
+    if(nphi_exists) then
+        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", nphi_value, error)
+        if(phi_exists) then
+            ! Full 3D case: nphi with phi array means 3D inter_grid
+            inter_grid%nphi = nphi_value
+        else
+            ! New case: nphi without phi array means use for passive grid only
+            inter_grid%nphi = 1  ! Keep inter_grid axisymmetric
+            pass_grid_nphi_override = nphi_value  ! Store for passive grid
+        endif
     else
-        inter_grid%nphi=1
+        ! Default axisymmetric case
+        inter_grid%nphi = 1
+        pass_grid_nphi_override = -1  ! Use default behavior
     endif
 
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
@@ -3710,7 +3783,7 @@ subroutine read_equilibrium
 
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
-    if(path_valid) then
+    if(phi_exists .and. inter_grid%nphi > 1) then
         call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
     else
         inter_grid%phi=0.d0
@@ -3893,6 +3966,8 @@ subroutine read_f(fid, error)
     integer(HSIZE_T), dimension(5) :: dims
     integer :: ir,is
     logical :: path_valid
+    logical :: nphi_exists_fbm, phi_exists_fbm
+    integer(Int32) :: nphi_value_fbm
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -3902,11 +3977,23 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
-    call h5ltpath_valid_f(fid, "/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
+
+    !! Check for nphi and phi array separately (like in read_equilibrium)
+    call h5ltpath_valid_f(fid, "/nphi", .True., nphi_exists_fbm, error)
+    call h5ltpath_valid_f(fid, "/phi", .True., phi_exists_fbm, error)
+
+    if(nphi_exists_fbm) then
+        call h5ltread_dataset_int_scalar_f(fid,"/nphi", nphi_value_fbm, error)
+        if(phi_exists_fbm) then
+            ! Full 3D distribution: nphi with phi array
+            fbm%nphi = nphi_value_fbm
+        else
+            ! nphi without phi array means it was for passive grid only - treat as axisymmetric
+            fbm%nphi = 1
+        endif
     else
-        fbm%nphi=1
+        ! No nphi in file - default to axisymmetric
+        fbm%nphi = 1
     endif
 
     if(((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)).or.(fbm%nphi.ne.inter_grid%nphi)) then
@@ -9018,6 +9105,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     dlength = 3.0 !cm
     skip = .False.
 
+    !$OMP PARALLEL DO schedule(dynamic) private(i,ri,vi,inp,max_length)
     loop_over_channels: do i=1, nlines
         ri = r0(:,i)
         vi = v0(:,i)
@@ -9049,6 +9137,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
         call uvw_to_cyl(ri, cyl_out(:,i))
 
     enddo loop_over_channels
+    !$OMP END PARALLEL DO
 
     dim = 2*count(.not.skip) ! 2 for enter and exit
 
@@ -15969,6 +16058,7 @@ subroutine neutron_spec_f
     allocate(all_tracks(pass_grid%ntrack, nc_chords%nchan))
     allocate(all_ntrack(nc_chords%nchan))
 
+    !$OMP PARALLEL DO schedule(dynamic) firstprivate(tracks) private(ichan,rn,vn,ntrack)
     do ichan = 1, nc_chords%nchan
         rn = nc_chords%det(ichan)%detector%origin
         vn = nc_chords%det(ichan)%aperture%origin - rn
@@ -15980,6 +16070,7 @@ subroutine neutron_spec_f
             all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
         endif
     enddo
+    !$OMP END PARALLEL DO
 
     !! Allocate thread-local arrays to eliminate critical sections
 #ifdef _OMP

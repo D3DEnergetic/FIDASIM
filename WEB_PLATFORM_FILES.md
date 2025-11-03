@@ -39,10 +39,9 @@ This document lists the files and directories needed for someone to clone, build
     - `docker/web/frontend/src/utils/` - Utility functions
 
 - `docker/core/` - FIDASIM core simulation service
-  - `docker/core/Dockerfile`
+  - `docker/core/Dockerfile` (includes Python dependencies inline)
   - `docker/core/api.py`
   - `docker/core/entrypoint.sh`
-  - `docker/core/requirements.txt`
 
 - `docker/preprocessor/` - Preprocessing service
   - `docker/preprocessor/Dockerfile`
@@ -50,7 +49,7 @@ This document lists the files and directories needed for someone to clone, build
   - `docker/preprocessor/requirements.txt`
 
 - `docker/postgres/` - Database initialization
-  - `docker/postgres/init.sql` (if exists)
+  - `docker/postgres/init.sql`
 
 ### 2. `scripts/` - Build and Deployment Scripts
 **Required:**

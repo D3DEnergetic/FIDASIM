@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for FIDASIM core
 # Stage 1: Build environment
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -52,15 +52,11 @@ ENV HDF5_HOME=/build/deps/hdf5
 ENV PATH=$HDF5_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$HDF5_HOME/lib:$LD_LIBRARY_PATH
 
-# Build FIDASIM (or use pre-built if available)
-RUN if [ -f fidasim ] && [ -x fidasim ]; then \
-        echo "Using pre-built FIDASIM executable"; \
-        cp fidasim /build/fidasim; \
-    else \
-        echo "Building FIDASIM from source"; \
-        make clean && \
-        make src -j$(nproc); \
-    fi
+# Build FIDASIM with -O3 instead of -Ofast for better stability
+RUN echo "Building FIDASIM from source with -O3 optimization" && \
+    make clean && \
+    sed -i 's/-Ofast/-O3/g' makefile && \
+    make src -j$(nproc)
 
 # Build atomic tables (or use pre-built if available)
 RUN if [ -f tables/atomic_tables.h5 ]; then \
@@ -71,7 +67,7 @@ RUN if [ -f tables/atomic_tables.h5 ]; then \
     fi
 
 # Stage 2: Runtime environment
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -85,15 +81,15 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages for the API
-RUN pip3 install --no-cache-dir \
-    fastapi==0.104.1 \
-    uvicorn[standard]==0.24.0 \
-    pydantic==2.5.0 \
-    h5py==3.10.0 \
-    numpy==1.24.3 \
-    aiofiles==23.2.1 \
-    python-multipart==0.0.6
+# Install Python packages for the API (updated for Python 3.12 compatibility)
+RUN pip3 install --no-cache-dir --break-system-packages \
+    fastapi==0.115.0 \
+    uvicorn[standard]==0.32.0 \
+    pydantic==2.9.0 \
+    h5py==3.11.0 \
+    numpy==2.1.0 \
+    aiofiles==24.1.0 \
+    python-multipart==0.0.12
 
 # Create non-root user
 RUN useradd -m -s /bin/bash fidasim

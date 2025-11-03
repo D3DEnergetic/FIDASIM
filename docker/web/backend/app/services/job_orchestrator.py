@@ -141,7 +141,7 @@ class JobOrchestrator:
                 job.metadata_["core_job_id"] = result.get("job_id")
                 job.status = "running"
                 job.started_at = datetime.utcnow()
-                self.db.commit()
+                db.commit()  # Fixed: Use the correct db session
             else:
                 raise Exception(f"Core API returned status {response.status_code}: {response.text}")
 
@@ -182,7 +182,7 @@ class JobOrchestrator:
             }
 
         try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
+            async with httpx.AsyncClient(timeout=30.0) as client:  # Increased: core API can be slow when FIDASIM is running
                 response = await client.get(
                     f"{self.core_api_url}/status/{core_job_id}"
                 )
@@ -197,7 +197,7 @@ class JobOrchestrator:
                         job.completed_at = datetime.utcnow()
                         job.output_files = core_status.get("output_files", [])
                     elif job.status == "failed":
-                        job.error_message = core_status.get("error", "Unknown error")
+                        job.error_message = core_status.get("error_message", "Unknown error")
                         job.completed_at = datetime.utcnow()
 
                     self.db.commit()
@@ -246,7 +246,7 @@ class JobOrchestrator:
             }
 
         try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
+            async with httpx.AsyncClient(timeout=30.0) as client:  # Increased: core API can be slow when FIDASIM is running
                 response = await client.get(
                     f"{self.core_api_url}/logs/{core_job_id}",
                     params={"tail": tail}

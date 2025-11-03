@@ -17,7 +17,7 @@ trap trap_handler SIGTERM SIGINT
 case "$1" in
     api)
         echo "Starting FIDASIM Core API server on port 8001..."
-        exec uvicorn api:app --host 0.0.0.0 --port 8001 --workers 1
+        exec uvicorn api:app --host 0.0.0.0 --port 8001 --workers 4
         ;;
 
     fidasim)

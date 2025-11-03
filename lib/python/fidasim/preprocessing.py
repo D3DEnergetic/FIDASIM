@@ -342,12 +342,15 @@ def check_grid(grid):
 
     if 'nphi' not in grid:
         info('"nphi" is missing from the interpolation grid, assuming axisymmetry')
-        nphi =1
+        nphi = 1
     else:
         nphi = grid['nphi']
-        if nphi < 3:
-            error('"phi" must have at least 3 elements')
+        # Check if phi array exists (for 3D geometry)
+        if 'phi' in grid and nphi < 3:
+            error('"phi" must have at least 3 elements when phi array is specified')
             error('Invalid interpolation grid. Exiting...', halt=True)
+        elif 'phi' not in grid and nphi > 1:
+            info('nphi={} specified without phi array - will be used for passive grid only'.format(nphi))
 
 
     nr = grid['nr']
@@ -370,8 +373,10 @@ def check_grid(grid):
 
     if 'nphi' in grid:
         schema.setdefault('nphi',zero_int)
-        schema.setdefault('phi', {'dims': [nphi],
-                                  'type': [float, np.float64]})
+        # Only include phi in schema if it exists in the grid
+        if 'phi' in grid:
+            schema.setdefault('phi', {'dims': [nphi],
+                                      'type': [float, np.float64]})
 
     err = check_dict_schema(schema, grid, desc="interpolation grid")
     if err:
@@ -397,6 +402,24 @@ def check_grid(grid):
         error('Invalid interpolation grid. Exiting...', halt=True)
     else:
         success('Interpolation grid is valid')
+
+        # Calculate and display grid resolution
+        nr = grid['nr']
+        nz = grid['nz']
+        dr = (grid['r'][-1] - grid['r'][0]) / (nr - 1) if nr > 1 else 0.0
+        dz = (grid['z'][-1] - grid['z'][0]) / (nz - 1) if nz > 1 else 0.0
+
+        info('Grid resolution:')
+        print('  Nr = {}, dR = {:.3f} cm'.format(nr, dr))
+        print('  Nz = {}, dZ = {:.3f} cm'.format(nz, dz))
+
+        if 'phi' in grid and 'nphi' in grid:
+            nphi = grid['nphi']
+            dphi = (grid['phi'][-1] - grid['phi'][0]) / (nphi - 1) if nphi > 1 else 0.0
+            dphi_deg = np.degrees(dphi)
+            print('  Nphi = {}, dPhi = {:.5f} rad ({:.2f} degrees)'.format(nphi, dphi, dphi_deg))
+        elif 'nphi' in grid and grid['nphi'] > 1:
+            info('  Nphi = {} specified without phi array - will be used for passive grid only'.format(grid['nphi']))
 
 def check_beam(inputs, nbi):
     """
@@ -601,11 +624,15 @@ def check_plasma(inputs, grid, plasma):
 
     nr = grid['nr']
     nz = grid['nz']
-    if 'nphi' not in grid:
-        info('"nphi" is missing from the plasma, assuming axisymmetry')
-        nphi =1
-    else:
+
+    # Check for phi array to determine if we're truly 3D
+    # nphi without phi array means passive grid only (plasma stays 2D)
+    is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+    if is_3d:
         nphi = grid['nphi']
+    else:
+        nphi = 1  # Treat as 2D for plasma arrays
 
     nthermal = plasma['nthermal']
 
@@ -621,7 +648,7 @@ def check_plasma(inputs, grid, plasma):
     nthermal_double = {'dims': [nthermal],
                        'type':[float, np.float64]}
 
-    if nphi>1:
+    if is_3d:
         nrnznphi_double = {'dims': [nr, nz, nphi],
                            'type': [float, np.float64]}
 
@@ -728,11 +755,14 @@ def check_fields(inputs, grid, fields):
 
     nr = grid['nr']
     nz = grid['nz']
-    if 'nphi' not in grid:
-        info('"nphi" is missing from the fields, assuming axisymmetry')
-        nphi =1
-    else:
+    # Check for phi array to determine if we're truly 3D
+    # nphi without phi array means passive grid only (fields stay 2D)
+    is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+    if is_3d:
         nphi = grid['nphi']
+    else:
+        nphi = 1  # Treat as 2D for field arrays
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -740,7 +770,7 @@ def check_fields(inputs, grid, fields):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    if nphi>1:
+    if is_3d:
         nrnznphi_double = {'dims': [nr, nz, nphi],
                            'type': [float, np.float64, np.float64]}
 
@@ -831,11 +861,15 @@ def check_distribution(inputs, grid, dist):
         nen = dist['nenergy']
         nr = grid['nr']
         nz = grid['nz']
-        if 'nphi' not in grid:
-            info('"nphi" is missing from the fast-ion distribution, assuming axisymmetry')
-            nphi =1
-        else:
+
+        # Check for phi array to determine if we're truly 3D
+        # nphi without phi array means passive grid only (distribution stays 2D)
+        is_3d = 'phi' in grid and 'nphi' in grid and grid['nphi'] > 1
+
+        if is_3d:
             nphi = grid['nphi']
+        else:
+            nphi = 1  # Treat as 2D for distribution arrays
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -846,7 +880,7 @@ def check_distribution(inputs, grid, dist):
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
 
-        if nphi>1:
+        if is_3d:
             nrnznphi_double = {'dims': [nr, nz, nphi],
                                'type': [float, np.float64, np.float64]}
         else:
@@ -863,7 +897,7 @@ def check_distribution(inputs, grid, dist):
                   'denf': nrnznphi_double,
                   'time': zero_double,
                   'data_source': zero_string}
-        if nphi>1:
+        if is_3d:
             schema['f'] = {'dims': [nen, npitch, nr, nz, nphi],
                            'type': [float, np.float64]}
         else:
@@ -1970,6 +2004,38 @@ def write_equilibrium(filename, plasma, fields):
         # Include species_mass as the scale for the species dimension
         plasma_coord_scales = {'r': 'r', 'z': 'z', 'species_mass': 'species'}
 
+        # Add dimension names for profiles subgroup if it might exist
+        # These will use the nested key format that write_data now supports
+        plasma_dim_names.update({
+            'profiles/dene': ['rho'],
+            'profiles/te': ['rho'],
+            'profiles/ti': ['rho'],
+            'profiles/zeff': ['rho'],
+            'profiles/omega': ['rho'],
+            'profiles/rho': ['rho']
+        })
+
+        # Mark rho as a coordinate scale for the profiles
+        plasma_coord_scales['profiles/rho'] = 'rho'
+
+        # Add descriptions for profiles subgroup (if it exists)
+        plasma_description.update({
+            'profiles/dene': 'Electron density profile',
+            'profiles/te': 'Electron temperature profile',
+            'profiles/ti': 'Ion temperature profile',
+            'profiles/zeff': 'Effective charge profile',
+            'profiles/omega': 'Toroidal rotation profile',
+            'profiles/rho': 'Normalized radial coordinate'
+        })
+
+        # Add units for profiles subgroup (if it exists)
+        plasma_units.update({
+            'profiles/dene': 'cm^-3',
+            'profiles/te': 'keV',
+            'profiles/ti': 'keV',
+            'profiles/omega': 'rad/s'
+        })
+
         write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units,
                    dim_names=plasma_dim_names, coord_scales=plasma_coord_scales, name='plasma')
 
@@ -2139,7 +2205,7 @@ def write_distribution(filename, distri):
     else:
         error('Distribution file creation failed.')
 
-def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
+def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None, nc=None, cfpd=None, use_abs_path=True):
     """
     #+#prefida
     #+Checks FIDASIM inputs and writes FIDASIM input files
@@ -2149,6 +2215,8 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+
     #+     **grid**: Interpolation grid structure
     #+
+    #+     **nbi**: Neutral beam geometry structure (can be None or empty dict for passive-only runs)
+    #+
     #+     **plasma**: Plasma parameters structure
     #+
     #+     **fields**: Electromagnetic fields structure
@@ -2156,8 +2224,6 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+     **fbm**: Fast-ion distribution structure
     #+
     #+##Keyword Arguments
-    #+     **nbi**: Optional, Neutral beam geometry structure (not needed for passive-only runs)
-    #+
     #+     **spec**: Optional, Spectral geometry structure
     #+
     #+     **npa**: Optional, NPA geometry structure
@@ -2169,9 +2235,9 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     #+##Example Usage
     #+```python
     #+>>> # With beam (active measurements)
-    #+>>> prefida(inputs, grid, plasma, fields, fbm, nbi=nbi, spec=spec, npa=npa, nc=nc)
-    #+>>> # Passive-only (no beam)
-    #+>>> prefida(inputs, grid, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
+    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
+    #+>>> # Passive-only (no beam) - pass None or empty dict
+    #+>>> prefida(inputs, grid, None, plasma, fields, fbm, spec=spec, npa=npa, nc=nc)
     #+```
     """
     # CHECK INPUTS
@@ -2185,15 +2251,17 @@ def prefida(inputs, grid, plasma, fields, fbm, nbi=None, spec=None, npa=None, nc
     check_grid(grid)
 
     # CHECK BEAM INPUTS (optional for passive-only runs)
-    if nbi is not None:
+    # Accept None or empty dict for passive-only mode
+    if nbi is not None and nbi:  # Check if nbi exists and is not empty
         nbi = check_beam(inputs, nbi)
     else:
+        # Passive-only mode: nbi is None or empty dict
         # Check if beam parameters are present in inputs
         has_beam_params = all(key in inputs for key in ['nx', 'ny', 'nz', 'einj', 'pinj', 'current_fractions'])
         if not has_beam_params:
             warn('='*70)
             warn('PASSIVE-ONLY MODE DETECTED')
-            warn('No beam geometry provided (nbi=None) and no beam parameters in inputs.')
+            warn('No beam geometry provided (nbi=None or {}) and no beam parameters in inputs.')
             warn('Only passive diagnostics will be calculated:')
             warn('  - Passive FIDA (calc_pfida)')
             warn('  - Passive NPA (calc_pnpa)')

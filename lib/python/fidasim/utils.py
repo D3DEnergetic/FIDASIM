@@ -384,26 +384,31 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
     #+
     #+    **nz**: Number of Z values
     #+
-    #+    **phimin**: Minimum Phi value [rad]
+    #+    **phimin**: Minimum Phi value [rad] (default: 0.0)
     #+
-    #+    **phimax**: Maximum Phi value [rad]
+    #+    **phimax**: Maximum Phi value [rad] (default: 0.0)
     #+
-    #+    **nphi**: Number of Phi values 
+    #+    **nphi**: Number of Phi values (default: 1)
+    #+
+    #+##Notes
+    #+    - If nphi > 1 with phimin=phimax=0.0 (defaults), only nphi is stored (for passive grid resolution)
+    #+    - If nphi > 1 with non-zero phimin or phimax, both nphi and phi array are created (3D geometry)
     #+
     #+##Return Value
     #+Interpolation grid dictionary
     #+
     #+##Example Usage
     #+```python
+    #+>>> # 3D geometry with phi array
     #+>>> grid = rz_grid(0,200.0,200,-100,100,200,phimin=4*np.pi/3,phimax=5*np.pi/3,nphi=5)
+    #+>>> # Passive grid nphi only (no phi array)
+    #+>>> grid = rz_grid(0,200.0,200,-100,100,200,nphi=50)
     #+```
     """
     dr = (rmax - rmin) / nr
     dz = (zmax - zmin) / nz
-    dphi = (phimax - phimin) / nphi
     r = rmin + dr * np.arange(nr, dtype=np.float64)
     z = zmin + dz * np.arange(nz, dtype=np.float64)
-    phi = phimin + dphi * np.arange(nphi, dtype=np.float64)
 
     r2d = np.tile(r, (nz, 1)).T
     z2d = np.tile(z, (nr, 1))
@@ -415,9 +420,15 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
             'nr': nr,
             'nz': nz}
 
+    # Check if we're specifying nphi for passive grid only (no phi extent specified)
+    # or for full 3D geometry (phi extent specified)
     if nphi > 1:
-        grid.setdefault('nphi',nphi)
-        grid.setdefault('phi', phi)
+        grid.setdefault('nphi', nphi)
+        # Only create phi array if phimin or phimax are non-zero (indicating 3D geometry)
+        if phimin != 0.0 or phimax != 0.0:
+            dphi = (phimax - phimin) / nphi
+            phi = phimin + dphi * np.arange(nphi, dtype=np.float64)
+            grid.setdefault('phi', phi)
 
     return grid
 
@@ -793,7 +804,29 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
     for key in dict2:
         if isinstance(dict2[key], dict):
             h5_grp = h5_obj.create_group(key)
-            write_data(h5_grp, dict2[key])
+            # Recursively handle nested dictionaries
+            # Extract nested descriptions, units, dim_names, and coord_scales if they exist
+            nested_desc = {}
+            nested_units = {}
+            nested_dim_names = {}
+            nested_coord_scales = {}
+
+            # Check if we have nested configuration for this group
+            for nested_key in dict2[key]:
+                full_key = f"{key}/{nested_key}"
+                if full_key in desc:
+                    nested_desc[nested_key] = desc[full_key]
+                if full_key in units:
+                    nested_units[nested_key] = units[full_key]
+                if full_key in dim_names:
+                    nested_dim_names[nested_key] = dim_names[full_key]
+                if full_key in coord_scales:
+                    nested_coord_scales[nested_key] = coord_scales[full_key]
+
+            # Pass along the nested configurations
+            write_data(h5_grp, dict2[key], desc=nested_desc, units=nested_units,
+                      dim_names=nested_dim_names, coord_scales=nested_coord_scales,
+                      name=f"{name}/{key}" if name else key)
             continue
 
         # Transpose data to match expected by Fortran and historically provided by IDL
@@ -835,6 +868,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
             if isinstance(dict2[key], np.ndarray) and dict2[key].ndim == 1:
                 if key not in dim_names:  # Only if not already labeled
                     ds.dims[0].label = coord_scales[key]
+                # Note: Self-attachment is not allowed in HDF5 (dimension scales cannot attach to themselves)
 
     # After all datasets created, attach dimension scales
     for key in dict2:

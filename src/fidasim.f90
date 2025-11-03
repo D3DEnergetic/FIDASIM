@@ -1260,6 +1260,8 @@ type(InterpolationGrid), save   :: inter_grid
     !+ Variable containing interpolation grid definition
 type(InterpolationGrid), save   :: pass_grid
     !+ Variable containing passive neutral grid definition
+integer(Int32), save             :: pass_grid_nphi_override = -1
+    !+ Override value for passive grid nphi from equilibrium file (-1 = use default)
 type(FastIonDistribution), save :: fbm
     !+ Variable containing the fast-ion distribution function
 type(FastIonParticles), save    :: particles
@@ -2589,10 +2591,10 @@ end subroutine make_beam_grid
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
-    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr, a_cent
-    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
-    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
-    logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
+    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: r0_arr, v0_arr, a_cent
+    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: xy_enter, xy_exit
+    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan))   :: yle, ygt
+    logical, dimension(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan)         :: skip
     real(Float64), dimension(:), allocatable  :: xarr, yarr
     real(Float64), dimension(3,8) :: vertices_xyz, vertices_uvw
     real(Float64), dimension(2,3) :: extrema
@@ -2658,7 +2660,7 @@ subroutine make_passive_grid
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
         call get_plasma_extrema(r0_arr(:,:spec_chords%nchan),v0_arr(:,:spec_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
-    else !pnpa>=1 case
+    else if(inputs%calc_pnpa.gt.0) then
         do i=1, npa_chords%nchan
             call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
             call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
@@ -2666,6 +2668,26 @@ subroutine make_passive_grid
             v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
         call get_plasma_extrema(r0_arr(:,:npa_chords%nchan),v0_arr(:,:npa_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+    else if((inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
+        ! Neutron collimator case: trace NC sight lines from detector through aperture
+        do i=1, nc_chords%nchan
+            r0_arr(:,i) = nc_chords%det(i)%detector%origin
+            v0_arr(:,i) = nc_chords%det(i)%aperture%origin - nc_chords%det(i)%detector%origin
+        enddo
+        call get_plasma_extrema(r0_arr(:,:nc_chords%nchan),v0_arr(:,:nc_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+        ! Extend phi range to capture NC tangency points beyond plasma boundary
+        extrema(2,3) = extrema(2,3) + 0.5
+    else
+        ! No passive diagnostics - use beam grid boundaries as fallback
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"WARNING: No passive diagnostics, using beam grid for passive grid boundaries")')
+        endif
+        extrema(1,1) = minval(inter_grid%r)
+        extrema(2,1) = maxval(inter_grid%r)
+        extrema(1,2) = minval(inter_grid%z)
+        extrema(2,2) = maxval(inter_grid%z)
+        extrema(1,3) = minval(xarr_beam_grid)
+        extrema(2,3) = maxval(yarr_beam_grid)
     endif
 
     !! Store the passive neutral grid
@@ -2678,9 +2700,22 @@ subroutine make_passive_grid
     pass_grid%z = inter_grid%z
     pass_grid%da = pass_grid%dr*pass_grid%dz
 
-    pass_grid%dphi = 2*pi/100 !TODO: make this user input
-    pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
-    if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
+    ! Use nphi override from equilibrium file if provided, otherwise use default
+    if(pass_grid_nphi_override > 0) then
+        ! User specified nphi in equilibrium file without phi array
+        pass_grid%nphi = pass_grid_nphi_override
+        if((extrema(2,3)-extrema(1,3)) > 0) then
+            pass_grid%dphi = (extrema(2,3)-extrema(1,3))/pass_grid%nphi
+        else
+            ! No phi extent from diagnostics, assume full torus
+            pass_grid%dphi = 2*pi/pass_grid%nphi
+        endif
+    else
+        ! Default behavior: use hardcoded dphi
+        pass_grid%dphi = 2*pi/100
+        pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
+        if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
+    endif
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
@@ -2701,15 +2736,23 @@ subroutine make_passive_grid
         write(*,'(a)') "---- Passive grid settings ----"
         write(*,'(T2,"Nr: ", i3)') pass_grid%nr
         write(*,'(T2,"Nz: ", i3)') pass_grid%nz
-        write(*,'(T2,"Nphi: ", i3)') pass_grid%nphi
+        if(pass_grid_nphi_override > 0) then
+            write(*,'(T2,"Nphi: ", i3, " (from equilibrium file)")') pass_grid%nphi
+            write(*,'(T2,"dPhi: ", f8.5, " rad")') pass_grid%dphi
+        else
+            write(*,'(T2,"Nphi: ", i3, " (default dphi = 2*pi/100)")') pass_grid%nphi
+        endif
         write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') &
               pass_grid%r(1),pass_grid%r(pass_grid%nr)
         write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') &
               pass_grid%z(1),pass_grid%z(pass_grid%nz)
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') &
               pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
+        write(*,'(T2,"dPhi: ", f8.5, " rad (", f6.2, " degrees)")') &
+              pass_grid%dphi, pass_grid%dphi*180.d0/pi
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
+        write(*,*) 'Passive grid created:    ', time_string(time_start)
     endif
 
 end subroutine make_passive_grid
@@ -2737,10 +2780,17 @@ subroutine make_diagnostic_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Creating diagnostic grids ----'
+    endif
+
     if(((inputs%calc_pfida+inputs%calc_pnpa).gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
-        if(inter_grid%nphi.gt.1) then
+        if(inter_grid%nphi.gt.1 .and. pass_grid_nphi_override.le.0) then
+            ! Only copy inter_grid if it's truly 3D (has phi array)
+            ! If pass_grid_nphi_override > 0, it means nphi was provided without phi array
             pass_grid = inter_grid
         else
+            ! Use separate passive grid (either axisymmetric or with override nphi)
             call make_passive_grid()
         endif
 
@@ -2748,11 +2798,16 @@ subroutine make_diagnostic_grids
         allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
-        allocate(tracks(pass_grid%ntrack))
-        allocate(dlength(pass_grid%nr, &
-                         pass_grid%nz, &
-                         pass_grid%nphi) )
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral passive grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
+        !$OMP PARALLEL DO schedule(dynamic) private(i,r0,v0,basis,length,r_enter,r_exit, &
+        !$OMP& nc,ic,randomu,sqrt_rho,theta,j,tracks,ntrack,ind,kk,jj,ii,dl,los_elem,dlength)
         pass_grid_chan_loop: do i=1,spec_chords%nchan
+            ! Allocate thread-local arrays
+            allocate(tracks(pass_grid%ntrack))
+            allocate(dlength(pass_grid%nr, pass_grid%nz, pass_grid%nphi))
             r0 = spec_chords%los(i)%lens_uvw
             v0 = spec_chords%los(i)%axis_uvw
             v0 = v0/norm2(v0)
@@ -2773,8 +2828,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2790,18 +2844,16 @@ subroutine make_diagnostic_grids
                 pass_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
                     !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo pass_grid_track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,pass_grid%nphi
                 do jj=1,pass_grid%nz
                     rloop: do ii=1, pass_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
                             dl = dlength(ii,jj,kk)
+                            !$OMP CRITICAL
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
                                 allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
@@ -2814,11 +2866,16 @@ subroutine make_diagnostic_grids
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                            !$OMP END CRITICAL
                         endif
                     enddo rloop
                 enddo
             enddo
+
+            ! Deallocate thread-local arrays
+            deallocate(tracks, dlength)
         enddo pass_grid_chan_loop
+        !$OMP END PARALLEL DO
 
         spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
         allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
@@ -2832,12 +2889,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cyl_cell(nc) = ic
             endif
         enddo
-        deallocate(dlength, tracks)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral passive grid intersections complete'
+        endif
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
     !! Only needed when beam grid exists for active measurements
     if((inputs%calc_beam.ge.1).and.((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0)) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral beam grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -2863,8 +2926,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2883,10 +2945,8 @@ subroutine make_diagnostic_grids
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,beam_grid%nz
                 do jj=1,beam_grid%ny
                     xloop: do ii=1, beam_grid%nx
@@ -2922,11 +2982,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cell(nc) = ic
             endif
         enddo
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral beam grid intersections complete'
+        endif
     endif
 
     !! NPA probability calculations
     !! Only needed when beam grid exists for active NPA measurements
     if(inputs%calc_beam.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing NPA beam grid probabilities for ', &
+                  npa_chords%nchan, ' channels...'
+        endif
         allocate(xd(50),yd(50))
         allocate(probs(beam_grid%ngrid))
         allocate(eff_rds(3,beam_grid%ngrid))
@@ -3017,7 +3084,14 @@ subroutine make_diagnostic_grids
         endif
     enddo npa_chan_loop
         deallocate(probs,eff_rds,xd,yd)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NPA beam grid probabilities complete'
+        endif
     endif  !! End of calc_beam conditional for NPA probability calculations
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Diagnostic grids complete ----'
+    endif
 
 end subroutine make_diagnostic_grids
 
@@ -3424,13 +3498,14 @@ subroutine read_neutron_collimator
     nc_chords%det%aperture%shape = a_shape
 
     chan_loop: do ichan=1,nc_chords%nchan
-        ! Convert to beam grid coordinates
-        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
-        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
-        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
-        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
-        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
-        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
+        ! Keep NC geometry in machine coordinates for track_cylindrical
+        ! DO NOT convert to beam grid coordinates - this breaks tangency radii!
+        xyz_a_cent = a_cent(:,ichan)    ! Keep as machine coords
+        xyz_a_redge = a_redge(:,ichan)
+        xyz_a_tedge = a_tedge(:,ichan)
+        xyz_d_cent = d_cent(:,ichan)    ! Keep as machine coords
+        xyz_d_redge = d_redge(:,ichan)
+        xyz_d_tedge = d_tedge(:,ichan)
 
         ! Define detector/aperture hh/hw
         nc_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
@@ -3461,7 +3536,10 @@ subroutine read_neutron_collimator
         endif
     enddo chan_loop
 
-    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+    if(inputs%verbose.ge.1) then
+        write(*,'(50X,a)') ""
+        write(*,*) 'NC geometry read:    ', time_string(time_start)
+    endif
 
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
@@ -3654,6 +3732,8 @@ subroutine read_equilibrium
     integer :: error
     integer :: n = 50
     logical :: path_valid
+    logical :: nphi_exists, phi_exists
+    integer(Int32) :: nphi_value
 
     integer, dimension(:,:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:,:), allocatable :: denn3d
@@ -3671,11 +3751,25 @@ subroutine read_equilibrium
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
+
+    !! Check for nphi and phi array separately to handle passive grid override case
+    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., nphi_exists, error)
+    call h5ltpath_valid_f(gid, "/plasma/phi", .True., phi_exists, error)
+
+    if(nphi_exists) then
+        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", nphi_value, error)
+        if(phi_exists) then
+            ! Full 3D case: nphi with phi array means 3D inter_grid
+            inter_grid%nphi = nphi_value
+        else
+            ! New case: nphi without phi array means use for passive grid only
+            inter_grid%nphi = 1  ! Keep inter_grid axisymmetric
+            pass_grid_nphi_override = nphi_value  ! Store for passive grid
+        endif
     else
-        inter_grid%nphi=1
+        ! Default axisymmetric case
+        inter_grid%nphi = 1
+        pass_grid_nphi_override = -1  ! Use default behavior
     endif
 
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
@@ -3689,7 +3783,7 @@ subroutine read_equilibrium
 
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
-    if(path_valid) then
+    if(phi_exists .and. inter_grid%nphi > 1) then
         call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
     else
         inter_grid%phi=0.d0
@@ -3872,6 +3966,8 @@ subroutine read_f(fid, error)
     integer(HSIZE_T), dimension(5) :: dims
     integer :: ir,is
     logical :: path_valid
+    logical :: nphi_exists_fbm, phi_exists_fbm
+    integer(Int32) :: nphi_value_fbm
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -3881,11 +3977,23 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
-    call h5ltpath_valid_f(fid, "/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
+
+    !! Check for nphi and phi array separately (like in read_equilibrium)
+    call h5ltpath_valid_f(fid, "/nphi", .True., nphi_exists_fbm, error)
+    call h5ltpath_valid_f(fid, "/phi", .True., phi_exists_fbm, error)
+
+    if(nphi_exists_fbm) then
+        call h5ltread_dataset_int_scalar_f(fid,"/nphi", nphi_value_fbm, error)
+        if(phi_exists_fbm) then
+            ! Full 3D distribution: nphi with phi array
+            fbm%nphi = nphi_value_fbm
+        else
+            ! nphi without phi array means it was for passive grid only - treat as axisymmetric
+            fbm%nphi = 1
+        endif
     else
-        fbm%nphi=1
+        ! No nphi in file - default to axisymmetric
+        fbm%nphi = 1
     endif
 
     if(((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)).or.(fbm%nphi.ne.inter_grid%nphi)) then
@@ -5719,6 +5827,21 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/passive_particles","description", &
                  "Passive NPA Monte Carlo particles",error)
 
+            !Add dimension names to passive particle arrays
+            ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+            ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cartesian_component)
+            call h5_set_dimension_name(gid, "ri", 1, "particle", error)
+            call h5_set_dimension_name(gid, "ri", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "rf", 1, "particle", error)
+            call h5_set_dimension_name(gid, "rf", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "gci", 1, "particle", error)
+            call h5_set_dimension_name(gid, "gci", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "pitch", 1, "particle", error)
+            call h5_set_dimension_name(gid, "energy", 1, "particle", error)
+            call h5_set_dimension_name(gid, "weight", 1, "particle", error)
+            call h5_set_dimension_name(gid, "detector", 1, "particle", error)
+            call h5_set_dimension_name(gid, "class", 1, "particle", error)
+
             !Close group
             call h5gclose_f(gid, error)
         endif
@@ -5815,6 +5938,8 @@ subroutine write_spectra
         call h5ltmake_compressed_dataset_int_f(fid, "/stark_sign", 1, dims(1:1), stark_sign, error)
         call h5ltset_attribute_string_f(fid,"/stark_sign", "description", &
          "Stark line indicator: 1=sigma, -1=pi ", error)
+        ! Add dimension label immediately after creation
+        call h5_set_dimension_name(fid, "/stark_sign", 1, "stark_component", error)
     endif
     dims(1) = n_stark
     dims(2) = inputs%nlambda
@@ -6096,7 +6221,7 @@ subroutine write_spectra
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                      dims(1:3), spec%fida(:,:,:,1), error)
-                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 4, &
                      dims_stokes(1:4), spec%fidastokes(:,:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
@@ -6284,6 +6409,45 @@ subroutine write_spectra
                 "Number of photons produced by neutral: pfida_photons(sample,channel)",error)
        endif
 
+       ! Add dimension labels for spatial group datasets
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       if(inputs%calc_dcx.ge.1) then
+           ! dcx_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "dcx_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 3, "cartesian_component", error)
+           ! dcx_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "dcx_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_halo.ge.1) then
+           ! halo_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "halo_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 3, "cartesian_component", error)
+           ! halo_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "halo_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_fida.ge.1) then
+           ! fida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "fida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 3, "cartesian_component", error)
+           ! fida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "fida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_pfida.ge.1) then
+           ! pfida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "pfida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 3, "cartesian_component", error)
+           ! pfida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "pfida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_photons", 2, "sample", error)
+       endif
+
        !Close spatial group
        call h5gclose_f(gid, error)
     endif
@@ -6349,40 +6513,43 @@ subroutine write_spectra
             call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
         else
             !3D datasets with stark: (stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/full", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/full", 1, "channel", error)
             call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/full", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/full", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/full", "/radius", 3, error)
-            call h5_set_dimension_name(fid, "/half", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/half", 1, "channel", error)
             call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/half", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/half", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/half", "/radius", 3, error)
-            call h5_set_dimension_name(fid, "/third", 1, "stark_component", error)
+            call h5_set_dimension_name(fid, "/third", 1, "channel", error)
             call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/third", 3, "channel", error)
+            call h5_set_dimension_name(fid, "/third", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 1, error)
             call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/third", "/radius", 3, error)
-            !4D stokes datasets with stark: (stark,4,lambda,chan)
+            !4D stokes datasets with stark: (stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
             call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/fullstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/stokes_parameter", 3, error)
             call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/halfstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/stokes_parameter", 3, error)
             call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
             call h5_set_dimension_name(fid, "/thirdstokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 4, error)
-            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
         endif
     endif
 
@@ -6505,64 +6672,140 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_fida.ge.1) then
-        if(inputs%stark_components.eq.0) then
-            ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
-            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
-            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
-            ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
-            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            endif
         else
-            ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
-            ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
-            call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
-            call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: fida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 4D: fidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: fida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 5D: fidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            endif
         endif
     endif
 
     if(inputs%calc_pfida.ge.1) then
-        if(inputs%stark_components.eq.0) then
-            ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
-            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
-            ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
-            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            endif
         else
-            ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
-            call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
-            ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
-            call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
-            call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
-            call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: pfida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 4D: pfidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: pfida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 5D: pfidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            endif
         endif
     endif
 
@@ -6699,12 +6942,6 @@ subroutine write_neutrons
 
         !Write energy-resolved neutron flux
         if(allocated(neutron%energy)) then
-            ! Debug output
-            if(inputs%verbose.ge.1) then
-                write(*,'(T6,"Writing eflux: allocated=",L1," max=",E12.4," nonzero=",I8)') &
-                    allocated(neutron%eflux), maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-            endif
-
             dim1(1) = neutron%nenergy
             call h5ltmake_dataset_double_f(fid,"/energy_nc", 1, dim1, neutron%energy, error)
             call h5ltset_attribute_string_f(fid,"/energy_nc","description", &
@@ -8868,6 +9105,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     dlength = 3.0 !cm
     skip = .False.
 
+    !$OMP PARALLEL DO schedule(dynamic) private(i,ri,vi,inp,max_length)
     loop_over_channels: do i=1, nlines
         ri = r0(:,i)
         vi = v0(:,i)
@@ -8899,6 +9137,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
         call uvw_to_cyl(ri, cyl_out(:,i))
 
     enddo loop_over_channels
+    !$OMP END PARALLEL DO
 
     dim = 2*count(.not.skip) ! 2 for enter and exit
 
@@ -9192,6 +9431,117 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
 end subroutine track
 
+subroutine find_grid_entry(r_start, v_ray, r_entry, enters_grid)
+    !+ Finds where a ray starting outside the grid enters the grid boundaries
+    real(Float64), dimension(3), intent(in)  :: r_start
+        !+ Starting position in machine coordinates [cm]
+    real(Float64), dimension(3), intent(in)  :: v_ray
+        !+ Ray direction vector (normalized)
+    real(Float64), dimension(3), intent(out) :: r_entry
+        !+ Entry point into grid in machine coordinates [cm]
+    logical, intent(out)                     :: enters_grid
+        !+ Whether ray enters the grid
+
+    real(Float64), dimension(3) :: r_cyl_start, r_cyl_current
+    real(Float64), dimension(3) :: p_temp
+    real(Float64) :: t_min, t_temp, t_r_min, t_r_max, t_z_min, t_z_max
+    real(Float64) :: r_start_mag, r_current, z_current
+    real(Float64) :: vr, vz
+    integer :: i
+
+    ! Convert start position to cylindrical for checking
+    r_start_mag = sqrt(r_start(1)**2 + r_start(2)**2)
+    r_cyl_start(1) = r_start_mag
+    r_cyl_start(2) = r_start(3)  ! z
+    r_cyl_start(3) = atan2(r_start(2), r_start(1))  ! phi
+
+    ! Get velocity components in cylindrical frame at starting position
+    vr = (r_start(1)*v_ray(1) + r_start(2)*v_ray(2))/r_start_mag
+    vz = v_ray(3)
+
+    enters_grid = .false.
+    t_min = huge(t_min)
+
+    ! Check intersection with outer R boundary (cylinder at R_max)
+    if (r_cyl_start(1) > pass_grid%r(pass_grid%nr)) then
+        ! Outside, need to check if we hit outer cylinder going inward
+        if (vr < 0.0) then  ! Moving inward
+            r_cyl_current(1) = pass_grid%r(pass_grid%nr)
+            r_cyl_current(2) = 0.0  ! Will be updated
+            r_cyl_current(3) = 0.0  ! Will be updated
+            call cyl_to_uvw(r_cyl_current, p_temp)
+            call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+            if (t_temp > 0.0 .and. t_temp < t_min) then
+                r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+                z_current = p_temp(3)
+                ! Check if z is within bounds at this R
+                if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                    t_min = t_temp
+                    r_entry = p_temp
+                    enters_grid = .true.
+                endif
+            endif
+        endif
+    endif
+
+    ! Check intersection with inner R boundary if within tokamak
+    if (r_cyl_start(1) < pass_grid%r(1) .and. vr > 0.0) then
+        r_cyl_current(1) = pass_grid%r(1)
+        r_cyl_current(2) = 0.0
+        r_cyl_current(3) = 0.0
+        call cyl_to_uvw(r_cyl_current, p_temp)
+        call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            z_current = p_temp(3)
+            if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! Check intersection with Z boundaries (top and bottom planes)
+    if (r_cyl_start(2) > pass_grid%z(pass_grid%nz) .and. vz < 0.0) then
+        ! Above grid, moving down
+        t_temp = (pass_grid%z(pass_grid%nz) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    if (r_cyl_start(2) < pass_grid%z(1) .and. vz > 0.0) then
+        ! Below grid, moving up
+        t_temp = (pass_grid%z(1) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! If starting point is already inside, just return it
+    if (r_cyl_start(1) >= pass_grid%r(1) .and. &
+        r_cyl_start(1) <= pass_grid%r(pass_grid%nr) .and. &
+        r_cyl_start(2) >= pass_grid%z(1) .and. &
+        r_cyl_start(2) <= pass_grid%z(pass_grid%nz)) then
+        r_entry = r_start
+        enters_grid = .true.
+    endif
+
+end subroutine find_grid_entry
+
 subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:pass_grid]]
     real(Float64), dimension(3), intent(in)          :: rin
@@ -9229,6 +9579,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
+    !! Variables for handling rays starting outside grid
+    logical :: enters_grid_flag
+    real(Float64), dimension(3) :: ri_entry
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     adaptive = 0; max_cell_splits = 1; split_tol = 0.0
@@ -9246,7 +9599,33 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = pass_grid%nz
     gdims(3) = pass_grid%nphi
 
-    phi = atan2(rin(2),rin(1))
+    !! Check if starting position is outside the grid
+    ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+    ri_cyl(2) = ri(3)
+    ri_cyl(3) = atan2(ri(2), ri(1))
+
+    !! Check if we're starting outside the grid boundaries
+    if (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. &
+        ri_cyl(1) < pass_grid%r(1) .or. &
+        ri_cyl(2) > pass_grid%z(pass_grid%nz) .or. &
+        ri_cyl(2) < pass_grid%z(1)) then
+
+        !! Ray starts outside grid - find entry point
+        call find_grid_entry(ri, vn, ri_entry, enters_grid_flag)
+
+        if (.not. enters_grid_flag) then
+            ntrack = 0
+            return
+        endif
+
+        !! Update starting position to grid entry point
+        ri = ri_entry
+        ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+        ri_cyl(2) = ri(3)
+        ri_cyl(3) = atan2(ri(2), ri(1))
+    endif
+
+    phi = atan2(ri(2),ri(1))
     s = sin(phi) ; c = cos(phi)
     vn_cyl(1) = c*vn(1) + s*vn(2)
     vn_cyl(3) = -s*vn(1) + c*vn(2)
@@ -9333,7 +9712,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ncross = 0
     call in_plasma(ri,in_plasma1,input_coords=1)
     track_loop: do i=1,pass_grid%ntrack
-        if(cc.gt.pass_grid%ntrack) exit track_loop
+        if(cc.gt.pass_grid%ntrack) then
+            exit track_loop
+        endif
 
         call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
         call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
@@ -9341,6 +9722,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
         mind = minpos(1)
+
+        !! Check if no valid forward intersection found
+        if(mind.eq.0) then
+            exit track_loop
+        endif
+
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
 
@@ -9444,8 +9831,16 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
 
-        if (ind(mind).gt.gdims(mind)) exit track_loop
-        if (ind(mind).lt.1) exit track_loop
+        if (mind.lt.1 .or. mind.gt.3) then
+            exit track_loop
+        endif
+
+        if (ind(mind).gt.gdims(mind)) then
+            exit track_loop
+        endif
+        if (ind(mind).lt.1) then
+            exit track_loop
+        endif
         if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
@@ -9468,6 +9863,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call plane_basis(v_plane, redge, tedge, basis)
     enddo track_loop
     ntrack = cc-1
+
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
@@ -10650,8 +11046,7 @@ subroutine get_ddnhe_anisotropy(plasma, v1, v3, kappa)
 end subroutine get_ddnhe_anisotropy
 
 subroutine get_dd_neutron_energy(v1, v2, v_detector, e_neutron, weight)
-    !+ Calculate precise neutron energy from DD reaction kinematics
-    !+ Based on relativistic two-body kinematics with proper Lorentz boost
+    !+ Calculate classical neutron energy from DD reaction kinematics
     real(Float64), dimension(3), intent(in) :: v1
         !+ First reactant velocity [cm/s]
     real(Float64), dimension(3), intent(in) :: v2
@@ -15663,16 +16058,19 @@ subroutine neutron_spec_f
     allocate(all_tracks(pass_grid%ntrack, nc_chords%nchan))
     allocate(all_ntrack(nc_chords%nchan))
 
+    !$OMP PARALLEL DO schedule(dynamic) firstprivate(tracks) private(ichan,rn,vn,ntrack)
     do ichan = 1, nc_chords%nchan
         rn = nc_chords%det(ichan)%detector%origin
         vn = nc_chords%det(ichan)%aperture%origin - rn
         vn = vn/norm2(vn)
+
         call track_cylindrical(rn, vn, tracks, ntrack)
         all_ntrack(ichan) = ntrack
         if(ntrack > 0) then
             all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
         endif
     enddo
+    !$OMP END PARALLEL DO
 
     !! Allocate thread-local arrays to eliminate critical sections
 #ifdef _OMP
@@ -16362,8 +16760,8 @@ program fidasim
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
-    
-     if(inputs%calc_neut_spec.ge.1) then
+
+    if((inputs%calc_neutron.ge.1).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
         call read_neutron_collimator()
     endif
 
@@ -16705,19 +17103,11 @@ program fidasim
             call neutron_f()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_f
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_f: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         else
             call neutron_mc()
             if(inputs%calc_neut_spec.ge.1) then
                 call neutron_spec_mc
-                if(inputs%verbose.ge.1 .and. allocated(neutron%eflux)) then
-                    write(*,'(T6,"After neutron_spec_mc: max eflux=",E12.4," nonzero=",I8)') &
-                        maxval(neutron%eflux), count(neutron%eflux > 0.0d0)
-                endif
             endif
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''

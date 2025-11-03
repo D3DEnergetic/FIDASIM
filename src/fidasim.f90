@@ -108,8 +108,8 @@ integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
 
 !! >>> [JFCM, 2025-10-27] >>>
-! integer, parameter :: reservoir_size = 250
-integer :: reservoir_size = 250
+! integer, parameter :: reservoir_size = 50
+integer :: reservoir_size = 50
     !+ Size of Neutral Particle Reservoir
 !! <<< [JFCM, 2025-10-27] <<<
 
@@ -1378,14 +1378,22 @@ type SimulationInputs
         !+ Output spectral stark components : 0=off, 1=on
 
     !! Non-thermal beam deposition switches
-    integer(Int32) :: enable_nonthermal_calc
-        !+ Enable the use of the fast ion distribution for beam deposition calculations
+    ! integer(Int32) :: enable_nonthermal_calc
+    !     !+ Enable the use of the fast ion distribution for beam deposition calculations
     Integer(Int32) :: calc_sink
         !+ Calculate ion sink profile: 0 = off, 1=on
     !! >>> [JFCM, 2025_10_02] >>>
     integer(Int32) :: enable_halo
-    	!+ Enable calculation of halo process
+        !+ Enable calculation of halo process
     !! <<< [JFCM, 2025_10_02] <<<
+    !! >>> [JFCM, 2025_10_30] >>>
+    integer(Int32) :: full_f
+        !+ Describes how the f4d data is interpreted. 0: fast correction, 1: full distribution
+    integer(Int32) :: non_thermal_beam_stopping
+        !+ Enable use of f4d for beam stopping calculation. Increases computational time x10 at least
+    integer(Int32) :: non_thermal_cx_sampling
+        !+ Enable use of f4d for CX calculation.
+    !! <<< [JFCM, 2025_10_30] <<<
 
     !! Distribution settings
     integer(Int32) :: dist_type
@@ -2319,7 +2327,9 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
-    integer            :: enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
+    ! integer            :: enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
+    integer            :: calc_sink, enable_halo, reservoir_size
+    integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2334,7 +2344,9 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
-        enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
+        ! enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size, &
+        calc_sink, enable_halo, reservoir_size, &
+        non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2415,7 +2427,10 @@ subroutine read_inputs
     split_tol=0
 
     ! Default values for non-thermal calculation if not included in namelist:
-    enable_nonthermal_calc=0
+    ! enable_nonthermal_calc=0
+    full_f=1
+    non_thermal_beam_stopping= 0
+    non_thermal_cx_sampling=1
     calc_sink=0
     enable_halo=0
     reservoir_size = 50
@@ -2495,7 +2510,10 @@ subroutine read_inputs
     inputs%calc_res = calc_res
 
     !! Non-thermal beam deposition switches
-    inputs%enable_nonthermal_calc = enable_nonthermal_calc
+    ! inputs%enable_nonthermal_calc = enable_nonthermal_calc
+    inputs%full_f = full_f
+    inputs%non_thermal_beam_stopping = non_thermal_beam_stopping
+    inputs%non_thermal_cx_sampling = non_thermal_cx_sampling
     inputs%calc_sink = calc_sink
     inputs%enable_halo = enable_halo
 
@@ -5375,12 +5393,12 @@ subroutine quasineutrality_check
     real(Float64) :: tol = 0.01
     real(Float64), dimension(:,:,:), allocatable :: quasi, deni
     integer :: i, quasi_cnt
-    integer(Int32) :: non_thermal_calc
+    integer(Int32) :: full_f
     real(FLoat64) :: fi_factor = 1.d0
 
     !! Check if non-thermal beam deposition calculations are enabled:
-    non_thermal_calc = inputs%enable_nonthermal_calc
-    if (non_thermal_calc .GE. 1) then
+    full_f = inputs%full_f
+    if (full_f .GE. 1) then
       fi_factor = 0.d0
     endif
 
@@ -5833,7 +5851,7 @@ subroutine read_tables
     !!Open HDF5 file
     call h5fopen_f(inputs%tables_file, H5F_ACC_RDONLY_F, fid, error)
 
-    if (inputs%enable_nonthermal_calc .ge. 1) then
+    if (inputs%non_thermal_beam_stopping .ge. 1) then
       !! Read All cross sections:
       call read_all_atomic_cross(fid)
     else
@@ -5847,9 +5865,10 @@ subroutine read_tables
     ! >>> [JFCM 2025-03-13] >>>
     ! Exclude the thermal CX and IZ loss terms so we can add the nonthermal version in "get_rate_matrix"
     ! call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
-    if (inputs%enable_nonthermal_calc .ge. 1) then
+    if (inputs%non_thermal_beam_stopping .ge. 1) then
       ! include_loss = .false.
       ! >>> [JFCM, 2025_04_02] >>>
+      ! TODO: now that we are using non_thermal_beam_stopping, we need to enable this and check that it still works
       include_loss = .true.
       ! <<< [JFCM, 2025_04_02] <<<
       call read_atomic_transitions(fid,"/rates/H_H", tables%H_H, include_loss)
@@ -11973,8 +11992,8 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat, vn)
         H_H_depop_i = 0.d0
         deni_i = deni(i)
 
-        if (inputs%enable_nonthermal_calc .eq. 1) then
-          !! In a non-thermal calculation, we no longer distinguish between fast and thermal ion.
+        if (inputs%full_f .eq. 1) then
+          !! In a non-thermal beam stopping calculation, we no longer distinguish between fast and thermal ion.
           !! The thermal ion density is equivalent to the moments of ion distribution function [fbm]
           !! At present, we are using [[libfida::fbm]] to store the main ion species's 4D distribution Function
           !! In future developments, we might need to create separate containers for the various distribution functions needed: (1) electron f4ds and (2) possibly multi-species ion f4ds.
@@ -12025,10 +12044,12 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat, vn)
         H_H_depop = H_H_depop + H_H_depop_i
 
         ! >>> [JFCM, 2025-03-13] >>>
-        if (inputs%enable_nonthermal_calc .eq. 1) then
+        if (inputs%non_thermal_beam_stopping .eq. 1) then
           ! Add the missing CX and IZ loss term when non-thermal calculation enabled (see read_atomic_transitions)
           ! Non-thermal loss rate term calculated using f4d where defined
           ! >>> [JFCM, 2025_04_02] >>>
+          ! TODO: 2025-10-30: we need to check if the following subroutine still works
+          ! TODO: we need to stop using mc_ion_velocity_f4d and start using mc_sample_ion_f4d_gc instead
           ! call mc_ion_loss_rate(plasma,i,ab,vn,H_H_depop)
           ! <<< [JFCM, 2025_04_02] <<<
         endif
@@ -13620,10 +13641,10 @@ subroutine dcx
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
-    integer(Int32) :: non_thermal_calc
+    integer(Int32) :: full_f
 
-    !! Check if non-thermal beam deposition calculations are enabled:
-    non_thermal_calc = inputs%enable_nonthermal_calc
+    !! Check if f4d represents the full distribution:
+    full_f = inputs%full_f
 
     !! Initialized Neutral Population
     call init_neutral_population(neut%dcx)
@@ -13680,7 +13701,7 @@ subroutine dcx
                 call get_plasma(plasma,pos=tracks(1)%pos)
 
                 !! Weight CX rates by ion source density
-                if( (non_thermal_calc .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
+                if( (full_f .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
                     states = rates*(plasma%deni(is) + plasma%denf)
                     if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
@@ -13754,7 +13775,7 @@ subroutine halo
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: local_iter_dens
-    integer(Int32) :: non_thermal_calc
+    integer(Int32) :: full_f
 
     type(NeutralPopulation) :: cur_pop, prev_pop
     !! Halo iteration
@@ -13765,7 +13786,7 @@ subroutine halo
     real(Float64) :: fi_correction
 
     !! Check if non-thermal beam deposition calculations are enabled:
-    non_thermal_calc = inputs%enable_nonthermal_calc
+    full_f = inputs%full_f
 
     !! Initialize Neutral Population
     call init_neutral_population(neut%halo)
@@ -13843,7 +13864,7 @@ subroutine halo
                     call get_plasma(plasma, pos=tracks(1)%pos)
 
                     !! Weight CX rates by ion source density
-                    if( (non_thermal_calc .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
+                    if( (full_f .eq. 0) .AND. (beam_mass.eq.thermal_mass(is)) ) then
                         states = rates*(plasma%deni(is) + plasma%denf)
                         if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
@@ -16215,6 +16236,7 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   sink%part(sink%cnt)%ind = ind
   sink%part(sink%cnt)%vi = vion
   sink%part(sink%cnt)%ri = ri
+  ! TODO: remove the following two variables:
   sink%part(sink%cnt)%denf4d = denf4d
   sink%part(sink%cnt)%denf4d_per_marker = denf4d_per_marker
 
@@ -16306,7 +16328,8 @@ subroutine mc_sample_ion_f4d_gc(ind_gc,is,rgc,deni_gc,fields_gc,rp,vp,ind_p,denf
   ! CHECK for nonthermal flag and CHECK if it is valid at GC position:
   use_f4d = .FALSE.
   f4d_defined = .FALSE.
-  if (inputs%enable_nonthermal_calc .eq. 1) then
+  ! TODO: make use_f4d an input variable and use inputs%non_thermal_cx_sampling outside as input to subroutine
+  if (inputs%non_thermal_cx_sampling .eq. 1) then
     use_f4d = .TRUE.
     call get_distribution(fbeam,deni_gc,pos=rgc, coeffs=fields_gc%b)
     if (deni_gc > deni_min) then
@@ -16350,7 +16373,7 @@ end subroutine mc_sample_ion_f4d_gc
 !! >>>>>>>>>>> [jfcm, 2024_11_22] >>>>>>>>>>>>
 subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
   !+ Samples an ion velocity vector from the ion distribution function (thermal or nonthermal)
-  !+ Given an input beam_grid 3D index "ind", neutral species index "is" and the inputs%enable_nonthermal_calc flag, this subroutine calculates the neutral marker position "rn" on the beam_grid and produces a neutral particle velocity vector "vn" in XYZ beam_grid coordinates sampled from either a maxwellian ion distirbution or the non_thermal ion distribution stored in fbm interpolated at "rn" position. In addition, it returns a flag f4d_defined which is .True. the particle velocity is sampled from nonthermal ion distribution function. Generally, the nonthernal distribution function is defined only for rho < 1.
+  !+ Given an input beam_grid 3D index "ind", neutral species index "is" and the inputs%non_thermal_beam_stopping flag, this subroutine calculates the neutral marker position "rn" on the beam_grid and produces a neutral particle velocity vector "vn" in XYZ beam_grid coordinates sampled from either a maxwellian ion distirbution or the non_thermal ion distribution stored in fbm interpolated at "rn" position. In addition, it returns a flag f4d_defined which is .True. the particle velocity is sampled from nonthermal ion distribution function. Generally, the nonthernal distribution function is defined only for rho < 1.
   !+ Need to consider effect of plasma rotation on the nonthermal f4d sampling.
   integer, dimension(3), intent(in) :: ind
     !+ [[libfida:beam_grid]] 3D index
@@ -16376,7 +16399,8 @@ subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
   !! Two options: (A) nonthermal or (B) thermal distribution
 
   !! A- Get samples from non_thermal distribution (single species case):
-  if (inputs%enable_nonthermal_calc.ge.1) then
+  ! TODO: make use_f4d as input and have inputs%non_thermal_beam_stopping be used outside subroutine
+  if (inputs%non_thermal_beam_stopping.ge.1) then
     !! Assume we can sample f4d:
     f4d_defined = .True.
 
@@ -16410,7 +16434,7 @@ subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
   endif !! nonthermal
 
   !! B- Get samples from thermal distribution:
-  if (inputs%enable_nonthermal_calc.eq.0 .or. .not. f4d_defined) then
+  if (inputs%non_thermal_beam_stopping.eq.0 .or. .not. f4d_defined) then
     !! Get thermal plasma profiles at ion position:
     !! input: ri in XYZ or ind in 3D index for beam_grid
     !! output: plasma

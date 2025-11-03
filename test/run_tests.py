@@ -112,23 +112,49 @@ def test_npa():
 def test_nc():
     """
     Generates test data for Neutron Collimator geometry.
+    NC system is below the plasma, looking upward through plasma and NBI.
+    All channels share a common aperture, with different detector positions
+    to create a fan. All channels are in a single R,Z plane (phi = 0 degrees).
 
     Returns:
         nc_chords: A dictionary representing the Neutron Collimator geometry.
     """
 
-    # Chords
-    nchan = 47
-    ulens = np.arange(nchan) * 3 + 101
-    vlens = np.zeros(nchan)
-    wlens = np.full(nchan, -100.0)
+    # Chords - fan of sightlines in R,Z plane at phi=0
+    nchan = 10
+
+    # All apertures at the same location (shared aperture)
+    u_ap = 0.0  # At phi=0 plane
+    v_ap = -150.0  # Radial position
+    w_ap = -80.0  # Below plasma
+    ulens = np.full(nchan, u_ap)
+    vlens = np.full(nchan, v_ap)
+    wlens = np.full(nchan, w_ap)
     lens = np.vstack((ulens, vlens, wlens))
 
-    ulos = np.arange(nchan) * 3 + 101
+    # Detectors spread out to create fan of sightlines through shared aperture
+    # For a true fan, we need to vary the ANGLE, not maintain parallel sightlines
+    # Place all detectors at same distance below aperture, but spread in R-Z
+    # All at same phi (u=0)
+
+    det_distance = 100.0  # Distance below aperture (cm)
+
+    # Fan angles: spread vertically from more horizontal to more vertical
+    # Angles relative to horizontal in the R-Z plane
+    angles = np.linspace(30, 60, nchan)  # degrees from horizontal
+
+    ulos = np.zeros(nchan)
     vlos = np.zeros(nchan)
     wlos = np.zeros(nchan)
+
+    for i in range(nchan):
+        angle_rad = np.radians(angles[i])
+        # Place detector at fixed distance from aperture, at varying angles
+        # Pointing downward and outward (negative v, negative w from aperture)
+        vlos[i] = v_ap - det_distance * np.cos(angle_rad)
+        wlos[i] = w_ap - det_distance * np.sin(angle_rad)
     radius = np.sqrt(ulos**2 + vlos**2)
-    id = np.array([b"c" + str(i).encode('utf-8') for i in range(nchan)])  # Generate IDs
+    id = np.array([b"nc" + str(i+1).encode('utf-8') for i in range(nchan)])  # Generate IDs
 
     # Initialize arrays for aperture and detector data
     a_cent = np.zeros((3, nchan))
@@ -138,29 +164,41 @@ def test_nc():
     d_redge = np.zeros((3, nchan))
     d_tedge = np.zeros((3, nchan))
 
-    # Define base points for aperture and detector
-    ac = np.array([0.0, 0.0, 0.0])
-    ar = np.array([0.0, 3.0, 0.0])
-    at = np.array([0.0, 0.0, 3.0])
-    dc = np.array([-50.0, 0.0, 0.0])
-    dr = np.array([-50.0, 3.0, 0.0])
-    dt = np.array([-50.0, 0.0, 3.0])
+    # Aperture and detector half-widths (cm)
+    ap_width = 3.0
+    det_width = 3.0
 
     # Loop through each channel and calculate positions
     for i in range(nchan):
-        r0 = np.array([ulens[i], vlens[i], wlens[i]])
-        rf = np.array([ulos[i], vlos[i], wlos[i]])
+        # Aperture position (same for all channels)
+        a_cent[:, i] = [ulens[i], vlens[i], wlens[i]]
 
-        R = fs.utils.line_basis(r0,rf-r0)
+        # Detector position (different for each channel)
+        d_cent[:, i] = [ulos[i], vlos[i], wlos[i]]
 
-        # Calculate aperture and detector positions using rotation and translation
-        a_cent[:, i] = np.dot(R, ac) + r0
-        a_redge[:, i] = np.dot(R, ar) + r0
-        a_tedge[:, i] = np.dot(R, at) + r0
+        # Calculate line-of-sight direction
+        los_dir = d_cent[:, i] - a_cent[:, i]
+        los_dir = los_dir / np.linalg.norm(los_dir)
 
-        d_cent[:, i] = np.dot(R, dc) + r0
-        d_redge[:, i] = np.dot(R, dr) + r0
-        d_tedge[:, i] = np.dot(R, dt) + r0
+        # Create orthogonal basis for aperture/detector planes
+        # Since all channels are in phi=0 plane (x=0), we can use standard basis
+        # Radial direction (in y-z plane)
+        radial = np.array([0.0, vlens[i], wlens[i]])
+        radial = radial / np.linalg.norm(radial)
+
+        # Toroidal direction (perpendicular to r,z plane)
+        toroidal = np.array([1.0, 0.0, 0.0])
+
+        # Vertical direction (in plane, perpendicular to radial)
+        vertical = np.cross(toroidal, radial)
+
+        # Define aperture edges
+        a_redge[:, i] = a_cent[:, i] + ap_width * radial
+        a_tedge[:, i] = a_cent[:, i] + ap_width * toroidal
+
+        # Define detector edges (same orientation as aperture)
+        d_redge[:, i] = d_cent[:, i] + det_width * radial
+        d_tedge[:, i] = d_cent[:, i] + det_width * toroidal
 
     # Create the Neutron Collimator geometry dictionary
     nc_chords = {

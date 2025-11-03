@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     zlib1g-dev \
     libgomp1 \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -33,23 +35,17 @@ ENV CXX=g++
 ENV USE_OPENMP=y
 ENV USE_MPI=n
 
-# Build HDF5 from source (using included tarball)
-# First check if HDF5 is already built locally
-RUN if [ -d deps/hdf5/lib ] && [ -f deps/hdf5/bin/h5fc ]; then \
-        echo "Using pre-built HDF5"; \
-        cp -r deps/hdf5 /build/deps/; \
-    else \
-        echo "Building HDF5 from source"; \
-        cd deps && \
-        tar -xzf hdf5-1.8.16.tar.gz && \
-        cd hdf5-1.8.16 && \
-        ./configure --prefix=/build/deps/hdf5 \
-                    --enable-fortran \
-                    --enable-shared \
-                    --with-zlib && \
-        make -j$(nproc) && \
-        make install; \
-    fi
+# Build HDF5 from source (always build in container for compatibility)
+RUN echo "Building HDF5 from source for container compatibility" && \
+    cd deps && \
+    tar -xzf hdf5-1.8.16.tar.gz && \
+    cd hdf5-1.8.16 && \
+    ./configure --prefix=/build/deps/hdf5 \
+                --enable-fortran \
+                --enable-shared \
+                --with-zlib && \
+    make -j$(nproc) && \
+    make install
 
 # Set HDF5 paths for FIDASIM build
 ENV HDF5_HOME=/build/deps/hdf5
@@ -66,15 +62,12 @@ RUN if [ -f fidasim ] && [ -x fidasim ]; then \
         make src -j$(nproc); \
     fi
 
-# Build atomic tables (or copy pre-built if available)
-RUN mkdir -p /build/tables && \
-    if [ -f tables/atomic_tables.h5 ]; then \
-        echo "Using pre-built atomic tables"; \
-        cp tables/atomic_tables.h5 /build/tables/; \
+# Build atomic tables (or use pre-built if available)
+RUN if [ -f tables/atomic_tables.h5 ]; then \
+        echo "Using pre-built atomic tables from tables/atomic_tables.h5"; \
     else \
         echo "Building atomic tables (this may take 30+ minutes)"; \
-        make tables && \
-        cp tables/atomic_tables.h5 /build/tables/; \
+        make tables; \
     fi
 
 # Stage 2: Runtime environment

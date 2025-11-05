@@ -2770,12 +2770,15 @@ subroutine make_diagnostic_grids
     character(len=20) :: system = ''
     real(Float64), dimension(:), allocatable :: probs
     real(Float64), dimension(:,:), allocatable :: eff_rds
+    real(Float64), dimension(:,:), allocatable :: rd_maxprob  !! Max-probability detector points
     real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0_d
     real(Float64), dimension(3,3) :: inv_basis
     real(Float64), dimension(:),allocatable :: xd, yd
     type(LocalEMFields) :: fields
     real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r, pitch
+    real(Float64) :: max_dprob  !! For max-probability detector point
+    real(Float64), dimension(3) :: rd_max  !! Max-probability detector position
     integer :: ichan,k,id,ix,iy,d_index,nd,ind_d(2)
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
@@ -3031,13 +3034,19 @@ subroutine make_diagnostic_grids
             eff_rds = 0.d0
             probs = 0.d0
             ! For each grid point find the probability of hitting the detector given an isotropic source
+            !! Allocate array to store max-probability detector points
+            allocate(rd_maxprob(3,beam_grid%ngrid))
+            rd_maxprob = 0.d0
+
             !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
+            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind,max_dprob,rd_max)
             do ic=istart,beam_grid%ngrid,istep
                 call ind2sub(beam_grid%dims,ic,ind)
                 i = ind(1) ; j = ind(2) ; k = ind(3)
                 r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
                 r0_d = matmul(inv_basis,r0-npa_chords%det(ichan)%detector%origin)
+                max_dprob = 0.d0
+                rd_max = 0.d0
                 do id = 1, nd*nd
                     call ind2sub([nd,nd],id,ind_d)
                     ix = ind_d(1) ; iy = ind_d(2)
@@ -3051,8 +3060,15 @@ subroutine make_diagnostic_grids
                         dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
                         eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
                         probs(ic) = probs(ic) + dprob
+                        !! Track maximum probability detector point
+                        if(dprob.gt.max_dprob) then
+                            max_dprob = dprob
+                            rd_max = rd
+                        endif
                     endif
                 enddo
+                !! Store max-probability point for this cell
+                rd_maxprob(:,ic) = rd_max
             enddo
             !$OMP END PARALLEL DO
 #ifdef _MPI
@@ -3064,7 +3080,12 @@ subroutine make_diagnostic_grids
                     call ind2sub(beam_grid%dims, ic, ind)
                     i = ind(1) ; j = ind(2) ; k = ind(3)
                     r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                    eff_rd = eff_rds(:,ic)/probs(ic)
+                    !! Use max-probability detector point instead of weighted average
+                    eff_rd = rd_maxprob(:,ic)
+                    !! Fall back to weighted average if max point is zero
+                    if(norm2(eff_rd).le.0.0) then
+                        eff_rd = eff_rds(:,ic)/probs(ic)
+                    endif
                     call get_fields(fields,pos=r0)
                     v0 = (eff_rd - r0)/norm2(eff_rd - r0)
                     npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
@@ -3074,6 +3095,7 @@ subroutine make_diagnostic_grids
                     npa_chords%hit(i,j,k) = .True.
                 endif
             enddo
+            deallocate(rd_maxprob)
             total_prob = sum(probs)
             if(total_prob.le.0.d0) then
                 if(inputs%verbose.ge.0) then
@@ -15922,7 +15944,7 @@ subroutine npa_weights
                         !!Check if it hits a detector just to make sure
                         dpos = phit%eff_rd
                         vi_norm = phit%dir
-                        call hit_npa_detector(pos,vi_norm,det)
+                        call hit_npa_detector(pos,vi_norm,det,det=ichan)
                         if (det.ne.ichan) then
                             if(inputs%verbose.ge.0) then
                                 write(*,'(a)') 'NPA_WEIGHTS: Missed detector'

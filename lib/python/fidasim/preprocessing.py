@@ -86,6 +86,154 @@ def check_dict_schema(schema, dic, desc=None):
 
     return err
 
+def check_detector_overlap(d_cent, d_redge, d_tedge, d_shape, system_name, channel_ids):
+    """
+    #+#check_detector_overlap
+    #+Check if any detectors overlap within a diagnostic system
+    #+***
+    #+##Input Arguments
+    #+     **d_cent**: Detector center positions [3, nchan]
+    #+
+    #+     **d_redge**: Detector radial edge positions [3, nchan]
+    #+
+    #+     **d_tedge**: Detector toroidal edge positions [3, nchan]
+    #+
+    #+     **d_shape**: Detector shape (1=rectangular, 2=circular) [nchan]
+    #+
+    #+     **system_name**: Name of the diagnostic system (e.g., "NPA", "NC")
+    #+
+    #+     **channel_ids**: Channel identifiers [nchan]
+    #+
+    #+##Output Arguments
+    #+     **overlaps**: List of tuples (i, j) of overlapping detector pairs
+    #+
+    """
+    nchan = d_cent.shape[1]
+    overlaps = []
+
+    # Check all pairs of detectors
+    for i in range(nchan):
+        for j in range(i + 1, nchan):
+            # Calculate detector properties for both detectors
+            cent_i = d_cent[:, i]
+            cent_j = d_cent[:, j]
+
+            # Calculate edge vectors
+            e1_i = d_redge[:, i] - cent_i
+            e2_i = d_tedge[:, i] - cent_i
+            e1_j = d_redge[:, j] - cent_j
+            e2_j = d_tedge[:, j] - cent_j
+
+            # Calculate normal vectors
+            normal_i = np.cross(e1_i, e2_i)
+            normal_j = np.cross(e1_j, e2_j)
+
+            # Normalize the normals
+            normal_i_norm = normal_i / np.linalg.norm(normal_i)
+            normal_j_norm = normal_j / np.linalg.norm(normal_j)
+
+            # Check if detectors are roughly co-planar (parallel normals)
+            dot_product = abs(np.dot(normal_i_norm, normal_j_norm))
+            are_parallel = dot_product > 0.99  # Nearly parallel (within ~8 degrees)
+
+            if are_parallel:
+                # Check if they're in the same plane (distance from one center to the other's plane)
+                displacement = cent_j - cent_i
+                distance_to_plane = abs(np.dot(displacement, normal_i_norm))
+
+                # Calculate effective radii (maximum distance from center to detector edge)
+                if d_shape[i] == 1:  # Rectangular
+                    radius_i = max(np.linalg.norm(e1_i), np.linalg.norm(e2_i))
+                else:  # Circular
+                    radius_i = np.linalg.norm(e1_i)
+
+                if d_shape[j] == 1:  # Rectangular
+                    radius_j = max(np.linalg.norm(e1_j), np.linalg.norm(e2_j))
+                else:  # Circular
+                    radius_j = np.linalg.norm(e1_j)
+
+                # If in same plane, check if centers are close enough to overlap
+                if distance_to_plane < 1.0:  # Within 1 cm of same plane
+                    center_distance = np.linalg.norm(cent_j - cent_i)
+                    # Conservative check: if distance between centers is less than sum of radii
+                    if center_distance < (radius_i + radius_j):
+                        overlaps.append((i, j))
+
+    # Report overlaps if found
+    if len(overlaps) > 0:
+        warn('Overlapping detectors detected in {} diagnostic'.format(system_name))
+        print('The following detector pairs may overlap:')
+        for i, j in overlaps:
+            id_i = channel_ids[i].decode('utf-8') if isinstance(channel_ids[i], bytes) else str(channel_ids[i])
+            id_j = channel_ids[j].decode('utf-8') if isinstance(channel_ids[j], bytes) else str(channel_ids[j])
+            print('  Channel {} (index {}) overlaps with Channel {} (index {})'.format(id_i, i, id_j, j))
+        print('Please check your diagnostic geometry definition.')
+
+    return overlaps
+
+def check_chord_overlap(lens, axis, spot_size, system_name, channel_ids):
+    """
+    #+#check_chord_overlap
+    #+Check if any spectral chords overlap within a diagnostic system
+    #+***
+    #+##Input Arguments
+    #+     **lens**: Lens positions [3, nchan]
+    #+
+    #+     **axis**: Chord axis directions [3, nchan]
+    #+
+    #+     **spot_size**: Observation spot sizes [nchan]
+    #+
+    #+     **system_name**: Name of the diagnostic system (e.g., "SPECTRAL", "FIDA")
+    #+
+    #+     **channel_ids**: Channel identifiers [nchan]
+    #+
+    #+##Output Arguments
+    #+     **overlaps**: List of tuples (i, j) of overlapping chord pairs
+    #+
+    """
+    nchan = lens.shape[1]
+    overlaps = []
+
+    # Check all pairs of chords
+    for i in range(nchan):
+        for j in range(i + 1, nchan):
+            # Calculate properties for both chords
+            lens_i = lens[:, i]
+            lens_j = lens[:, j]
+            axis_i = axis[:, i]
+            axis_j = axis[:, j]
+
+            # Check if axes are nearly parallel
+            dot_product = abs(np.dot(axis_i, axis_j))
+            are_parallel = dot_product > 0.99  # Nearly parallel (within ~8 degrees)
+
+            if are_parallel:
+                # Check distance between lens positions
+                lens_distance = np.linalg.norm(lens_j - lens_i)
+
+                # Use spot sizes to determine potential overlap
+                # If both spot sizes are defined, use their sum
+                if spot_size[i] > 0 and spot_size[j] > 0:
+                    threshold = spot_size[i] + spot_size[j]
+                else:
+                    # Use a default threshold of 2 cm if spot sizes not specified
+                    threshold = 2.0
+
+                if lens_distance < threshold:
+                    overlaps.append((i, j))
+
+    # Report overlaps if found
+    if len(overlaps) > 0:
+        warn('Overlapping chords detected in {} diagnostic'.format(system_name))
+        print('The following chord pairs may overlap (same/similar lens position and parallel axes):')
+        for i, j in overlaps:
+            id_i = channel_ids[i].decode('utf-8') if isinstance(channel_ids[i], bytes) else str(channel_ids[i])
+            id_j = channel_ids[j].decode('utf-8') if isinstance(channel_ids[j], bytes) else str(channel_ids[j])
+            print('  Channel {} (index {}) overlaps with Channel {} (index {})'.format(id_i, i, id_j, j))
+        print('Please check your diagnostic geometry definition.')
+
+    return overlaps
+
 def check_inputs(inputs, use_abs_path=True):
     """
     #+#check_inputs
@@ -1122,6 +1270,9 @@ def check_spec(inputs, chords):
         # For passive-only runs, skip beam grid intersection check
         info('Passive-only mode: skipping beam grid intersection check for spectral chords')
 
+    # Check for overlapping chords
+    check_chord_overlap(chords['lens'], chords['axis'], chords['spot_size'], chords['system'], chords['id'])
+
     if err:
         error('Invalid FIDA/BES geometry. Exiting...', halt=True)
     else:
@@ -1273,6 +1424,9 @@ def check_npa(inp, npa):
         # For passive-only mode, skip the beam grid intersection message
         info('Passive-only mode: skipping beam grid intersection check for NPA detectors')
 
+    # Check for overlapping detectors
+    check_detector_overlap(npa['d_cent'], npa['d_redge'], npa['d_tedge'], npa['d_shape'], 'NPA', npa['id'])
+
     if err:
         error('Invalid NPA geometry. Exiting...', halt=True)
     else:
@@ -1415,8 +1569,12 @@ def check_nc(inp, nc):
         print('Missed channels:')
         print(f'    {nc["id"][np.where(err_arr != 0)[0]]}')  # Assuming 'id' is a numpy array
     """
+
+    # Check for overlapping detectors
+    check_detector_overlap(nc['d_cent'], nc['d_redge'], nc['d_tedge'], nc['d_shape'], 'NC', nc['id'])
+
     print('Neutron Collimator geometry is valid')
-        
+
 
 def check_cfpd(inp, cfpd):
     """
@@ -1522,6 +1680,9 @@ def check_cfpd(inp, cfpd):
     nw = err_arr[w].size
     if nw == 0:
         err = True
+
+    # Check for overlapping detectors
+    check_detector_overlap(cfpd['d_cent'], cfpd['d_redge'], cfpd['d_tedge'], cfpd['d_shape'], 'CFPD', cfpd['id'])
 
     if err:
         error('Invalid CFPD geometry. Exiting...', halt=True)

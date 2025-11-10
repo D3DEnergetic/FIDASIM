@@ -7361,14 +7361,14 @@ subroutine write_fida_weights
     call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
     call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
     call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
-    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "radius", error)
     call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
     call h5_make_dimension_scale(fid, "/energy", "energy", error)
     call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
-    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+    call h5_make_dimension_scale(fid, "/radius", "radius", error)
 
     !Add dimension names to weight: weight(lambda,energy,pitch,chan)
-    call h5_set_dimension_name(fid, "/weight", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/weight", 1, "radius", error)
     call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
     call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
     call h5_set_dimension_name(fid, "/weight", 4, "wavelength", error)
@@ -7378,13 +7378,13 @@ subroutine write_fida_weights
     call h5_attach_dimension_scale(fid, "/weight", "/lambda", 1, error)
 
     !Add dimension names to fida: fida(lambda,chan)
-    call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/fida", 1, "radius", error)
     call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
     call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
     call h5_attach_dimension_scale(fid, "/fida", "/lambda", 1, error)
 
     !Add dimension names to mean_f: mean_f(energy,pitch,chan)
-    call h5_set_dimension_name(fid, "/mean_f", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/mean_f", 1, "radius", error)
     call h5_set_dimension_name(fid, "/mean_f", 2, "pitch", error)
     call h5_set_dimension_name(fid, "/mean_f", 3, "energy", error)
     call h5_attach_dimension_scale(fid, "/mean_f", "/radius", 3, error)
@@ -7578,19 +7578,19 @@ subroutine write_npa_weights
     !Mark coordinate arrays as dimension scales and label their dimensions
     call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
     call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
-    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "radius", error)
     call h5_make_dimension_scale(fid, "/energy", "energy", error)
     call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
-    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+    call h5_make_dimension_scale(fid, "/radius", "radius", error)
 
     !Add dimension names to flux: flux(energy,chan)
-    call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/flux", 1, "radius", error)
     call h5_set_dimension_name(fid, "/flux", 2, "energy", error)
     call h5_attach_dimension_scale(fid, "/flux", "/radius", 2, error)
     call h5_attach_dimension_scale(fid, "/flux", "/energy", 1, error)
 
     !Add dimension names to weight: weight(energy,pitch,chan)
-    call h5_set_dimension_name(fid, "/weight", 1, "channel", error)
+    call h5_set_dimension_name(fid, "/weight", 1, "radius", error)
     call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
     call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
     call h5_attach_dimension_scale(fid, "/weight", "/radius", 3, error)
@@ -7638,7 +7638,11 @@ subroutine write_nc_weights
     !Write pitch grid
     dim1(1) = inputs%np_nc
     call h5ltmake_dataset_double_f(gid, "pitch", 1, dim1, ncweight%pitch, error)
-    
+
+    !Write radius (channel coordinate)
+    dim1(1) = nc_chords%nchan
+    call h5ltmake_dataset_double_f(gid, "radius", 1, dim1, nc_chords%radius, error)
+
     !Write weight function
     dim3 = [inputs%ne_nc, inputs%np_nc, nc_chords%nchan]
     call h5ltmake_dataset_double_f(gid, "weight", 3, dim3, ncweight%weight, error)
@@ -7667,30 +7671,35 @@ subroutine write_nc_weights
     !Mark coordinate arrays as dimension scales and label their dimensions
     call h5_set_dimension_name(gid, "energy", 1, "energy", error)
     call h5_set_dimension_name(gid, "pitch", 1, "pitch", error)
+    call h5_set_dimension_name(gid, "radius", 1, "radius", error)
     call h5_set_dimension_name(gid, "r", 1, "r", error)
     call h5_set_dimension_name(gid, "z", 1, "z", error)
     call h5_make_dimension_scale(gid, "energy", "energy", error)
     call h5_make_dimension_scale(gid, "pitch", "pitch", error)
+    call h5_make_dimension_scale(gid, "radius", "radius", error)
     call h5_make_dimension_scale(gid, "r", "r", error)
     call h5_make_dimension_scale(gid, "z", "z", error)
 
     !Add dimension names to weight: weight(energy,pitch,chan)
-    call h5_set_dimension_name(gid, "weight", 1, "channel", error)
+    call h5_set_dimension_name(gid, "weight", 1, "radius", error)
     call h5_set_dimension_name(gid, "weight", 2, "pitch", error)
     call h5_set_dimension_name(gid, "weight", 3, "energy", error)
+    call h5_attach_dimension_scale(gid, "weight", "radius", 3, error)
     call h5_attach_dimension_scale(gid, "weight", "pitch", 2, error)
     call h5_attach_dimension_scale(gid, "weight", "energy", 1, error)
 
     !Add dimension names to flux: flux(energy,chan)
-    call h5_set_dimension_name(gid, "flux", 1, "channel", error)
+    call h5_set_dimension_name(gid, "flux", 1, "radius", error)
     call h5_set_dimension_name(gid, "flux", 2, "energy", error)
+    call h5_attach_dimension_scale(gid, "flux", "radius", 2, error)
     call h5_attach_dimension_scale(gid, "flux", "energy", 1, error)
 
     !Add dimension names to emissivity if present: emissivity(r,z,chan)
     if(inputs%calc_nc_wght.ge.2) then
-        call h5_set_dimension_name(gid, "emissivity", 1, "channel", error)
+        call h5_set_dimension_name(gid, "emissivity", 1, "radius", error)
         call h5_set_dimension_name(gid, "emissivity", 2, "z", error)
         call h5_set_dimension_name(gid, "emissivity", 3, "r", error)
+        call h5_attach_dimension_scale(gid, "emissivity", "radius", 3, error)
         call h5_attach_dimension_scale(gid, "emissivity", "z", 2, error)
         call h5_attach_dimension_scale(gid, "emissivity", "r", 1, error)
     endif

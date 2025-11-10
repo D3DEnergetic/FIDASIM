@@ -88,18 +88,25 @@ def check_dict_schema(schema, dic, desc=None):
 
 def check_detector_overlap(d_cent, d_redge, d_tedge, d_shape, system_name, channel_ids):
     """
-    Check if any detectors overlap within a diagnostic system.
-
-    Input Arguments:
-        d_cent: Detector center positions [3, nchan]
-        d_redge: Detector radial edge positions [3, nchan]
-        d_tedge: Detector toroidal edge positions [3, nchan]
-        d_shape: Detector shape (1=rectangular, 2=circular) [nchan]
-        system_name: Name of the diagnostic system (e.g., "NPA", "NC")
-        channel_ids: Channel identifiers [nchan]
-
-    Returns:
-        overlaps: List of tuples (i, j) of overlapping detector pairs
+    #+#check_detector_overlap
+    #+Check if any detectors overlap within a diagnostic system
+    #+***
+    #+##Input Arguments
+    #+     **d_cent**: Detector center positions [3, nchan]
+    #+
+    #+     **d_redge**: Detector radial edge positions [3, nchan]
+    #+
+    #+     **d_tedge**: Detector toroidal edge positions [3, nchan]
+    #+
+    #+     **d_shape**: Detector shape (1=rectangular, 2=circular) [nchan]
+    #+
+    #+     **system_name**: Name of the diagnostic system (e.g., "NPA", "NC")
+    #+
+    #+     **channel_ids**: Channel identifiers [nchan]
+    #+
+    #+##Output Arguments
+    #+     **overlaps**: List of tuples (i, j) of overlapping detector pairs
+    #+
     """
     nchan = d_cent.shape[1]
     overlaps = []
@@ -166,17 +173,23 @@ def check_detector_overlap(d_cent, d_redge, d_tedge, d_shape, system_name, chann
 
 def check_chord_overlap(lens, axis, spot_size, system_name, channel_ids):
     """
-    Check if any spectral chords overlap within a diagnostic system.
-
-    Input Arguments:
-        lens: Lens positions [3, nchan]
-        axis: Chord axis directions [3, nchan]
-        spot_size: Observation spot sizes [nchan]
-        system_name: Name of the diagnostic system (e.g., "SPECTRAL", "FIDA")
-        channel_ids: Channel identifiers [nchan]
-
-    Returns:
-        overlaps: List of tuples (i, j) of overlapping chord pairs
+    #+#check_chord_overlap
+    #+Check if any spectral chords overlap within a diagnostic system
+    #+***
+    #+##Input Arguments
+    #+     **lens**: Lens positions [3, nchan]
+    #+
+    #+     **axis**: Chord axis directions [3, nchan]
+    #+
+    #+     **spot_size**: Observation spot sizes [nchan]
+    #+
+    #+     **system_name**: Name of the diagnostic system (e.g., "SPECTRAL", "FIDA")
+    #+
+    #+     **channel_ids**: Channel identifiers [nchan]
+    #+
+    #+##Output Arguments
+    #+     **overlaps**: List of tuples (i, j) of overlapping chord pairs
+    #+
     """
     nchan = lens.shape[1]
     overlaps = []

@@ -57,12 +57,27 @@ where the `plasma` group has the following datasets
 | `denimp`            | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Impurity density                                             |
 | `deni`              | Float64 | 3/4  | [`nthermal`,`nr`,`nz`[,`nphi`]] | cm^-3 | Ion density for each thermal species                         |
 | `denn`              | Float64 | 2/3  | [`nlevs`,`nthermal`,`nr`,`nz`[,`nphi`]]            | cm^-3 | Cold neutral density                                         |
+| `denm`              | Float64 | 3/4  | [`nthermal`,`nr`,`nz`[,`nphi`]] | cm^-3 | Cold molecular hydrogen (H2) density (Optional)             |
 | `zeff`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | NA    | Z-effective                                                  |
 | `vr`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Radial component of the bulk plasma rotation/flow            |
 | `vt`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow      |
 | `vz`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Z component of the bulk plasma rotation/flow                 |
 | `description`       | String  | 0    | NA                              | NA    | Plasma Parameters                        |
 | `coordinate system` | String  | 0    | NA                              | NA    | Cylindrical                              |
+
+## Molecular Hydrogen Support
+
+FIDASIM now supports molecular hydrogen (H2) as a charge exchange target for passive signal calculations. The molecular density field `denm` is optional and represents the cold molecular hydrogen density for each thermal species. If not provided, FIDASIM assumes no molecular hydrogen is present.
+
+Key points about molecular hydrogen support:
+- Molecular hydrogen is treated as a static target (temperature-independent)
+- H+H2 charge exchange produces m-resolved (not n/m-resolved) reaction rates
+- Molecular contributions are automatically added to passive FIDA and NPA signals
+- Typical edge molecular densities can range from 10^10 to 10^13 cm^-3
+
+The molecular density should be provided in the same format as ion density:
+- 3D array for 2D grids: [`nthermal`, `nr`, `nz`]
+- 4D array for 3D grids: [`nthermal`, `nr`, `nz`, `nphi`]
 
 and where the `fields` group has the following datasets
 

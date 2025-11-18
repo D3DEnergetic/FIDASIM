@@ -29,6 +29,17 @@ where arguments are defined as follows. Click the argument description for extre
 * `spec`: [Spectral Geometry](../03_technical/01_prefida_inputs.html#spectral-geometry-structure)
 * `npa`: [NPA Geometry](../03_technical/01_prefida_inputs.html#npa-geometry-structure)
 
+## Including Molecular Hydrogen (H2) for Passive Signals
+
+To include molecular hydrogen in passive signal calculations, add the `denm` field to your plasma structure:
+
+```python
+# Example: Adding molecular hydrogen density
+plasma['denm'] = denm_array  # Shape: [nthermal, nr, nz] or [nthermal, nr, nz, nphi]
+```
+
+Where `denm` is the molecular hydrogen density in cm^-3. This is optional - if not provided, only atomic charge exchange will be considered.
+
 PREFIDA will create the following files
 
 * Namelist File

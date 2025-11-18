@@ -209,6 +209,7 @@ Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more
 | `te`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | keV   | Electron temperature                                          |
 | `ti`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | keV   | Ion temperature                                               |
 | `dene`              | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm^-3 | Electron density                                              |
+| `denm`              | Float64 | 3/4    | [`nthermal`,`nr`,`nz`[,`nphi`]] | cm^-3 | Molecular hydrogen (H2) density (Optional)                   |
 | `zeff`              | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | NA    | Z-effective                                                   |
 | `vr`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm/s  | Radial component of the bulk plasma rotation/flow             |
 | `vt`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow       |

@@ -14,6 +14,10 @@ Active diagnostic signals are produced from charge exchange with injected neutra
 Passive signals must be treated to get valid active FIDA data.
 For example, passive-FIDA (p-FIDA) signals of comparable magnitude with active signals were experimentally measured on NSTX-U.
 
+FIDASIM now supports two types of cold neutral targets:
+- **Atomic hydrogen** (H, D, T) - Traditional cold neutral population
+- **Molecular hydrogen** (H2, D2, T2) - Important in edge and divertor regions
+
 ![NSTX-U](|media|/nstxu.png){: width="400"}
 {: style="text-align: center"}
 
@@ -23,6 +27,20 @@ FIDASIM accepts 2D and 3D cold neutral density input (TRANSP output variable is 
 FIDASIM will assume that all neutrals are in the ground state.
 Using local plasma parameters, the neutrals are time evolved by solving the collisional radiative model until equilibrium is achieved.
 Then, the neutrals are distributed throughout the interpolation grid for subsequent passive calculations.
+
+# Molecular Hydrogen Contribution
+
+In addition to atomic neutrals, FIDASIM can include molecular hydrogen (H2) as a charge exchange target. Molecular hydrogen is particularly important in:
+- Edge plasma regions where molecular densities can be significant
+- Divertor regions with high recycling
+- Gas puffing scenarios
+
+The H+H2 charge exchange process differs from atomic CX:
+- Molecules are treated as static targets (temperature-independent)
+- Cross sections are only m-resolved (no initial n-states for molecules)
+- Reaction: H+ + H2 → H(m) + H2+
+
+Molecular density is provided via the optional `denm` field in the plasma equilibrium file. If not provided, only atomic CX is considered.
 
 # Types of Passive Signals
 

@@ -11,8 +11,9 @@ As a neutral particle travels through a plasma it undergoes several different ty
 * Charge Exchange with Hydrogen and Impurities
 * Excitation with Electrons, Hydrogen, and Impurities
 * Ionization with Electrons, Hydrogen, and Impurities
+* Charge Exchange with Molecular Hydrogen (H2) - for passive signals
 
-These cross sections, as well as Maxwellian averaged reaction rates, are pre-computed over a range of logarithmically spaced collision energies and target temperatures.
+These cross sections, as well as Maxwellian averaged reaction rates, are pre-computed over a range of logarithmically spaced collision energies and target temperatures. Molecular hydrogen cross sections are treated separately as they are temperature-independent (static targets).
 
 # Approximate Hydrogen Charge Exchange Cross Sections 
 Some of atomic transitions needed by FIDASIM are not available.
@@ -220,4 +221,21 @@ A more precice references can be found in the Fortran function documentation. Fo
 
 ![](|media|/H_C6_ioniz.svg "H-C6 Ionization"){: width="400"}
 {: style="text-align: center"}
+
+#Hydrogen-Molecular Hydrogen Interactions
+
+##\(H^+ + H_2 \rightarrow H(m) + H_2^+\)
+
+The H+H2 charge exchange cross sections are used for passive signal calculations when molecular hydrogen is present in the plasma. Unlike atomic hydrogen CX, these cross sections are:
+
+* Only m-resolved (molecules have no initial n-states)
+* Temperature-independent (molecules treated as static targets)
+* Important for edge and divertor diagnostics
+
+Cross section data sources:
+* n=1-3: Barnett 1990 (measured data with Chebyshev fits)
+* n=4: Hughes 1967 (experimental measurements)
+* n=5-6: Plowman 2022 (theoretical predictions)
+
+Energy range: 5-2000 keV for most final states
 

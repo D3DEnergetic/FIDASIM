@@ -33,11 +33,15 @@ class VisualizationService:
             return self.cache[file_path]
 
         try:
-            # Try loading as NetCDF first (xarray native)
-            ds = xr.open_dataset(file_path, engine='netcdf4')
+            # Try h5netcdf first for proper HDF5 dimension scale handling
+            ds = xr.open_dataset(file_path, engine='h5netcdf')
         except:
-            # Fall back to HDF5 with custom loading
-            ds = self._load_hdf5_as_xarray(file_path)
+            try:
+                # Fall back to netcdf4
+                ds = xr.open_dataset(file_path, engine='netcdf4')
+            except:
+                # Last resort: custom HDF5 loading
+                ds = self._load_hdf5_as_xarray(file_path)
 
         # Cache the dataset
         self.cache[file_path] = ds

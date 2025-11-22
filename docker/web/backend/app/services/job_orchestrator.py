@@ -6,6 +6,7 @@ Handles job submission, status tracking, log retrieval, and cancellation.
 """
 
 import httpx
+import logging
 from typing import Dict, Any, Optional, List
 from uuid import UUID
 from datetime import datetime
@@ -15,6 +16,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.config import settings
 from app.models.job import Job
 from app.db.database import SessionLocal
+
+logger = logging.getLogger(__name__)
 
 
 class JobOrchestrator:
@@ -90,9 +93,12 @@ class JobOrchestrator:
         try:
             job = db.query(Job).filter(Job.id == job_id).first()
             if not job:
+                logger.error(f"Job {job_id} not found for async submission")
                 return
 
+            logger.info(f"Starting async submission for job {job.run_id}")
             await self._submit_to_core_impl(job, db)
+            logger.info(f"Async submission completed for job {job.run_id}")
         except Exception as e:
             import traceback
             error_detail = str(e) if str(e) else repr(e)
@@ -100,8 +106,8 @@ class JobOrchestrator:
                 job.status = "failed"
                 job.error_message = f"Failed to submit to core API: {error_detail}"
                 db.commit()
-            print(f"ERROR submitting job {job.run_id if job else job_id}: {error_detail}")
-            print(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"ERROR submitting job {job.run_id if job else job_id}: {error_detail}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
         finally:
             db.close()
 
@@ -112,7 +118,8 @@ class JobOrchestrator:
         Args:
             job: Job object to submit
         """
-        async with httpx.AsyncClient(timeout=300.0) as client:  # 5 minute timeout for large file copies
+        logger.info(f"Submitting job {job.run_id} to core API at {self.core_api_url}/run")
+        async with httpx.AsyncClient(timeout=600.0) as client:  # 10 minute timeout for large file copies when core is busy
             # Get input file path - check if it's a full path or just filename
             input_file = job.config.get("input_file", "")
             if input_file and not input_file.startswith("/"):
@@ -136,12 +143,16 @@ class JobOrchestrator:
 
             if response.status_code == 200:
                 result = response.json()
+                core_job_id = result.get("job_id")
+                logger.info(f"Core API accepted job {job.run_id}, assigned core_job_id: {core_job_id}")
+
                 # Update job with fidasim-core job_id
                 job.metadata_ = job.metadata_ or {}
-                job.metadata_["core_job_id"] = result.get("job_id")
+                job.metadata_["core_job_id"] = core_job_id
                 job.status = "running"
                 job.started_at = datetime.utcnow()
                 db.commit()  # Fixed: Use the correct db session
+                logger.info(f"Successfully linked job {job.run_id} to core_job_id {core_job_id}")
             else:
                 raise Exception(f"Core API returned status {response.status_code}: {response.text}")
 
@@ -304,7 +315,7 @@ class JobOrchestrator:
             try:
                 async with httpx.AsyncClient(timeout=10.0) as client:
                     response = await client.delete(
-                        f"{self.core_api_url}/jobs/{core_job_id}/cancel"
+                        f"{self.core_api_url}/jobs/{core_job_id}"
                     )
 
                     if response.status_code not in [200, 204]:

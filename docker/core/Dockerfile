@@ -52,10 +52,10 @@ ENV HDF5_HOME=/build/deps/hdf5
 ENV PATH=$HDF5_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$HDF5_HOME/lib:$LD_LIBRARY_PATH
 
-# Build FIDASIM with -O3 instead of -Ofast for better stability
-RUN echo "Building FIDASIM from source with -O3 optimization" && \
+# Build FIDASIM with -O1 for stability in container
+RUN echo "Building FIDASIM from source with -O1 optimization" && \
     make clean && \
-    sed -i 's/-Ofast/-O3/g' makefile && \
+    sed -i 's/-Ofast/-O1/g' makefile && \
     make src -j$(nproc)
 
 # Build atomic tables (or use pre-built if available)
@@ -91,8 +91,10 @@ RUN pip3 install --no-cache-dir --break-system-packages \
     aiofiles==24.1.0 \
     python-multipart==0.0.12
 
-# Create non-root user
-RUN useradd -m -s /bin/bash fidasim
+# Create non-root user with explicit UID to match other containers
+# Check if UID 1000 exists and remove it if it does
+RUN (getent passwd 1000 && userdel -r $(getent passwd 1000 | cut -d: -f1)) || true && \
+    useradd -m -u 1000 -s /bin/bash fidasim
 
 # Set working directory
 WORKDIR /app
@@ -122,7 +124,7 @@ RUN chown -R fidasim:fidasim /app
 USER fidasim
 
 # Environment variables
-ENV OMP_NUM_THREADS=4
+# Note: OMP_NUM_THREADS is set by FIDASIM command line argument, not here
 ENV FIDASIM_DIR=/app
 ENV DATA_DIR=/data
 ENV PYTHONUNBUFFERED=1

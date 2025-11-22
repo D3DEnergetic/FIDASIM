@@ -13,8 +13,10 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN useradd -m -s /bin/bash preprocessor
+# Create non-root user with explicit UID to match other containers
+# Check if UID 1000 exists and remove it if it does
+RUN (getent passwd 1000 && userdel -r $(getent passwd 1000 | cut -d: -f1)) || true && \
+    useradd -m -u 1000 -s /bin/bash preprocessor
 
 # Set working directory
 WORKDIR /app

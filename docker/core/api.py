@@ -205,6 +205,23 @@ async def run_fidasim_task(job_id: str, config: SimulationConfig):
         job["status"] = JobStatus.RUNNING
         job["started_at"] = datetime.utcnow()
 
+        logger.info(f"Copying input files for job {job_id}")
+
+        # Copy input file to job directory
+        input_src = DATA_DIR / config.input_file
+        shutil.copy2(input_src, job_dir / input_src.name)
+
+        # Copy other required files if specified
+        for file_attr in ["equilibrium_file", "geometry_file", "distribution_file", "neutrals_file"]:
+            file_path = getattr(config, file_attr)
+            if file_path:
+                src = DATA_DIR / file_path
+                if src.exists():
+                    shutil.copy2(src, job_dir / src.name)
+                    logger.info(f"Copied {src.name} to job directory")
+                else:
+                    logger.warning(f"File not found: {file_path}")
+
         # Set up environment - ensure OMP_NUM_THREADS is set correctly
         env = {}
         env["OMP_NUM_THREADS"] = str(config.cores)
@@ -320,7 +337,6 @@ async def run_fidasim_task(job_id: str, config: SimulationConfig):
 
 @app.post("/run")
 async def run_simulation(
-    background_tasks: BackgroundTasks,
     config: SimulationConfig
 ) -> JobInfo:
     """Start a new FIDASIM simulation"""
@@ -332,23 +348,10 @@ async def run_simulation(
     job_dir = DATA_DIR / f"job_{job_id}"
     job_dir.mkdir(parents=True, exist_ok=True)
 
-    # Validate input file exists
+    # Validate input file exists (quick check only, don't copy yet)
     input_path = DATA_DIR / config.input_file
     if not input_path.exists():
         raise HTTPException(status_code=404, detail=f"Input file not found: {config.input_file}")
-
-    # Copy input file to job directory
-    shutil.copy2(input_path, job_dir / input_path.name)
-
-    # Copy other required files if specified
-    for file_attr in ["equilibrium_file", "geometry_file", "distribution_file", "neutrals_file"]:
-        file_path = getattr(config, file_attr)
-        if file_path:
-            src = DATA_DIR / file_path
-            if src.exists():
-                shutil.copy2(src, job_dir / src.name)
-            else:
-                logger.warning(f"File not found: {file_path}")
 
     # Create job entry
     job = {
@@ -367,9 +370,10 @@ async def run_simulation(
 
     jobs[job_id] = job
 
-    # Start background task
-    background_tasks.add_task(run_fidasim_task, job_id, config)
+    # Start truly async background task (not FastAPI BackgroundTasks which blocks response)
+    asyncio.create_task(run_fidasim_task(job_id, config))
 
+    # Return immediately so web backend doesn't timeout
     return JobInfo(**job)
 
 @app.get("/jobs")

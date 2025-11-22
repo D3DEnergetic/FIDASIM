@@ -5,10 +5,7 @@ services:
   fidasim-core:
     build:
       context: .
-      dockerfile: docker/core/Dockerfile.working
-      args:
-        - USER_ID=${USER_ID:-1000}
-        - GROUP_ID=${GROUP_ID:-1000}
+      dockerfile: docker/core/Dockerfile
     image: fidasim-core:latest
     container_name: fidasim-core
     hostname: fidasim-core
@@ -20,8 +17,8 @@ services:
       - ./test:/test
     environment:
       - MAX_CORES=32
-      - OMP_NUM_THREADS=4
       - DATA_DIR=/data
+      # OMP_NUM_THREADS is set by FIDASIM command line argument, not here
     networks:
       - fidasim-network
     healthcheck:
@@ -33,6 +30,9 @@ services:
 
   # FIDASIM Preprocessor - Using pre-built image
   fidasim-preprocessor:
+    build:
+      context: .
+      dockerfile: docker/preprocessor/Dockerfile
     image: fidasim-preprocessor:latest
     container_name: fidasim-preprocessor
     hostname: fidasim-preprocessor

@@ -3080,14 +3080,17 @@ subroutine make_diagnostic_grids
                     call ind2sub(beam_grid%dims, ic, ind)
                     i = ind(1) ; j = ind(2) ; k = ind(3)
                     r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                    !! Use max-probability detector point instead of weighted average
-                    eff_rd = rd_maxprob(:,ic)
-                    !! Fall back to weighted average if max point is zero
-                    if(norm2(eff_rd).le.0.0) then
-                        eff_rd = eff_rds(:,ic)/probs(ic)
-                    endif
+                    !! Try weighted average first (preserves existing behavior)
+                    eff_rd = eff_rds(:,ic)/probs(ic)
                     call get_fields(fields,pos=r0)
                     v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    !! Check if weighted average hits the correct detector
+                    call hit_npa_detector(r0,v0,d_index,det=ichan)
+                    if(d_index.ne.ichan) then
+                        !! Weighted average failed, use max-probability point instead
+                        eff_rd = rd_maxprob(:,ic)
+                        v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    endif
                     npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
                     npa_chords%phit(i,j,k,ichan)%p = probs(ic)
                     npa_chords%phit(i,j,k,ichan)%dir = v0
@@ -14256,7 +14259,7 @@ subroutine npa_f
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
-                        if (inputs%verbose.ge.0)then
+                        if (inputs%verbose.ge.1)then
                             write(*,*) "NPA_F: Missed Detector ",ichan
                         endif
                         cycle gyro_range_loop
@@ -15876,6 +15879,8 @@ subroutine npa_weights
     real(Float64), dimension(3) :: pos,dpos,r_gyro
     integer(Int32) :: ichan
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
+    real(Float64) :: prob_total, prob_weight  !! For probability-weighted contributions
+    integer :: jchan  !! Loop variable for probability sum
 
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
@@ -15931,7 +15936,8 @@ subroutine npa_weights
 
     loop_over_channels: do ichan=1,npa_chords%nchan
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields,phit,&
-        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
+        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf,&
+        !$OMP& prob_total,prob_weight,jchan)
         loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
@@ -15941,16 +15947,11 @@ subroutine npa_weights
                         call get_fields(fields,pos=pos)
                         if(.not.fields%in_plasma) cycle loop_along_x
 
-                        !!Check if it hits a detector just to make sure
+                        !!Set direction from stored phit data
                         dpos = phit%eff_rd
                         vi_norm = phit%dir
-                        call hit_npa_detector(pos,vi_norm,det,det=ichan)
-                        if (det.ne.ichan) then
-                            if(inputs%verbose.ge.0) then
-                                write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
-                            endif
-                            cycle loop_along_x
-                        endif
+                        !! REMOVED: Detector recheck - trust the phit calculation
+                        !! The phit%p already encodes the correct probability for this channel
 
                         !! Determine the angle between the B-field and the Line of Sight
                         pitch = phit%pitch

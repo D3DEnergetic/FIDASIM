@@ -1225,11 +1225,13 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
     #+```
     '''
 
-    var_list = ["X","TRFLX","TFLUX","TIME","NE","NH","ND","NT","NIMP","TE","TI","ZEFFI","OMEGA","DN0WD","XZIMP"]
+    var_list = ["X","TRFLX","TFLUX","TIME3","NE","NH","ND","NT","NIMP","TE",
+                "TI","ZEFFI","OMEGA","DN0WD","XZIMP"]
 
     zz = read_ncdf(filename, vars=var_list)
 
-    t = zz['TIME']
+    t = zz['TIME3']
+    
     idx = np.argmin(abs(t-intime))
     time = t[idx].astype('float64')
 

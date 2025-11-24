@@ -48,6 +48,7 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
+    printf,55,f='("calc_res = ",i2 , "    !! Calculate spatial resolution")',inputs.calc_res
     printf,55,''
     printf,55,'!! Advanced Settings'
     printf,55,f='("seed = ",i9,  "    !! RNG Seed. If seed is negative a random seed is used")',inputs.seed
@@ -116,6 +117,7 @@ PRO write_namelist, filename, inputs
     printf,55,f='("adaptive = ",i2,"    !! Adaptive switch, 0:split off, 1:dene, 2:denn, 3:denf, 4:deni, 5:denimp, 6:te, 7:ti")',inputs.adaptive
     printf,55,f='("split_tol = ",1f9.6,"    !! Tolerance for change in plasma parameter, number of cell splits is proportional to 1/split_tol")',inputs.split_tol
     printf,55,f='("max_cell_splits = ",i5,"    !! Maximum number of times a cell can be split")',inputs.max_cell_splits
+    printf,55,f='("max_crossings = ",i5,"    !! Maximum number of times a neutral/LOS can cross the plasma boundary")',inputs.max_crossings
     printf,55,''
     printf,55,'/'
     printf,55,''

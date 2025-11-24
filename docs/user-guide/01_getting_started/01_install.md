@@ -38,6 +38,16 @@ sudo apt-get install gfortran
 sudo apt-get install zlib1g-dev
 ```
 
+The followeing commands will install the required dependencies (Tested on Fedora 34)
+```bash
+sudo dnf update
+sudo dnf install gcc-c++
+sudo dnf install gfortran
+sudo dnf install openmpi
+sudo dnf install openmpi-devel
+sudo dnf install zlib-devel
+```
+
 ##Getting FIDASIM source
 It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.
 
@@ -85,6 +95,10 @@ export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
 export PYTHONPATH=$FIDASIM_DIR/lib/python:$PYTHONPATH
 
 ulimit -s unlimited #Omit this if you like segfaults
+
+## FEDORA and MPI ONLY
+source /etc/profile.d/modules.sh
+module load mpi/openmpi-x86_64
 ```
 replacing `/path/to/fidasim/install/directory` with the real directory. To set the environmental variables in the current shell run
 ```bash
@@ -120,11 +134,13 @@ The following code snippit will generate the atomic tables using the default set
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
 In that case edit the file `tables/table_settings.dat` before running the following command if FIDASIM was compiled with OpenMP (the default build)
 ```bash
-./tables/generate_tables ./tables/default_settings.dat [num_threads]
+cd tables
+./generate_tables ./table_settings.dat [num_threads]
 ```
 or if FIDASIM was built with MPI
 ```bash
-mpirun -np num_processes ./tables/generate_tables ./tables/default_settings.dat
+cd tables
+mpirun -np num_processes ./generate_tables ./table_settings.dat
 ```
 @warning
 This is computationally expensive so make sure you run this on a computer
@@ -135,6 +151,7 @@ Now would be a good time to get more coffee... or maybe a nap.
 ##Run a test case
 From the command line
 ```bash
+cd ../test
 run_tests.py, "/place/where/you/want/the/output"
 ```
 ** Note: This requires python **

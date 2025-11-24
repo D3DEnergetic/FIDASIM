@@ -58,9 +58,11 @@ real(Float64), parameter :: H3_amu = 3.01550071632d0
     !+ Atomic mass of Hydrogen-3 (tritium) [amu]
 real(Float64), parameter :: He3_amu = 3.01602931914d0
     !+ Atomic mass of Helium-3 [amu]
-real(Float64), parameter :: B5_amu = 10.81d0
+real(Float64), parameter :: He4_amu = 4.00260325413d0
+    !+ Atomic mass of Helium-4 [amu]
+real(Float64), parameter :: B10_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
-real(Float64), parameter :: C6_amu = 12.011d0
+real(Float64), parameter :: C12_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
 real(Float64), parameter :: mass_u    = 1.660539040d-27
     !+ Atomic mass unit [kg]
@@ -101,7 +103,7 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-integer :: reservoir_size = 50
+integer, parameter :: reservoir_size = 50
     !+ Size of Neutral Particle Reservoir
 
 !!Loop Parallization Settings
@@ -771,6 +773,12 @@ type NPAParticle
         !+ Birth Energy [keV]
     real(Float64) :: pitch = 0.d0
         !+ Birth Pitch
+    real(Float64) :: xgci = 0.d0
+        !+ Initial x position of the gyrocenter
+    real(Float64) :: ygci = 0.d0
+        !+ Initial y position of the gyrocenter
+    real(Float64) :: zgci = 0.d0
+        !+ Initial z position of the gyrocenter
 end type NPAParticle
 
 type NPAResults
@@ -867,6 +875,24 @@ type NeutronRate
         !+ Neutron rate weight: weight(E,p,R,Z,Phi)
     real(Float64), dimension(:,:,:), allocatable :: emis
         !+ Neutron emissivity: emis(R,Z,Phi)
+    real(Float64), dimension(:,:), allocatable :: flux
+        !+ Neutron flux: flux(orbit_type,chan) [neutrons/sec]
+    integer(Int32) :: nenergy = 100
+        !+ Number of energy bins for neutron spectra
+    real(Float64) :: emin = 2000.0
+        !+ Minimum neutron energy [keV]
+    real(Float64) :: emax = 2800.0
+        !+ Maximum neutron energy [keV]
+    real(Float64), dimension(:), allocatable :: energy
+        !+ Energy grid for neutron spectra [keV]
+    real(Float64), dimension(:,:,:), allocatable :: eflux
+        !+ Energy-resolved neutron flux (combined): eflux(energy,chan,orbit_type) [neutrons/(s*keV)]
+    real(Float64), dimension(:,:,:), allocatable :: eflux_bt
+        !+ Energy-resolved beam-thermal neutron flux: eflux_bt(energy,chan,orbit_type) [neutrons/(s*keV)]
+    real(Float64), dimension(:,:,:), allocatable :: eflux_tt
+        !+ Energy-resolved thermal-thermal neutron flux: eflux_tt(energy,chan,orbit_type) [neutrons/(s*keV)]
+    logical :: include_thermal = .false.
+        !+ Flag to include thermal-thermal neutron reactions
 end type NeutronRate
 
 type CFPDRate
@@ -885,7 +911,7 @@ type NeutralParticle
     real(Float64) :: w = 1.d0
         !+ Neutral particle weight
     real(Float64), dimension(3)  :: v = 0.d0
-        !+ Neutral particle velocity
+        !+ Neutral particle position/velocity
 end type NeutralParticle
 
 type NeutralParticleReservoir
@@ -902,7 +928,7 @@ type NeutralParticleReservoir
         !+ Size of the reservoir
     real(Float64)  :: W = 0.d0
         !+ Sampling weight
-    type(NeutralParticle), dimension(:), allocatable :: R
+    type(NeutralParticle), dimension(reservoir_size) :: R
         !+ Neutral Particle Reservoir
 end type NeutralParticleReservoir
 
@@ -932,6 +958,14 @@ type Neutrals
 !        !+ FIDA-Halo neutral population
 end type Neutrals
 
+type SpatialSpectra
+    !+ Spatial Storage of photon neutral birth
+    type(NeutralParticleReservoir), dimension(:), allocatable :: dcx
+    type(NeutralParticleReservoir), dimension(:), allocatable :: halo
+    type(NeutralParticleReservoir), dimension(:), allocatable :: fida
+    type(NeutralParticleReservoir), dimension(:), allocatable :: pfida
+end type SpatialSpectra
+
 type FIDAWeights
     !+ FIDA weights structure
     real(Float64), dimension(:,:,:), allocatable   :: mean_f
@@ -953,6 +987,20 @@ type NPAWeights
     real(Float64), dimension(:,:), allocatable       :: flux
         !+ Neutral particle flux: flux(E,chan) [neutrals/(s*dE)]
 end type NPAWeights
+
+type NCWeights
+    !+ Neutron Collimator weight function structure
+    real(Float64), dimension(:,:,:), allocatable     :: weight
+        !+ NC weight function: weight(E,p,chan) [neutrons/(s*fast-ion*dE*dP)]
+    real(Float64), dimension(:,:,:), allocatable     :: emissivity
+        !+ Channel-resolved neutron emissivity: emissivity(r,z,chan) [neutrons/(s*cm^3)]
+    real(Float64), dimension(:,:), allocatable       :: flux
+        !+ Neutron flux: flux(E,chan) [neutrons/(s*dE)]
+    real(Float64), dimension(:), allocatable         :: energy
+        !+ Energy grid [keV]
+    real(Float64), dimension(:), allocatable         :: pitch
+        !+ Pitch grid
+end type NCWeights
 
 type SimulationInputs
     !+ Simulation settings structure
@@ -986,7 +1034,7 @@ type SimulationInputs
     integer(Int64) :: n_pfida
         !+ Number of Passive FIDA mc markers
     integer(Int64) :: n_npa
-        !+ Number of Passiv NPA mc markers
+        !+ Number of Active NPA mc markers
     integer(Int64) :: n_pnpa
         !+ Number of Passive NPA mc markers
     integer(Int64) :: n_nbi
@@ -1041,8 +1089,14 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_neut_spec
+        !+ Calculate neutron collimation flux: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_nc_wght
+        !+ Calculate NC weight function: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_cfpd
         !+ Calculate Charged Fusion Product flux: 0 = off, 1=on
+    integer(Int32) :: calc_res
+        !+ Calculate spatial resolution of LOS
     integer(Int32) :: flr
         !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
@@ -1077,6 +1131,18 @@ type SimulationInputs
         !+ Number of wavelength to calculate in weight functions
     real(Float64)  :: emax_wght
         !+ Maximum energy in weight functions [keV]
+    integer(Int32) :: ne_nc
+        !+ Number of energy bins for NC weight function
+    integer(Int32) :: np_nc
+        !+ Number of pitch bins for NC weight function
+    real(Float64)  :: emax_nc_wght
+        !+ Maximum energy for NC weight function [keV]
+    integer(Int32) :: nenergy_nc
+        !+ Number of energy bins for neutron spectra
+    real(Float64)  :: emin_nc
+        !+ Minimum neutron energy [keV]
+    real(Float64)  :: emax_nc
+        !+ Maximum neutron energy [keV]
     real(Float64)  :: lambdamin_wght
         !+ Minimum wavelength in weight functions [nm]
     real(Float64)  :: lambdamax_wght
@@ -1089,6 +1155,8 @@ type SimulationInputs
         !+ Maximum number of times a cell can be split
     real(Float64)  :: split_tol
         !+ Tolerance level for splitting cells
+    integer(Int32) :: max_crossings
+        !+ Number of times a neutral particle/LOS can cross the plasma boundary default=2
 end type SimulationInputs
 
 type ParticleTrack
@@ -1191,6 +1259,8 @@ type(InterpolationGrid), save   :: inter_grid
     !+ Variable containing interpolation grid definition
 type(InterpolationGrid), save   :: pass_grid
     !+ Variable containing passive neutral grid definition
+integer(Int32), save             :: pass_grid_nphi_override = -1
+    !+ Override value for passive grid nphi from equilibrium file (-1 = use default)
 type(FastIonDistribution), save :: fbm
     !+ Variable containing the fast-ion distribution function
 type(FastIonParticles), save    :: particles
@@ -1209,6 +1279,8 @@ type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
+type(NPAChords), save           :: nc_chords
+    !+ Variable containing the Neutron Collimator system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
@@ -1219,14 +1291,18 @@ type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
 type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(CFPDRate), save          :: cfpd
+type(CFPDRate), save            :: cfpd
     !+ Variable for storing the Charged Fusion Product rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
-type(CFPDTable), save       :: ctable
+type(NCWeights), save           :: ncweight
+    !+ Variable for storing the calculated NC weights
+type(CFPDTable), save           :: ctable
     !+ Variable for storing the calculated Charged Fusion Product orbits
+type(SpatialSpectra), save      :: spatres
+    !+ Variable for storing birth neutral for spatial resolution
 
 contains
 
@@ -1319,6 +1395,9 @@ subroutine npa_part_assign(p1, p2)
     p1%energy = p2%energy
     p1%pitch = p2%pitch
     p1%detector = p2%detector
+    p1%xgci = p2%xgci
+    p1%ygci = p2%ygci
+    p1%zgci = p2%zgci
 
 end subroutine npa_part_assign
 
@@ -1354,7 +1433,7 @@ subroutine npr_assign(r1,r2)
     type(NeutralParticleReservoir), intent(inout) :: r1
 
     if(r2%k.eq.0) return
-    call init_reservoir(r1,r2%k)
+    call init_reservoir(r1) !r2%k)
     r1%n = r2%n
     r1%k = r2%k
     r1%i = r2%i
@@ -1956,17 +2035,20 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed, calc_cfpd
+    integer            :: pathlen, calc_neutron, calc_neut_spec, seed, calc_cfpd
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
-    integer            :: calc_birth,calc_fida_wght,calc_npa_wght
+    integer            :: calc_birth,calc_fida_wght,calc_npa_wght, calc_nc_wght, calc_res
     integer            :: load_neutrals,verbose,flr,split,stark_components
     integer            :: output_neutral_reservoir
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    integer(Int32)     :: adaptive, max_cell_splits
+    integer(Int32)     :: ne_nc, np_nc
+    integer(Int32)     :: nenergy_nc
+    integer(Int32)     :: adaptive, max_cell_splits, max_crossings
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)      :: lambdamin_wght,lambdamax_wght
+    real(Float64)      :: lambdamin_wght,lambdamax_wght, emax_nc_wght
+    real(Float64)      :: emin_nc, emax_nc
     real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -1977,16 +2059,18 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
-        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
-        calc_neutron, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, calc_res, seed, flr, split, &
+        calc_fida_wght, calc_npa_wght, calc_nc_wght, load_neutrals, verbose, stark_components, &
+        calc_neutron, calc_neut_spec, calc_cfpd, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, output_neutral_reservoir, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        adaptive, max_cell_splits, split_tol
+        ne_nc, np_nc, emax_nc_wght, &
+        nenergy_nc, emin_nc, emax_nc, &
+        adaptive, max_cell_splits, split_tol, max_crossings
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2016,15 +2100,18 @@ subroutine read_inputs
     calc_npa=0
     calc_pnpa=0
     calc_birth=0
+    calc_res=0
     flr=2
     stark_components=0
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
+    calc_nc_wght=0
     load_neutrals=0
     output_neutral_reservoir=1
     verbose=0
     calc_neutron=0
+    calc_neut_spec=0
     calc_cfpd=0
     n_fida=0
     n_pfida=0
@@ -2061,9 +2148,16 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
+    ne_nc=0
+    np_nc=0
+    emax_nc_wght=0
+    nenergy_nc=100
+    emin_nc=2000.0d0
+    emax_nc=2800.0d0
     adaptive=0
     max_cell_splits=1
     split_tol=0
+    max_crossings = 2
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2135,8 +2229,11 @@ subroutine read_inputs
     inputs%calc_birth=calc_birth
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
+    inputs%calc_nc_wght=calc_nc_wght
     inputs%calc_neutron=calc_neutron
+    inputs%calc_neut_spec=calc_neut_spec
     inputs%calc_cfpd=calc_cfpd
+    inputs%calc_res = calc_res
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -2146,6 +2243,7 @@ subroutine read_inputs
     inputs%flr = flr
     inputs%stark_components = stark_components
     inputs%split = split
+    inputs%max_crossings = max_crossings
 
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
@@ -2168,6 +2266,12 @@ subroutine read_inputs
     inputs%np_wght=np_wght
     inputs%nphi_wght=nphi_wght
     inputs%emax_wght=emax_wght
+    inputs%ne_nc=ne_nc
+    inputs%np_nc=np_nc
+    inputs%emax_nc_wght=emax_nc_wght
+    inputs%nenergy_nc=nenergy_nc
+    inputs%emin_nc=emin_nc
+    inputs%emax_nc=emax_nc
     inputs%nlambda_wght = nlambda_wght
     inputs%lambdamin_wght=lambdamin_wght
     inputs%lambdamax_wght=lambdamax_wght
@@ -2479,17 +2583,17 @@ subroutine make_beam_grid
             write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                             &Less than 10% of the beam grid cells fall within the plasma."
         endif
-        stop
+        ! stop
     endif
 
 end subroutine make_beam_grid
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
-    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr
-    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
-    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
-    logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
+    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: r0_arr, v0_arr, a_cent
+    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan+nc_chords%nchan) :: xy_enter, xy_exit
+    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan))   :: yle, ygt
+    logical, dimension(spec_chords%nchan+npa_chords%nchan+nc_chords%nchan)         :: skip
     real(Float64), dimension(:), allocatable  :: xarr, yarr
     real(Float64), dimension(3,8) :: vertices_xyz, vertices_uvw
     real(Float64), dimension(2,3) :: extrema
@@ -2498,7 +2602,7 @@ subroutine make_passive_grid
     real(Float64), dimension(8)   :: xarr_beam_grid, yarr_beam_grid
     real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax, max_length
     real(Float64) :: dlength = 3.0 !cm
-    integer :: i, iin, iout, dim_le, dim_gt, dim
+    integer :: i, iin, iout, dim_le, dim_gt, dim, j
     logical :: inp, phi_pos
 
     !! Get beam grid boundaries
@@ -2536,31 +2640,54 @@ subroutine make_passive_grid
         yarr_beam_grid(i) = vertices_uvw(2,i)
     enddo
 
-    !! Next consider passive diagnostic extrema relative to the plasma
+        !! Next consider passive diagnostic extrema relative to the plasma
     if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
         do i=1,(spec_chords%nchan)
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
         do i=1, npa_chords%nchan
-            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i+spec_chords%nchan))
+            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
+            call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
             xyz_axis = npa_chords%det(i)%detector%basis
-            v0_arr(:,i+spec_chords%nchan) = matmul(beam_grid%basis, xyz_axis(:,3))
+            v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
+        call get_plasma_extrema(r0_arr,v0_arr,extrema,xarr_beam_grid,yarr_beam_grid)
     else if(inputs%calc_pfida.gt.0) then
         do i=1, spec_chords%nchan
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
-    else !pnpa>=1 case
+        call get_plasma_extrema(r0_arr(:,:spec_chords%nchan),v0_arr(:,:spec_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+    else if(inputs%calc_pnpa.gt.0) then
         do i=1, npa_chords%nchan
             call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
+            call xyz_to_uvw(npa_chords%det(i)%aperture%origin, a_cent(:,i))
             xyz_axis = npa_chords%det(i)%detector%basis
-            v0_arr(:,i) = matmul(beam_grid%basis, xyz_axis(:,3))
+            v0_arr(:,i) = a_cent(:,i) - r0_arr(:,i)
         enddo
+        call get_plasma_extrema(r0_arr(:,:npa_chords%nchan),v0_arr(:,:npa_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+    else if((inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
+        ! Neutron collimator case: trace NC sight lines from detector through aperture
+        do i=1, nc_chords%nchan
+            r0_arr(:,i) = nc_chords%det(i)%detector%origin
+            v0_arr(:,i) = nc_chords%det(i)%aperture%origin - nc_chords%det(i)%detector%origin
+        enddo
+        call get_plasma_extrema(r0_arr(:,:nc_chords%nchan),v0_arr(:,:nc_chords%nchan),extrema,xarr_beam_grid,yarr_beam_grid)
+        ! Extend phi range to capture NC tangency points beyond plasma boundary
+        extrema(2,3) = extrema(2,3) + 0.5
+    else
+        ! No passive diagnostics - use beam grid boundaries as fallback
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"WARNING: No passive diagnostics, using beam grid for passive grid boundaries")')
+        endif
+        extrema(1,1) = minval(inter_grid%r)
+        extrema(2,1) = maxval(inter_grid%r)
+        extrema(1,2) = minval(inter_grid%z)
+        extrema(2,2) = maxval(inter_grid%z)
+        extrema(1,3) = minval(xarr_beam_grid)
+        extrema(2,3) = maxval(yarr_beam_grid)
     endif
-
-    call get_plasma_extrema(r0_arr,v0_arr,extrema,xarr_beam_grid,yarr_beam_grid)
 
     !! Store the passive neutral grid
     pass_grid%dr = inter_grid%dr
@@ -2572,15 +2699,33 @@ subroutine make_passive_grid
     pass_grid%z = inter_grid%z
     pass_grid%da = pass_grid%dr*pass_grid%dz
 
-    pass_grid%dphi = 2*pi/100 !TODO: make this user input
-    pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
+    ! Use nphi override from equilibrium file if provided, otherwise use default
+    if(pass_grid_nphi_override > 0) then
+        ! User specified nphi in equilibrium file without phi array
+        pass_grid%nphi = pass_grid_nphi_override
+        if((extrema(2,3)-extrema(1,3)) > 0) then
+            pass_grid%dphi = (extrema(2,3)-extrema(1,3))/pass_grid%nphi
+        else
+            ! No phi extent from diagnostics, assume full torus
+            pass_grid%dphi = 2*pi/pass_grid%nphi
+        endif
+    else
+        ! Default behavior: use hardcoded dphi
+        pass_grid%dphi = 2*pi/100
+        pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
+        if(pass_grid%nphi.eq.0) pass_grid%nphi = 1  ! Ensure nphi is at least 1 for axisymmetric case
+    endif
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
         pass_grid%phi(i) = extrema(1,3) + (i-1)*pass_grid%dphi
     enddo
 
-    pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
+    if(pass_grid%nphi.eq.1) then
+        pass_grid%dv = pass_grid%dr*pass_grid%dz  ! Axisymmetric case
+    else
+        pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
+    endif
     pass_grid%dims = [pass_grid%nr, pass_grid%nz, pass_grid%nphi]
 
     pass_grid%ntrack = (pass_grid%nr+pass_grid%nz+pass_grid%nphi)*inputs%max_cell_splits
@@ -2590,15 +2735,23 @@ subroutine make_passive_grid
         write(*,'(a)') "---- Passive grid settings ----"
         write(*,'(T2,"Nr: ", i3)') pass_grid%nr
         write(*,'(T2,"Nz: ", i3)') pass_grid%nz
-        write(*,'(T2,"Nphi: ", i3)') pass_grid%nphi
+        if(pass_grid_nphi_override > 0) then
+            write(*,'(T2,"Nphi: ", i3, " (from equilibrium file)")') pass_grid%nphi
+            write(*,'(T2,"dPhi: ", f8.5, " rad")') pass_grid%dphi
+        else
+            write(*,'(T2,"Nphi: ", i3, " (default dphi = 2*pi/100)")') pass_grid%nphi
+        endif
         write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') &
               pass_grid%r(1),pass_grid%r(pass_grid%nr)
         write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') &
               pass_grid%z(1),pass_grid%z(pass_grid%nz)
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') &
               pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
+        write(*,'(T2,"dPhi: ", f8.5, " rad (", f6.2, " degrees)")') &
+              pass_grid%dphi, pass_grid%dphi*180.d0/pi
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
+        write(*,*) 'Passive grid created:    ', time_string(time_start)
     endif
 
 end subroutine make_passive_grid
@@ -2616,32 +2769,47 @@ subroutine make_diagnostic_grids
     character(len=20) :: system = ''
     real(Float64), dimension(:), allocatable :: probs
     real(Float64), dimension(:,:), allocatable :: eff_rds
+    real(Float64), dimension(:,:), allocatable :: rd_maxprob  !! Max-probability detector points
     real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0_d
     real(Float64), dimension(3,3) :: inv_basis
     real(Float64), dimension(:),allocatable :: xd, yd
     type(LocalEMFields) :: fields
     real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r, pitch
+    real(Float64) :: max_dprob  !! For max-probability detector point
+    real(Float64), dimension(3) :: rd_max  !! Max-probability detector position
     integer :: ichan,k,id,ix,iy,d_index,nd,ind_d(2)
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
-    if((inputs%calc_pfida+inputs%calc_pnpa+inputs%calc_cold).gt.0) then
-        if(inter_grid%nphi.gt.1) then
-            pass_grid = inter_grid
-        else
-            call make_passive_grid()
-        endif
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Creating diagnostic grids ----'
     endif
 
-    !! Spectral line-of-sight passive neutral grid intersection calculations
-    allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
+    if(((inputs%calc_pfida+inputs%calc_pnpa).gt.0).or.(inputs%calc_neutron.ge.3).or.(inputs%calc_neut_spec.ge.1)) then
+        if(inter_grid%nphi.gt.1 .and. pass_grid_nphi_override.le.0) then
+            ! Only copy inter_grid if it's truly 3D (has phi array)
+            ! If pass_grid_nphi_override > 0, it means nphi was provided without phi array
+            pass_grid = inter_grid
+        else
+            ! Use separate passive grid (either axisymmetric or with override nphi)
+            call make_passive_grid()
+        endif
+
+        !! Spectral line-of-sight passive neutral grid intersection calculations
+        allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
+    endif
     if((inputs%calc_pfida+inputs%calc_cold).gt.0) then
-        allocate(tracks(pass_grid%ntrack))
-        allocate(dlength(pass_grid%nr, &
-                         pass_grid%nz, &
-                         pass_grid%nphi) )
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral passive grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
+        !$OMP PARALLEL DO schedule(dynamic) private(i,r0,v0,basis,length,r_enter,r_exit, &
+        !$OMP& nc,ic,randomu,sqrt_rho,theta,j,tracks,ntrack,ind,kk,jj,ii,dl,los_elem,dlength)
         pass_grid_chan_loop: do i=1,spec_chords%nchan
+            ! Allocate thread-local arrays
+            allocate(tracks(pass_grid%ntrack))
+            allocate(dlength(pass_grid%nr, pass_grid%nz, pass_grid%nphi))
             r0 = spec_chords%los(i)%lens_uvw
             v0 = spec_chords%los(i)%axis_uvw
             v0 = v0/norm2(v0)
@@ -2662,8 +2830,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2679,18 +2846,16 @@ subroutine make_diagnostic_grids
                 pass_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
                     !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo pass_grid_track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,pass_grid%nphi
                 do jj=1,pass_grid%nz
                     rloop: do ii=1, pass_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
                             dl = dlength(ii,jj,kk)
+                            !$OMP CRITICAL
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
                                 allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
@@ -2703,11 +2868,16 @@ subroutine make_diagnostic_grids
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                            !$OMP END CRITICAL
                         endif
                     enddo rloop
                 enddo
             enddo
+
+            ! Deallocate thread-local arrays
+            deallocate(tracks, dlength)
         enddo pass_grid_chan_loop
+        !$OMP END PARALLEL DO
 
         spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
         allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
@@ -2721,11 +2891,18 @@ subroutine make_diagnostic_grids
                 spec_chords%cyl_cell(nc) = ic
             endif
         enddo
-        deallocate(dlength, tracks)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral passive grid intersections complete'
+        endif
     endif
 
     !! Spectral line-of-sight beam grid intersection calculations
-    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
+    !! Only needed when beam grid exists for active measurements
+    if((inputs%calc_beam.ge.1).and.((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0)) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing spectral beam grid intersections for ', &
+                  spec_chords%nchan, ' channels...'
+        endif
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -2751,8 +2928,7 @@ subroutine make_diagnostic_grids
             endif
 
             dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            ! Note: Nested parallel disabled - outer channel loop is already parallel
             do ic=1,nc
                 ! Uniformally sample within spot size
                 call randu(randomu)
@@ -2771,10 +2947,8 @@ subroutine make_diagnostic_grids
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
                     dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
                 enddo track_loop
             enddo
-            !$OMP END PARALLEL DO
             do kk=1,beam_grid%nz
                 do jj=1,beam_grid%ny
                     xloop: do ii=1, beam_grid%nx
@@ -2810,20 +2984,29 @@ subroutine make_diagnostic_grids
                 spec_chords%cell(nc) = ic
             endif
         enddo
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'Spectral beam grid intersections complete'
+        endif
     endif
 
     !! NPA probability calculations
-    allocate(xd(50),yd(50))
-    allocate(probs(beam_grid%ngrid))
-    allocate(eff_rds(3,beam_grid%ngrid))
-    allocate(npa_chords%phit(beam_grid%nx, &
-                             beam_grid%ny, &
-                             beam_grid%nz, &
-                             npa_chords%nchan) )
-    allocate(npa_chords%hit(beam_grid%nx, &
-                            beam_grid%ny, &
-                            beam_grid%nz) )
-    npa_chords%hit = .False.
+    !! Only needed when beam grid exists for active NPA measurements
+    if(inputs%calc_beam.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a,i3,a)') 'Computing NPA beam grid probabilities for ', &
+                  npa_chords%nchan, ' channels...'
+        endif
+        allocate(xd(50),yd(50))
+        allocate(probs(beam_grid%ngrid))
+        allocate(eff_rds(3,beam_grid%ngrid))
+        allocate(npa_chords%phit(beam_grid%nx, &
+                                 beam_grid%ny, &
+                                 beam_grid%nz, &
+                                 npa_chords%nchan) )
+        allocate(npa_chords%hit(beam_grid%nx, &
+                                beam_grid%ny, &
+                                beam_grid%nz) )
+        npa_chords%hit = .False.
 
     npa_chan_loop: do ichan=1,npa_chords%nchan
         v0 = npa_chords%det(ichan)%aperture%origin - npa_chords%det(ichan)%detector%origin
@@ -2850,13 +3033,19 @@ subroutine make_diagnostic_grids
             eff_rds = 0.d0
             probs = 0.d0
             ! For each grid point find the probability of hitting the detector given an isotropic source
+            !! Allocate array to store max-probability detector points
+            allocate(rd_maxprob(3,beam_grid%ngrid))
+            rd_maxprob = 0.d0
+
             !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
+            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind,max_dprob,rd_max)
             do ic=istart,beam_grid%ngrid,istep
                 call ind2sub(beam_grid%dims,ic,ind)
                 i = ind(1) ; j = ind(2) ; k = ind(3)
                 r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
                 r0_d = matmul(inv_basis,r0-npa_chords%det(ichan)%detector%origin)
+                max_dprob = 0.d0
+                rd_max = 0.d0
                 do id = 1, nd*nd
                     call ind2sub([nd,nd],id,ind_d)
                     ix = ind_d(1) ; iy = ind_d(2)
@@ -2870,8 +3059,15 @@ subroutine make_diagnostic_grids
                         dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
                         eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
                         probs(ic) = probs(ic) + dprob
+                        !! Track maximum probability detector point
+                        if(dprob.gt.max_dprob) then
+                            max_dprob = dprob
+                            rd_max = rd
+                        endif
                     endif
                 enddo
+                !! Store max-probability point for this cell
+                rd_maxprob(:,ic) = rd_max
             enddo
             !$OMP END PARALLEL DO
 #ifdef _MPI
@@ -2883,9 +3079,17 @@ subroutine make_diagnostic_grids
                     call ind2sub(beam_grid%dims, ic, ind)
                     i = ind(1) ; j = ind(2) ; k = ind(3)
                     r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                    !! Try weighted average first (preserves existing behavior)
                     eff_rd = eff_rds(:,ic)/probs(ic)
                     call get_fields(fields,pos=r0)
                     v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    !! Check if weighted average hits the correct detector
+                    call hit_npa_detector(r0,v0,d_index,det=ichan)
+                    if(d_index.ne.ichan) then
+                        !! Weighted average failed, use max-probability point instead
+                        eff_rd = rd_maxprob(:,ic)
+                        v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    endif
                     npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
                     npa_chords%phit(i,j,k,ichan)%p = probs(ic)
                     npa_chords%phit(i,j,k,ichan)%dir = v0
@@ -2893,6 +3097,7 @@ subroutine make_diagnostic_grids
                     npa_chords%hit(i,j,k) = .True.
                 endif
             enddo
+            deallocate(rd_maxprob)
             total_prob = sum(probs)
             if(total_prob.le.0.d0) then
                 if(inputs%verbose.ge.0) then
@@ -2902,7 +3107,15 @@ subroutine make_diagnostic_grids
             endif
         endif
     enddo npa_chan_loop
-    deallocate(probs,eff_rds,xd,yd)
+        deallocate(probs,eff_rds,xd,yd)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NPA beam grid probabilities complete'
+        endif
+    endif  !! End of calc_beam conditional for NPA probability calculations
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Diagnostic grids complete ----'
+    endif
 
 end subroutine make_diagnostic_grids
 
@@ -3209,6 +3422,154 @@ subroutine read_npa
 
 end subroutine read_npa
 
+subroutine read_neutron_collimator
+    !+ Reads the Neutron Collimator geometry and stores the quantities in [[libfida:nc_chords]]
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(2) :: dims
+    logical :: path_valid
+
+    real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
+    real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
+    real(Float64), dimension(beam_grid%ngrid) :: probs
+    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
+    integer, dimension(:), allocatable :: a_shape, d_shape
+    character(len=20) :: system = ''
+
+    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
+    real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
+    real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
+    real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
+    real(Float64), dimension(3,3) :: basis, inv_basis
+    real(Float64), dimension(50) :: xd, yd
+    type(LocalEMFields) :: fields
+    real(Float64) :: length,total_prob, hh, hw, dprob, dx, dy, r, pitch
+    integer :: ichan,ic,i,j,k,id,ix,iy,d_index,nd,ind_d(2),ind(3)
+    integer :: error
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
+
+    !!Check if Neutron Collimator group exists
+    call h5ltpath_valid_f(fid, "/nc", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'Neutron Collimator geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without Neutron signals'
+        endif
+        inputs%calc_neutron = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
+        return
+    endif
+
+    !!Open Neutron Collimator group
+    call h5gopen_f(fid, "/nc", gid, error)
+
+    call h5ltread_dataset_string_f(gid, "/nc/system", system, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/nc/nchan", nc_chords%nchan, error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- Neutron Collimator settings ----"
+        write(*,'(T2,"Neutron Collimator System: ", a)') trim(adjustl(system))
+        write(*,'(T2,"Number of channels: ",i3)') nc_chords%nchan
+    endif
+
+    allocate(a_tedge(3, nc_chords%nchan))
+    allocate(a_redge(3, nc_chords%nchan))
+    allocate(a_cent(3,  nc_chords%nchan))
+    allocate(a_shape(nc_chords%nchan))
+    allocate(d_tedge(3, nc_chords%nchan))
+    allocate(d_redge(3, nc_chords%nchan))
+    allocate(d_cent(3,  nc_chords%nchan))
+    allocate(d_shape(nc_chords%nchan))
+    allocate(nc_chords%radius(nc_chords%nchan))
+    allocate(nc_chords%det(nc_chords%nchan))
+    allocate(nc_chords%phit(beam_grid%nx, &
+                             beam_grid%ny, &
+                             beam_grid%nz, &
+                             nc_chords%nchan) )
+    allocate(nc_chords%hit(beam_grid%nx, &
+                            beam_grid%ny, &
+                            beam_grid%nz) )
+    nc_chords%hit = .False.
+
+    dims = [3,nc_chords%nchan]
+    call h5ltread_dataset_double_f(gid,"/nc/radius", nc_chords%radius, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/nc/a_shape", a_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_tedge", a_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_redge", a_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_cent",  a_cent, dims, error)
+
+    call h5ltread_dataset_int_f(gid, "/nc/d_shape", d_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_tedge", d_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_redge", d_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_cent",  d_cent, dims, error)
+
+    !!Close Neutron Collimator group
+    call h5gclose_f(gid, error)
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    ! Define detector/aperture shape
+    nc_chords%det%detector%shape = d_shape
+    nc_chords%det%aperture%shape = a_shape
+
+    chan_loop: do ichan=1,nc_chords%nchan
+        ! Keep NC geometry in machine coordinates for track_cylindrical
+        ! DO NOT convert to beam grid coordinates - this breaks tangency radii!
+        xyz_a_cent = a_cent(:,ichan)    ! Keep as machine coords
+        xyz_a_redge = a_redge(:,ichan)
+        xyz_a_tedge = a_tedge(:,ichan)
+        xyz_d_cent = d_cent(:,ichan)    ! Keep as machine coords
+        xyz_d_redge = d_redge(:,ichan)
+        xyz_d_tedge = d_tedge(:,ichan)
+
+        ! Define detector/aperture hh/hw
+        nc_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
+
+        nc_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
+
+        ! Define detector/aperture origin
+        nc_chords%det(ichan)%detector%origin = xyz_d_cent
+        nc_chords%det(ichan)%aperture%origin = xyz_a_cent
+
+        ! Define detector/aperture basis
+        call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
+             nc_chords%det(ichan)%detector%basis, &
+             nc_chords%det(ichan)%detector%inv_basis)
+        call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
+             nc_chords%det(ichan)%aperture%basis, &
+             nc_chords%det(ichan)%aperture%inv_basis)
+
+        v0 = xyz_a_cent - xyz_d_cent
+        v0 = v0/norm2(v0)
+        call grid_intersect(xyz_d_cent,v0,length,r0,r0_d)
+        if(length.le.0.0) then
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
+            endif
+        endif
+    enddo chan_loop
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(50X,a)') ""
+        write(*,*) 'NC geometry read:    ', time_string(time_start)
+    endif
+
+    deallocate(a_shape,a_cent,a_redge,a_tedge)
+    deallocate(d_shape,d_cent,d_redge,d_tedge)
+
+end subroutine read_neutron_collimator
+
 subroutine read_cfpd
     !+ Reads the CFPD geometry and stores the quantities in [[libfida:ctable]]
     integer(HID_T) :: fid, gid
@@ -3359,10 +3720,12 @@ subroutine read_plasma
     enddo
 
     select case (impurity_charge)
+        case (2)
+            impurity_mass = He4_amu
         case (5)
-            impurity_mass = B5_amu
+            impurity_mass = B10_amu
         case (6)
-            impurity_mass = C6_amu
+            impurity_mass = C12_amu
         case DEFAULT
             impurity_mass = 2.d0*impurity_charge*H1_amu
     end select
@@ -3393,6 +3756,8 @@ subroutine read_equilibrium
     integer :: error
     integer :: n = 50
     logical :: path_valid
+    logical :: nphi_exists, phi_exists
+    integer(Int32) :: nphi_value
 
     integer, dimension(:,:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:,:), allocatable :: denn3d
@@ -3410,11 +3775,25 @@ subroutine read_equilibrium
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
+
+    !! Check for nphi and phi array separately to handle passive grid override case
+    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., nphi_exists, error)
+    call h5ltpath_valid_f(gid, "/plasma/phi", .True., phi_exists, error)
+
+    if(nphi_exists) then
+        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", nphi_value, error)
+        if(phi_exists) then
+            ! Full 3D case: nphi with phi array means 3D inter_grid
+            inter_grid%nphi = nphi_value
+        else
+            ! New case: nphi without phi array means use for passive grid only
+            inter_grid%nphi = 1  ! Keep inter_grid axisymmetric
+            pass_grid_nphi_override = nphi_value  ! Store for passive grid
+        endif
     else
-        inter_grid%nphi=1
+        ! Default axisymmetric case
+        inter_grid%nphi = 1
+        pass_grid_nphi_override = -1  ! Use default behavior
     endif
 
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
@@ -3428,7 +3807,7 @@ subroutine read_equilibrium
 
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
-    if(path_valid) then
+    if(phi_exists .and. inter_grid%nphi > 1) then
         call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
     else
         inter_grid%phi=0.d0
@@ -3609,9 +3988,10 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: deni_tot
     integer :: ir,is
     logical :: path_valid
+    logical :: nphi_exists_fbm, phi_exists_fbm
+    integer(Int32) :: nphi_value_fbm
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -3621,11 +4001,23 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
-    call h5ltpath_valid_f(fid, "/nphi", .True., path_valid, error)
-    if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
+
+    !! Check for nphi and phi array separately (like in read_equilibrium)
+    call h5ltpath_valid_f(fid, "/nphi", .True., nphi_exists_fbm, error)
+    call h5ltpath_valid_f(fid, "/phi", .True., phi_exists_fbm, error)
+
+    if(nphi_exists_fbm) then
+        call h5ltread_dataset_int_scalar_f(fid,"/nphi", nphi_value_fbm, error)
+        if(phi_exists_fbm) then
+            ! Full 3D distribution: nphi with phi array
+            fbm%nphi = nphi_value_fbm
+        else
+            ! nphi without phi array means it was for passive grid only - treat as axisymmetric
+            fbm%nphi = 1
+        endif
     else
-        fbm%nphi=1
+        ! No nphi in file - default to axisymmetric
+        fbm%nphi = 1
     endif
 
     if(((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)).or.(fbm%nphi.ne.inter_grid%nphi)) then
@@ -3664,8 +4056,16 @@ subroutine read_f(fid, error)
     else
         fbm%phi=0.d0
     endif
-    !call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
-    fbm%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        fbm%A = beam_mass
+    endif
 
     equil%plasma%denf = fbm%denf
 
@@ -3695,23 +4095,6 @@ subroutine read_f(fid, error)
     fbm%phimax = maxval(fbm%phi,1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
-    deni_tot = 0.0
-    do ir=1,fbm%nr
-        fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
-        do is=1,n_thermal
-            deni_tot = deni_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%deni(is))*fbm%r(ir)
-        enddo
-    enddo
-
-    if(fbm%n_tot.ge.deni_tot) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
-                "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
-                 fbm%n_tot, deni_tot
-            write(*,'(a)') "This is usually caused by zeff being incorrect."
-        endif
-        stop
-    endif
 
     if(inputs%verbose.ge.1) then
         if(fbm%nphi.gt.1) then
@@ -3733,7 +4116,10 @@ subroutine read_f(fid, error)
         if(fbm%nphi.gt.1) then
             write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         endif
-        write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
+        ! This fbm%n_tot is never caalculated not used, so it just print 0 in
+        ! the output file, which is quite confusing for the user, just comment 
+        ! this to avoid confusion
+        ! write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
 
@@ -3767,8 +4153,17 @@ subroutine read_mc(fid, error)
     allocate(weight(particles%nparticle))
 
     dims(1) = particles%nparticle
-    !call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
-    particles%fast_ion%A = beam_mass
+
+    call h5ltpath_valid_f(fid, "/A", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
+    else
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_MC: Distribution file has no species mass (A). Assuming beam mass = fast-ion mass"
+        endif
+        particles%fast_ion%A = beam_mass
+    endif
+
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
@@ -4359,12 +4754,14 @@ subroutine read_tables
     !!Read Hydrogen-Impurity Transitions
     impname = ''
     select case (impurity_charge)
+        case (2)
+            impname = "He2"
         case (5)
             impname = "B5"
         case (6)
             impname = "C6"
         case DEFAULT
-            impname = "Aq"
+            write(impname,'("A",i1)') impurity_charge
     end select
 
     call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), tables%H_Aq)
@@ -4379,7 +4776,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1.or.inputs%calc_cfpd.ge.1) then
+    if(inputs%calc_neutron.ge.1.or.inputs%calc_neut_spec.ge.1.or.inputs%calc_cfpd.ge.1) then
         call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
     endif
 
@@ -4472,6 +4869,15 @@ subroutine write_beam_grid(id, error)
 
     call h5ltset_attribute_string_f(id,"grid","coordinate_system", &
          "Right-handed cartesian",error)
+
+    !Mark coordinate arrays as dimension scales for xarray/netCDF compatibility
+    !Also label the 1D coordinate arrays themselves
+    call h5_set_dimension_name(gid, "x", 1, "x", error)
+    call h5_set_dimension_name(gid, "y", 1, "y", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
+    call h5_make_dimension_scale(gid, "x", "x", error)
+    call h5_make_dimension_scale(gid, "y", "y", error)
+    call h5_make_dimension_scale(gid, "z", "z", error)
 
     !Close grid group
     call h5gclose_f(gid, error)
@@ -4644,6 +5050,117 @@ subroutine write_birth_profile
         call h5ltset_attribute_string_f(fid, "/", "description", &
              "Birth density and particles calculated by FIDASIM", error)
 
+        !Add dimension names for xarray/pandas compatibility
+        ! Create soft links at root level for coordinates
+        call h5_create_soft_link(fid, "/grid/x", "x", error)
+        call h5_create_soft_link(fid, "/grid/y", "y", error)
+        call h5_create_soft_link(fid, "/grid/z", "z", error)
+
+        ! Mark soft links as dimension scales
+        call h5_make_dimension_scale(fid, "x", "x", error)
+        call h5_make_dimension_scale(fid, "y", "y", error)
+        call h5_make_dimension_scale(fid, "z", "z", error)
+
+        ! Create beam_component dimension scale (1=Full, 2=Half, 3=Third)
+        block
+            integer, dimension(3) :: beam_comp_idx
+            beam_comp_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/beam_component", 1, [3_HSIZE_T], beam_comp_idx, error)
+            call h5ltset_attribute_string_f(fid, "/beam_component", "description", &
+                 "Beam energy component index (1=Full, 2=Half, 3=Third)", error)
+            call h5_set_dimension_name(fid, "/beam_component", 1, "beam_component", error)
+            call h5_make_dimension_scale(fid, "/beam_component", "beam_component", error)
+        end block
+
+        ! Create particle dimension scale (particle indices)
+        if(npart.gt.0) then
+            block
+                integer, dimension(:), allocatable :: particle_idx
+                integer :: ip
+                allocate(particle_idx(npart))
+                do ip = 1, npart
+                    particle_idx(ip) = ip
+                enddo
+                call h5ltmake_dataset_int_f(fid, "/particle", 1, [int(npart,HSIZE_T)], particle_idx, error)
+                call h5ltset_attribute_string_f(fid, "/particle", "description", &
+                     "Particle index", error)
+                call h5_set_dimension_name(fid, "/particle", 1, "particle", error)
+                call h5_make_dimension_scale(fid, "/particle", "particle", error)
+                deallocate(particle_idx)
+            end block
+        endif
+
+        ! Create cylindrical_component dimension scale (1=R, 2=Phi, 3=Z)
+        block
+            integer, dimension(3) :: cyl_comp_idx
+            cyl_comp_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/cylindrical_component", 1, [3_HSIZE_T], cyl_comp_idx, error)
+            call h5ltset_attribute_string_f(fid, "/cylindrical_component", "description", &
+                 "Cylindrical coordinate component (1=R, 2=Phi, 3=Z)", error)
+            call h5_set_dimension_name(fid, "/cylindrical_component", 1, "cylindrical_component", error)
+            call h5_make_dimension_scale(fid, "/cylindrical_component", "cylindrical_component", error)
+        end block
+
+        ! Create grid_index dimension scale (1=ix, 2=iy, 3=iz)
+        block
+            integer, dimension(3) :: grid_idx
+            grid_idx = [1, 2, 3]
+            call h5ltmake_dataset_int_f(fid, "/grid_index", 1, [3_HSIZE_T], grid_idx, error)
+            call h5ltset_attribute_string_f(fid, "/grid_index", "description", &
+                 "Grid index component (1=ix, 2=iy, 3=iz)", error)
+            call h5_set_dimension_name(fid, "/grid_index", 1, "grid_index", error)
+            call h5_make_dimension_scale(fid, "/grid_index", "grid_index", error)
+        end block
+
+        ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+        ! Fortran: dens(beam_comp,x,y,z) = (3,50,60,70) → HDF5: (70,60,50,3) = (z,y,x,beam_comp)
+        call h5_set_dimension_name(fid, "/dens", 1, "z", error)
+        call h5_set_dimension_name(fid, "/dens", 2, "y", error)
+        call h5_set_dimension_name(fid, "/dens", 3, "x", error)
+        call h5_set_dimension_name(fid, "/dens", 4, "beam_component", error)
+
+        ! Attach scales using local soft links
+        call h5_attach_dimension_scale(fid, "/dens", "z", 1, error)
+        call h5_attach_dimension_scale(fid, "/dens", "y", 2, error)
+        call h5_attach_dimension_scale(fid, "/dens", "x", 3, error)
+        call h5_attach_dimension_scale(fid, "/dens", "/beam_component", 4, error)
+
+        ! Fortran: ri_gc(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/ri_gc", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ri_gc", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/ri_gc", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ri_gc", "/cylindrical_component", 2, error)
+
+        ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/ri", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ri", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/ri", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ri", "/cylindrical_component", 2, error)
+
+        ! Fortran: vi(3,particle) → HDF5: (particle,3) = (particle,cylindrical_component)
+        call h5_set_dimension_name(fid, "/vi", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/vi", 2, "cylindrical_component", error)
+        call h5_attach_dimension_scale(fid, "/vi", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/vi", "/cylindrical_component", 2, error)
+
+        ! Fortran: ind(3,particle) → HDF5: (particle,3) = (particle,grid_index)
+        call h5_set_dimension_name(fid, "/ind", 1, "particle", error)
+        call h5_set_dimension_name(fid, "/ind", 2, "grid_index", error)
+        call h5_attach_dimension_scale(fid, "/ind", "/particle", 1, error)
+        call h5_attach_dimension_scale(fid, "/ind", "/grid_index", 2, error)
+
+        call h5_set_dimension_name(fid, "/energy", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/energy", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/pitch", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/pitch", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/weight", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/particle", 1, error)
+
+        call h5_set_dimension_name(fid, "/type", 1, "particle", error)
+        call h5_attach_dimension_scale(fid, "/type", "/particle", 1, error)
+
         !!Close file
         call h5fclose_f(fid, error)
 
@@ -4670,7 +5187,7 @@ subroutine write_neutral_population(id, pop, error)
     integer, intent(out)                :: error
         !+ Error code
 
-    integer(HID_T) :: gid
+    integer(HID_T) :: gid, fid_local
     integer(HSIZE_T), dimension(1) :: d
     integer(HSIZE_T), dimension(4) :: dims4
     integer(HSIZE_T), dimension(5) :: dims5
@@ -4678,8 +5195,11 @@ subroutine write_neutral_population(id, pop, error)
     real(Float64), dimension(:,:,:,:,:), allocatable :: v
     real(Float64), dimension(:,:,:,:), allocatable   :: w
     integer(Int32), dimension(:,:,:), allocatable    :: n
+    integer(Int32), dimension(:), allocatable        :: level_array
 
     integer :: ic, ir, i, j, k, ind(3), nx, ny, nz, nk
+    integer(SIZE_T) :: name_size
+    character(256) :: group_name, dset_path
 
     nx = beam_grid%nx
     ny = beam_grid%ny
@@ -4691,10 +5211,55 @@ subroutine write_neutral_population(id, pop, error)
     call h5ltset_attribute_string_f(id,"nlevel","description", &
          "Number of atomic energy levels", error)
 
+    ! Create atomic level index array for xarray compatibility
+    dims4(1) = nlevs
+    allocate(level_array(nlevs))
+    do i=1,nlevs
+        level_array(i) = i
+    enddo
+    call h5ltmake_compressed_dataset_int_f(id, "level", 1, dims4(1:1), level_array, error)
+    call h5ltset_attribute_string_f(id,"level","description", &
+         "Atomic energy level index", error)
+    deallocate(level_array)
+
+    dims4 = [nlevs, nx, ny, nz]
     call h5ltmake_compressed_dataset_double_f(id, "dens", 4, dims4, pop%dens, error)
     call h5ltset_attribute_string_f(id,"dens","units","neutrals*cm^-3",error)
     call h5ltset_attribute_string_f(id,"dens","description", &
          "Neutral density dens(level,x,y,z)", error)
+
+    !Set dimension names for xarray/pandas compatibility
+    !Get file ID and construct full path to dataset since id is a group ID
+    call h5iget_file_id_f(id, fid_local, error)
+    call h5iget_name_f(id, group_name, 256_SIZE_T, name_size, error)
+    dset_path = trim(group_name) // "/dens"
+
+    ! Create soft links to grid coordinates within this group for xarray compatibility
+    call h5_create_coordinate_links(id, "/grid", error)
+
+    ! Mark level array as dimension scale and attach it to dens
+    dset_path = trim(group_name) // "/level"
+    call h5_set_dimension_name(fid_local, trim(dset_path), 1, "atomic_level", error)
+    call h5_make_dimension_scale(fid_local, trim(dset_path), "atomic_level", error)
+
+    ! Mark the local coordinate soft links as dimension scales
+    call h5_make_dimension_scale(id, "x", "x", error)
+    call h5_make_dimension_scale(id, "y", "y", error)
+    call h5_make_dimension_scale(id, "z", "z", error)
+
+    ! NOTE: Dimension labels are in HDF5 storage order (reversed from Fortran declaration)
+    ! Fortran: dens(level,x,y,z) = (6,50,60,70) → HDF5 file: (70,60,50,6) = (z,y,x,level)
+    dset_path = trim(group_name) // "/dens"
+    call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+    call h5_set_dimension_name(fid_local, trim(dset_path), 4, "atomic_level", error)
+
+    !Attach coordinate scales using local soft links (not cross-group references)
+    call h5_attach_dimension_scale(id, "dens", "z", 1, error)
+    call h5_attach_dimension_scale(id, "dens", "y", 2, error)
+    call h5_attach_dimension_scale(id, "dens", "x", 3, error)
+    call h5_attach_dimension_scale(id, "dens", "level", 4, error)
 
     dims5 = [3, reservoir_size, nx, ny, nz]
     allocate(v(3,reservoir_size, nx, ny, nz))
@@ -4724,18 +5289,82 @@ subroutine write_neutral_population(id, pop, error)
        call h5ltset_attribute_string_f(gid,"k","description", &
             "Reservoir Size", error)
 
+       ! Create dimension scale arrays for particle and cartesian_component dimensions
+       ! This ensures all dimensions have scales, avoiding xarray "mixed dimensions" error
+       block
+           integer, dimension(:), allocatable :: particle_idx
+           integer, dimension(3) :: cart_comp_idx
+           integer :: ip
+
+           ! Particle index dimension (1 to reservoir_size)
+           allocate(particle_idx(reservoir_size))
+           do ip = 1, reservoir_size
+               particle_idx(ip) = ip
+           enddo
+           call h5ltmake_dataset_int_f(gid, "particle", 1, [int(reservoir_size,HSIZE_T)], particle_idx, error)
+           call h5ltset_attribute_string_f(gid, "particle", "description", &
+                "Particle index in reservoir", error)
+           call h5_set_dimension_name(gid, "particle", 1, "particle", error)
+           call h5_make_dimension_scale(gid, "particle", "particle", error)
+           deallocate(particle_idx)
+
+           ! Cartesian component dimension (1=x, 2=y, 3=z)
+           cart_comp_idx = [1, 2, 3]
+           call h5ltmake_dataset_int_f(gid, "cartesian_component", 1, [3_HSIZE_T], cart_comp_idx, error)
+           call h5ltset_attribute_string_f(gid, "cartesian_component", "description", &
+                "Cartesian velocity component (1=x, 2=y, 3=z)", error)
+           call h5_set_dimension_name(gid, "cartesian_component", 1, "cartesian_component", error)
+           call h5_make_dimension_scale(gid, "cartesian_component", "cartesian_component", error)
+       end block
+
        call h5ltmake_compressed_dataset_int_f(gid, "n", 3, dims4(2:4), n, error)
        call h5ltset_attribute_string_f(gid, "n", "description", &
             "Number of particles in each reservoir", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: n(x,y,z) = (50,60,70) → HDF5: (70,60,50) = (z,y,x)
+       dset_path = trim(group_name) // "/reservoir/n"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "n", trim(group_name)//"/x", 3, error)
 
        call h5ltmake_compressed_dataset_double_f(gid, "w", 4, dims5(2:5), w, error, compress=.False.)
        call h5ltset_attribute_string_f(gid, "w", "description", &
             "Neutral Particle Weight", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: w(particle,x,y,z) = (res,50,60,70) → HDF5: (70,60,50,res) = (z,y,x,particle)
+       dset_path = trim(group_name) // "/reservoir/w"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 4, "particle", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "w", trim(group_name)//"/x", 3, error)
+       call h5_attach_dimension_scale(gid, "w", "particle", 4, error)
 
        call h5ltmake_compressed_dataset_double_f(gid, "v", 5, dims5, v, error, compress=.False.)
        call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
        call h5ltset_attribute_string_f(gid,"v","description", &
             "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       ! Fortran: v(3,particle,x,y,z) = (3,res,50,60,70) → HDF5: (70,60,50,res,3) = (z,y,x,particle,component)
+       dset_path = trim(group_name) // "/reservoir/v"
+       call h5_set_dimension_name(fid_local, trim(dset_path), 1, "z", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 2, "y", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 3, "x", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 4, "particle", error)
+       call h5_set_dimension_name(fid_local, trim(dset_path), 5, "cartesian_component", error)
+       ! Use absolute paths to parent group's soft links (relative paths like "../z" don't work reliably)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/z", 1, error)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/y", 2, error)
+       call h5_attach_dimension_scale(gid, "v", trim(group_name)//"/x", 3, error)
+       call h5_attach_dimension_scale(gid, "v", "particle", 4, error)
+       call h5_attach_dimension_scale(gid, "v", "cartesian_component", 5, error)
        !Close reservoir group
        call h5gclose_f(gid, error)
     endif
@@ -4827,7 +5456,7 @@ subroutine write_npa
     integer :: error
 
     integer, dimension(:), allocatable :: dcount
-    real(Float64), dimension(:,:), allocatable :: ri, rf
+    real(Float64), dimension(:,:), allocatable :: ri, rf, gci
     real(Float64), dimension(:), allocatable :: weight, energy, pitch
     integer, dimension(:), allocatable :: det, orbit_type
     integer :: i, npart, c, start_index, end_index
@@ -4861,7 +5490,7 @@ subroutine write_npa
     npart = npa%npart
     if(npart.gt.0) then
         do i=1,npa_chords%nchan
-            dcount(i) = count(npa%part%detector.eq.i)
+            dcount(i) = count(npa%part(1:npa%npart)%detector.eq.i)
         enddo
     else
         dcount = 0
@@ -4886,7 +5515,7 @@ subroutine write_npa
     end_index = npa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3,npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -4901,6 +5530,10 @@ subroutine write_npa
             rf(1,i) = npa%part(c)%xf
             rf(2,i) = npa%part(c)%yf
             rf(3,i) = npa%part(c)%zf
+            gci(1,i) = npa%part(c)%xgci
+            gci(2,i) = npa%part(c)%ygci
+            gci(3,i) = npa%part(c)%zgci
+
             weight(i) = npa%part(c)%weight
             energy(i) = npa%part(c)%energy
             pitch(i) = npa%part(c)%pitch
@@ -4911,6 +5544,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -4961,6 +5595,33 @@ subroutine write_npa
         call h5ltset_attribute_string_f(fid,"/count","description", &
              "Number of particles that hit the detector: count(chan)", error)
 
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+        !Add dimension names to flux dataset
+        ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+        if(particles%nclass.gt.1) then
+            ! Fortran: flux(energy,chan,class) → HDF5: (class,chan,energy)
+            call h5_set_dimension_name(fid, "/flux", 1, "particle_class", error)
+            call h5_set_dimension_name(fid, "/flux", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/flux", 3, "energy", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/flux", "/energy", 3, error)
+        else
+            ! Fortran: flux(energy,chan) → HDF5: (chan,energy)
+            call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/flux", 2, "energy", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/flux", "/energy", 2, error)
+        endif
+
+        !Add dimension name to count
+        call h5_set_dimension_name(fid, "/count", 1, "channel", error)
+        call h5_attach_dimension_scale(fid, "/count", "/radius", 1, error)
+
 
         if((npart.gt.0).and.(inputs%calc_npa.ge.2)) then
             !Create Group
@@ -4970,6 +5631,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -4984,7 +5646,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
-            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)            
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -5003,6 +5668,21 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/particles","description", &
                  "Active NPA Monte Carlo particles",error)
 
+            !Add dimension names to particle arrays
+            ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+            ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cartesian_component)
+            call h5_set_dimension_name(gid, "ri", 1, "particle", error)
+            call h5_set_dimension_name(gid, "ri", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "rf", 1, "particle", error)
+            call h5_set_dimension_name(gid, "rf", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "gci", 1, "particle", error)
+            call h5_set_dimension_name(gid, "gci", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "pitch", 1, "particle", error)
+            call h5_set_dimension_name(gid, "energy", 1, "particle", error)
+            call h5_set_dimension_name(gid, "weight", 1, "particle", error)
+            call h5_set_dimension_name(gid, "detector", 1, "particle", error)
+            call h5_set_dimension_name(gid, "class", 1, "particle", error)
+
             !Close group
             call h5gclose_f(gid, error)
         endif
@@ -5010,7 +5690,7 @@ subroutine write_npa
 
     deallocate(dcount)
     if(npart.gt.0) then
-        deallocate(ri,rf)
+        deallocate(ri,rf, gci)
         deallocate(energy,pitch,weight,det,orbit_type)
     endif
 
@@ -5019,7 +5699,7 @@ subroutine write_npa
     npart = pnpa%npart
     if(npart.gt.0) then
         do i=1,npa_chords%nchan
-            dcount(i) = count(pnpa%part%detector.eq.i)
+            dcount(i) = count(pnpa%part(1:pnpa%npart)%detector.eq.i)
         enddo
     else
         dcount = 0
@@ -5044,7 +5724,7 @@ subroutine write_npa
     end_index = pnpa%npart + c
 
     if(npart.gt.0) then
-        allocate(ri(3,npart),rf(3,npart))
+        allocate(ri(3,npart),rf(3,npart), gci(3, npart))
         allocate(weight(npart),energy(npart),pitch(npart))
         allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
@@ -5059,6 +5739,10 @@ subroutine write_npa
             rf(1,i) = pnpa%part(c)%xf
             rf(2,i) = pnpa%part(c)%yf
             rf(3,i) = pnpa%part(c)%zf
+            gci(1,i) = pnpa%part(c)%xgci
+            gci(2,i) = pnpa%part(c)%ygci
+            gci(3,i) = pnpa%part(c)%zgci
+            
             weight(i) = pnpa%part(c)%weight
             energy(i) = pnpa%part(c)%energy
             pitch(i) = pnpa%part(c)%pitch
@@ -5069,6 +5753,7 @@ subroutine write_npa
 #ifdef _MPI
         call parallel_sum(ri)
         call parallel_sum(rf)
+        call parallel_sum(gci)
         call parallel_sum(weight)
         call parallel_sum(energy)
         call parallel_sum(pitch)
@@ -5128,6 +5813,7 @@ subroutine write_npa
             dim2 = [3, npart]
             call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
             call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"gci",2,dim2, gci, error)
             call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, pitch, error)
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
@@ -5143,6 +5829,10 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"rf","description", &
                  "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
             call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"gci","description", &
+            "Neutral particle's gyrocenter birth position in machine coordinates: gci([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"gci","units", "cm", error)
+
             call h5ltset_attribute_string_f(gid,"pitch","description", &
                  "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
             call h5ltset_attribute_string_f(gid,"energy","description", &
@@ -5161,8 +5851,45 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/passive_particles","description", &
                  "Passive NPA Monte Carlo particles",error)
 
+            !Add dimension names to passive particle arrays
+            ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+            ! Fortran: ri(3,particle) → HDF5: (particle,3) = (particle,cartesian_component)
+            call h5_set_dimension_name(gid, "ri", 1, "particle", error)
+            call h5_set_dimension_name(gid, "ri", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "rf", 1, "particle", error)
+            call h5_set_dimension_name(gid, "rf", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "gci", 1, "particle", error)
+            call h5_set_dimension_name(gid, "gci", 2, "cartesian_component", error)
+            call h5_set_dimension_name(gid, "pitch", 1, "particle", error)
+            call h5_set_dimension_name(gid, "energy", 1, "particle", error)
+            call h5_set_dimension_name(gid, "weight", 1, "particle", error)
+            call h5_set_dimension_name(gid, "detector", 1, "particle", error)
+            call h5_set_dimension_name(gid, "class", 1, "particle", error)
+
             !Close group
             call h5gclose_f(gid, error)
+        endif
+
+        ! Add dimension labels for passive NPA flux and count
+        if(inputs%calc_pnpa.ge.1) then
+            ! pcount(chan)
+            call h5_set_dimension_name(fid, "/pcount", 1, "channel", error)
+            call h5_attach_dimension_scale(fid, "/pcount", "/radius", 1, error)
+
+            if(particles%nclass.gt.1) then
+                ! pflux(energy,chan,class) → HDF5: (class,chan,energy)
+                call h5_set_dimension_name(fid, "/pflux", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pflux", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pflux", 3, "energy", error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/energy", 3, error)
+            else
+                ! pflux(energy,chan) → HDF5: (chan,energy)
+                call h5_set_dimension_name(fid, "/pflux", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pflux", 2, "energy", error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pflux", "/energy", 2, error)
+            endif
         endif
     endif
 
@@ -5186,14 +5913,14 @@ end subroutine write_npa
 
 subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
-    integer(HID_T) :: fid
+    integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(5) :: dims_stokes
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
     character(charlim) :: filename
-    integer :: i
+    integer :: i, ir, ic
     real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
 
@@ -5203,6 +5930,11 @@ subroutine write_spectra
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,n_thermal) :: dcxstokes, halostokes, coldstokes
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
     real(Float64), dimension(4,inputs%nlambda,spec_chords%nchan,particles%nclass) :: fidastokes, pfidastokes
+
+    real(Float64), dimension(3,reservoir_size,spec_chords%nchan) :: dcx_spat, halo_spat, fida_spat, pfida_spat
+    real(Float64), dimension(reservoir_size,spec_chords%nchan) :: dcx_photons, halo_photons, fida_photons, pfida_photons
+    integer, dimension(n_stark) :: stark_sign
+    stark_sign = +1*stark_sigma - 1*stark_pi
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -5227,6 +5959,11 @@ subroutine write_spectra
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
     if(inputs%stark_components.ge.1) then
         call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
+        call h5ltmake_compressed_dataset_int_f(fid, "/stark_sign", 1, dims(1:1), stark_sign, error)
+        call h5ltset_attribute_string_f(fid,"/stark_sign", "description", &
+         "Stark line indicator: 1=sigma, -1=pi ", error)
+        ! Add dimension label immediately after creation
+        call h5_set_dimension_name(fid, "/stark_sign", 1, "stark_component", error)
     endif
     dims(1) = n_stark
     dims(2) = inputs%nlambda
@@ -5241,6 +5978,17 @@ subroutine write_spectra
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(3:3), &
          spec_chords%radius, error)
+
+    ! Create stokes_parameter dimension scale array (1=I, 2=Q, 3=U, 4=V)
+    block
+        integer, dimension(4) :: stokes_idx
+        integer(HSIZE_T), dimension(1) :: stokes_dims
+        stokes_idx = [1, 2, 3, 4]
+        stokes_dims(1) = 4
+        call h5ltmake_dataset_int_f(fid, "/stokes_parameter", 1, stokes_dims, stokes_idx, error)
+        call h5ltset_attribute_string_f(fid, "/stokes_parameter", "description", &
+             "Stokes parameter index (1=I, 2=Q, 3=U, 4=V)", error)
+    end block
 
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
@@ -5431,6 +6179,14 @@ subroutine write_spectra
        call h5ltset_attribute_string_f(fid,"/thermal_lambda0","description", &
             "Rest wavelength of the thermal species lines: thermal_lambda0(species)", error)
        call h5ltset_attribute_string_f(fid,"/thermal_lambda0", "units", "nm", error)
+
+       ! Mark thermal_mass as dimension scale for thermal_species
+       call h5_set_dimension_name(fid, "/thermal_mass", 1, "thermal_species", error)
+       call h5_make_dimension_scale(fid, "/thermal_mass", "thermal_species", error)
+
+       ! Label thermal_lambda0 dimension and attach to thermal_mass scale
+       call h5_set_dimension_name(fid, "/thermal_lambda0", 1, "thermal_species", error)
+       call h5_attach_dimension_scale(fid, "/thermal_lambda0", "/thermal_mass", 1, error)
     endif
 
 
@@ -5489,7 +6245,7 @@ subroutine write_spectra
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                      dims(1:3), spec%fida(:,:,:,1), error)
-                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidastokes", 4, &
                      dims_stokes(1:4), spec%fidastokes(:,:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
@@ -5596,9 +6352,486 @@ subroutine write_spectra
        call h5ltset_attribute_string_f(fid,"/pfidastokes","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
+    if(inputs%calc_res.ge.1) then 
+       !Create spatial group
+       call h5gcreate_f(fid, "spatial", gid, error)
+       call h5ltset_attribute_string_f(fid,"spatial","description", &
+            "Spatial Resolution",error)
+       dims(1) = 3
+       dims(2) = reservoir_size
+       dims(3) = spec_chords%nchan
+       if(inputs%calc_dcx.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   dcx_photons(ir,ic) = spatres%dcx(ic)%R(ir)%w
+                   dcx_spat(:,ir,ic) = spatres%dcx(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "dcx_spatial", 3, dims(1:3),&
+                dcx_spat, error)
+           call h5ltset_attribute_string_f(gid,"dcx_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"dcx_spatial","description",&
+                "Birth position of neutral that produced a photon: dcx_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "dcx_photons", 2, dims(2:3),&
+                dcx_photons, error)
+           call h5ltset_attribute_string_f(gid,"dcx_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"dcx_photons","description",&
+                "Number of photons produced by neutral: dcx_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_halo.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   halo_photons(ir,ic) = spatres%halo(ic)%R(ir)%w
+                   halo_spat(:,ir,ic) = spatres%halo(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "halo_spatial", 3, dims(1:3),&
+                halo_spat, error)
+           call h5ltset_attribute_string_f(gid,"halo_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"halo_spatial","description",&
+                "Birth position of neutral that produced a photon: halo_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "halo_photons", 2, dims(2:3),&
+                halo_photons, error)
+           call h5ltset_attribute_string_f(gid,"halo_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"halo_photons","description",&
+                "Number of photons produced by neutral: halo_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_fida.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   fida_photons(ir,ic) = spatres%fida(ic)%R(ir)%w
+                   fida_spat(:,ir,ic) = spatres%fida(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "fida_spatial", 3, dims(1:3),&
+                fida_spat, error)
+           call h5ltset_attribute_string_f(gid,"fida_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"fida_spatial","description",&
+                "Birth position of neutral that produced a photon: fida_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "fida_photons", 2, dims(2:3),&
+                fida_photons, error)
+           call h5ltset_attribute_string_f(gid,"fida_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"fida_photons","description",&
+                "Number of photons produced by neutral: fida_photons(sample,channel)",error)
+       endif
+       if(inputs%calc_pfida.ge.1) then
+           do ic=1,spec_chords%nchan
+               do ir=1,reservoir_size
+                   pfida_photons(ir,ic) = spatres%pfida(ic)%R(ir)%w
+                   pfida_spat(:,ir,ic) = spatres%pfida(ic)%R(ir)%v
+               enddo
+           enddo
+           call h5ltmake_compressed_dataset_double_f(gid, "pfida_spatial", 3, dims(1:3),&
+                pfida_spat, error)
+           call h5ltset_attribute_string_f(gid,"pfida_spatial","units","cm",error)
+           call h5ltset_attribute_string_f(gid,"pfida_spatial","description",&
+                "Birth position of neutral that produced a photon: pfida_spatial([x,y,z],sample,channel)",error)
+           call h5ltmake_compressed_dataset_double_f(gid, "pfida_photons", 2, dims(2:3),&
+                pfida_photons, error)
+           call h5ltset_attribute_string_f(gid,"pfida_photons","units","Ph",error)
+           call h5ltset_attribute_string_f(gid,"pfida_photons","description",&
+                "Number of photons produced by neutral: pfida_photons(sample,channel)",error)
+       endif
+
+       ! Add dimension labels for spatial group datasets
+       ! NOTE: Dimension labels in HDF5 storage order (reversed from Fortran)
+       if(inputs%calc_dcx.ge.1) then
+           ! dcx_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "dcx_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "dcx_spatial", 3, "cartesian_component", error)
+           ! dcx_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "dcx_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "dcx_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_halo.ge.1) then
+           ! halo_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "halo_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "halo_spatial", 3, "cartesian_component", error)
+           ! halo_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "halo_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "halo_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_fida.ge.1) then
+           ! fida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "fida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "fida_spatial", 3, "cartesian_component", error)
+           ! fida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "fida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "fida_photons", 2, "sample", error)
+       endif
+       if(inputs%calc_pfida.ge.1) then
+           ! pfida_spatial([x,y,z],sample,channel) -> HDF5: (channel,sample,3)
+           call h5_set_dimension_name(gid, "pfida_spatial", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 2, "sample", error)
+           call h5_set_dimension_name(gid, "pfida_spatial", 3, "cartesian_component", error)
+           ! pfida_photons(sample,channel) -> HDF5: (channel,sample)
+           call h5_set_dimension_name(gid, "pfida_photons", 1, "channel", error)
+           call h5_set_dimension_name(gid, "pfida_photons", 2, "sample", error)
+       endif
+
+       !Close spatial group
+       call h5gclose_f(gid, error)
+    endif
+
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
          "Spectra calculated by FIDASIM", error)
+
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "channel", error)
+    call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
+    call h5_make_dimension_scale(fid, "/radius", "channel", error)
+
+    ! Mark stokes_parameter as dimension scale (already created earlier)
+    call h5_set_dimension_name(fid, "/stokes_parameter", 1, "stokes_parameter", error)
+    call h5_make_dimension_scale(fid, "/stokes_parameter", "stokes_parameter", error)
+
+    !Add dimension names to spectral datasets
+    ! NOTE: All dimension labels in HDF5 storage order (reversed from Fortran)
+    if(inputs%calc_brems.ge.1) then
+        ! Fortran: brems(lambda,chan) → HDF5: (chan,lambda)
+        call h5_set_dimension_name(fid, "/brems", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/brems", 2, "wavelength", error)
+        call h5_attach_dimension_scale(fid, "/brems", "/radius", 1, error)
+        call h5_attach_dimension_scale(fid, "/brems", "/lambda", 2, error)
+    endif
+
+    if(inputs%calc_bes.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !Fortran: full/half/third(lambda,chan) → HDF5: (chan,lambda)
+            call h5_set_dimension_name(fid, "/full", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/half", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/third", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
+            !3D stokes datasets: (4,lambda,chan) -> HDF5: (chan,lambda,4)
+            call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
+        else
+            !3D datasets with stark: (stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/full", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/full", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/full", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/full", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/full", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/half", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/half", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/half", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/half", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/half", "/lambda", 2, error)
+            call h5_set_dimension_name(fid, "/third", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/third", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/third", 3, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/third", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/third", "/lambda", 2, error)
+            !4D stokes datasets with stark: (stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+            call h5_set_dimension_name(fid, "/fullstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/fullstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/fullstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/halfstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/halfstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/halfstokes", "/stokes_parameter", 3, error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 1, "channel", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 2, "wavelength", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 3, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/thirdstokes", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/radius", 1, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/lambda", 2, error)
+            call h5_attach_dimension_scale(fid, "/thirdstokes", "/stokes_parameter", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_dcx.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !3D: dcx(lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcx", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcx", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcx", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/lambda", 3, error)
+            !4D: dcxstokes(4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcxstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/stokes_parameter", 4, error)
+        else
+            !4D: dcx(stark,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcx", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcx", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcx", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcx", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcx", "/lambda", 3, error)
+            !5D: dcxstokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/dcxstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/dcxstokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/dcxstokes", "/lambda", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_halo.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            !3D: halo(lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halo", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halo", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halo", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/halo", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/lambda", 3, error)
+            !4D: halostokes(4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halostokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halostokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halostokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halostokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/stokes_parameter", 4, error)
+        else
+            !4D: halo(stark,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halo", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halo", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halo", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halo", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halo", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halo", "/lambda", 3, error)
+            !5D: halostokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/halostokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/halostokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/halostokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/halostokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/halostokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/halostokes", "/lambda", 3, error)
+        endif
+    endif
+
+    ! Add missing dimension labels for cold, fida, pfida
+    if(inputs%calc_cold.ge.1) then
+        if(inputs%stark_components.eq.0) then
+            ! 3D: cold(lambda,chan,species) -> HDF5: (species,chan,lambda) = (thermal_species,channel,wavelength)
+            call h5_set_dimension_name(fid, "/cold", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/cold", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/cold", 3, "wavelength", error)
+            call h5_attach_dimension_scale(fid, "/cold", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/lambda", 3, error)
+            ! 4D: coldstokes(4,lambda,chan,species) -> HDF5: (species,chan,lambda,4) = (thermal_species,channel,wavelength,stokes_parameter)
+            call h5_set_dimension_name(fid, "/coldstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 4, "stokes_parameter", error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/lambda", 3, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/stokes_parameter", 4, error)
+        else
+            ! 4D: cold(stark,lambda,chan,species) -> HDF5: (species,chan,lambda,stark)
+            call h5_set_dimension_name(fid, "/cold", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/cold", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/cold", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/cold", 4, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/cold", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/cold", "/lambda", 3, error)
+            ! 5D: coldstokes(stark,4,lambda,chan,species)
+            call h5_set_dimension_name(fid, "/coldstokes", 1, "thermal_species", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 2, "channel", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 3, "wavelength", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 4, "stokes_parameter", error)
+            call h5_set_dimension_name(fid, "/coldstokes", 5, "stark_component", error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/thermal_mass", 1, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/radius", 2, error)
+            call h5_attach_dimension_scale(fid, "/coldstokes", "/lambda", 3, error)
+        endif
+    endif
+
+    if(inputs%calc_fida.ge.1) then
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: fida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 3D: fidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: fida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 2, error)
+                ! 4D: fidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 2, error)
+            endif
+        else
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: fida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 4D: fidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: fida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/fida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fida", "/lambda", 3, error)
+                ! 5D: fidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/fidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/fidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/fidastokes", "/stokes_parameter", 4, error)
+            endif
+        endif
+    endif
+
+    if(inputs%calc_pfida.ge.1) then
+        if(particles%nclass.le.1) then
+            ! Single class case
+            if(inputs%stark_components.eq.0) then
+                ! 2D: pfida(lambda,chan) -> HDF5: (chan,lambda) = (channel,wavelength)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 3D: pfidastokes(4,lambda,chan) -> HDF5: (chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 3, error)
+            else
+                ! 3D: pfida(stark,lambda,chan) -> HDF5: (chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 2, error)
+                ! 4D: pfidastokes(stark,4,lambda,chan) -> HDF5: (chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 1, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 2, error)
+            endif
+        else
+            ! Multi-class case
+            if(inputs%stark_components.eq.0) then
+                ! 3D: pfida(lambda,chan,class) -> HDF5: (class,chan,lambda)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 4D: pfidastokes(4,lambda,chan,class) -> HDF5: (class,chan,lambda,4)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            else
+                ! 4D: pfida(stark,lambda,chan,class) -> HDF5: (class,chan,lambda,stark)
+                call h5_set_dimension_name(fid, "/pfida", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfida", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfida", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfida", 4, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfida", "/lambda", 3, error)
+                ! 5D: pfidastokes(stark,4,lambda,chan,class) -> HDF5: (class,chan,lambda,4,stark)
+                call h5_set_dimension_name(fid, "/pfidastokes", 1, "particle_class", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 2, "channel", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 3, "wavelength", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 4, "stokes_parameter", error)
+                call h5_set_dimension_name(fid, "/pfidastokes", 5, "stark_component", error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/radius", 2, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/lambda", 3, error)
+                call h5_attach_dimension_scale(fid, "/pfidastokes", "/stokes_parameter", 4, error)
+            endif
+        endif
+    endif
 
     !Close file
     call h5fclose_f(fid, error)
@@ -5616,6 +6849,7 @@ subroutine write_neutrons
     !+ Writes [[libfida:neutron]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(5) :: dim5
     integer :: error
@@ -5690,10 +6924,184 @@ subroutine write_neutrons
              "Z array", error)
         call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
     endif
+    
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neut_spec.ge.1)) then
+        ! Create channel index array for dimension scale
+        block
+            integer :: nchan_nc, i_nc
+            integer, dimension(:), allocatable :: chan_idx
+            nchan_nc = size(neutron%flux, 2)
+            allocate(chan_idx(nchan_nc))
+            do i_nc = 1, nchan_nc
+                chan_idx(i_nc) = i_nc
+            enddo
+            dim1(1) = nchan_nc
+            call h5ltmake_dataset_int_f(fid, "/channel", 1, dim1, chan_idx, error)
+            call h5ltset_attribute_string_f(fid, "/channel", "description", &
+                 "Neutron detector channel index", error)
+            call h5_set_dimension_name(fid, "/channel", 1, "channel", error)
+            call h5_make_dimension_scale(fid, "/channel", "channel", error)
+            deallocate(chan_idx)
+        end block
+
+        if(particles%nclass.gt.1) then
+            dim1(1) = 1
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
+            dim1(1) = particles%nclass
+            dim2 = shape(neutron%flux)
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, dim2, neutron%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux: flux(orbit_class,chan)", error)
+        else
+            ! For single class, write as 1D array
+            dim1(1) = size(neutron%flux, 2)  ! Number of channels
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 1, dim1, neutron%flux(1,:), error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux: flux(chan)", error)
+            ! Label flux dimension and attach channel scale
+            call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            call h5_attach_dimension_scale(fid, "/flux", "/channel", 1, error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/flux","units","neutrons/s",error )
+
+        !Write energy-resolved neutron flux
+        if(allocated(neutron%energy)) then
+            dim1(1) = neutron%nenergy
+            call h5ltmake_dataset_double_f(fid,"/energy_nc", 1, dim1, neutron%energy, error)
+            call h5ltset_attribute_string_f(fid,"/energy_nc","description", &
+                 "Neutron energy array", error)
+            call h5ltset_attribute_string_f(fid,"/energy_nc","units","keV",error )
+
+            if(particles%nclass.gt.1) then
+                dim3 = shape(neutron%eflux)
+                ! Write combined spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_spectra", 3, dim3, neutron%eflux, error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","description", &
+                     "Combined energy-resolved neutron flux: nc_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","units","neutrons/(s*keV)",error )
+                ! Write beam-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_bt_spectra", 3, dim3, neutron%eflux_bt, error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","description", &
+                     "Beam-thermal energy-resolved neutron flux: nc_bt_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","units","neutrons/(s*keV)",error )
+                ! Write thermal-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_tt_spectra", 3, dim3, neutron%eflux_tt, error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","description", &
+                     "Thermal-thermal energy-resolved neutron flux: nc_tt_spectra(energy,orbit_class,chan)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","units","neutrons/(s*keV)",error )
+            else
+                ! Get dimensions directly from the array shape - HDF5 handles column/row major conversion
+                dim2 = shape(neutron%eflux(:,:,1))
+                ! Write combined spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_spectra", 2, dim2, neutron%eflux(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","description", &
+                     "Combined energy-resolved neutron flux: nc_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_spectra","units","neutrons/(s*keV)",error )
+                ! Write beam-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_bt_spectra", 2, dim2, neutron%eflux_bt(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","description", &
+                     "Beam-thermal energy-resolved neutron flux: nc_bt_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_bt_spectra","units","neutrons/(s*keV)",error )
+                ! Write thermal-thermal spectra
+                call h5ltmake_compressed_dataset_double_f(fid, "/nc_tt_spectra", 2, dim2, neutron%eflux_tt(:,:,1), error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","description", &
+                     "Thermal-thermal energy-resolved neutron flux: nc_tt_spectra(chan,energy)", error)
+                call h5ltset_attribute_string_f(fid,"/nc_tt_spectra","units","neutrons/(s*keV)",error )
+            endif
+        endif
+    endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
          "Neutron rate calculated by FIDASIM", error)
+
+    !Add dimension names for xarray/pandas compatibility
+    if(particles%nclass.gt.1) then
+        call h5_set_dimension_name(fid, "/rate", 1, "orbit_class", error)
+    endif
+
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.2)) then
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/r", 1, "r", error)
+        call h5_set_dimension_name(fid, "/z", 1, "z", error)
+        call h5_set_dimension_name(fid, "/phi", 1, "phi", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+        call h5_make_dimension_scale(fid, "/r", "r", error)
+        call h5_make_dimension_scale(fid, "/z", "z", error)
+        call h5_make_dimension_scale(fid, "/phi", "phi", error)
+
+        !Add dimension names to weight function: weight(E,p,R,Z,Phi)
+        call h5_set_dimension_name(fid, "/weight", 1, "phi", error)
+        call h5_set_dimension_name(fid, "/weight", 2, "z", error)
+        call h5_set_dimension_name(fid, "/weight", 3, "r", error)
+        call h5_set_dimension_name(fid, "/weight", 4, "pitch", error)
+        call h5_set_dimension_name(fid, "/weight", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/phi", 5, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/r", 3, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/pitch", 2, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/energy", 1, error)
+
+        !Add dimension names to emissivity: emissivity(R,Z,Phi)
+        call h5_set_dimension_name(fid, "/emissivity", 1, "phi", error)
+        call h5_set_dimension_name(fid, "/emissivity", 2, "z", error)
+        call h5_set_dimension_name(fid, "/emissivity", 3, "r", error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/phi", 3, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/z", 2, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/r", 1, error)
+    endif
+
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neut_spec.ge.1)) then
+        if(particles%nclass.gt.1) then
+            !flux(orbit_class,chan) in Fortran -> HDF5: (chan, orbit_class) after transpose
+            ! Note: Not setting dimension labels as we don't have scales for these
+            ! call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+            ! call h5_set_dimension_name(fid, "/flux", 2, "orbit_class", error)
+        else
+            !flux(1,chan) in Fortran -> HDF5: (chan, 1) after transpose
+            ! Note: Not setting dimension labels as we don't have scales for these
+        endif
+
+        if(allocated(neutron%energy)) then
+            !Mark neutron energy as dimension scale and label its dimension
+            call h5_set_dimension_name(fid, "/energy_nc", 1, "neutron_energy", error)
+            call h5_make_dimension_scale(fid, "/energy_nc", "neutron_energy", error)
+
+            if(particles%nclass.gt.1) then
+                !3D: nc_spectra(energy,orbit_class,chan) -> HDF5: (chan,orbit_class,energy)
+                call h5_set_dimension_name(fid, "/nc_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_spectra", "/energy_nc", 1, error)
+
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_bt_spectra", "/energy_nc", 1, error)
+
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 1, "neutron_energy", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 2, "orbit_class", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 3, "channel", error)
+                call h5_attach_dimension_scale(fid, "/nc_tt_spectra", "/energy_nc", 1, error)
+            else
+                !2D: nc_spectra(energy,chan) -> HDF5: (chan,energy)
+                call h5_set_dimension_name(fid, "/nc_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_spectra", "/energy_nc", 2, error)
+
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_bt_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_bt_spectra", "/energy_nc", 2, error)
+
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 1, "channel", error)
+                call h5_set_dimension_name(fid, "/nc_tt_spectra", 2, "neutron_energy", error)
+                call h5_attach_dimension_scale(fid, "/nc_tt_spectra", "/energy_nc", 2, error)
+            endif
+        endif
+    endif
 
     !Close file
     call h5fclose_f(fid, error)
@@ -5776,6 +7184,39 @@ subroutine write_cfpd_weights
     call h5ltset_attribute_string_f(fid,"/","description",&
          "CFPD signals calculated by FIDASIM", error)
 
+    !Add dimension names for xarray/pandas compatibility
+    if(inputs%dist_type.eq.1) then
+        !Mark coordinate arrays as dimension scales and label their dimensions
+        call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+        call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/earray", 1, "detector_energy", error)
+        call h5_make_dimension_scale(fid, "/energy", "energy", error)
+        call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+        call h5_make_dimension_scale(fid, "/earray", "detector_energy", error)
+
+        !Add dimension names to flux/prob/gam: (energy,chan)
+        call h5_set_dimension_name(fid, "/flux", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/flux", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/flux", "/earray", 2, error)
+
+        call h5_set_dimension_name(fid, "/prob", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/prob", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/prob", "/earray", 2, error)
+
+        call h5_set_dimension_name(fid, "/gam", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/gam", 2, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/gam", "/earray", 2, error)
+
+        !Add dimension names to weight: weight(Ch,E3,E,p) -> (detector_energy,channel,energy,pitch)
+        call h5_set_dimension_name(fid, "/weight", 1, "pitch", error)
+        call h5_set_dimension_name(fid, "/weight", 2, "energy", error)
+        call h5_set_dimension_name(fid, "/weight", 3, "channel", error)
+        call h5_set_dimension_name(fid, "/weight", 4, "detector_energy", error)
+        call h5_attach_dimension_scale(fid, "/weight", "/pitch", 1, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/energy", 2, error)
+        call h5_attach_dimension_scale(fid, "/weight", "/earray", 4, error)
+    endif
+
     !Close file
     call h5fclose_f(fid, error)
 
@@ -5803,7 +7244,7 @@ subroutine write_fida_weights
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
     real(Float64), dimension(:,:), allocatable :: jacobian,e_grid,p_grid
     real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
-    real(Float64) :: dlambda, wtot, dE, dP
+    real(Float64) :: dlambda, dE, dP
 
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     allocate(lambda_arr(inputs%nlambda_wght))
@@ -5848,18 +7289,6 @@ subroutine write_fida_weights
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
     jacobian = ((beam_mass*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
-
-    !! normalize mean_f
-    do ic=1,spec_chords%nchan
-        do ip=1,inputs%np_wght
-            do ie=1,inputs%ne_wght
-                wtot = sum(fweight%weight(:,ie,ip,ic))
-                if((wtot.gt.0.d0)) then
-                    fweight%mean_f(ie,ip,ic) = fweight%mean_f(ie,ip,ic)/wtot
-                endif
-            enddo
-        enddo
-    enddo
 
     !! Calculate FIDA estimate
     allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
@@ -5950,6 +7379,67 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/vpa_grid","description", &
          "2D parallel velocity grid", error)
     call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
+
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/lambda", 1, "wavelength", error)
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "radius", error)
+    call h5_make_dimension_scale(fid, "/lambda", "wavelength", error)
+    call h5_make_dimension_scale(fid, "/energy", "energy", error)
+    call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+    call h5_make_dimension_scale(fid, "/radius", "radius", error)
+
+    !Add dimension names to weight: weight(lambda,energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/weight", 1, "radius", error)
+    call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
+    call h5_set_dimension_name(fid, "/weight", 4, "wavelength", error)
+    call h5_attach_dimension_scale(fid, "/weight", "/radius", 1, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/energy", 3, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/lambda", 4, error)
+
+    !Add dimension names to fida: fida(lambda,chan)
+    call h5_set_dimension_name(fid, "/fida", 1, "radius", error)
+    call h5_set_dimension_name(fid, "/fida", 2, "wavelength", error)
+    call h5_attach_dimension_scale(fid, "/fida", "/radius", 2, error)
+    call h5_attach_dimension_scale(fid, "/fida", "/lambda", 1, error)
+
+    !Add dimension names to mean_f: mean_f(energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/mean_f", 1, "radius", error)
+    call h5_set_dimension_name(fid, "/mean_f", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/mean_f", 3, "energy", error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/radius", 1, error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/mean_f", "/energy", 3, error)
+
+    !Add dimension names to 2D grids: (energy,pitch)
+    call h5_set_dimension_name(fid, "/jacobian", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/jacobian", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/jacobian", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/jacobian", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/vpe_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/vpe_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/vpe_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/vpe_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/vpa_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/vpa_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/vpa_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/vpa_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/e_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/e_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/e_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/e_grid", "/energy", 1, error)
+
+    call h5_set_dimension_name(fid, "/p_grid", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/p_grid", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/p_grid", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/p_grid", "/energy", 1, error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -6065,7 +7555,71 @@ subroutine write_npa_weights
              "Attenuation factor i.e. survival probability: attenuation(energy,x,y,z,chan)", error)
         call h5ltset_attribute_string_f(fid,"/phit","description", &
              "Probability of hitting the detector given an isotropic source: phit(x,y,z,chan)", error)
+
+        !Add dimension names to diagnostic arrays
+        !emissivity(x,y,z,chan)
+        call h5_set_dimension_name(fid, "/emissivity", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/emissivity", 2, "z", error)
+        call h5_set_dimension_name(fid, "/emissivity", 3, "y", error)
+        call h5_set_dimension_name(fid, "/emissivity", 4, "x", error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/z", 3, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/y", 2, error)
+        call h5_attach_dimension_scale(fid, "/emissivity", "/grid/x", 1, error)
+
+        !attenuation(energy,x,y,z,chan)
+        call h5_set_dimension_name(fid, "/attenuation", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/attenuation", 2, "z", error)
+        call h5_set_dimension_name(fid, "/attenuation", 3, "y", error)
+        call h5_set_dimension_name(fid, "/attenuation", 4, "x", error)
+        call h5_set_dimension_name(fid, "/attenuation", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/y", 3, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/grid/x", 2, error)
+        call h5_attach_dimension_scale(fid, "/attenuation", "/energy", 1, error)
+
+        !cx(energy,x,y,z,chan)
+        call h5_set_dimension_name(fid, "/cx", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/cx", 2, "z", error)
+        call h5_set_dimension_name(fid, "/cx", 3, "y", error)
+        call h5_set_dimension_name(fid, "/cx", 4, "x", error)
+        call h5_set_dimension_name(fid, "/cx", 5, "energy", error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/z", 4, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/y", 3, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/grid/x", 2, error)
+        call h5_attach_dimension_scale(fid, "/cx", "/energy", 1, error)
+
+        !phit(x,y,z,chan)
+        call h5_set_dimension_name(fid, "/phit", 1, "channel", error)
+        call h5_set_dimension_name(fid, "/phit", 2, "z", error)
+        call h5_set_dimension_name(fid, "/phit", 3, "y", error)
+        call h5_set_dimension_name(fid, "/phit", 4, "x", error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/z", 3, error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/y", 2, error)
+        call h5_attach_dimension_scale(fid, "/phit", "/grid/x", 1, error)
     endif
+
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(fid, "/energy", 1, "energy", error)
+    call h5_set_dimension_name(fid, "/pitch", 1, "pitch", error)
+    call h5_set_dimension_name(fid, "/radius", 1, "radius", error)
+    call h5_make_dimension_scale(fid, "/energy", "energy", error)
+    call h5_make_dimension_scale(fid, "/pitch", "pitch", error)
+    call h5_make_dimension_scale(fid, "/radius", "radius", error)
+
+    !Add dimension names to flux: flux(energy,chan)
+    call h5_set_dimension_name(fid, "/flux", 1, "radius", error)
+    call h5_set_dimension_name(fid, "/flux", 2, "energy", error)
+    call h5_attach_dimension_scale(fid, "/flux", "/radius", 1, error)
+    call h5_attach_dimension_scale(fid, "/flux", "/energy", 2, error)
+
+    !Add dimension names to weight: weight(energy,pitch,chan)
+    call h5_set_dimension_name(fid, "/weight", 1, "radius", error)
+    call h5_set_dimension_name(fid, "/weight", 2, "pitch", error)
+    call h5_set_dimension_name(fid, "/weight", 3, "energy", error)
+    call h5_attach_dimension_scale(fid, "/weight", "/radius", 1, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/pitch", 2, error)
+    call h5_attach_dimension_scale(fid, "/weight", "/energy", 3, error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -6077,6 +7631,117 @@ subroutine write_npa_weights
     endif
 
 end subroutine write_npa_weights
+
+subroutine write_nc_weights
+    !+ Writes [[libfida:ncweight]] to a HDF5 file
+    character(charlim) :: filename
+    integer :: i
+    
+    !! HDF5 variables
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(3) :: dim3
+    integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer :: error
+    
+    filename = trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_nc_weights.h5"
+    
+    !Open HDF5 interface
+    call h5open_f(error)
+    
+    !Create HDF5 file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+    
+    !Create ncweight group
+    call h5gcreate_f(fid, "/ncweight", gid, error)
+    
+    !Write energy grid
+    dim1(1) = inputs%ne_nc
+    call h5ltmake_dataset_double_f(gid, "energy", 1, dim1, ncweight%energy, error)
+    
+    !Write pitch grid
+    dim1(1) = inputs%np_nc
+    call h5ltmake_dataset_double_f(gid, "pitch", 1, dim1, ncweight%pitch, error)
+
+    !Write radius (channel coordinate)
+    dim1(1) = nc_chords%nchan
+    call h5ltmake_dataset_double_f(gid, "radius", 1, dim1, nc_chords%radius, error)
+
+    !Write weight function
+    dim3 = [inputs%ne_nc, inputs%np_nc, nc_chords%nchan]
+    call h5ltmake_dataset_double_f(gid, "weight", 3, dim3, ncweight%weight, error)
+    
+    !Write flux
+    dim2 = [inputs%ne_nc, nc_chords%nchan]
+    call h5ltmake_dataset_double_f(gid, "flux", 2, dim2, ncweight%flux, error)
+    
+    !Write emissivity if calculated
+    if(inputs%calc_nc_wght.ge.2) then
+        dim3 = [inter_grid%nr, inter_grid%nz, nc_chords%nchan]
+        call h5ltmake_dataset_double_f(gid, "emissivity", 3, dim3, ncweight%emissivity, error)
+    endif
+    
+    !Write channel IDs (if available)
+    ! dim1(1) = nc_chords%nchan
+    ! call h5ltmake_dataset_string_f(gid, "channels", nc_chords%chan_id, error)
+    
+    !Write grid information
+    dim1(1) = inter_grid%nr
+    call h5ltmake_dataset_double_f(gid, "r", 1, dim1, inter_grid%r, error)
+    dim1(1) = inter_grid%nz  
+    call h5ltmake_dataset_double_f(gid, "z", 1, dim1, inter_grid%z, error)
+    
+    !Add dimension names for xarray/pandas compatibility
+    !Mark coordinate arrays as dimension scales and label their dimensions
+    call h5_set_dimension_name(gid, "energy", 1, "energy", error)
+    call h5_set_dimension_name(gid, "pitch", 1, "pitch", error)
+    call h5_set_dimension_name(gid, "radius", 1, "radius", error)
+    call h5_set_dimension_name(gid, "r", 1, "r", error)
+    call h5_set_dimension_name(gid, "z", 1, "z", error)
+    call h5_make_dimension_scale(gid, "energy", "energy", error)
+    call h5_make_dimension_scale(gid, "pitch", "pitch", error)
+    call h5_make_dimension_scale(gid, "radius", "radius", error)
+    call h5_make_dimension_scale(gid, "r", "r", error)
+    call h5_make_dimension_scale(gid, "z", "z", error)
+
+    !Add dimension names to weight: weight(energy,pitch,chan)
+    call h5_set_dimension_name(gid, "weight", 1, "radius", error)
+    call h5_set_dimension_name(gid, "weight", 2, "pitch", error)
+    call h5_set_dimension_name(gid, "weight", 3, "energy", error)
+    call h5_attach_dimension_scale(gid, "weight", "radius", 1, error)
+    call h5_attach_dimension_scale(gid, "weight", "pitch", 2, error)
+    call h5_attach_dimension_scale(gid, "weight", "energy", 3, error)
+
+    !Add dimension names to flux: flux(energy,chan)
+    call h5_set_dimension_name(gid, "flux", 1, "radius", error)
+    call h5_set_dimension_name(gid, "flux", 2, "energy", error)
+    call h5_attach_dimension_scale(gid, "flux", "radius", 1, error)
+    call h5_attach_dimension_scale(gid, "flux", "energy", 2, error)
+
+    !Add dimension names to emissivity if present: emissivity(r,z,chan)
+    if(inputs%calc_nc_wght.ge.2) then
+        call h5_set_dimension_name(gid, "emissivity", 1, "radius", error)
+        call h5_set_dimension_name(gid, "emissivity", 2, "z", error)
+        call h5_set_dimension_name(gid, "emissivity", 3, "r", error)
+        call h5_attach_dimension_scale(gid, "emissivity", "radius", 1, error)
+        call h5_attach_dimension_scale(gid, "emissivity", "z", 2, error)
+        call h5_attach_dimension_scale(gid, "emissivity", "r", 3, error)
+    endif
+
+    !Close ncweight group
+    call h5gclose_f(gid, error)
+
+    !Close HDF5 file
+    call h5fclose_f(fid, error)
+    
+    !Close HDF5 interface
+    call h5close_f(error)
+    
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'NC weight functions written to: ', trim(filename)
+    endif
+    
+end subroutine write_nc_weights
 
 subroutine read_neutral_population(id, pop, error)
     !+ Reads neutral population from file
@@ -6105,8 +7770,14 @@ subroutine read_neutral_population(id, pop, error)
     call h5ltread_dataset_double_f(id, "dens", pop%dens, dims4, error)
 
     call h5gopen_f(id, "reservoir", gid, error)
-    call h5ltread_dataset_int_scalar_f(gid, "k", reservoir_size, error)
     k = reservoir_size
+    call h5ltread_dataset_int_scalar_f(gid, "k", k, error)
+    if (k.ne.reservoir_size) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NEUTRAL_POPULATION: Unsupported reservoir size: ',k, reservoir_size
+        endif
+        stop
+    endif
 
     allocate(v(3,k,nx,ny,nz))
     allocate(w(k,nx,ny,nz))
@@ -6123,7 +7794,7 @@ subroutine read_neutral_population(id, pop, error)
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-        call init_reservoir(pop%res(ii,jj,kk), k)
+        call init_reservoir(pop%res(ii,jj,kk))
         pop%res(ii,jj,kk)%n = n(ii,jj,kk)
         do ir=1,min(k,pop%res(ii,jj,kk)%n)
             pop%res(ii,jj,kk)%R(ir) = NeutralParticle(w(ir,ii,jj,kk), v(:,ir,ii,jj,kk))
@@ -7467,6 +9138,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
     dlength = 3.0 !cm
     skip = .False.
 
+    !$OMP PARALLEL DO schedule(dynamic) private(i,ri,vi,inp,max_length)
     loop_over_channels: do i=1, nlines
         ri = r0(:,i)
         vi = v0(:,i)
@@ -7498,6 +9170,7 @@ subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
         call uvw_to_cyl(ri, cyl_out(:,i))
 
     enddo loop_over_channels
+    !$OMP END PARALLEL DO
 
     dim = 2*count(.not.skip) ! 2 for enter and exit
 
@@ -7779,7 +9452,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -7790,6 +9463,117 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     endif
 
 end subroutine track
+
+subroutine find_grid_entry(r_start, v_ray, r_entry, enters_grid)
+    !+ Finds where a ray starting outside the grid enters the grid boundaries
+    real(Float64), dimension(3), intent(in)  :: r_start
+        !+ Starting position in machine coordinates [cm]
+    real(Float64), dimension(3), intent(in)  :: v_ray
+        !+ Ray direction vector (normalized)
+    real(Float64), dimension(3), intent(out) :: r_entry
+        !+ Entry point into grid in machine coordinates [cm]
+    logical, intent(out)                     :: enters_grid
+        !+ Whether ray enters the grid
+
+    real(Float64), dimension(3) :: r_cyl_start, r_cyl_current
+    real(Float64), dimension(3) :: p_temp
+    real(Float64) :: t_min, t_temp, t_r_min, t_r_max, t_z_min, t_z_max
+    real(Float64) :: r_start_mag, r_current, z_current
+    real(Float64) :: vr, vz
+    integer :: i
+
+    ! Convert start position to cylindrical for checking
+    r_start_mag = sqrt(r_start(1)**2 + r_start(2)**2)
+    r_cyl_start(1) = r_start_mag
+    r_cyl_start(2) = r_start(3)  ! z
+    r_cyl_start(3) = atan2(r_start(2), r_start(1))  ! phi
+
+    ! Get velocity components in cylindrical frame at starting position
+    vr = (r_start(1)*v_ray(1) + r_start(2)*v_ray(2))/r_start_mag
+    vz = v_ray(3)
+
+    enters_grid = .false.
+    t_min = huge(t_min)
+
+    ! Check intersection with outer R boundary (cylinder at R_max)
+    if (r_cyl_start(1) > pass_grid%r(pass_grid%nr)) then
+        ! Outside, need to check if we hit outer cylinder going inward
+        if (vr < 0.0) then  ! Moving inward
+            r_cyl_current(1) = pass_grid%r(pass_grid%nr)
+            r_cyl_current(2) = 0.0  ! Will be updated
+            r_cyl_current(3) = 0.0  ! Will be updated
+            call cyl_to_uvw(r_cyl_current, p_temp)
+            call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+            if (t_temp > 0.0 .and. t_temp < t_min) then
+                r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+                z_current = p_temp(3)
+                ! Check if z is within bounds at this R
+                if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                    t_min = t_temp
+                    r_entry = p_temp
+                    enters_grid = .true.
+                endif
+            endif
+        endif
+    endif
+
+    ! Check intersection with inner R boundary if within tokamak
+    if (r_cyl_start(1) < pass_grid%r(1) .and. vr > 0.0) then
+        r_cyl_current(1) = pass_grid%r(1)
+        r_cyl_current(2) = 0.0
+        r_cyl_current(3) = 0.0
+        call cyl_to_uvw(r_cyl_current, p_temp)
+        call line_cylinder_intersect(r_start, v_ray, p_temp, p_temp, t_temp)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            z_current = p_temp(3)
+            if (z_current >= pass_grid%z(1) .and. z_current <= pass_grid%z(pass_grid%nz)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! Check intersection with Z boundaries (top and bottom planes)
+    if (r_cyl_start(2) > pass_grid%z(pass_grid%nz) .and. vz < 0.0) then
+        ! Above grid, moving down
+        t_temp = (pass_grid%z(pass_grid%nz) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    if (r_cyl_start(2) < pass_grid%z(1) .and. vz > 0.0) then
+        ! Below grid, moving up
+        t_temp = (pass_grid%z(1) - r_start(3))/v_ray(3)
+        if (t_temp > 0.0 .and. t_temp < t_min) then
+            p_temp = r_start + t_temp * v_ray
+            r_current = sqrt(p_temp(1)**2 + p_temp(2)**2)
+            if (r_current >= pass_grid%r(1) .and. r_current <= pass_grid%r(pass_grid%nr)) then
+                t_min = t_temp
+                r_entry = p_temp
+                enters_grid = .true.
+            endif
+        endif
+    endif
+
+    ! If starting point is already inside, just return it
+    if (r_cyl_start(1) >= pass_grid%r(1) .and. &
+        r_cyl_start(1) <= pass_grid%r(pass_grid%nr) .and. &
+        r_cyl_start(2) >= pass_grid%z(1) .and. &
+        r_cyl_start(2) <= pass_grid%z(pass_grid%nz)) then
+        r_entry = r_start
+        enters_grid = .true.
+    endif
+
+end subroutine find_grid_entry
 
 subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:pass_grid]]
@@ -7828,6 +9612,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
+    !! Variables for handling rays starting outside grid
+    logical :: enters_grid_flag
+    real(Float64), dimension(3) :: ri_entry
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     adaptive = 0; max_cell_splits = 1; split_tol = 0.0
@@ -7845,7 +9632,33 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = pass_grid%nz
     gdims(3) = pass_grid%nphi
 
-    phi = atan2(rin(2),rin(1))
+    !! Check if starting position is outside the grid
+    ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+    ri_cyl(2) = ri(3)
+    ri_cyl(3) = atan2(ri(2), ri(1))
+
+    !! Check if we're starting outside the grid boundaries
+    if (ri_cyl(1) > pass_grid%r(pass_grid%nr) .or. &
+        ri_cyl(1) < pass_grid%r(1) .or. &
+        ri_cyl(2) > pass_grid%z(pass_grid%nz) .or. &
+        ri_cyl(2) < pass_grid%z(1)) then
+
+        !! Ray starts outside grid - find entry point
+        call find_grid_entry(ri, vn, ri_entry, enters_grid_flag)
+
+        if (.not. enters_grid_flag) then
+            ntrack = 0
+            return
+        endif
+
+        !! Update starting position to grid entry point
+        ri = ri_entry
+        ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+        ri_cyl(2) = ri(3)
+        ri_cyl(3) = atan2(ri(2), ri(1))
+    endif
+
+    phi = atan2(ri(2),ri(1))
     s = sin(phi) ; c = cos(phi)
     vn_cyl(1) = c*vn(1) + s*vn(2)
     vn_cyl(3) = -s*vn(1) + c*vn(2)
@@ -7932,7 +9745,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ncross = 0
     call in_plasma(ri,in_plasma1,input_coords=1)
     track_loop: do i=1,pass_grid%ntrack
-        if(cc.gt.pass_grid%ntrack) exit track_loop
+        if(cc.gt.pass_grid%ntrack) then
+            exit track_loop
+        endif
 
         call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
         call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
@@ -7940,6 +9755,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
         mind = minpos(1)
+
+        !! Check if no valid forward intersection found
+        if(mind.eq.0) then
+            exit track_loop
+        endif
+
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
 
@@ -8043,9 +9864,17 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
 
-        if (ind(mind).gt.gdims(mind)) exit track_loop
-        if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) then
+        if (mind.lt.1 .or. mind.gt.3) then
+            exit track_loop
+        endif
+
+        if (ind(mind).gt.gdims(mind)) then
+            exit track_loop
+        endif
+        if (ind(mind).lt.1) then
+            exit track_loop
+        endif
+        if (ncross.ge.inputs%max_crossings) then
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
@@ -8067,6 +9896,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call plane_basis(v_plane, redge, tedge, basis)
     enddo track_loop
     ntrack = cc-1
+
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
@@ -8427,6 +10257,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     real(Float64) :: dE, dp
     integer :: err
 
+    !! Find nearest grid point in (E, p) space
     epi(1) = minloc(abs(fbm%energy - energy),1)
     epi(2) = minloc(abs(fbm%pitch - pitch),1)
     dE = abs(fbm%energy(epi(1)) - energy)
@@ -8457,33 +10288,21 @@ end subroutine get_ep_denf
 !=============================================================================
 !--------------------------Result Storage Routines----------------------------
 !=============================================================================
-subroutine init_reservoir(res, k)
+subroutine init_reservoir(res)
     !+ Initialize reservoir
     type(NeutralParticleReservoir), intent(inout) :: res
         !+ Neutral Particle Reservoir
-    integer, intent(in) :: k
+    !integer, intent(in) :: k
         !+ Size of reservoir
 
     real(Float64) :: randomu(2)
 
-    if(k.le.0) return
-
-    if (res%n.ne.1) then
+    if (res%n.lt.1) then
         res%n = 1
-        res%k = k
+        res%k = reservoir_size
         call randu(randomu)
-        res%W = exp(log(randomu(1))/k)
-        res%i = k + floor(log(randomu(2))/log(1.0-res%W)) + 1
-    endif
-
-    !! Allocate reservoir if not already
-    if (.not.allocated(res%R)) then
-        allocate(res%R(k))
-    else
-        if(size(res%R).ne.k) then
-            deallocate(res%R)
-            allocate(res%R(k))
-        endif
+        res%W = exp(log(randomu(1))/res%k)
+        res%i = res%k + floor(log(randomu(2))/log(1.0-res%W)) + 1
     endif
 
 end subroutine init_reservoir
@@ -8500,28 +10319,23 @@ subroutine update_reservoir(res, vn, wght)
     integer, dimension(1) :: randomi
     real(Float64), dimension(2) :: randomu
 
+    !print*, res%n, res%k, res%i
+    !$OMP CRITICAL(update_reservoir_1)
     if (res%n.le.res%k) then
-        !$OMP CRITICAL(update_reservoir_1)
-        if (res%n.eq.0) then
-            call init_reservoir(res,reservoir_size)
+        if (res%n.le.0) then
+            call init_reservoir(res)
         endif
-        res%R(res%n) = NeutralParticle(wght, vn)
-        res%n = res%n + 1
-        !$OMP END CRITICAL(update_reservoir_1)
-        return
-    endif
-
-    if (res%n.eq.res%i) then
-        !$OMP CRITICAL(update_reservoir_2)
+        res%R(res%n)%w = wght
+        res%R(res%n)%v = vn
+    elseif (res%n.eq.res%i) then
         call randind(res%k, randomi)
         res%R(randomi(1)) = NeutralParticle(wght, vn)
         call randu(randomu)
         res%W = res%W*exp(log(randomu(1))/res%k)
         res%i = res%i + floor(log(randomu(2))/log(1.0-res%W)) + 1
-        !$OMP END CRITICAL(update_reservoir_2)
     endif
-
     res%n = res%n + 1
+    !$OMP END CRITICAL(update_reservoir_1)
 
 end subroutine update_reservoir
 
@@ -8536,10 +10350,10 @@ subroutine merge_reservoirs(res1,res2)
     type(NeutralParticleReservoir) :: res3
     real(Float64) :: p, randomu(1)
 
-    if(res2%n.eq.0) return
-    if(res1%n.eq.0) then
-        call init_reservoir(res1,res2%k)
+    if(res1%n.le.0) then
+        call init_reservoir(res1) !res2%k)
     endif
+    if(res2%n.le.0) return
 
     !! If neither reservoir is full just fill res1 from res2 normally
     if ((res1%n.le.res1%k).and.(res2%n.le.res2%k)) then
@@ -8585,12 +10399,30 @@ subroutine init_neutral_population(pop)
 
     if(.not.allocated(pop%dens)) then
         allocate(pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    if(.not.allocated(pop%res)) then
         allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     endif
     pop%dens = 0.d0
     pop%res%n = 0
 
 end subroutine init_neutral_population
+
+subroutine free_neutral_population(pop)
+    !+ Initialize [[NeutralPopulation]]
+    type(NeutralPopulation), intent(inout) :: pop
+        !+ Neutral Population to initialize
+
+    integer :: i, j, k, ic, ind(3)
+
+    if(allocated(pop%dens)) then
+        deallocate(pop%dens)
+    endif
+    if(allocated(pop%res)) then
+        deallocate(pop%res)
+    endif
+
+end subroutine free_neutral_population
 
 subroutine update_neutrals(pop, ind, vn, dens)
     !+Update [NeutralPopulation]] `pop` at `ind`
@@ -8708,14 +10540,14 @@ subroutine parallel_merge_reservoirs(res)
     call parallel_sum(vels)
     call parallel_sum(wghts)
 
-    call init_reservoir(res1,k)
+    call init_reservoir(res1)
     res1%n = nums(1)
     res1%i = inds(1)
     res1%W = Ws(1)
     do i=1,min(k,res1%n)
         res1%R(i) = NeutralParticle(wghts(i,1),vels(:,i,1))
     enddo
-    call init_reservoir(res2,k)
+    call init_reservoir(res2)
     do i=2,num_procs
         res2%n = nums(i)
         res2%i = inds(i)
@@ -8764,7 +10596,7 @@ subroutine store_births(ind, neut_type, dflux)
     !$OMP END ATOMIC
 end subroutine store_births
 
-subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
+subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive, gs)
     !+ Store NPA particles in [[libfida:npa]]
     integer, intent(in)                     :: det
         !+ Detector/Channel Number
@@ -8780,10 +10612,12 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         !+ Orbit class ID
     logical, intent(in), optional           :: passive
         !+ Indicates whether npa particle is passive
+    type(GyroSurface), optional, intent(in)  :: gs
+        !+ Gyro-surface
 
     integer :: iclass, oclass
     type(LocalEMFields) :: fields
-    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
+    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm, uvw_gc
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
@@ -8802,6 +10636,9 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     ! Convert to machine coordinates
     call xyz_to_uvw(ri,uvw_ri)
     call xyz_to_uvw(rf,uvw_rf)
+    if (present(gs)) then
+        call xyz_to_uvw(gs%center, uvw_gc)
+    endif
 
     ! Calculate energy
     energy = beam_mass*v2_to_E_per_amu*dot_product(vn,vn)
@@ -8827,7 +10664,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         if(pnpa%npart.gt.pnpa%nmax) then
             pnpa%nmax = int(pnpa%nmax*2)
             allocate(parts(pnpa%nmax))
-            parts(1:(pnpa%npart-1)) = pnpa%part
+            parts(1:(pnpa%npart-1)) = pnpa%part(1:(pnpa%npart-1))
             deallocate(pnpa%part)
             call move_alloc(parts, pnpa%part)
         endif
@@ -8839,6 +10676,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         pnpa%part(pnpa%npart)%xf = uvw_rf(1)
         pnpa%part(pnpa%npart)%yf = uvw_rf(2)
         pnpa%part(pnpa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            pnpa%part(pnpa%npart)%xgci = uvw_gc(1)
+            pnpa%part(pnpa%npart)%ygci = uvw_gc(2)
+            pnpa%part(pnpa%npart)%zgci = uvw_gc(3)
+        endif
         pnpa%part(pnpa%npart)%energy = energy
         pnpa%part(pnpa%npart)%pitch = pitch
         pnpa%part(pnpa%npart)%weight = flux
@@ -8852,7 +10694,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         if(npa%npart.gt.npa%nmax) then
             npa%nmax = int(npa%nmax*2)
             allocate(parts(npa%nmax))
-            parts(1:(npa%npart-1)) = npa%part
+            parts(1:(npa%npart-1)) = npa%part(1:(npa%npart-1))
             deallocate(npa%part)
             call move_alloc(parts, npa%part)
         endif
@@ -8864,6 +10706,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
         npa%part(npa%npart)%xf = uvw_rf(1)
         npa%part(npa%npart)%yf = uvw_rf(2)
         npa%part(npa%npart)%zf = uvw_rf(3)
+        if (present(gs)) then
+            npa%part(npa%npart)%xgci = uvw_gc(1)
+            npa%part(npa%npart)%ygci = uvw_gc(2)
+            npa%part(npa%npart)%zgci = uvw_gc(3)
+        endif
         npa%part(npa%npart)%energy = energy
         npa%part(npa%npart)%pitch = pitch
         npa%part(npa%npart)%weight = flux
@@ -9061,6 +10908,9 @@ subroutine get_dd_rate(plasma, eb, rate, branch)
         rate = 0.d0
     else
         rate = 0.d0
+        if (beam_mass.eq.H2_amu) then
+            rate = plasma%denf * exp(lograte*log_10)
+        endif
         do is=1,n_thermal
             if(thermal_mass(is).eq.H2_amu) then
                 rate = rate + plasma%deni(is) * exp(lograte*log_10)
@@ -9148,6 +10998,333 @@ subroutine get_ddpt_anisotropy(plasma, v1, v3, kappa)
     kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
 
 end subroutine get_ddpt_anisotropy
+
+subroutine get_ddnhe_anisotropy(plasma, v1, v3, kappa)
+    !+ Gets d(d,n)3He anisotropy defecit/enhancement factor for a beam interacting with a target plasma
+    type(LocalProfiles), intent(in)         :: plasma
+        !+ Plasma Paramters
+    real(Float64), dimension(3), intent(in) :: v1
+        !+ Beam velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v3
+        !+ Neutron velocity [cm/s]
+    real(Float64), intent(out)              :: kappa
+        !+ Anisotropy factor
+    !+ Reference: Eq. (1) and (3) of NIM A236 (1985) 380
+
+    real(Float64), dimension(3,12) :: abc
+    real(Float64), dimension(12)   :: bhcor
+    real(Float64), dimension(12)   :: e, a, b, c
+    real(Float64), dimension(3)    :: vcm, v3cm, vrel
+    type(InterpolCoeffs1D) :: c1D
+
+    real(Float64) :: ai, bi, ci, b1, b2, b11, b12, b21, b22, cos_phi, sin_phi
+    real(Float64) :: eb, e1com, vnet_square, cos_theta, k, KE, Q, mp, k0, JMeV
+    integer :: ei, i, err_status
+
+    !! Calculate effective beam energy
+    vrel = v1-plasma%vrot ![cm/s]
+    vnet_square=dot_product(vrel, vrel) ![(cm/s)**2]
+    eb = v2_to_E_per_amu*fbm%A*vnet_square ![keV]
+
+    !!Calculate anisotropy enhancement/deficit factor
+    JMeV = 1.60218d-13 ! Conversion factor from MeV to Joules
+    mp = H1_amu*mass_u  ![kg]
+    Q = 3.27*JMeV ![J]
+
+    vcm = 0.5*(v1+plasma%vrot) ![cm/s]
+    KE = 0.5*mp*vnet_square*1.d-4  ! [J] C-O-M kinetic energy
+    k0 = norm2(vcm) * sqrt(2*mp/(3*(Q+KE)))*100.d0 ![(cm/s)**2]
+    if ((norm2(vcm)*norm2(v3)).gt.0.d0) then
+        cos_phi = dot_product(vcm, v3) / (norm2(vcm)*norm2(v3))
+        sin_phi = sin(acos(cos_phi))
+
+        if (abs(k0*sin_phi).le.1) then
+            cos_theta = cos_phi*sqrt(1-(k0*sin_phi)**2) - k0*sin_phi**2
+        else
+            cos_theta = 0.d0
+        endif
+
+    else
+        cos_theta = 0.d0
+    endif
+
+    !Brown-Jarmie coefficients in Table I with prepended isotropic low-energy extrapolated point
+    e = [0.0,19.944,29.935,39.927,49.922,59.917,69.914,79.912,89.911,99.909,109.909,116.909]
+    a = [0.0,0.0181,0.0782,0.178,0.2994,0.4406,0.564,0.716,0.8769,1.018,1.138,1.231]
+    b = [0.0,0.0108,0.0425,0.1027,0.212,0.303,0.446,0.537,0.674,0.755,1.09,1.05]
+    c = [0.0,0.0,0.0,0.0,0.0,0.049,0.111,0.052,0.095,0.2,0.09,0.2]
+    e(1) = 10.0
+    a(1) = 0.00903775/(4*pi)
+    abc(1,:) = a ; abc(2,:) = b ; abc(3,:) = c
+
+    !Correction factor to make it consistent with Bosch & Hale
+    bhcor=[1.0, 1.00648, 1.00817, 1.00431, 0.99405, .98711, .99591, 1.02146, .99845, 1.00157, .98565, 1.00405]
+    do i=1,12
+        abc(:,i) = abc(:,i)*bhcor(i)
+    enddo
+
+    e1com=0.5d0*eb
+    call interpol_coeff(e, e1com, c1D, err_status)
+
+    ei = c1D%i
+    b1 = c1D%b1
+    b2 = c1D%b2
+
+    ai = b1*abc(1,ei) + b2*abc(1,ei+1)
+    bi = b1*abc(2,ei) + b2*abc(2,ei+1)
+    ci = b1*abc(3,ei) + b2*abc(3,ei+1)
+
+    kappa = (ai + bi*cos_theta**2 + ci*cos_theta**4) / (ai+bi/3.d0+ci/5.d0)
+
+end subroutine get_ddnhe_anisotropy
+
+subroutine get_dd_neutron_energy(v1, v2, v_detector, e_neutron, weight)
+    !+ Calculate classical neutron energy from DD reaction kinematics
+    real(Float64), dimension(3), intent(in) :: v1
+        !+ First reactant velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v2
+        !+ Second reactant velocity [cm/s]
+    real(Float64), dimension(3), intent(in) :: v_detector
+        !+ Unit vector toward detector
+    real(Float64), intent(out) :: e_neutron
+        !+ Neutron energy in lab frame [keV]
+    real(Float64), intent(out) :: weight
+        !+ Angular weight factor
+
+    real(Float64) :: m_d, m_n, m_he3, Q_dd, c_light
+    real(Float64), dimension(3) :: v_cm, v_rel
+    real(Float64) :: E_cm_total, E_cm_n, v_cm_n
+    real(Float64) :: cos_theta_lab, E_cm_boost, E_interaction
+    real(Float64) :: E_lab_n, mu_dd
+
+    ! Physical constants
+    m_d = H2_amu       ! Deuteron mass [amu]
+    m_n = 1.008665d0   ! Neutron mass [amu]
+    m_he3 = 3.01603d0  ! He3 mass [amu]
+    Q_dd = 3.27d0      ! Q-value [MeV]
+    c_light = 2.998d10 ! Speed of light [cm/s]
+
+    ! Calculate center of mass velocity and relative velocity
+    v_cm = 0.5d0 * (v1 + v2)  ! CM velocity [cm/s]
+    v_rel = v1 - v2           ! Relative velocity [cm/s]
+
+    ! Calculate total energy in CM frame
+    ! E_cm = (1/2)*mu*v_rel^2 + Q where mu = m_d/2 for DD
+    mu_dd = m_d / 2.0d0  ! Reduced mass for DD system [amu]
+    E_cm_total = 0.5d0 * mu_dd * mass_u * norm2(v_rel)**2 * 1.0d-4 / 1.60218d-13 ! [MeV]
+    E_cm_total = E_cm_total + Q_dd  ! Total available energy [MeV]
+
+    ! Use non-relativistic two-body kinematics
+    ! In CM frame, momentum conservation: p_n = -p_He3
+    ! Energy conservation: E_cm_total = KE_n + KE_He3
+    ! For non-relativistic case: KE = p^2/(2m)
+    ! Solving: KE_n = m_He3/(m_n + m_He3) * E_cm_total
+
+    ! Neutron gets fraction m_He3/(m_n+m_He3) ≈ 0.75 of available kinetic energy
+    E_cm_n = (m_he3 / (m_n + m_he3)) * E_cm_total  ! Kinetic energy in CM [MeV]
+
+    ! Calculate neutron velocity in CM frame
+    ! v = sqrt(2*KE/m)
+    if(E_cm_n > 0.0d0) then
+        v_cm_n = sqrt(2.0d0 * E_cm_n * 1.60218d-13 / (m_n * mass_u)) * 1.0d2  ! [cm/s]
+    else
+        v_cm_n = 0.0d0
+    endif
+
+    ! For non-relativistic boost (valid for typical fusion velocities):
+    ! v_lab = v_cm + v_CM
+    ! The energy in lab frame depends on the emission angle in CM frame
+
+    ! Transform to lab frame using velocity addition
+    ! For non-relativistic case: E_lab = (1/2)*m*|v_cm_neutron + v_CM|^2
+    ! where v_cm_neutron is neutron velocity in CM frame (isotropic)
+
+    ! Angle between CM velocity and detector direction
+    if(norm2(v_cm) > 0.0d0) then
+        cos_theta_lab = dot_product(v_cm/norm2(v_cm), v_detector)
+    else
+        cos_theta_lab = 0.0d0
+    endif
+
+    ! Assume isotropic emission in CM and use average along detector direction
+    ! Lab energy considering CM boost:
+    ! E_lab = E_cm + E_cm_boost + 2*sqrt(E_cm*E_cm_boost)*cos(theta)
+    ! where E_cm_boost = (1/2)*m_n*v_CM^2
+
+    ! CM boost energy
+    E_cm_boost = 0.5d0 * m_n * mass_u * norm2(v_cm)**2 * 1.0d-4 / 1.60218d-13  ! [MeV]
+
+    ! Interaction term (using forward scattering approximation)
+    E_interaction = 2.0d0 * sqrt(E_cm_n * E_cm_boost) * cos_theta_lab
+
+    ! Total lab energy
+    E_lab_n = E_cm_n + E_cm_boost + E_interaction  ! [MeV]
+
+    ! Convert to keV and ensure positive
+    if(E_lab_n > 0.0d0) then
+        e_neutron = E_lab_n * 1000.0d0  ! [keV]
+    else
+        e_neutron = E_cm_n * 1000.0d0  ! Fallback to CM energy [keV]
+    endif
+
+    ! Angular weight (will be multiplied by anisotropy factor later)
+    weight = 1.0d0
+
+end subroutine get_dd_neutron_energy
+
+subroutine get_thermal_dd_rate(T_ion, rate_tt)
+    !+ Calculate thermal-thermal DD reaction rate for Maxwellian distribution
+    real(Float64), intent(in) :: T_ion
+        !+ Ion temperature [keV]
+    real(Float64), intent(out) :: rate_tt
+        !+ Reaction rate coefficient <sigma*v> [cm^3/s]
+
+    real(Float64) :: T_eV
+
+    ! Convert temperature to eV for parameterization
+    T_eV = T_ion * 1000.0d0  ! [eV]
+
+    ! Use Bosch-Hale parameterization for DD reaction rate
+    ! Valid for 0.2 keV < T < 100 keV
+    ! <sigma*v> ~ 1.2e-24 * T^2 * exp(-18.8/T^(1/3)) [cm^3/s] for T in keV
+    ! This is a simplified fit; for production use the full Bosch-Hale formula
+
+    if(T_ion < 0.2d0) then
+        rate_tt = 0.0d0
+    elseif(T_ion < 100.0d0) then
+        ! Simplified Gamow peak formula
+        rate_tt = 1.2d-24 * T_ion**2 * exp(-18.8d0 / T_ion**(1.0d0/3.0d0))
+    else
+        ! Extrapolate for very high temperatures
+        rate_tt = 1.0d-15  ! Saturation value
+    endif
+
+end subroutine get_thermal_dd_rate
+
+subroutine neutron_thermal_thermal(ichan, tid, eflux_tt_local)
+    !+ Calculate neutron flux from thermal-thermal DD reactions for a specific channel
+    integer, intent(in) :: ichan
+        !+ Channel index
+    integer, intent(in) :: tid
+        !+ Thread ID for thread-local storage
+    real(Float64), dimension(:,:,:,:), intent(inout) :: eflux_tt_local
+        !+ Thread-local array for thermal-thermal flux
+
+    type(LocalProfiles) :: plasma
+    real(Float64), dimension(3) :: r_detector, vn_det, ri
+    real(Float64) :: rate_tt, e_neutron, weight, flux, domega, flux_contrib
+    real(Float64), dimension(3) :: v1_thermal, v2_thermal
+    type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
+    integer :: ntrack, i, ie_neutron, igamma, ngamma
+    real(Float64) :: T_ion, d
+
+    ! Get detector position and viewing direction
+    r_detector = nc_chords%det(ichan)%detector%origin
+    vn_det = nc_chords%det(ichan)%aperture%origin - r_detector
+    vn_det = vn_det/norm2(vn_det)
+
+    ! Track through plasma using cylindrical grid for full coverage
+    call track_cylindrical(r_detector, vn_det, tracks, ntrack)
+    if(ntrack.eq.0) return
+
+    ngamma = 100  ! Number of samples for velocity distribution
+
+    ! Loop along sightline
+    do i = 1, ntrack
+        ri = tracks(i)%pos
+        call get_plasma(plasma, pos=ri, input_coords=1)
+        if(.not.plasma%in_plasma) cycle
+
+        ! Check if thermal plasma has deuterium
+        if(abs(thermal_mass(1) - H2_amu) > 0.01) cycle
+
+        ! Ion temperature
+        T_ion = plasma%ti  ! [keV]
+        if(T_ion < 0.1d0) cycle  ! Skip very cold plasma
+
+        ! Calculate thermal-thermal DD rate
+        call get_thermal_dd_rate(T_ion, rate_tt)  ! [cm^3/s]
+
+        ! Total neutron production rate [neutrons/(cm^3*s)]
+        ! Factor 0.5 for identical particles, 0.5 for neutron branch
+        flux = 0.25d0 * plasma%deni(1)**2 * rate_tt
+
+        if(flux <= 0.0d0) cycle
+
+        ! Calculate solid angle factor
+        d = norm2(r_detector - ri)
+        if (nc_chords%det(ichan)%detector%shape.eq.1) then
+            domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                    (pi * d**2)
+        else
+            domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                    (4.0d0 * d**2)
+        endif
+
+        ! Sample thermal velocities for energy calculation
+        ! Use Monte Carlo sampling of Maxwell-Boltzmann distribution
+        do igamma = 1, ngamma
+            ! Sample two independent thermal ion velocities
+            call sample_thermal_ion_velocity(plasma, v1_thermal)
+            call sample_thermal_ion_velocity(plasma, v2_thermal)
+
+            ! Calculate neutron energy for this velocity pair
+            call get_dd_neutron_energy(v1_thermal, v2_thermal, vn_det, e_neutron, weight)
+
+            ! Bin the flux by energy
+            if(allocated(neutron%eflux)) then
+                ie_neutron = floor((e_neutron - neutron%emin) / &
+                    (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                if(ie_neutron >= 1 .and. ie_neutron <= neutron%nenergy) then
+                    ! Convert to spectral flux [neutrons/(s*keV)] by dividing by bin width
+                    flux_contrib = flux * tracks(i)%time * weight * domega * real(neutron%nenergy) / &
+                        (real(ngamma) * (neutron%emax - neutron%emin))
+                    ! Store in thread-local array (no critical section needed)
+                    eflux_tt_local(ie_neutron, ichan, 1, tid) = &
+                        eflux_tt_local(ie_neutron, ichan, 1, tid) + flux_contrib
+                endif
+            endif
+        enddo
+    enddo
+
+end subroutine neutron_thermal_thermal
+
+subroutine sample_thermal_ion_velocity(plasma, v_thermal)
+    !+ Sample a single thermal deuteron velocity from Maxwell-Boltzmann distribution
+    type(LocalProfiles), intent(in) :: plasma
+        !+ Plasma parameters
+    real(Float64), dimension(3), intent(out) :: v_thermal
+        !+ Sampled thermal ion velocity [cm/s]
+
+    real(Float64) :: T_ion, v_thermal_rms
+    real(Float64), dimension(3) :: randomu
+    real(Float64) :: cos_theta, sin_theta, phi
+
+    ! Get ion temperature
+    T_ion = plasma%ti  ! [keV]
+
+    if(T_ion < 0.1d0) then
+        ! For very cold plasma, use bulk rotation only
+        v_thermal = plasma%vrot
+        return
+    endif
+
+    ! RMS thermal velocity for deuterium
+    v_thermal_rms = sqrt(2.0d0 * T_ion * 1000.0d0 * 1.60218d-19 / (H2_amu * mass_u))  ! [cm/s]
+
+    ! Sample from Maxwell-Boltzmann distribution (isotropic)
+    call randu(randomu)
+    cos_theta = 2.0d0*randomu(1) - 1.0d0
+    sin_theta = sqrt(1.0d0 - cos_theta**2)
+    phi = 2.0d0*pi*randomu(2)
+
+    ! Generate thermal velocity vector
+    v_thermal(1) = v_thermal_rms * sin_theta * cos(phi)
+    v_thermal(2) = v_thermal_rms * sin_theta * sin(phi)
+    v_thermal(3) = v_thermal_rms * cos_theta
+    v_thermal = v_thermal + plasma%vrot  ! Add bulk plasma rotation
+
+end subroutine sample_thermal_ion_velocity
 
 subroutine get_pgyro(fields,E3,E1,pitch,plasma,v3_xyz,pgyro,gam0)
     !+ Returns fraction of gyroangles that can produce a reaction with
@@ -9424,7 +11601,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     real(Float64) :: logTmin, dlogT, logti, logti_amu, logte
     integer :: neb, nt, i
     type(InterpolCoeffs2D) :: c
-    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp
+    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp, denf, deni_i
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop_i, H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop_i, H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
@@ -9439,6 +11616,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     deni = plasma%deni
     dene = plasma%dene
     denimp = plasma%denimp
+    denf = plasma%denf
     logeb_amu = log10(eb/ab)
     logti = log10(plasma%ti)
     logte = log10(plasma%te)
@@ -9454,6 +11632,10 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     do i=1, n_thermal
         H_H_pop_i = 0.d0
         H_H_depop_i = 0.d0
+        deni_i = deni(i)
+        if(beam_mass.eq.thermal_mass(i)) then
+            deni_i = deni(i) + denf
+        endif
         logti_amu = log10(plasma%ti/thermal_mass(i))
         call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
                             logeb_amu, logti_amu, c, err_status)
@@ -9477,7 +11659,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_pop_i.lt.tables%H_H%minlog_pop)
                 H_H_pop_i = 0.d0
             elsewhere
-                H_H_pop_i = deni(i) * exp(H_H_pop_i*log_10)
+                H_H_pop_i = deni_i * exp(H_H_pop_i*log_10)
             end where
 
             H_H_depop_i = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
@@ -9487,7 +11669,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_depop_i.lt.tables%H_H%minlog_depop)
                 H_H_depop_i = 0.d0
             elsewhere
-                H_H_depop_i = deni(i) * exp(H_H_depop_i*log_10)
+                H_H_depop_i = deni_i * exp(H_H_depop_i*log_10)
             end where
         endif
         H_H_pop = H_H_pop + H_H_pop_i
@@ -9700,7 +11882,8 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
         endif
     enddo
 
-    if(ncross.gt.1) states = 0.0
+    ! max_crossings - 1 because the particle should always start in the plasma
+    if(ncross.gt.(inputs%max_crossings - 1)) states = 0.0
 
 end subroutine attenuate
 
@@ -9730,8 +11913,18 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     !! Calculate Stark Splitting
     !! Calculate E-field
     bfield = fields%b_norm*fields%b_abs        ! planck constant in SI units
+    efield = fields%e_norm*fields%e_abs
+    efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
+    efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
+    efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
+
+    E = norm2(efield)
+    B = norm2(bfield)
+
     m = 9.109384d-31
         ! mass of electron [kg]
+    h = 6.62607004d-34
+        ! planck constant in SI units
     l0 = lambda0*1d-9
         ! reference wavelength [m]
     ! stark-zeeman corrections to energy of n=2 states are -q0, 0 and q0
@@ -9740,21 +11933,7 @@ subroutine doppler_stark(vecp, vi, fields, lambda0, lambda)
     q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
     ! wavelengths calculated from h*c0/lambda =  E_i - E_j for transition from i to j energies
     ! order is small wavelengths to large wavelengths
-    efield = fields%e_norm*fields%e_abs
-    efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
-    efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
-    efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
-    E = norm2(efield)
-    B = norm2(bfield)
-    !Stark Splitting
-    h=6.62607004d-34
-        ! planck constant in SI units
-    m = 9.109384d-31
-        ! mass of electron
-    l0 = lambda0*1d-9
-        ! reference wavelength in [m]
-    q0 = sqrt((e0*h*B/(4*pi*m))**2 + (3*a_0*e0*E)**2)
-    q1 = sqrt(4*(e0*h*B/(4*pi*m))**2 + 9*(3*a_0*e0*E)**2)
+
     if(n_stark.eq.15) then
         wavel(1)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(-1)+q1*(2))*l0)
         wavel(2)  = 2*c0*h*l0/(2*c0*h+(-2*q0*(0)+q1*(2))*l0)
@@ -9925,7 +12104,7 @@ subroutine store_photons(pos, vi, lambda0, photons, spectra, stokevec, passive)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
-    type(LOSInters) :: inter
+    type(LOSinters) :: inter
     integer :: ichan,i,j,bin,nchan, k
     logical :: pas = .False.
 
@@ -10020,6 +12199,7 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
 
     integer :: iclass = 1
     logical :: pas = .False.
+    type(LOSinters) :: inter
 
     if(present(orbit_class)) then
         iclass = min(orbit_class,particles%nclass)
@@ -10035,14 +12215,57 @@ subroutine store_fida_photons(pos, vi, lambda0, photons, orbit_class, passive)
 
 end subroutine store_fida_photons
 
-subroutine store_neutrons(rate, orbit_class)
+subroutine store_photon_birth(pos, photons, res, passive)
+    !+ Store neutral birth location of the photon source
+    real(Float64), dimension(3), intent(in)       :: pos
+        !+ Birth location of the photon source neutral
+    real(Float64), intent(in)                     :: photons
+        !+ Number of photons
+    type(NeutralParticleReservoir), dimension(:), intent(inout) :: res
+        !+ reservoir of neutral particles
+    logical, intent(in), optional                 :: passive
+
+    integer :: i = 1, ichan
+    logical :: pas = .False.
+    real(Float64) :: cyl(3), pos_xyz(3)
+    integer(Int32) :: ind(3), nchan
+    type(LOSinters) :: inter
+
+    if(present(passive)) pas = passive
+
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = atan2(pos(2), pos(1))
+        call get_passive_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    endif
+
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
+    loop_over_channels: do i=1,nchan
+        ichan = inter%los_elem(i)%id
+        call update_reservoir(res(ichan), pos, photons)
+    enddo loop_over_channels
+
+end subroutine store_photon_birth
+
+subroutine store_neutrons(rate, orbit_class, neutron_collimator, channel)
     !+ Store neutron rate in [[libfida:neutron]]
     real(Float64), intent(in)     :: rate
         !+ Neutron rate [neutrons/sec]
     integer, intent(in), optional :: orbit_class
         !+ Orbit class ID
+    logical, intent(in), optional :: neutron_collimator
+        !+ Indicates whether `rate` is for a Neutron Collimator diagnostic
+    integer, intent(in), optional :: channel
 
-    integer :: iclass
+    integer :: iclass, ichan
+    logical :: nc
 
     if(present(orbit_class)) then
         iclass = min(orbit_class,particles%nclass)
@@ -10050,9 +12273,23 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP ATOMIC UPDATE
-    neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END ATOMIC
+    if(present(neutron_collimator)) then
+        nc = neutron_collimator
+    else
+        nc = .False.
+    endif
+
+    if(present(channel)) ichan = channel
+
+    if (nc) then
+        !$OMP ATOMIC UPDATE
+        neutron%flux(iclass,ichan)= neutron%flux(iclass,ichan) + rate
+        !$OMP END ATOMIC
+    else
+        !$OMP ATOMIC UPDATE
+        neutron%rate(iclass)= neutron%rate(iclass) + rate
+        !$OMP END ATOMIC
+    endif
 
 end subroutine store_neutrons
 
@@ -10076,7 +12313,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         !+ LOS intersection length with [[libfida:beam_grid]] cell particle is in
     real(Float64), intent(in)               :: sigma_pi
         !+ Sigma-pi ratio for channel
-    real(Float64), intent(in)               :: denf
+    real(Float64), optional, intent(in)               :: denf
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
@@ -10097,15 +12334,13 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,lambda0,fields,dlength
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
         if (bin.gt.inputs%nlambda_wght) cycle loop_over_stark
-        !fida(bin,ichan)= fida(bin,ichan) + &
-        !  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
         fweight%weight(bin,eind,pind,ichan) = &
           fweight%weight(bin,eind,pind,ichan) + intensity(i)*intens_fac !(ph*cm)/(s*nm*sr*fast-ion*dE*dp)
+        if(present(denf)) then
+           fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
+                                             denf*intensity(i)*intens_fac
+        endif       
     enddo loop_over_stark
-    if(denf.gt.0.d0) then
-        fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
-                                          (denf*intens_fac)*sum(intensity)
-    endif
     !$OMP END CRITICAL(fida_wght)
 
 end subroutine store_fw_photons_at_chan
@@ -10161,13 +12396,13 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
 
     logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
     real(Float64), dimension(beam_grid%ngrid) :: cdf
-    integer  :: c, i, j, k, nc, nm, ind(3)
-    integer  :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
     real(Float64), pointer :: papprox_ptr(:)
@@ -10196,6 +12431,11 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             nlaunch(i,j,k) = nlaunch(i,j,k) + 1
         enddo
+        !! Safety check, we should be close to the desired number of markers
+        if ((abs(nr_markers - sum(nlaunch))/nr_markers).gt.0.1) then
+            write(*,*) 'The number of markers is off my more than 10%'
+            stop
+        endif
     endif
 
 end subroutine get_nlaunch
@@ -10206,15 +12446,15 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), intent(in)   :: papprox
         !+ [[libfida:pass_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
 
     logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
     real(Float64), dimension(pass_grid%ngrid) :: cdf
     integer, dimension(1) :: randomi
     type(rng_type) :: r
-    integer :: c, i, j, k, nc, nm, ind(3)
-    integer :: nmin = 5
+    integer  :: i, j, k, ind(3)
+    integer(Int64)  :: c, nc, nm, nmin = 5
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -10899,7 +13139,7 @@ subroutine dcx
     real(Float64):: iflux, ipostflux, cur_birth  !! temp variables for birth/ioniz source info
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
     !! for storing birth/ioniz source info
     real(Float64), dimension(:,:,:), allocatable :: ibirth, icerprev
@@ -10965,12 +13205,13 @@ subroutine dcx
                 !! Weight CX rates by ion source density, states has units of 1/s/cm3
                 if(beam_mass.eq.thermal_mass(is)) then
                     states = rates*(plasma%deni(is) + plasma%denf)
+                    if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
                 else
                     states = rates*plasma%deni(is)
+                    if(sum(states).eq.0) cycle loop_over_dcx
                     fi_correction = 1.d0
                 endif
-                if(sum(states).eq.0) cycle loop_over_dcx
 
                 if(inputs%calc_birth.ge.1) then
                    !! iflux has units of 1/s/m3, so does not need to be multiplied by beam_grid%dv
@@ -10999,10 +13240,14 @@ subroutine dcx
                        !! Save the current flux to compare with in the next step along track
                        iflux=ipostflux
                     endif
+                    photons = fi_correction*photons !! Correct for including fast-ions in states
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                        photons = fi_correction*photons !! Correct for including fast-ions in states
                         call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),&
                             &spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
+                    endif
+
+                    if((photons.gt.0.d0).and.(inputs%calc_res.ge.1)) then
+                        call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%dcx)
                     endif
                 enddo loop_along_track
             enddo loop_over_dcx
@@ -11019,6 +13264,11 @@ subroutine dcx
     if(inputs%calc_birth.ge.1) then
        call parallel_sum(ibirth)
        call parallel_sum(icerprev)
+    endif
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%dcx(jj))
+        enddo
     endif
 #endif
     if(inputs%calc_birth.ge.1) then
@@ -11068,7 +13318,7 @@ subroutine halo
     real(Float64):: iflux, ipostflux, cur_birth  !! temp variables for birth/ioniz source info
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: local_iter_dens
 
     type(NeutralPopulation) :: cur_pop, prev_pop
@@ -11161,12 +13411,13 @@ subroutine halo
                     !! Weight CX rates by ion source density
                     if(beam_mass.eq.thermal_mass(is)) then
                         states = rates*(plasma%deni(is) + plasma%denf)
+                        if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
                     else
                         states = rates*plasma%deni(is)
+                        if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = 1.d0
                     endif
-                    if(sum(states).eq.0) cycle loop_over_halos
                     if(inputs%calc_birth.ge.1) then
                        iflux = sum(states)
                        ! For halo 1 need to debit CE source from DCX, otherwise we debit from self
@@ -11196,10 +13447,15 @@ subroutine halo
                         endif
 
 
+                        photons = fi_correction*photons !! Correct for including fast-ions in states
+
                         if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                            photons = fi_correction*photons !! Correct for including fast-ions in states
                             call store_photons(tracks(it)%pos,vihalo,thermal_lambda0(is), &
                                                photons/nlaunch(i,j,k),spec%halo(:,:,:,is),spec%halostokes(:,:,:,:,is))
+                        endif
+
+                        if((photons.gt.0.d0).and.(inputs%calc_res.ge.1)) then
+                            call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%halo)
                         endif
                     enddo loop_along_track
                 enddo loop_over_halos
@@ -11235,6 +13491,9 @@ subroutine halo
         if(seed_dcx.lt.0.01) exit iterations
     enddo iterations
 
+    call free_neutral_population(cur_pop)
+    call free_neutral_population(prev_pop)
+
 #ifdef _MPI
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
@@ -11243,6 +13502,11 @@ subroutine halo
     if(inputs%calc_birth.ge.1) then
        call parallel_sum(ibirth)
        call parallel_sum(icerprev)
+    endif
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%halo(jj))
+        enddo
     endif
 #endif
     if(inputs%calc_birth.ge.1) then
@@ -11543,7 +13807,9 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength ! move dlength
                 call get_plasma(plasma,pos=r0)
                 max_length = max_length + dlength
-                if(max_length.gt.300) cycle loop_over_los
+                ! If plasma is not within max_length [1000 cm] of LOS lens then no brems is calculated for the channel
+                ! 1000 cm is assumed to cover the limit for most devices simulated in FIDASIM as of March 2023
+                if(max_length.gt.1000) cycle loop_over_los
             enddo
 
             ! Calculate bremsstrahlung along los
@@ -11601,7 +13867,7 @@ subroutine fida_f
     real(Float64) :: eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -11666,6 +13932,8 @@ subroutine fida_f
                 call colrad(plasma, fbm%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons/nlaunch(i,j,k))
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%fida)
+
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -11673,6 +13941,11 @@ subroutine fida_f
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%fida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine fida_f
@@ -11705,7 +13978,7 @@ subroutine pfida_f
     real(Float64) :: max_papprox, eb, ptch
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -11775,6 +14048,9 @@ subroutine pfida_f
                 call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons/nlaunch(i,j,k), passive=.True.)
+                if(inputs%calc_res.ge.1) then 
+                    call store_photon_birth(tracks(1)%pos, photons/nlaunch(i,j,k), spatres%pfida, passive=.True.)
+                endif
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -11782,6 +14058,11 @@ subroutine pfida_f
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%pfida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine pfida_f
@@ -11877,6 +14158,7 @@ subroutine fida_mc
                 call colrad(plasma, fast_ion%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, beam_lambda0, photons, fast_ion%class)
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%fida)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -11884,6 +14166,11 @@ subroutine fida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%fida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine fida_mc
@@ -11985,6 +14272,7 @@ subroutine pfida_mc
                 call colrad(plasma, fast_ion%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, beam_lambda0, photons, fast_ion%class,passive=.True.)
+                if(inputs%calc_res.ge.1) call store_photon_birth(tracks(1)%pos, photons, spatres%pfida, passive = .True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -11992,6 +14280,11 @@ subroutine pfida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    if(inputs%calc_res.ge.1) then
+        do jj=1,spec_chords%nchan
+            call parallel_merge_reservoirs(spatres%pfida(jj))
+        enddo
+    endif
 #endif
 
 end subroutine pfida_mc
@@ -12015,7 +14308,7 @@ subroutine npa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
     do ic=1,beam_grid%ngrid
@@ -12030,7 +14323,7 @@ subroutine npa_f
                         sum(neut%halo%dens(:,i,j,k)))* &
                         plasma%denf
     enddo
-
+    
     ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -12070,7 +14363,7 @@ subroutine npa_f
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
-                        if (inputs%verbose.ge.0)then
+                        if (inputs%verbose.ge.1)then
                             write(*,*) "NPA_F: Missed Detector ",ichan
                         endif
                         cycle gyro_range_loop
@@ -12091,7 +14384,7 @@ subroutine npa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux)
+                    call store_npa(det,ri,rf,vi,flux, gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -12128,7 +14421,7 @@ subroutine pnpa_f
     integer :: inpa,ichan,nrange,ir,npart,ncell, is
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
-    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
+    integer(Int64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     papprox=0.d0
     do ic=1,pass_grid%ngrid
@@ -12205,7 +14498,7 @@ subroutine pnpa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*pass_grid%r(i)*pass_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux,passive=.True.)
+                    call store_npa(det,ri,rf,vi,flux,passive=.True., gs=gs)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -12297,7 +14590,7 @@ subroutine npa_mc
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
                             if (inputs%verbose.ge.0)then
-                                write(*,*) "NPA_MC: Missed Detector ",ichan
+                                write(*,*) "NPA_MC: Central Trajectory Missed Detector ",ichan
                             endif
                             cycle gyro_range_loop
                         endif
@@ -12323,7 +14616,7 @@ subroutine npa_mc
                             call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                             if(det.ne.ichan) then
                                 if (inputs%verbose.ge.0)then
-                                    write(*,*) "NPA_MC: Missed Detector ",ichan
+                                    write(*,*) "NPA_MC: Spread Trajectory Missed Detector ",ichan
                                 endif
                                 cycle spread_loop
                             endif
@@ -12544,7 +14837,10 @@ end subroutine pnpa_mc
 
 subroutine neutron_f
     !+ Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)
-    integer :: ir, iphi, iz, ie, ip, igamma, ngamma
+#ifdef _OMP
+    use omp_lib
+#endif
+    integer :: ir, iphi, iz, ie, ip, igamma, ngamma, tid, max_threads
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb,pitch
@@ -12554,6 +14850,7 @@ subroutine neutron_f
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: s, c
+    real(Float64), dimension(:,:,:,:), allocatable :: emis_local
 
     if(.not.any(thermal_mass.eq.H2_amu)) then
         write(*,'(T2,a)') 'NEUTRON_F: Thermal Deuterium is not present in plasma'
@@ -12576,11 +14873,31 @@ subroutine neutron_f
 
     ngamma = 20
     rate = 0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
-    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
-    phi_loop: do iphi = 1, fbm%nphi
-        z_loop: do iz = istart, fbm%nz, istep
-            r_loop: do ir=1, fbm%nr
+
+    ! Allocate thread-local arrays to eliminate critical section
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(inputs%calc_neutron.ge.2) then
+        allocate(emis_local(fbm%nr, fbm%nz, fbm%nphi, max_threads))
+        emis_local = 0.d0
+    endif
+
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic, 100) private(fields,vi,ri,pitch,eb,&
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c,tid)
+    z_loop: do iz = istart, fbm%nz, istep
+        r_loop: do ir=1, fbm%nr
+            phi_loop: do iphi = 1, fbm%nphi
+
+#ifdef _OMP
+                tid = OMP_get_thread_num() + 1
+#else
+                tid = 1
+#endif
+
                 !! Calculate position
                 if(fbm%nphi.eq.1) then
                     s = 0.d0
@@ -12596,47 +14913,57 @@ subroutine neutron_f
 
                 !! Get fields
                 call get_fields(fields,pos=uvw,input_coords=1)
-                if(.not.fields%in_plasma) cycle r_loop
 
-                factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
-                !! Loop over energy/pitch/gamma
-                pitch_loop: do ip = 1, fbm%npitch
-                    pitch = fbm%pitch(ip)
-                    energy_loop: do ie =1, fbm%nenergy
-                        eb = fbm%energy(ie)
-                        gyro_loop: do igamma=1, ngamma
-                            call gyro_correction(fields,eb,pitch,fbm%A,ri,vi)
+                ! Use conditional instead of cycle for collapse compatibility
+                if(fields%in_plasma) then
+                    factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
+                    !! Loop over energy/pitch/gamma
+                    pitch_loop: do ip = 1, fbm%npitch
+                        pitch = fbm%pitch(ip)
+                        energy_loop: do ie =1, fbm%nenergy
+                            eb = fbm%energy(ie)
+                            gyro_loop: do igamma=1, ngamma
+                                call gyro_correction(fields,eb,pitch,fbm%A,ri,vi)
 
-                            !! Get plasma parameters at particle position
-                            call get_plasma(plasma,pos=ri)
-                            if(.not.plasma%in_plasma) cycle gyro_loop
+                                !! Get plasma parameters at particle position
+                                call get_plasma(plasma,pos=ri)
+                                if(.not.plasma%in_plasma) cycle gyro_loop
 
-                            !! Calculate effective beam energy
-                            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-                            erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+                                !! Calculate effective beam energy
+                                vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                                erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
-                            !! Get neutron production rate
-                            call get_dd_rate(plasma, erel, rate, branch=2)
-                            if(inputs%calc_neutron.ge.2) then
-                                neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
-                                                                 + rate * factor
-                                !$OMP CRITICAL(neutron_emis)
-                                neutron%emis(ir,iz,iphi) = neutron%emis(ir,iz,iphi) &
-                                                                 + rate * fbm%f(ie,ip,ir,iz,iphi) &
-                                                                 * factor
-                                !$OMP END CRITICAL(neutron_emis)
-                            endif
+                                !! Get neutron production rate
+                                call get_dd_rate(plasma, erel, rate, branch=2)
+                                if(inputs%calc_neutron.ge.2) then
+                                    ! weight: no race condition (each iteration writes to unique element)
+                                    neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
+                                                                     + rate * factor
+                                    ! emis: use thread-local (multiple iterations write to same element)
+                                    emis_local(ir,iz,iphi,tid) = emis_local(ir,iz,iphi,tid) &
+                                                                     + rate * fbm%f(ie,ip,ir,iz,iphi) &
+                                                                     * factor
+                                endif
 
-                            rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
-                            !! Store neutrons
-                            call store_neutrons(rate)
-                        enddo gyro_loop
-                    enddo energy_loop
-                enddo pitch_loop
-            enddo r_loop
-        enddo z_loop
-    enddo phi_loop
+                                rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
+                                !! Store neutrons
+                                call store_neutrons(rate)
+                            enddo gyro_loop
+                        enddo energy_loop
+                    enddo pitch_loop
+                endif
+            enddo phi_loop
+        enddo r_loop
+    enddo z_loop
     !$OMP END PARALLEL DO
+
+    ! Combine thread-local emis results
+    if(inputs%calc_neutron.ge.2) then
+        do tid = 1, max_threads
+            neutron%emis(:,:,:) = neutron%emis(:,:,:) + emis_local(:,:,:,tid)
+        enddo
+        deallocate(emis_local)
+    endif
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
@@ -12645,19 +14972,6 @@ subroutine neutron_f
         call parallel_sum(neutron%emis)
     endif
 #endif
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
-        write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time(time_start)
-    endif
-
-#ifdef _MPI
-    if(my_rank().eq.0) call write_neutrons()
-#else
-    call write_neutrons()
-#endif
-
 
 end subroutine neutron_f
 
@@ -12779,7 +15093,7 @@ subroutine cfpd_f
 
     if(inputs%verbose.ge.1) then
         write(*,'(30X,a)') ''
-        write(*,*) 'write charged fusion products:    ' , time(time_start)
+        write(*,*) 'write charged fusion products:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -12902,19 +15216,343 @@ subroutine neutron_mc
     call parallel_sum(neutron%rate)
 #endif
 
+end subroutine neutron_mc
+
+subroutine neutron_spec_mc
+    !+ Calculate neutron collimator flux using a Monte Carlo Fast-ion distribution
+#ifdef _OMP
+    use omp_lib
+#endif
+    integer :: iion, igamma, ngamma, ichan, ie_neutron, i, ntrack
+    type(FastIon) :: fast_ion
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
+    real(Float64) :: eb, flux, kappa, e_neutron, e_weight
+    real(Float64), dimension(3) :: ri, vi, uvw, uvw_vi
+    real(Float64), dimension(3) :: rn, vn, r_detector
+    real(Float64) :: vnet_square
+    real(Float64) :: phi, s, c, factor, delta_phi
+    real(Float64) :: d, domega, los_angle, max_angle
+    logical :: visible
+    integer :: n_thermal, itherm
+    real(Float64), dimension(3) :: v_thermal
+    real(Float64) :: flux_contrib
+    integer :: tid, max_threads
+    real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
+    type(ParticleTrack), dimension(:,:), allocatable :: tt_tracks
+    integer, dimension(:), allocatable :: tt_ntrack
+    integer :: max_ntrack_tt, igamma_tt, ngamma_tt, ie_neutron_tt, itrack
+    real(Float64) :: rate_tt, flux_tt, domega_tt, d_tt, flux_contrib_tt, e_neutron_tt, weight_tt, T_ion
+    real(Float64), dimension(3) :: r_detector_tt, vn_det_tt, ri_tt, v1_thermal_tt, v2_thermal_tt
+
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_SPEC_MC: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(any(thermal_mass.eq.H3_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_SPEC_MC: D-T neutron production is not implemented'
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'NEUTRON_SPEC_MC: Fast-ion species is not Deuterium'
+        return
+    endif
+
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
-        write(*,'(30X,a)') ''
-        write(*,*) 'write neutrons:    ' , time(time_start)
+        write(*,'(T6,"# of markers: ",i10)') particles%nparticle
+        write(*,'(T6,"# of channels: ",i10)') nc_chords%nchan
+    endif
+
+    !! Correct neutron flux when equilibrium is 3D and MC distribution is 4D
+    if(particles%axisym.and.(inter_grid%nphi.gt.1)) then
+        delta_phi = inter_grid%phi(inter_grid%nphi)-inter_grid%phi(1)
+        delta_phi = delta_phi + delta_phi/(inter_grid%nphi-1)/2 !Add half a cell
+        factor = delta_phi/(2*pi) * 2 !Riemann sum below assumes coord's are at midpoint of cell
+    else
+        factor = 1
+    endif
+
+    flux = 0.0
+    ngamma = 20
+    n_thermal = 100  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
+
+    !! Allocate thread-local arrays to eliminate critical sections
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(allocated(neutron%eflux)) then
+        allocate(eflux_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        allocate(eflux_bt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+        eflux_local = 0.d0
+        eflux_bt_local = 0.d0
+        eflux_tt_local = 0.d0
+    endif
+
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,flux,eb,igamma,phi,ichan, &
+    !$OMP& rn,vn,r_detector,d,domega,visible,los_angle,max_angle,kappa, &
+    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib,tid)
+    loop_over_fast_ions: do iion=istart,particles%nparticle,istep
+#ifdef _OMP
+        tid = OMP_get_thread_num() + 1
+#else
+        tid = 1
+#endif
+        fast_ion = particles%fast_ion(iion)
+        if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
+
+        !! Calculate position in machine coordinates
+        if(particles%axisym) then
+            s = 0.d0
+            c = 1.d0
+        else
+            phi = fast_ion%phi
+            s = sin(phi)
+            c = cos(phi)
+        endif
+
+        uvw(1) = fast_ion%r*c
+        uvw(2) = fast_ion%r*s
+        uvw(3) = fast_ion%z
+
+        !! Loop over collimator channels
+        channel_loop: do ichan=1, nc_chords%nchan
+            r_detector = nc_chords%det(ichan)%detector%origin
+            
+            !! Check if particle is visible from detector
+            !! Simple geometric check - could be refined
+            d = norm2(r_detector - uvw)
+            vn = (uvw - r_detector)/d  ! Unit vector from detector to particle
+            
+            !! Check if particle is within aperture solid angle
+            !! This is a simplified visibility check
+            rn = nc_chords%det(ichan)%aperture%origin - r_detector
+            los_angle = acos(dot_product(vn, rn/norm2(rn)))
+            
+            !! Maximum acceptance angle (approximate)
+            if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                max_angle = max(nc_chords%det(ichan)%detector%hw, &
+                               nc_chords%det(ichan)%detector%hh) / norm2(rn)
+            else
+                max_angle = sqrt(nc_chords%det(ichan)%detector%hw**2 + &
+                                nc_chords%det(ichan)%detector%hh**2) / norm2(rn)
+            endif
+            
+            visible = (los_angle .le. max_angle)
+            if(.not.visible) cycle channel_loop
+
+            !! Calculate solid angle
+            if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                        (pi * d**2)
+            else
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                        (4 * d**2)
+            endif
+
+            if(inputs%dist_type.eq.2) then
+                !! Get electromagnetic fields
+                call get_fields(fields, pos=uvw, input_coords=1)
+                if(.not.fields%in_plasma) cycle channel_loop
+
+                gyro_loop: do igamma=1,ngamma
+                    !! Correct for Gyro-motion
+                    call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, ri, vi)
+
+                    !! Get plasma parameters
+                    call get_plasma(plasma,pos=ri)
+                    if(.not.plasma%in_plasma) cycle gyro_loop
+
+                    !! Calculate effective beam energy
+                    vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                    eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
+
+                    !! Get neutron production rate
+                    call get_dd_rate(plasma, eb, flux, branch=2)
+                    
+                    !! Apply anisotropy correction
+                    call get_ddnhe_anisotropy(plasma, vi, vn, kappa)
+                    flux = flux * kappa * fast_ion%weight * domega / ngamma * factor
+
+                    !! Store neutrons
+                    call store_neutrons(flux, fast_ion%class, neutron_collimator=.True., channel=ichan)
+                enddo gyro_loop
+            else
+                !! Get plasma parameters
+                call get_plasma(plasma,pos=uvw,input_coords=1)
+                if(.not.plasma%in_plasma) cycle channel_loop
+
+                !! Calculate effective beam energy
+                uvw_vi(1) = fast_ion%vr
+                uvw_vi(2) = fast_ion%vt
+                uvw_vi(3) = fast_ion%vz
+                vi = matmul(beam_grid%inv_basis,uvw_vi)
+                vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
+
+                !! Get neutron production rate
+                call get_dd_rate(plasma, eb, flux, branch=2)
+
+                !! Apply anisotropy correction for angular distribution
+                call get_ddnhe_anisotropy(plasma, vi, vn, kappa)
+                flux = flux * kappa * fast_ion%weight * domega * factor
+
+                !! Store integrated flux (always calculate)
+                call store_neutrons(flux, fast_ion%class, neutron_collimator=.True., channel=ichan)
+
+                !! Calculate energy-resolved spectrum (only if calc_neut_spec >= 2)
+                if(inputs%calc_neut_spec.ge.2) then
+                    thermal_loop: do itherm = 1, n_thermal
+                        !! Sample thermal ion velocity
+                        call sample_thermal_ion_velocity(plasma, v_thermal)
+
+                        !! Calculate neutron energy for this thermal ion
+                        call get_dd_neutron_energy(vi, v_thermal, vn, e_neutron, e_weight)
+
+                        !! Bin by energy
+                        if(allocated(neutron%eflux)) then
+                            ie_neutron = floor((e_neutron - neutron%emin) / &
+                                (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                            if(ie_neutron >= 1 .and. ie_neutron <= neutron%nenergy) then
+                                ! Convert to spectral flux [neutrons/(s*keV)] by dividing by bin width
+                                flux_contrib = flux * e_weight * real(neutron%nenergy) / &
+                                    (real(n_thermal) * (neutron%emax - neutron%emin))
+                                ! Store in thread-local arrays (no critical section needed)
+                                eflux_local(ie_neutron, ichan, fast_ion%class, tid) = &
+                                    eflux_local(ie_neutron, ichan, fast_ion%class, tid) + flux_contrib
+                                eflux_bt_local(ie_neutron, ichan, fast_ion%class, tid) = &
+                                    eflux_bt_local(ie_neutron, ichan, fast_ion%class, tid) + flux_contrib
+                            endif
+                        endif
+                    enddo thermal_loop
+                endif
+            endif
+        enddo channel_loop
+    enddo loop_over_fast_ions
+    !$OMP END PARALLEL DO
+
+    !! Combine thread-local results into global arrays
+    if(allocated(neutron%eflux)) then
+        do tid = 1, max_threads
+            neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_local(:,:,:,tid)
+            neutron%eflux_bt(:,:,:) = neutron%eflux_bt(:,:,:) + eflux_bt_local(:,:,:,tid)
+        enddo
+        deallocate(eflux_local, eflux_bt_local, eflux_tt_local)
+    endif
+
+    !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
+    if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
+        ! Pre-compute thermal-thermal tracks for all channels
+        allocate(tt_tracks(pass_grid%ntrack, nc_chords%nchan))
+        allocate(tt_ntrack(nc_chords%nchan))
+        max_ntrack_tt = 0
+
+        do ichan = 1, nc_chords%nchan
+            r_detector_tt = nc_chords%det(ichan)%detector%origin
+            vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+            vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+            call track_cylindrical(r_detector_tt, vn_det_tt, tracks, ntrack)
+            tt_ntrack(ichan) = ntrack
+            if(ntrack > 0) then
+                do itrack = 1, ntrack
+                    tt_tracks(itrack, ichan) = tracks(itrack)
+                enddo
+                max_ntrack_tt = max(max_ntrack_tt, ntrack)
+            endif
+        enddo
+
+        ngamma_tt = 100
+
+        ! Allocate thread-local arrays for thermal-thermal
+        if(allocated(neutron%eflux)) then
+            allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, particles%nclass, max_threads))
+            eflux_tt_local = 0.d0
+        endif
+
+        !$OMP PARALLEL DO collapse(2) schedule(dynamic, 10) &
+        !$OMP& private(ichan,i,tid,ri_tt,plasma,T_ion,rate_tt,flux_tt,d_tt,domega_tt, &
+        !$OMP& igamma_tt,v1_thermal_tt,v2_thermal_tt,e_neutron_tt,weight_tt,ie_neutron_tt,flux_contrib_tt,r_detector_tt,vn_det_tt)
+        do ichan = 1, nc_chords%nchan
+            do i = 1, max_ntrack_tt
+#ifdef _OMP
+                tid = OMP_get_thread_num() + 1
+#else
+                tid = 1
+#endif
+                if(i > tt_ntrack(ichan)) cycle
+
+                ri_tt = tt_tracks(i, ichan)%pos
+                call get_plasma(plasma, pos=ri_tt, input_coords=1)
+                if(.not.plasma%in_plasma) cycle
+
+                if(abs(thermal_mass(1) - H2_amu) > 0.01) cycle
+
+                T_ion = plasma%ti
+                if(T_ion < 0.1d0) cycle
+
+                call get_thermal_dd_rate(T_ion, rate_tt)
+                flux_tt = 0.25d0 * plasma%deni(1)**2 * rate_tt
+                if(flux_tt <= 0.0d0) cycle
+
+                r_detector_tt = nc_chords%det(ichan)%detector%origin
+                vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+                vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+
+                d_tt = norm2(r_detector_tt - ri_tt)
+                if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (pi * d_tt**2)
+                else
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (4.0d0 * d_tt**2)
+                endif
+
+                do igamma_tt = 1, ngamma_tt
+                    call sample_thermal_ion_velocity(plasma, v1_thermal_tt)
+                    call sample_thermal_ion_velocity(plasma, v2_thermal_tt)
+                    call get_dd_neutron_energy(v1_thermal_tt, v2_thermal_tt, vn_det_tt, e_neutron_tt, weight_tt)
+
+                    if(allocated(neutron%eflux)) then
+                        ie_neutron_tt = floor((e_neutron_tt - neutron%emin) / &
+                            (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                        if(ie_neutron_tt >= 1 .and. ie_neutron_tt <= neutron%nenergy) then
+                            flux_contrib_tt = flux_tt * tt_tracks(i, ichan)%time * weight_tt * domega_tt * &
+                                real(neutron%nenergy) / (real(ngamma_tt) * (neutron%emax - neutron%emin))
+                            eflux_tt_local(ie_neutron_tt, ichan, 1, tid) = &
+                                eflux_tt_local(ie_neutron_tt, ichan, 1, tid) + flux_contrib_tt
+                        endif
+                    endif
+                enddo
+            enddo
+        enddo
+        !$OMP END PARALLEL DO
+
+        ! Combine thermal-thermal thread-local results
+        if(allocated(neutron%eflux)) then
+            do tid = 1, max_threads
+                neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_tt_local(:,:,:,tid)
+                neutron%eflux_tt(:,:,:) = neutron%eflux_tt(:,:,:) + eflux_tt_local(:,:,:,tid)
+            enddo
+            deallocate(eflux_tt_local)
+        endif
+
+        deallocate(tt_tracks, tt_ntrack)
     endif
 
 #ifdef _MPI
-    if(my_rank().eq.0) call write_neutrons()
-#else
-    call write_neutrons()
+    call parallel_sum(neutron%flux)
+    if(allocated(neutron%eflux)) then
+        call parallel_sum(neutron%eflux)
+        call parallel_sum(neutron%eflux_bt)
+        call parallel_sum(neutron%eflux_tt)
+    endif
 #endif
 
-end subroutine neutron_mc
+end subroutine neutron_spec_mc
 
 subroutine fida_weights_mc
     !+ Calculates FIDA weights
@@ -12951,7 +15589,10 @@ subroutine fida_weights_mc
     real(Float64) :: fbm_denf,phase_area
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+
+    !! For Normalization of mean_f:
+    real(Float64), allocatable :: wtot(:,:,:)
 
     nwav = inputs%nlambda_wght
 
@@ -13073,9 +15714,14 @@ subroutine fida_weights_mc
 
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
+    !! normalize mean_f
+    wtot = sum(fweight%weight, dim=1)   ! sum over wavelengths
+    where(wtot.gt.0.d0) 
+       fweight%mean_f = fweight%mean_f / wtot
+    endwhere
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write fida weights:    ' , time(time_start)
+        write(*,*) 'write fida weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13293,10 +15939,10 @@ subroutine fida_weights_los
 
                     call colrad(plasma,beam_mass,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
+                    fweight%mean_f(ienergy,ipitch,ichan) = denf
                     photons = photons/real(inputs%nphi_wght)
                     call store_fw_photons_at_chan(ichan, ienergy, ipitch, &
-                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, denf, photons)
-
+                         vp, vi, beam_lambda0, fields, dlength, sigma_pi, photons=photons)
                 enddo
             enddo
         enddo
@@ -13307,7 +15953,7 @@ subroutine fida_weights_los
     fweight%mean_f = fweight%mean_f/(dEdP)
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write fida weights:    ' , time(time_start)
+        write(*,*) 'write fida weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13337,6 +15983,8 @@ subroutine npa_weights
     real(Float64), dimension(3) :: pos,dpos,r_gyro
     integer(Int32) :: ichan
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
+    real(Float64) :: prob_total, prob_weight  !! For probability-weighted contributions
+    integer :: jchan  !! Loop variable for probability sum
 
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
@@ -13392,7 +16040,8 @@ subroutine npa_weights
 
     loop_over_channels: do ichan=1,npa_chords%nchan
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields,phit,&
-        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
+        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf,&
+        !$OMP& prob_total,prob_weight,jchan)
         loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
@@ -13402,16 +16051,11 @@ subroutine npa_weights
                         call get_fields(fields,pos=pos)
                         if(.not.fields%in_plasma) cycle loop_along_x
 
-                        !!Check if it hits a detector just to make sure
+                        !!Set direction from stored phit data
                         dpos = phit%eff_rd
                         vi_norm = phit%dir
-                        call hit_npa_detector(pos,vi_norm,det)
-                        if (det.ne.ichan) then
-                            if(inputs%verbose.ge.0) then
-                                write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
-                            endif
-                            cycle loop_along_x
-                        endif
+                        !! REMOVED: Detector recheck - trust the phit calculation
+                        !! The phit%p already encodes the correct probability for this channel
 
                         !! Determine the angle between the B-field and the Line of Sight
                         pitch = phit%pitch
@@ -13478,7 +16122,7 @@ subroutine npa_weights
     enddo
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'write npa weights:    ' , time(time_start)
+        write(*,*) 'write npa weights:    ' , time_string(time_start)
     endif
 
 #ifdef _MPI
@@ -13488,6 +16132,575 @@ subroutine npa_weights
 #endif
 
 end subroutine npa_weights
+
+subroutine neutron_spec_f
+    !+ Calculate neutron collimator flux using a fast-ion distribution function F(E,p,r,z,phi)
+#ifdef _OMP
+    use omp_lib
+#endif
+    integer :: ie, ip, igamma, ngamma, ichan, ie_neutron
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb, pitch
+    real(Float64) :: erel, flux, d, domega, kappa, e_neutron, e_weight
+    real(Float64), dimension(3) :: ri
+    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: rn, vn, r_gyro
+    integer, dimension(3) :: ind
+    real(Float64)  :: vnet_square, factor
+    real(Float64) :: fbm_denf
+    integer :: ntrack
+    integer :: i      !! counter along track
+    type(ParticleTrack),dimension(pass_grid%ntrack) :: tracks
+    logical :: beam_available
+    real(Float64) :: track_step
+    integer :: n_thermal, itherm
+    real(Float64), dimension(3) :: v_thermal
+    real(Float64) :: flux_contrib
+    integer :: tid, max_threads
+    real(Float64), dimension(:,:,:,:), allocatable :: eflux_local, eflux_bt_local, eflux_tt_local
+    type(ParticleTrack), dimension(:,:), allocatable :: all_tracks
+    integer, dimension(:), allocatable :: all_ntrack
+    type(ParticleTrack), dimension(:,:), allocatable :: tt_tracks
+    integer, dimension(:), allocatable :: tt_ntrack
+    integer :: max_ntrack_tt, igamma_tt, ngamma_tt, ie_neutron_tt, itrack
+    real(Float64) :: rate_tt, flux_tt, domega_tt, d_tt, flux_contrib_tt, e_neutron_tt, weight_tt, T_ion
+    real(Float64), dimension(3) :: r_detector_tt, vn_det_tt, ri_tt, v1_thermal_tt, v2_thermal_tt
+
+    !! Check if the beam is available
+    beam_available = allocated(fbm%energy) .and. allocated(fbm%pitch)
+
+    if (.not.beam_available) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,a)') 'NEUTRON_SPEC_F: Beam grid not available, skipping beam-thermal neutron calculation'
+        endif
+        return
+    endif
+
+    ngamma = 47
+    n_thermal = 256  ! Number of thermal ion samples per fast-ion state (for energy-resolved spectra)
+    flux = 0
+
+    !! Pre-compute track data for all channels to enable collapse parallelization
+    allocate(all_tracks(pass_grid%ntrack, nc_chords%nchan))
+    allocate(all_ntrack(nc_chords%nchan))
+
+    !$OMP PARALLEL DO schedule(dynamic) firstprivate(tracks) private(ichan,rn,vn,ntrack)
+    do ichan = 1, nc_chords%nchan
+        rn = nc_chords%det(ichan)%detector%origin
+        vn = nc_chords%det(ichan)%aperture%origin - rn
+        vn = vn/norm2(vn)
+
+        call track_cylindrical(rn, vn, tracks, ntrack)
+        all_ntrack(ichan) = ntrack
+        if(ntrack > 0) then
+            all_tracks(1:ntrack, ichan) = tracks(1:ntrack)
+        endif
+    enddo
+    !$OMP END PARALLEL DO
+
+    !! Allocate thread-local arrays to eliminate critical sections
+#ifdef _OMP
+    max_threads = OMP_get_max_threads()
+#else
+    max_threads = 1
+#endif
+
+    if(allocated(neutron%eflux)) then
+        allocate(eflux_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        allocate(eflux_bt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+        eflux_local = 0.d0
+        eflux_bt_local = 0.d0
+        eflux_tt_local = 0.d0
+    endif
+
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic, 10) &
+    !$OMP& private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
+    !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,kappa,track_step,&
+    !$OMP& e_neutron,e_weight,ie_neutron,itherm,v_thermal,flux_contrib,tid)
+    channel_loop: do ichan=1, nc_chords%nchan
+        pitch_loop: do ip = 1, fbm%npitch
+            energy_loop: do ie = 1, fbm%nenergy
+
+#ifdef _OMP
+                tid = OMP_get_thread_num() + 1
+#else
+                tid = 1
+#endif
+
+                ! Use pre-computed track data
+                ntrack = all_ntrack(ichan)
+                if(ntrack == 0) cycle energy_loop
+
+                pitch = fbm%pitch(ip)
+                eb = fbm%energy(ie)
+
+                ! Calculate viewing direction for this channel
+                rn = nc_chords%det(ichan)%detector%origin
+                vn = nc_chords%det(ichan)%aperture%origin - rn
+                vn = vn/norm2(vn)
+
+                !! Calculate the flux produced in each cell along the path
+                loop_along_track: do i=1,ntrack
+                    rn = all_tracks(i, ichan)%pos
+
+                    if (i.lt.ntrack) then
+                        track_step = norm2(all_tracks(i+1, ichan)%pos - all_tracks(i, ichan)%pos)
+                    else
+                        if (i.gt.1) then
+                            track_step = norm2(all_tracks(i, ichan)%pos - all_tracks(i-1, ichan)%pos)
+                        else
+                            track_step = 0.1d0
+                        endif
+                    endif
+
+                    !! Get fields
+                    call get_fields(fields,pos=rn)
+                    if(.not.fields%in_plasma) cycle loop_along_track
+
+                    !! Calculate solid angle in the large distance limit
+                    d = norm2(nc_chords%det(ichan)%detector%origin-rn)
+                    if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                        domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                                 (pi * d**2) !the 4s cancelled out
+                    else
+                        domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                                 (4 * d**2) !the pis cancelled out
+                    endif
+
+                    call get_indices(rn, ind)
+                 !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
+                 !!!factor = domega*beam_grid%dv/ngamma
+                    factor = domega*track_step/ngamma
+
+                    !! Loop over gyro-angles (energy and pitch are now outer collapsed loops)
+                    gyro_loop: do igamma=1, ngamma
+                        call gyro_correction(fields,eb,pitch, fbm%A, ri, vi)
+
+                        !! Correct for gyro orbit
+                        call gyro_step(vi,fields,fbm%A,r_gyro)
+
+                        !! Get distribution at guiding center
+                        fbm_denf=0
+                        if (inputs%dist_type.eq.1) then
+                            call get_ep_denf(eb,pitch,fbm_denf,pos=(ri+r_gyro))
+                        endif
+                        if (fbm_denf.ne.fbm_denf) cycle gyro_loop  ! Skip NaN
+                        if (fbm_denf < 1.0e-20) cycle gyro_loop    ! Skip negligible values
+
+                        !! Get plasma parameters at particle position
+                        call get_plasma(plasma,pos=ri)
+                        if(.not.plasma%in_plasma) cycle gyro_loop
+
+                        !! Calculate effective beam energy
+                        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                        erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
+
+                        !! Get neutron production flux
+                        call get_dd_rate(plasma,erel,flux,branch=2)
+
+                        !! Apply anisotropy correction for neutron emission
+                        call get_ddnhe_anisotropy(plasma,vi,vn,kappa)
+                        flux = flux*kappa
+                        flux = flux*2*fbm_denf*factor
+                        !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
+
+                        !! Store integrated flux (always calculate)
+                        call store_neutrons(flux, neutron_collimator=.True.,channel=ichan)
+
+                        !! Calculate energy-resolved spectrum (only if calc_neut_spec >= 2)
+                        if(inputs%calc_neut_spec.ge.2) then
+                            thermal_loop: do itherm = 1, n_thermal
+                                !! Sample thermal ion velocity
+                                call sample_thermal_ion_velocity(plasma, v_thermal)
+
+                                !! Calculate neutron energy for this thermal ion
+                                call get_dd_neutron_energy(vi, v_thermal, vn, e_neutron, e_weight)
+
+                                !! Bin by energy
+                                if(allocated(neutron%eflux)) then
+                                    ie_neutron = floor((e_neutron - neutron%emin) / &
+                                        (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                                    if(ie_neutron >= 1 .and. ie_neutron <= neutron%nenergy) then
+
+                                        ! Properly weight flux contribution
+                                        flux_contrib = flux * e_weight * real(neutron%nenergy) / &
+                                                       (real(n_thermal) * (neutron%emax - neutron%emin))
+                                        ! Store in thread-local arrays (no critical section needed)
+                                        eflux_local(ie_neutron, ichan, 1, tid) = &
+                                            eflux_local(ie_neutron, ichan, 1, tid) + flux_contrib
+                                        eflux_bt_local(ie_neutron, ichan, 1, tid) = &
+                                            eflux_bt_local(ie_neutron, ichan, 1, tid) + flux_contrib
+                                    endif
+                                endif
+                            enddo thermal_loop
+                        endif
+                    enddo gyro_loop
+                enddo loop_along_track
+            enddo energy_loop
+        enddo pitch_loop
+    enddo channel_loop
+    !$OMP END PARALLEL DO
+
+    !! Combine thread-local results into global arrays
+    if(allocated(neutron%eflux)) then
+        do tid = 1, max_threads
+            neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_local(:,:,:,tid)
+            neutron%eflux_bt(:,:,:) = neutron%eflux_bt(:,:,:) + eflux_bt_local(:,:,:,tid)
+            ! Note: eflux_tt accumulation happens in neutron_thermal_thermal
+        enddo
+        deallocate(eflux_local, eflux_bt_local, eflux_tt_local)
+    endif
+
+    !! Deallocate pre-computed track arrays
+    deallocate(all_tracks, all_ntrack)
+
+    !! Add thermal-thermal contribution if enabled (only for energy-resolved spectra)
+    if(neutron%include_thermal .and. inputs%calc_neut_spec.ge.2) then
+        ! Pre-compute thermal-thermal tracks for all channels
+        allocate(tt_tracks(pass_grid%ntrack, nc_chords%nchan))
+        allocate(tt_ntrack(nc_chords%nchan))
+        max_ntrack_tt = 0
+
+        do ichan = 1, nc_chords%nchan
+            r_detector_tt = nc_chords%det(ichan)%detector%origin
+            vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+            vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+            call track_cylindrical(r_detector_tt, vn_det_tt, tracks, ntrack)
+            tt_ntrack(ichan) = ntrack
+            if(ntrack > 0) then
+                do itrack = 1, ntrack
+                    tt_tracks(itrack, ichan) = tracks(itrack)
+                enddo
+                max_ntrack_tt = max(max_ntrack_tt, ntrack)
+            endif
+        enddo
+
+        ngamma_tt = 100
+
+        ! Allocate thread-local arrays for thermal-thermal
+        if(allocated(neutron%eflux)) then
+            allocate(eflux_tt_local(neutron%nenergy, nc_chords%nchan, 1, max_threads))
+            eflux_tt_local = 0.d0
+        endif
+
+        !$OMP PARALLEL DO collapse(2) schedule(dynamic, 10) &
+        !$OMP& private(ichan,i,tid,ri_tt,plasma,T_ion,rate_tt,flux_tt,d_tt,domega_tt, &
+        !$OMP& igamma_tt,v1_thermal_tt,v2_thermal_tt,e_neutron_tt,weight_tt,ie_neutron_tt,flux_contrib_tt,r_detector_tt,vn_det_tt)
+        do ichan = 1, nc_chords%nchan
+            do i = 1, max_ntrack_tt
+#ifdef _OMP
+                tid = OMP_get_thread_num() + 1
+#else
+                tid = 1
+#endif
+                if(i > tt_ntrack(ichan)) cycle
+
+                ri_tt = tt_tracks(i, ichan)%pos
+                call get_plasma(plasma, pos=ri_tt, input_coords=1)
+                if(.not.plasma%in_plasma) cycle
+
+                if(abs(thermal_mass(1) - H2_amu) > 0.01) cycle
+
+                T_ion = plasma%ti
+                if(T_ion < 0.1d0) cycle
+
+                call get_thermal_dd_rate(T_ion, rate_tt)
+                flux_tt = 0.25d0 * plasma%deni(1)**2 * rate_tt
+                if(flux_tt <= 0.0d0) cycle
+
+                r_detector_tt = nc_chords%det(ichan)%detector%origin
+                vn_det_tt = nc_chords%det(ichan)%aperture%origin - r_detector_tt
+                vn_det_tt = vn_det_tt/norm2(vn_det_tt)
+
+                d_tt = norm2(r_detector_tt - ri_tt)
+                if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (pi * d_tt**2)
+                else
+                    domega_tt = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw / &
+                            (4.0d0 * d_tt**2)
+                endif
+
+                do igamma_tt = 1, ngamma_tt
+                    call sample_thermal_ion_velocity(plasma, v1_thermal_tt)
+                    call sample_thermal_ion_velocity(plasma, v2_thermal_tt)
+                    call get_dd_neutron_energy(v1_thermal_tt, v2_thermal_tt, vn_det_tt, e_neutron_tt, weight_tt)
+
+                    if(allocated(neutron%eflux)) then
+                        ie_neutron_tt = floor((e_neutron_tt - neutron%emin) / &
+                            (neutron%emax - neutron%emin) * real(neutron%nenergy)) + 1
+                        if(ie_neutron_tt >= 1 .and. ie_neutron_tt <= neutron%nenergy) then
+                            flux_contrib_tt = flux_tt * tt_tracks(i, ichan)%time * weight_tt * domega_tt * &
+                                real(neutron%nenergy) / (real(ngamma_tt) * (neutron%emax - neutron%emin))
+                            eflux_tt_local(ie_neutron_tt, ichan, 1, tid) = &
+                                eflux_tt_local(ie_neutron_tt, ichan, 1, tid) + flux_contrib_tt
+                        endif
+                    endif
+                enddo
+            enddo
+        enddo
+        !$OMP END PARALLEL DO
+
+        ! Combine thermal-thermal thread-local results
+        if(allocated(neutron%eflux)) then
+            do tid = 1, max_threads
+                neutron%eflux(:,:,:) = neutron%eflux(:,:,:) + eflux_tt_local(:,:,:,tid)
+                neutron%eflux_tt(:,:,:) = neutron%eflux_tt(:,:,:) + eflux_tt_local(:,:,:,tid)
+            enddo
+            deallocate(eflux_tt_local)
+        endif
+
+        deallocate(tt_tracks, tt_ntrack)
+    endif
+
+#ifdef _MPI
+    call parallel_sum(neutron%flux)
+    if(allocated(neutron%eflux)) then
+        call parallel_sum(neutron%eflux)
+        call parallel_sum(neutron%eflux_bt)
+        call parallel_sum(neutron%eflux_tt)
+    endif
+#endif
+
+end subroutine neutron_spec_f
+
+subroutine neutron_weights
+    !+ Calculate neutron collimator weight functions
+    integer :: ie, ip, ichan, i, j, k
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb, pitch, dE, dP
+    real(Float64) :: erel, rate, kappa
+    real(Float64), dimension(3) :: ri, vi, r_gyro
+    real(Float64), dimension(3) :: rn, vn, r_detector
+    real(Float64) :: vnet_square, fbm_denf
+    real(Float64) :: d, domega
+    real(Float64), dimension(:), allocatable :: ebarr, ptcharr
+    integer :: igamma, ngamma
+    integer :: ntrack
+    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+    
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_WEIGHTS: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'NEUTRON_WEIGHTS: Fast-ion species is not Deuterium'
+        return
+    endif
+    
+    !! Define energy array
+    allocate(ebarr(inputs%ne_nc))
+    do i=1,inputs%ne_nc
+        ebarr(i) = real(i-0.5)*inputs%emax_nc_wght/real(inputs%ne_nc)
+    enddo
+    dE = abs(ebarr(2)-ebarr(1))
+    
+    !! Define pitch array
+    allocate(ptcharr(inputs%np_nc))
+    do i=1,inputs%np_nc
+        ptcharr(i) = real(i-0.5)*2./real(inputs%np_nc) - 1.
+    enddo
+    dP = abs(ptcharr(2)-ptcharr(1))
+    
+    if(inputs%verbose.ge.1) then
+        write(*,'(T3,"Number of Channels: ",i3)') nc_chords%nchan
+        write(*,'(T3,"Nenergy: ",i3)') inputs%ne_nc
+        write(*,'(T3,"Npitch: ",i3)') inputs%np_nc
+        write(*,'(T3,"Maximum energy: ",f7.2)') inputs%emax_nc_wght
+        write(*,*) ''
+    endif
+    
+    !! Allocate storage arrays
+    allocate(ncweight%energy(inputs%ne_nc))
+    allocate(ncweight%pitch(inputs%np_nc))
+    allocate(ncweight%weight(inputs%ne_nc, inputs%np_nc, nc_chords%nchan))
+    allocate(ncweight%flux(inputs%ne_nc, nc_chords%nchan))
+    ncweight%energy = ebarr
+    ncweight%pitch = ptcharr
+    ncweight%weight = 0.d0
+    ncweight%flux = 0.d0
+    
+    if(inputs%calc_nc_wght.ge.2) then
+        allocate(ncweight%emissivity(inter_grid%nr, inter_grid%nz, nc_chords%nchan))
+        ncweight%emissivity = 0.d0
+    endif
+    
+    ngamma = 20
+    
+    !$OMP PARALLEL DO schedule(guided) collapse(3) &
+    !$OMP& private(i,j,k,ie,ip,ichan,ri,vi,r_gyro,rn,vn,r_detector, &
+    !$OMP& fields,plasma,eb,pitch,erel,rate,kappa,vnet_square,fbm_denf, &
+    !$OMP& d,domega,igamma,tracks,ntrack)
+    do ichan=1,nc_chords%nchan
+        do ip=1,inputs%np_nc
+            do ie=1,inputs%ne_nc
+                eb = ebarr(ie)
+                pitch = ptcharr(ip)
+                
+                r_detector = nc_chords%det(ichan)%detector%origin
+                vn = nc_chords%det(ichan)%aperture%origin - r_detector
+                vn = vn/norm2(vn)
+                
+                !! Track through plasma along line of sight
+                call track_cylindrical(r_detector, vn, tracks, ntrack)
+                if(ntrack.eq.0) cycle
+                
+                !! Loop along track
+                do i=1,ntrack
+                    rn = tracks(i)%pos
+                    
+                    !! Get fields at position
+                    call get_fields(fields, pos=rn)
+                    if(.not.fields%in_plasma) cycle
+                    
+                    !! Calculate solid angle
+                    d = norm2(r_detector - rn)
+                    if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (pi * d**2)
+                    else
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (4 * d**2)
+                    endif
+                    
+                    !! Average over gyro-angles
+                    do igamma=1,ngamma
+                        !! Gyro-correction
+                        call gyro_correction(fields, eb, pitch, beam_mass/H1_amu, ri, vi)
+                        call gyro_step(vi, fields, beam_mass/H1_amu, r_gyro)
+                        
+                        !! Get plasma parameters
+                        call get_plasma(plasma, pos=ri)
+                        if(.not.plasma%in_plasma) cycle
+                        
+                        !! Calculate effective energy
+                        vnet_square = dot_product(vi-plasma%vrot, vi-plasma%vrot)
+                        erel = v2_to_E_per_amu * beam_mass * vnet_square
+                        
+                        !! Get neutron production rate
+                        call get_dd_rate(plasma, erel, rate, branch=2)
+                        
+                        !! Apply anisotropy correction
+                        call get_ddnhe_anisotropy(plasma, vi, vn, kappa)
+                        
+                        !! Get fast-ion density at this energy and pitch
+                        fbm_denf = 0.d0
+                        if (inputs%dist_type.eq.1) then
+                            call get_ep_denf(eb, pitch, fbm_denf, coeffs=fields%b)
+                        endif
+                        
+                        !! Weight function contribution
+                        !$OMP ATOMIC UPDATE
+                        ncweight%weight(ie,ip,ichan) = ncweight%weight(ie,ip,ichan) + &
+                            rate * kappa * domega * tracks(i)%time / (ngamma * dE * dP)
+                        
+                        !! Flux contribution using actual fast-ion density
+                        if (fbm_denf.gt.0.d0) then
+                            !$OMP ATOMIC UPDATE
+                            ncweight%flux(ie,ichan) = ncweight%flux(ie,ichan) + &
+                                rate * kappa * domega * fbm_denf * tracks(i)%time / (ngamma * dE)
+                        endif
+                    enddo ! gyro_loop
+                enddo ! track loop
+            enddo ! energy loop
+        enddo ! pitch loop
+    enddo ! channel loop
+    !$OMP END PARALLEL DO
+    
+    !! Calculate channel-resolved emissivity if requested
+    if(inputs%calc_nc_wght.ge.2) then
+        !$OMP PARALLEL DO schedule(guided) collapse(3) &
+        !$OMP& private(i,j,ichan,ri,vi,r_detector,vn,d,domega,ie,ip,eb,pitch,&
+        !$OMP& plasma,fields,igamma,vnet_square,erel,rate,kappa,fbm_denf)
+        do ichan=1,nc_chords%nchan
+            do j=1,inter_grid%nz
+                do i=1,inter_grid%nr
+                    ri = [inter_grid%r(i), 0.d0, inter_grid%z(j)]
+                    
+                    call get_plasma(plasma, pos=ri, input_coords=1)
+                    if(.not.plasma%in_plasma) cycle
+                    
+                    call get_fields(fields, pos=ri, input_coords=1)
+                    if(.not.fields%in_plasma) cycle
+                    
+                    !! Get detector direction for anisotropy calculation
+                    r_detector = nc_chords%det(ichan)%detector%origin
+                    vn = r_detector - ri
+                    d = norm2(vn)
+                    if(d.gt.0.d0) vn = vn/d
+                    
+                    !! Calculate solid angle
+                    if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (pi * d**2)
+                    else
+                        domega = nc_chords%det(ichan)%detector%hh * &
+                                nc_chords%det(ichan)%detector%hw / (4 * d**2)
+                    endif
+                    
+                    !! Integrate over fast-ion distribution
+                    do ip=1,inputs%np_nc
+                        pitch = ptcharr(ip)
+                        do ie=1,inputs%ne_nc
+                            eb = ebarr(ie)
+                            
+                            !! Get fast-ion density
+                            fbm_denf = 0.d0
+                            if (inputs%dist_type.eq.1) then
+                                call get_ep_denf(eb, pitch, fbm_denf, coeffs=fields%b)
+                            endif
+                            if (fbm_denf.le.0.d0) cycle
+                            
+                            !! Gyro-average
+                            do igamma=1,ngamma
+                                call gyro_correction(fields, eb, pitch, beam_mass/H1_amu, ri, vi)
+                                
+                                !! Calculate effective energy
+                                vnet_square = dot_product(vi-plasma%vrot, vi-plasma%vrot)
+                                erel = v2_to_E_per_amu * beam_mass * vnet_square
+                                
+                                !! Get neutron production rate
+                                call get_dd_rate(plasma, erel, rate, branch=2)
+                                
+                                !! Apply anisotropy correction
+                                call get_ddnhe_anisotropy(plasma, vi, vn, kappa)
+                                
+                                !$OMP ATOMIC UPDATE
+                                ncweight%emissivity(i,j,ichan) = ncweight%emissivity(i,j,ichan) + &
+                                    rate * kappa * domega * fbm_denf * dE * dP / ngamma
+                            enddo ! gyro
+                        enddo ! energy
+                    enddo ! pitch
+                enddo ! r
+            enddo ! z  
+        enddo ! channel
+        !$OMP END PARALLEL DO
+    endif
+    
+#ifdef _MPI
+    call parallel_sum(ncweight%weight)
+    call parallel_sum(ncweight%flux)
+    if(inputs%calc_nc_wght.ge.2) then
+        call parallel_sum(ncweight%emissivity)
+    endif
+#endif
+    
+    deallocate(ebarr, ptcharr)
+    
+    if(inputs%verbose.ge.1) then
+        write(*,*) 'write nc weights:    ' , time_string(time_start)
+    endif
+    
+#ifdef _MPI
+    if(my_rank().eq.0) call write_nc_weights()
+#else
+    call write_nc_weights()
+#endif
+    
+end subroutine neutron_weights
 
 end module libfida
 
@@ -13507,6 +16720,9 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer               :: i,narg,nthreads,max_threads,seed
+    logical               :: nbi_exists
+    integer(HID_T)        :: geo_fid
+    integer               :: h5_error
 
 #ifdef _VERSION
     version = _VERSION
@@ -13596,19 +16812,84 @@ program fidasim
     call read_plasma()
     call read_tables()
     call read_equilibrium()
-    call make_beam_grid()
-    if(inputs%calc_beam.ge.1) call read_beam()
+
+    !! Check if beam geometry is needed and available BEFORE trying to use it
+    !! Beam grid only needed for active measurements
+    !! Passive measurements (PFIDA, PNPA, neutrons) use pass_grid instead
+    if(inputs%calc_beam.ge.1) then
+        !! Check if /nbi group exists in geometry file before trying to read it
+        call h5open_f(h5_error)
+        call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, geo_fid, h5_error)
+        call h5ltpath_valid_f(geo_fid, "/nbi", .True., nbi_exists, h5_error)
+        call h5fclose_f(geo_fid, h5_error)
+        call h5close_f(h5_error)
+
+        if(.not.nbi_exists) then
+            !! Active diagnostics requested but no beam geometry available
+            if((inputs%calc_fida.ge.1).or.(inputs%calc_npa.ge.1).or.(inputs%calc_bes.ge.1).or. &
+               (inputs%calc_dcx.ge.1).or.(inputs%calc_halo.ge.1).or.(inputs%calc_birth.ge.1).or. &
+               (inputs%calc_fida_wght.ge.1).or.(inputs%calc_npa_wght.ge.1)) then
+                if(inputs%verbose.ge.0) then
+                    write(*,*)
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,'(a)') '!! ERROR: ACTIVE DIAGNOSTIC REQUESTED WITHOUT BEAM GEOMETRY'
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,*)
+                    write(*,'(a)') 'One or more ACTIVE diagnostics have been enabled, but no beam'
+                    write(*,'(a)') 'geometry is available (missing /nbi group in geometry file).'
+                    write(*,*)
+                    write(*,'(a)') 'Active diagnostics that require beam geometry:'
+                    if(inputs%calc_fida.ge.1)       write(*,'(a)') '  - calc_fida      = 1  (FIDA spectroscopy)'
+                    if(inputs%calc_npa.ge.1)        write(*,'(a)') '  - calc_npa       = 1  (Active NPA)'
+                    if(inputs%calc_bes.ge.1)        write(*,'(a)') '  - calc_bes       = 1  (Beam emission spectroscopy)'
+                    if(inputs%calc_dcx.ge.1)        write(*,'(a)') '  - calc_dcx       = 1  (Direct charge exchange)'
+                    if(inputs%calc_halo.ge.1)       write(*,'(a)') '  - calc_halo      = 1  (Halo radiation)'
+                    if(inputs%calc_birth.ge.1)      write(*,'(a)') '  - calc_birth     = 1  (Birth profile)'
+                    if(inputs%calc_fida_wght.ge.1)  write(*,'(a)') '  - calc_fida_wght = 1  (FIDA weight functions)'
+                    if(inputs%calc_npa_wght.ge.1)   write(*,'(a)') '  - calc_npa_wght  = 1  (NPA weight functions)'
+                    write(*,*)
+                    write(*,'(a)') 'SOLUTIONS:'
+                    write(*,'(a)') '  1. Provide beam geometry in your preprocessing script:'
+                    write(*,'(a)') '     prefida(inputs, grid, plasma, equil, fbm, nbi=nbi_geometry, ...)'
+                    write(*,'(a)') '  2. Set all active diagnostic flags to 0 in your inputs'
+                    write(*,'(a)') '  3. Use only passive diagnostics (calc_pfida, calc_pnpa, calc_neutron)'
+                    write(*,*)
+                    write(*,'(a)') 'For passive-only runs, set calc_beam=0 and only enable:'
+                    write(*,'(a)') '  - calc_pfida     (Passive FIDA)'
+                    write(*,'(a)') '  - calc_pnpa      (Passive NPA)'
+                    write(*,'(a)') '  - calc_neutron   (Neutron rates)'
+                    write(*,'(a)') '  - calc_neut_spec (Neutron spectra)'
+                    write(*,*)
+                    write(*,'(a)') '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                    write(*,*)
+                endif
+                stop 'ERROR: Active diagnostics require beam geometry. Exiting.'
+            endif
+        endif
+
+        call make_beam_grid()
+        call read_beam()
+    endif
+
     call read_distribution()
 
     call quasineutrality_check()
 
-    allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
+    !! Allocate intersection arrays only if beam grid exists
+    if(inputs%calc_beam.ge.1) then
+        allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    !! Read spectral chords for active or passive FIDA measurements
+    if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1).or.(inputs%calc_pfida.ge.1)) then
         call read_chords()
     endif
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
+    endif
+
+    if((inputs%calc_neutron.ge.1).or.(inputs%calc_neut_spec.ge.1).or.(inputs%calc_nc_wght.ge.1)) then
+        call read_neutron_collimator()
     endif
 
     if(inputs%calc_cfpd.ge.1) then
@@ -13680,6 +16961,13 @@ program fidasim
         endif
     endif
 
+    if(inputs%calc_res.ge.1) then
+        if(inputs%calc_dcx.ge.1) allocate(spatres%dcx(spec_chords%nchan))
+        if(inputs%calc_halo.ge.1) allocate(spatres%halo(spec_chords%nchan))
+        if(inputs%calc_fida.ge.1) allocate(spatres%fida(spec_chords%nchan))
+        if(inputs%calc_pfida.ge.1) allocate(spatres%pfida(spec_chords%nchan))
+    endif
+
     if(inputs%calc_npa.ge.1)then
         npa%nchan = npa_chords%nchan
         allocate(npa%part(npa%nmax))
@@ -13718,6 +17006,43 @@ program fidasim
         allocate(neutron%rate(particles%nclass))
         neutron%rate = 0.d0
     endif
+    
+    if(inputs%calc_neut_spec.ge.1)then
+        allocate(neutron%flux(particles%nclass, nc_chords%nchan))
+        neutron%flux = 0.d0
+    endif
+
+    if(inputs%calc_neut_spec.ge.2)then
+        ! Initialize energy arrays for neutron spectra
+        neutron%nenergy = inputs%nenergy_nc
+        neutron%emin = inputs%emin_nc  ! keV
+        neutron%emax = inputs%emax_nc  ! keV
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"Neutron spectra settings:")')
+            write(*,'(T4,"nenergy_nc = ",I5)') neutron%nenergy
+            write(*,'(T4,"emin_nc = ",F10.2," keV")') neutron%emin
+            write(*,'(T4,"emax_nc = ",F10.2," keV")') neutron%emax
+        endif
+
+        allocate(neutron%energy(neutron%nenergy))
+        allocate(neutron%eflux(neutron%nenergy, nc_chords%nchan, particles%nclass))
+        allocate(neutron%eflux_bt(neutron%nenergy, nc_chords%nchan, particles%nclass))
+        allocate(neutron%eflux_tt(neutron%nenergy, nc_chords%nchan, particles%nclass))
+
+        ! Initialize energy grid
+        do i = 1, neutron%nenergy
+            neutron%energy(i) = neutron%emin + real(i-0.5d0) * (neutron%emax - neutron%emin) / real(neutron%nenergy)
+        enddo
+        neutron%eflux = 0.d0
+        neutron%eflux_bt = 0.d0
+        neutron%eflux_tt = 0.d0
+
+        ! Enable thermal-thermal if deuterium is present
+        if(abs(thermal_mass(1) - H2_amu) < 0.01) then
+            neutron%include_thermal = .true.
+        endif
+    endif
 
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
@@ -13727,7 +17052,7 @@ program fidasim
 
         if(inputs%calc_bes.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'nbi:     ' , time(time_start)
+                write(*,*) 'nbi:     ' , time_string(time_start)
             endif
             call nbi_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13735,7 +17060,7 @@ program fidasim
 
         if(inputs%calc_dcx.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'dcx:     ' , time(time_start)
+                write(*,*) 'dcx:     ' , time_string(time_start)
             endif
             call dcx_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13743,7 +17068,7 @@ program fidasim
 
         if(inputs%calc_halo.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'halo:    ' , time(time_start)
+                write(*,*) 'halo:    ' , time_string(time_start)
             endif
             call halo_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13753,7 +17078,7 @@ program fidasim
             !! ----------- BEAM NEUTRALS ---------- !!
             if(inputs%calc_nbi_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'nbi:     ' , time(time_start)
+                    write(*,*) 'nbi:     ' , time_string(time_start)
                 endif
                 call ndmc()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13762,7 +17087,7 @@ program fidasim
             !! ---------- DCX (Direct charge exchange) ---------- !!
             if(inputs%calc_dcx_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'dcx:     ' , time(time_start)
+                    write(*,*) 'dcx:     ' , time_string(time_start)
                 endif
                 call dcx()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13771,7 +17096,7 @@ program fidasim
             !! ---------- HALO ---------- !!
             if(inputs%calc_halo_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
-                    write(*,*) 'halo:    ' , time(time_start)
+                    write(*,*) 'halo:    ' , time_string(time_start)
                 endif
                 call halo()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13779,7 +17104,7 @@ program fidasim
 
             !! ---------- WRITE NEUTRALS ---------- !!
             if(inputs%verbose.ge.1) then
-                write(*,*) 'write neutrals:    ' , time(time_start)
+                write(*,*) 'write neutrals:    ' , time_string(time_start)
             endif
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 #ifdef _MPI
@@ -13790,7 +17115,7 @@ program fidasim
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             if(inputs%calc_birth.eq.1)then
                if(inputs%verbose.ge.1) then
-                  write(*,*) 'write birth:    ' , time(time_start)
+                  write(*,*) 'write birth:    ' , time_string(time_start)
                endif
                call write_birth_profile()
                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13803,7 +17128,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_cold.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'cold:    ' ,time(time_start)
+            write(*,*) 'cold:    ' ,time_string(time_start)
         endif
         call cold_spec()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13814,7 +17139,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_brems.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'bremsstrahlung:    ' ,time(time_start)
+            write(*,*) 'bremsstrahlung:    ' ,time_string(time_start)
         endif
         call bremsstrahlung()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13825,7 +17150,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_fida.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'fida:    ' ,time(time_start)
+            write(*,*) 'fida:    ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call fida_f()
@@ -13837,7 +17162,7 @@ program fidasim
 
     if(inputs%calc_pfida.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'pfida:   ' ,time(time_start)
+            write(*,*) 'pfida:   ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call pfida_f()
@@ -13849,7 +17174,7 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'write spectra:    ' , time(time_start)
+            write(*,*) 'write spectra:    ' , time_string(time_start)
         endif
 #ifdef _MPI
         if(my_rank().eq.0) call write_spectra()
@@ -13864,7 +17189,7 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%calc_npa.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'npa:     ' ,time(time_start)
+            write(*,*) 'npa:     ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call npa_f()
@@ -13876,7 +17201,7 @@ program fidasim
 
     if(inputs%calc_pnpa.ge.1)then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'pnpa:     ' ,time(time_start)
+            write(*,*) 'pnpa:     ' ,time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call pnpa_f()
@@ -13888,7 +17213,7 @@ program fidasim
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'write npa:    ' , time(time_start)
+            write(*,*) 'write npa:    ' , time_string(time_start)
         endif
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -13899,21 +17224,39 @@ program fidasim
     !! -------------------------------------------------------------------
     if(inputs%calc_neutron.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'neutron rate:    ', time(time_start)
+            write(*,*) 'neutron rate:    ', time_string(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call neutron_f()
+            if(inputs%calc_neut_spec.ge.1) then
+                call neutron_spec_f
+            endif
         else
             call neutron_mc()
+            if(inputs%calc_neut_spec.ge.1) then
+                call neutron_spec_mc
+            endif
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_cfpd.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'charged fusion products:    ', time(time_start)
+            write(*,*) 'charged fusion products:    ', time_string(time_start)
         endif
         call cfpd_f()
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+    
+    if(inputs%calc_neutron.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'write neutrons:    ' , time_string(time_start)
+        endif
+#ifdef _MPI
+        if(my_rank().eq.0) call write_neutrons()
+#else
+        call write_neutrons()
+#endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
@@ -13922,7 +17265,7 @@ program fidasim
     !! -------------------------------------------------------------------
     if(inputs%calc_fida_wght.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'fida weight function:    ', time(time_start)
+            write(*,*) 'fida weight function:    ', time_string(time_start)
         endif
         if(inputs%calc_fida_wght.eq.1) then
             call fida_weights_los()
@@ -13934,9 +17277,17 @@ program fidasim
 
     if(inputs%calc_npa_wght.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'npa weight function:    ', time(time_start)
+            write(*,*) 'npa weight function:    ', time_string(time_start)
         endif
         call npa_weights()
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    if(inputs%calc_nc_wght.ge.1.and.inputs%calc_neut_spec.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'nc weight function:     ', time_string(time_start)
+        endif
+        call neutron_weights()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
@@ -13945,7 +17296,7 @@ program fidasim
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,*) 'END: hour:minute:second ', time(time_start)
+        write(*,*) 'END: hour:minute:second ', time_string(time_start)
     endif
 
 end program fidasim

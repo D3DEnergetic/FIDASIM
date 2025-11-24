@@ -109,6 +109,116 @@ def test_npa():
 
     return npa_chords
 
+def test_nc():
+    """
+    Generates test data for Neutron Collimator geometry.
+    NC system is below the plasma, looking upward through plasma and NBI.
+    All channels share a common aperture, with different detector positions
+    to create a fan. All channels are in a single R,Z plane (phi = 0 degrees).
+
+    Returns:
+        nc_chords: A dictionary representing the Neutron Collimator geometry.
+    """
+
+    # Chords - fan of sightlines in R,Z plane at phi=0
+    nchan = 10
+
+    # All apertures at the same location (shared aperture)
+    u_ap = 0.0  # At phi=0 plane
+    v_ap = -150.0  # Radial position
+    w_ap = -80.0  # Below plasma
+    ulens = np.full(nchan, u_ap)
+    vlens = np.full(nchan, v_ap)
+    wlens = np.full(nchan, w_ap)
+    lens = np.vstack((ulens, vlens, wlens))
+
+    # Detectors spread out to create fan of sightlines through shared aperture
+    # For a true fan, we need to vary the ANGLE, not maintain parallel sightlines
+    # Place all detectors at same distance below aperture, but spread in R-Z
+    # All at same phi (u=0)
+
+    det_distance = 100.0  # Distance below aperture (cm)
+
+    # Fan angles: spread vertically from more horizontal to more vertical
+    # Angles relative to horizontal in the R-Z plane
+    angles = np.linspace(30, 60, nchan)  # degrees from horizontal
+
+    ulos = np.zeros(nchan)
+    vlos = np.zeros(nchan)
+    wlos = np.zeros(nchan)
+
+    for i in range(nchan):
+        angle_rad = np.radians(angles[i])
+        # Place detector at fixed distance from aperture, at varying angles
+        # Pointing downward and outward (negative v, negative w from aperture)
+        vlos[i] = v_ap - det_distance * np.cos(angle_rad)
+        wlos[i] = w_ap - det_distance * np.sin(angle_rad)
+    radius = np.sqrt(ulos**2 + vlos**2)
+    id = np.array([b"nc" + str(i+1).encode('utf-8') for i in range(nchan)])  # Generate IDs
+
+    # Initialize arrays for aperture and detector data
+    a_cent = np.zeros((3, nchan))
+    a_redge = np.zeros((3, nchan))
+    a_tedge = np.zeros((3, nchan))
+    d_cent = np.zeros((3, nchan))
+    d_redge = np.zeros((3, nchan))
+    d_tedge = np.zeros((3, nchan))
+
+    # Aperture and detector half-widths (cm)
+    ap_width = 3.0
+    det_width = 3.0
+
+    # Loop through each channel and calculate positions
+    for i in range(nchan):
+        # Aperture position (same for all channels)
+        a_cent[:, i] = [ulens[i], vlens[i], wlens[i]]
+
+        # Detector position (different for each channel)
+        d_cent[:, i] = [ulos[i], vlos[i], wlos[i]]
+
+        # Calculate line-of-sight direction
+        los_dir = d_cent[:, i] - a_cent[:, i]
+        los_dir = los_dir / np.linalg.norm(los_dir)
+
+        # Create orthogonal basis for aperture/detector planes
+        # Since all channels are in phi=0 plane (x=0), we can use standard basis
+        # Radial direction (in y-z plane)
+        radial = np.array([0.0, vlens[i], wlens[i]])
+        radial = radial / np.linalg.norm(radial)
+
+        # Toroidal direction (perpendicular to r,z plane)
+        toroidal = np.array([1.0, 0.0, 0.0])
+
+        # Vertical direction (in plane, perpendicular to radial)
+        vertical = np.cross(toroidal, radial)
+
+        # Define aperture edges
+        a_redge[:, i] = a_cent[:, i] + ap_width * radial
+        a_tedge[:, i] = a_cent[:, i] + ap_width * toroidal
+
+        # Define detector edges (same orientation as aperture)
+        d_redge[:, i] = d_cent[:, i] + det_width * radial
+        d_tedge[:, i] = d_cent[:, i] + det_width * toroidal
+
+    # Create the Neutron Collimator geometry dictionary
+    nc_chords = {
+        'nchan': nchan,
+        'system': "NC",
+        'data_source': "run_tests.py:test_nc",
+        'id': id,
+        'a_shape': np.repeat(2,nchan),  # All apertures have shape 2
+        'd_shape': np.repeat(2,nchan),  # All detectors have shape 2
+        'a_cent': a_cent,
+        'a_redge': a_redge,
+        'a_tedge': a_tedge,
+        'd_cent': d_cent,
+        'd_redge': d_redge,
+        'd_tedge': d_tedge,
+        'radius': radius
+    }
+
+    return nc_chords
+
 def test_profiles(filename, grid, rhogrid):
     prof = fs.utils.read_ncdf(filename)
 
@@ -177,10 +287,12 @@ def run_test(args):
                     "n_halo":500000, "n_dcx":500000, "n_birth":10000,
                     "ne_wght":50, "np_wght":50,"nphi_wght":100,"emax_wght":100e0,
                     "nlambda_wght":1000,"lambdamin_wght":647e0,"lambdamax_wght":667e0,
+                    "ne_nc":40,"np_nc":40,"emax_nc_wght":100e0,
+                    "nenergy_nc":100,"emin_nc":1000e0,"emax_nc":3000e0,
                     "calc_npa":2, "calc_brems":1,"calc_fida":1,"calc_neutron":1,
-                    "calc_cfpd":0,
+                    "calc_cfpd":0, "calc_neut_spec":1, "calc_res":0,
                     "calc_bes":1, "calc_dcx":1, "calc_halo":1, "calc_cold":1,
-                    "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,
+                    "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,"calc_nc_wght":1,
                     "calc_pfida":1, "calc_pnpa":2,
                     "result_dir":args.path, "tables_file":fida_dir+'/tables/atomic_tables.h5'}
 
@@ -199,17 +311,18 @@ def run_test(args):
     nbi = test_beam()
     spec = test_chords()
     npa = test_npa()
+    nc = test_nc()
 
     grid = fs.utils.rz_grid(100.0, 240.0, 70, -100.0, 100.0, 100)
 
-    equil, rho, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid)
+    equil, rho, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid, ccw_phi=True, exp_Bp=0)
     fbm = fs.utils.read_nubeam(test_dir+'/test_fi_1.cdf', grid, btipsign = btipsign)
 
     plasma = test_profiles(test_dir+'/test_profiles.cdf',grid,rho)
     plasma['deni'] = plasma['deni'] - fbm['denf'].reshape(1,grid['nr'],grid['nz'])
     plasma['deni'] = np.where(plasma['deni'] > 0.0, plasma['deni'], 0.0).astype('float64')
 
-    fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa)
+    fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa, nc=nc)
 
     return 0
 

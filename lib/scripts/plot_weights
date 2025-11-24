@@ -1,0 +1,366 @@
+#!/bin/sh
+"exec" "$FIDASIM_DIR/deps/python" "$0" "$@"
+
+"""
+FIDASIM Weight Function Plotting Script
+========================================
+
+This script plots weight functions for FIDA, NPA, and NC diagnostics.
+It provides visualization of energy-pitch weight functions and related quantities.
+"""
+
+import os
+import h5py
+import argparse
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.gridspec import GridSpec
+from fidasim import utils as ut
+
+def read_fida_weights(filename):
+    """Read FIDA weight functions from HDF5 file"""
+    data = {}
+    with h5py.File(filename, 'r') as f:
+        if 'fweight' in f:
+            g = f['fweight']
+            data['energy'] = g['energy'][:]
+            data['pitch'] = g['pitch'][:]
+            data['weight'] = g['weight'][:]  # (lambda, energy, pitch, chan)
+            data['mean_f'] = g['mean_f'][:]  # (energy, pitch, chan)
+            data['lambda'] = g['lambda'][:]
+            data['nchan'] = data['weight'].shape[3]
+        else:
+            ut.error('No fweight group found in file')
+    return data
+
+def read_npa_weights(filename):
+    """Read NPA weight functions from HDF5 file"""
+    data = {}
+    with h5py.File(filename, 'r') as f:
+        if 'nweight' in f:
+            g = f['nweight']
+            data['energy'] = g['energy'][:]
+            data['pitch'] = g['pitch'][:]
+            data['weight'] = g['weight'][:]  # (energy, pitch, chan)
+            if 'flux' in g:
+                data['flux'] = g['flux'][:]  # (energy, chan)
+            if 'emissivity' in g:
+                data['emissivity'] = g['emissivity'][:]  # (x, y, z, chan)
+            data['nchan'] = data['weight'].shape[2]
+        else:
+            ut.error('No nweight group found in file')
+    return data
+
+def read_nc_weights(filename):
+    """Read NC (Neutron Collimator) weight functions from HDF5 file"""
+    data = {}
+    with h5py.File(filename, 'r') as f:
+        if 'ncweight' in f:
+            g = f['ncweight']
+            data['energy'] = g['energy'][:]
+            data['pitch'] = g['pitch'][:]
+            data['weight'] = g['weight'][:]  # (energy, pitch, chan)
+            if 'flux' in g:
+                data['flux'] = g['flux'][:]  # (energy, chan)
+            if 'emissivity' in g:
+                data['emissivity'] = g['emissivity'][:]  # (r, z, chan)
+            if 'r' in g:
+                data['r'] = g['r'][:]
+            if 'z' in g:
+                data['z'] = g['z'][:]
+            data['nchan'] = data['weight'].shape[2]
+        else:
+            ut.error('No ncweight group found in file')
+    return data
+
+def plot_weight_2d(ax, energy, pitch, weight, title='Weight Function', 
+                   cmap='viridis', vmin=None, vmax=None):
+    """Plot 2D weight function"""
+    im = ax.pcolormesh(energy, pitch, weight.T, shading='auto', 
+                       cmap=cmap, vmin=vmin, vmax=vmax)
+    ax.set_xlabel('Energy [keV]')
+    ax.set_ylabel('Pitch')
+    ax.set_title(title)
+    return im
+
+def plot_weight_summary(data, channel=0, diag_type='FIDA', save_fig=None):
+    """Create comprehensive weight function plot for a single channel"""
+    
+    fig = plt.figure(figsize=(15, 10))
+    gs = GridSpec(3, 3, figure=fig, hspace=0.3, wspace=0.3)
+    
+    # Main 2D weight function
+    ax_main = fig.add_subplot(gs[0:2, 0:2])
+    
+    if diag_type == 'FIDA':
+        # For FIDA, sum over wavelengths
+        weight = np.sum(data['weight'][:, :, :, channel], axis=0)
+        title = f'FIDA Weight Function - Channel {channel}'
+    else:
+        weight = data['weight'][:, :, channel]
+        title = f'{diag_type} Weight Function - Channel {channel}'
+    
+    im = plot_weight_2d(ax_main, data['energy'], data['pitch'], weight, title=title)
+    plt.colorbar(im, ax=ax_main, label='Weight')
+    
+    # Energy distribution (pitch integrated)
+    ax_energy = fig.add_subplot(gs[0, 2])
+    energy_dist = np.sum(weight, axis=1)
+    ax_energy.plot(data['energy'], energy_dist, 'b-', linewidth=2)
+    ax_energy.set_xlabel('Energy [keV]')
+    ax_energy.set_ylabel('Weight (pitch integrated)')
+    ax_energy.set_title('Energy Distribution')
+    ax_energy.grid(True, alpha=0.3)
+    
+    # Pitch distribution (energy integrated)
+    ax_pitch = fig.add_subplot(gs[1, 2])
+    pitch_dist = np.sum(weight, axis=0)
+    ax_pitch.plot(data['pitch'], pitch_dist, 'r-', linewidth=2)
+    ax_pitch.set_xlabel('Pitch')
+    ax_pitch.set_ylabel('Weight (energy integrated)')
+    ax_pitch.set_title('Pitch Distribution')
+    ax_pitch.grid(True, alpha=0.3)
+    
+    # Additional plots depending on diagnostic type
+    if diag_type == 'FIDA' and 'lambda' in data:
+        # Wavelength dependence at peak E,p
+        ax_lambda = fig.add_subplot(gs[2, 0])
+        ie_max, ip_max = np.unravel_index(np.argmax(weight), weight.shape)
+        lambda_dist = data['weight'][:, ie_max, ip_max, channel]
+        ax_lambda.plot(data['lambda'], lambda_dist, 'g-', linewidth=2)
+        ax_lambda.set_xlabel('Wavelength [nm]')
+        ax_lambda.set_ylabel('Weight')
+        ax_lambda.set_title(f'λ at E={data["energy"][ie_max]:.1f} keV, p={data["pitch"][ip_max]:.2f}')
+        ax_lambda.grid(True, alpha=0.3)
+        
+        # Mean F plot
+        if 'mean_f' in data:
+            ax_meanf = fig.add_subplot(gs[2, 1])
+            mean_f = data['mean_f'][:, :, channel]
+            im2 = ax_meanf.pcolormesh(data['energy'], data['pitch'], mean_f.T, 
+                                     shading='auto', cmap='plasma')
+            ax_meanf.set_xlabel('Energy [keV]')
+            ax_meanf.set_ylabel('Pitch')
+            ax_meanf.set_title('Mean F')
+            plt.colorbar(im2, ax=ax_meanf)
+    
+    if 'flux' in data:
+        # Energy spectrum
+        ax_flux = fig.add_subplot(gs[2, 1] if diag_type != 'FIDA' else gs[2, 2])
+        ax_flux.plot(data['energy'], data['flux'][:, channel], 'k-', linewidth=2)
+        ax_flux.set_xlabel('Energy [keV]')
+        ax_flux.set_ylabel('Flux')
+        ax_flux.set_title('Energy Spectrum')
+        ax_flux.grid(True, alpha=0.3)
+        ax_flux.set_xlim(left=0)
+        ax_flux.set_ylim(bottom=0)
+    
+    # Total weight per channel bar chart
+    ax_bar = fig.add_subplot(gs[2, 2] if diag_type == 'FIDA' else gs[2, 0])
+    nchan = data['nchan']
+    total_weights = np.zeros(nchan)
+    for ch in range(nchan):
+        if diag_type == 'FIDA':
+            total_weights[ch] = np.sum(data['weight'][:, :, :, ch])
+        else:
+            total_weights[ch] = np.sum(data['weight'][:, :, ch])
+    
+    ax_bar.bar(range(nchan), total_weights)
+    ax_bar.set_xlabel('Channel')
+    ax_bar.set_ylabel('Total Weight')
+    ax_bar.set_title('Total Weight by Channel')
+    ax_bar.grid(True, alpha=0.3, axis='y')
+    if channel < nchan:
+        ax_bar.axvline(channel, color='r', linestyle='--', alpha=0.5)
+    
+    fig.suptitle(f'{diag_type} Weight Functions - Channel {channel}', fontsize=14, y=0.98)
+    
+    if save_fig:
+        plt.savefig(save_fig, dpi=150, bbox_inches='tight')
+        ut.success(f'Figure saved to {save_fig}')
+    
+    return fig
+
+def plot_channel_comparison(data, channels=None, diag_type='FIDA', save_fig=None):
+    """Compare weight functions across multiple channels"""
+    
+    if channels is None:
+        nchan = data['nchan']
+        channels = list(range(min(5, nchan)))  # Default to first 5 channels
+    
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    colors = plt.cm.rainbow(np.linspace(0, 1, len(channels)))
+    
+    # Pick representative energy and pitch indices
+    ne = len(data['energy'])
+    np_ = len(data['pitch'])
+    ie_mid = ne // 2
+    ip_mid = np_ // 2
+    
+    for i, ch in enumerate(channels):
+        if diag_type == 'FIDA':
+            weight = np.sum(data['weight'][:, :, :, ch], axis=0)
+        else:
+            weight = data['weight'][:, :, ch]
+        
+        # Energy dependence at mid-pitch
+        axes[0, 0].plot(data['energy'], weight[:, ip_mid], 
+                       color=colors[i], label=f'Ch {ch}', linewidth=2)
+        
+        # Pitch dependence at mid-energy
+        axes[0, 1].plot(data['pitch'], weight[ie_mid, :], 
+                       color=colors[i], label=f'Ch {ch}', linewidth=2)
+        
+        # Total weight
+        axes[1, 0].bar(ch, np.sum(weight), color=colors[i])
+        
+        # Flux spectrum if available
+        if 'flux' in data:
+            axes[1, 1].plot(data['energy'], data['flux'][:, ch], 
+                          color=colors[i], label=f'Ch {ch}', linewidth=2)
+    
+    # Format plots
+    axes[0, 0].set_xlabel('Energy [keV]')
+    axes[0, 0].set_ylabel('Weight')
+    axes[0, 0].set_title(f'Energy Dep. (pitch={data["pitch"][ip_mid]:.2f})')
+    axes[0, 0].legend()
+    axes[0, 0].grid(True, alpha=0.3)
+    
+    axes[0, 1].set_xlabel('Pitch')
+    axes[0, 1].set_ylabel('Weight')
+    axes[0, 1].set_title(f'Pitch Dep. (E={data["energy"][ie_mid]:.1f} keV)')
+    axes[0, 1].legend()
+    axes[0, 1].grid(True, alpha=0.3)
+    
+    axes[1, 0].set_xlabel('Channel')
+    axes[1, 0].set_ylabel('Total Weight')
+    axes[1, 0].set_title('Total Weight Comparison')
+    axes[1, 0].grid(True, alpha=0.3, axis='y')
+    
+    if 'flux' in data:
+        axes[1, 1].set_xlabel('Energy [keV]')
+        axes[1, 1].set_ylabel('Flux')
+        axes[1, 1].set_title('Flux Spectrum')
+        axes[1, 1].legend()
+        axes[1, 1].grid(True, alpha=0.3)
+    else:
+        axes[1, 1].axis('off')
+    
+    fig.suptitle(f'{diag_type} Channel Comparison', fontsize=14)
+    plt.tight_layout()
+    
+    if save_fig:
+        plt.savefig(save_fig, dpi=150, bbox_inches='tight')
+        ut.success(f'Figure saved to {save_fig}')
+    
+    return fig
+
+def plot_all_weights(data, diag_type='FIDA', save_fig=None):
+    """Plot all channels in a grid"""
+    
+    nchan = data['nchan']
+    ncols = int(np.ceil(np.sqrt(nchan)))
+    nrows = int(np.ceil(nchan / ncols))
+    
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4*ncols, 3*nrows))
+    axes = axes.flatten() if nchan > 1 else [axes]
+    
+    # Find global min/max for consistent color scale
+    if diag_type == 'FIDA':
+        all_weights = np.sum(data['weight'], axis=0)
+    else:
+        all_weights = data['weight']
+    vmin = np.min(all_weights)
+    vmax = np.max(all_weights)
+    
+    for ch in range(nchan):
+        ax = axes[ch]
+        if diag_type == 'FIDA':
+            weight = np.sum(data['weight'][:, :, :, ch], axis=0)
+        else:
+            weight = data['weight'][:, :, ch]
+        
+        im = plot_weight_2d(ax, data['energy'], data['pitch'], weight,
+                          title=f'Channel {ch}', vmin=vmin, vmax=vmax)
+        
+    # Turn off unused axes
+    for ch in range(nchan, len(axes)):
+        axes[ch].axis('off')
+    
+    # Add colorbar
+    fig.colorbar(im, ax=axes, label='Weight', fraction=0.046, pad=0.04)
+    fig.suptitle(f'{diag_type} Weight Functions - All Channels', fontsize=14)
+    plt.tight_layout()
+    
+    if save_fig:
+        plt.savefig(save_fig, dpi=150, bbox_inches='tight')
+        ut.success(f'Figure saved to {save_fig}')
+    
+    return fig
+
+def main():
+    parser = argparse.ArgumentParser(description="Plot FIDASIM weight functions")
+    
+    parser.add_argument('filename', type=str, 
+                       help='Weight function file (e.g., runid_fida_weights.h5)')
+    parser.add_argument('-c', '--channel', type=int, default=0,
+                       help='Channel to plot (default: 0)')
+    parser.add_argument('-ch', '--channels', type=int, nargs='+',
+                       help='Channels to compare (default: first 5)')
+    parser.add_argument('-a', '--all', action='store_true',
+                       help='Plot all channels in grid')
+    parser.add_argument('-s', '--save', type=str,
+                       help='Save figure to file')
+    parser.add_argument('-t', '--type', type=str, choices=['FIDA', 'NPA', 'NC'],
+                       help='Diagnostic type (auto-detected if not specified)')
+    
+    args = parser.parse_args()
+    
+    # Check if file exists
+    if not os.path.exists(args.filename):
+        ut.error(f'File not found: {args.filename}', halt=True)
+    
+    # Auto-detect diagnostic type from filename if not specified
+    if args.type is None:
+        filename_lower = args.filename.lower()
+        if 'fida' in filename_lower:
+            diag_type = 'FIDA'
+        elif 'npa' in filename_lower:
+            diag_type = 'NPA'
+        elif 'nc' in filename_lower or 'neutron' in filename_lower:
+            diag_type = 'NC'
+        else:
+            ut.error('Could not determine diagnostic type from filename. Use -t option.', halt=True)
+    else:
+        diag_type = args.type
+    
+    ut.info(f'Reading {diag_type} weight functions from {args.filename}')
+    
+    # Read data based on type
+    if diag_type == 'FIDA':
+        data = read_fida_weights(args.filename)
+    elif diag_type == 'NPA':
+        data = read_npa_weights(args.filename)
+    elif diag_type == 'NC':
+        data = read_nc_weights(args.filename)
+    
+    ut.success(f'Loaded {diag_type} weights with {data["nchan"]} channels')
+    
+    # Create plots
+    if args.all:
+        # Plot all channels
+        fig = plot_all_weights(data, diag_type, save_fig=args.save)
+    elif args.channels:
+        # Compare specific channels
+        fig = plot_channel_comparison(data, args.channels, diag_type, save_fig=args.save)
+    else:
+        # Plot single channel summary
+        if args.channel >= data['nchan']:
+            ut.error(f'Channel {args.channel} out of range. Max channel is {data["nchan"]-1}', halt=True)
+        fig = plot_weight_summary(data, args.channel, diag_type, save_fig=args.save)
+    
+    plt.show()
+
+if __name__ == '__main__':
+    main()

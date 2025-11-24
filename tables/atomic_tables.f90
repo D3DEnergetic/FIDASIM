@@ -56,13 +56,17 @@ real(Float64), parameter :: H3_amu = 3.01550071632d0
     !+ Atomic mass of Hydrogen-3 (tritium) [amu]
 real(Float64), parameter :: He3_amu = 3.01602931914d0
     !+ Atomic mass of Helium-3 [amu]
-real(Float64), parameter :: B_amu = 10.81d0
+real(Float64), parameter :: He4_amu = 4.00260325413d0
+    !+ Atomic mass of Helium-4 [amu]
+real(Float64), parameter :: B10_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
-real(Float64), parameter :: C_amu = 12.011d0
+real(Float64), parameter :: C12_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
 
+integer, parameter :: He_q = 2
+    !+ proton number of Helium
 integer, parameter :: B_q = 5
-    !+ Proton number of Boron
+    !+ proton number of boron
 integer, parameter :: C_q = 6
     !+ Proton number of Carbon
 
@@ -2910,6 +2914,80 @@ function Aq_cx_n_adas(eb, q, n) result(sigma)
 
 end function Aq_cx_n_adas
 
+function He2_cx_1_janev(eb) result(sigma)
+    !+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom
+    !+in the \(n=1\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(1) \rightarrow He^{+} + H^+ $$
+    !+
+    !+###References
+    !+* Page 116 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(9), parameter :: A = [17.438d0, 2.1263d0, 2.1401d-3,   &
+                                                   1.6498d0, 2.6259d-6, 2.4226d-11, &
+                                                   15.665d0, 7.9193d0, -4.4053d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb) /  &
+           (1.0 + A(3)*eb**A(4) + A(5)*eb**3.5 +  &
+            A(6)*eb**5.4) + A(7)*exp(-A(8)*eb)/(eb**A(9)))
+
+end function He2_cx_1_janev
+
+function He2_cx_2_janev(eb) result(sigma)
+    !+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom
+    !+in the \(n=2\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(2) \rightarrow He^{+} + H^+ $$
+    !+
+    !+###References
+    !+* Page 118 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(9), parameter :: A = [88.508d0, 0.78429d0, 3.2903d-2, &
+                                                   1.7635d0, 7.3265d-5, 1.4418d-8, &
+                                                   0.80478d0, 0.22349d0, -0.68604d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb) /  &
+           (1.0 + A(3)*eb**A(4) + A(5)*eb**3.5 +  &
+            A(6)*eb**5.4) + A(7)*exp(-A(8)*eb)/(eb**A(9)))
+
+end function He2_cx_2_janev
+
+function He2_cx_n_janev(eb, n) result(sigma)
+    !+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom
+    !+in the \(n>2\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(n) \rightarrow He^{+} + H^+ ; n>2$$
+    !+
+    !+###References
+    !+* Page 120 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    integer, intent(in)       :: n
+        !+ Initial atomic energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: etil, B
+    real(Float64), dimension(4), parameter :: A = [2.0032d2, 1.4591d0, 2.0384d-4, 2.0d-9]
+
+    etil = eb*n**2
+
+    B = 1 + etil**A(2) + A(3)*etil**3.5 + A(4)*etil**5.4
+    sigma = (n**4)*(7.04d-16 * A(1)*(1 - exp(-(4/(3*A(1))) * B))/B)
+
+end function He2_cx_n_janev
+
 function B5_cx_1_janev(eb) result(sigma)
     !+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom
     !+in the \(n=1\) state colliding with a fully stripped Boron ion at energy `eb`
@@ -2972,6 +3050,9 @@ function Aq_cx_n_janev(eb, q, n) result(sigma)
     !+$$ A^{q+} + H(n) \rightarrow A^{(q-1)+} + H^+, q \gt 3 $$
     !+
     !+###References
+    !+* Page 116 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 118 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 120 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 166 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 168 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 174 in Ref. 5 [[atomic_tables(module)]]
@@ -2992,11 +3073,29 @@ function Aq_cx_n_janev(eb, q, n) result(sigma)
     nf = real(n)
     qf = real(q)
 
+    ! Helium Impurity
+    if((n.eq.1).and.(q.eq.2)) then
+        sigma = He2_cx_1_janev(eb)
+        return
+    endif
+
+    if((n.eq.2).and.(q.eq.2)) then
+        sigma = He2_cx_2_janev(eb)
+        return
+    endif
+
+    if((n.gt.2).and.(q.eq.2)) then
+        sigma = He2_cx_n_janev(eb, n)
+        return
+    endif
+
+    ! Boron Impurity
     if((n.eq.1).and.(q.eq.5)) then
         sigma = B5_cx_1_janev(eb)
         return
     endif
 
+    ! Carbon Impurity
     if((n.eq.1).and.(q.eq.6)) then
         sigma = C6_cx_1_janev(eb)
         return
@@ -3007,6 +3106,7 @@ function Aq_cx_n_janev(eb, q, n) result(sigma)
         return
     endif
 
+    ! Generic Impurity
     etil = eb*(nf**2.0)/(qf**0.5)
 
     sigma = qf*nf**4 * 7.04d-16 * A/(etil**3.5 * (1.0 + B*etil**2)) * &
@@ -3074,6 +3174,101 @@ function Aq_cx(eb, q, n_max) result(sigma)
 end function Aq_cx
 
 !Impurity impact ionization
+function He2_ioniz_1_janev(eb) result(sigma)
+    !+ Calculates the total ionization cross section for a Neutral Hydrogen atom
+    !+in the \(n=1\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(1) \rightarrow He^{2+} + H^+ + e $$
+    !+
+    !+###References
+    !+* Page 108 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(8), parameter :: A = [40.498d0, 112.61d0,   &
+                                                   1.5496d6, 1.4285d-5,  &
+                                                   4.1163d-2, -2.6347d0, &
+                                                   4.0589d0, -5.9204d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/((eb**A(6)) + A(7)*(eb**A(8))))
+
+end function He2_ioniz_1_janev
+
+function He2_ioniz_2_janev(eb) result(sigma)
+    !+ Calculates the total ionization cross section for a Neutral Hydrogen atom
+    !+in the \(n=2\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(2) \rightarrow He^{2+} + H^+ + e $$
+    !+
+    !+###References
+    !+* Page 110 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(8), parameter :: A = [1.0901d0, 26.473d0,   &
+                                                   1.0224d6, 5.7286d-3,  &
+                                                   0.040151d0, -2.4092d0, &
+                                                   0.014897d0, -0.23786d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/((eb**A(6)) + A(7)*(eb**A(8))))
+
+end function He2_ioniz_2_janev
+
+function He2_ioniz_3_janev(eb) result(sigma)
+    !+ Calculates the total ionization cross section for a Neutral Hydrogen atom
+    !+in the \(n=3\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(3) \rightarrow He^{2+} + H^+ + e $$
+    !+
+    !+###References
+    !+* Page 110 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(8), parameter :: A = [250.10d0, 7.9018d0,   &
+                                                   2.1448d6, 0.33041d0,  &
+                                                   0.093012d0, -0.49446d0, &
+                                                   0.63357d0, -2.7261d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/((eb**A(6)) + A(7)*(eb**A(8))))
+
+end function He2_ioniz_3_janev
+
+function He2_ioniz_n_janev(eb, n) result(sigma)
+    !+ Calculates the total ionization cross section for a Neutral Hydrogen atom
+    !+in the \(n>3\) state colliding with a fully stripped Helium ion at energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(n) \rightarrow He^{2+} + H^+ + e ; n > 3$$
+    !+
+    !+###References
+    !+* Page 112 in Ref. 5 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: eb
+        !+ Relative collision energy [keV/amu]
+    integer, intent(in)       :: n
+        !+ Initial atomic energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: etil
+
+    etil = eb*((3.0/n)**2)
+    sigma = ((n/3.0)**4)*He2_ioniz_3_janev(etil)
+
+end function He2_ioniz_n_janev
+
 function B5_ioniz_1_janev(eb) result(sigma)
     !+ Calculates the total ionization cross section for a Neutral Hydrogen atom
     !+in the \(n=1\) state colliding with a fully stripped Boron ion at energy `eb`
@@ -3169,6 +3364,9 @@ function Aq_ioniz_n(eb, q, n) result(sigma)
     !+$$ A^{q+} + H(n) \rightarrow A^{(q-1)+} + H^+, q \gt 3 $$
     !+
     !+###References
+    !+* Page 108 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 110 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 112 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 152 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 154 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 160 in Ref. 5 [[atomic_tables(module)]]
@@ -3180,6 +3378,26 @@ function Aq_ioniz_n(eb, q, n) result(sigma)
         !+ Initial atomic energy level/state
     real(Float64)             :: sigma
         !+ Cross Section [\(cm^2\)]
+
+    if((q.eq.2).and.(n.eq.1)) then
+        sigma = He2_ioniz_1_janev(eb)
+        return
+    endif
+
+    if((q.eq.2).and.(n.eq.2)) then
+        sigma = He2_ioniz_2_janev(eb)
+        return
+    endif
+
+    if((q.eq.2).and.(n.eq.3)) then
+        sigma = He2_ioniz_3_janev(eb)
+        return
+    endif
+
+    if((q.eq.2).and.(n.gt.3)) then
+        sigma = He2_ioniz_n_janev(eb,n)
+        return
+    endif
 
     if((q.eq.5).and.(n.eq.1)) then
         sigma = B5_ioniz_1_janev(eb)
@@ -3205,6 +3423,9 @@ function Aq_ioniz(eb, q, n_max) result(sigma)
     !+$$ A^{q+} + H(n=1..n_{max}) \rightarrow A^{(q-1)+} + H^+, q \gt 3 $$
     !+
     !+###References
+    !+* Page 108 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 110 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 112 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 152 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 154 in Ref. 5 [[atomic_tables(module)]]
     !+* Page 160 in Ref. 5 [[atomic_tables(module)]]
@@ -3226,6 +3447,567 @@ function Aq_ioniz(eb, q, n_max) result(sigma)
 end function Aq_ioniz
 
 !Impurity impact excitation
+function He2_excit_1_2_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m=2\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(2) $$
+    !+
+    !+###References
+    !+* Page 84 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(10), parameter :: A = [177.69d0, 64.506d0, 0.10807d0, 2.1398d-4,  &
+                                                    0.73358d0, -2.9773d0, 7.5603d-2, 18.997d0, &
+                                                    2.4352d-3, 3.4085d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6) + A(7)*exp(-A(8)/eb)/(1+A(9)*eb**A(10)))
+
+end function He2_excit_1_2_janev
+
+function He2_excit_1_3_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m=3\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(3) $$
+    !+
+    !+###References
+    !+* Page 86 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(10), parameter :: A = [18.775d0, 73.938d0, 3.2231d0, 1.2879d-4,  &
+                                                    0.75301d0, -4.1638d0, 2.3660d-1, 20.927d0, &
+                                                    1.6636d-3, 3.6319d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6) + A(7)*exp(-A(8)/eb)/(1+A(9)*eb**A(10)))
+
+end function He2_excit_1_3_janev
+
+function He2_excit_1_4_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m=4\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(4) $$
+    !+
+    !+###References
+    !+* Page 88 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(10), parameter :: A = [5.5094d0, 68.504d0, 12.621d0, 7.7669d-5,  &
+                                                    0.53813d0, -4.1788d0, 4.0349d-2, 16.213d0, &
+                                                    5.4493d-9, 9.5011d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6) + A(7)*exp(-A(8)/eb)/(1+A(9)*eb**A(10)))
+
+end function He2_excit_1_4_janev
+
+function He2_excit_1_5_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m=5\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(5) $$
+    !+
+    !+###References
+    !+* Page 90 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(8), parameter :: A = [4.9796d0, 64.582d0, 0.10588d0, 2.8878d-5,  &
+                                                   0.15531d0, -2.4161d0, 1.6389d-3, -6.3726d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/(eb**A(6) + A(7)*eb**A(8)))
+
+end function He2_excit_1_5_janev
+
+function He2_excit_1_6_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m=6\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(6) $$
+    !+
+    !+###References
+    !+* Page 90 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(8), parameter :: A = [2.55080d0, 74.348d0, 0.19625d0, 3.3570d-5, &
+                                                   0.12878d0, -2.2950d0, 5.1445d-3, -5.5986d0]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/(eb**A(6) + A(7)*eb**A(8)))
+
+end function He2_excit_1_6_janev
+
+function He2_excit_1_m_janev(eb, m) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the \(m>6\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(1) \rightarrow A^{2+} + H(m), m > 6 $$
+    !+
+    !+###References
+    !+* Page 90 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)       :: m
+        !+ final energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    sigma = ((6.0/m)**3)*He2_excit_1_6_janev(eb)
+
+end function He2_excit_1_m_janev
+
+function He2_excit_1_janev(eb, m_max) result(sigma)
+    !+Calculates an array of the excitation cross sections for a neutral Hydrogen atom transitioning from
+    !+the \(n=1\) state to the m=1..`m_max` states due to a collision with an fully stripped Helium ion energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(1) \rightarrow He^{2+} + H(m=1..m_{max}) $$
+    !+
+    !+###References
+    !+* Page 84-90 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in)       :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)             :: m_max
+        !+ Number of m states to calculate
+    real(Float64), dimension(m_max) :: sigma
+        !+ Array of cross sections where the m'th index refers to
+        !+an excitation from the \(n=1\) state to the m'th state [\(cm^2\)]
+
+    integer :: m
+
+    sigma = 0.d0
+    do m=1,m_max
+        select case (m)
+            case (1)
+                sigma(1) = 0.d0
+            case (2)
+                sigma(2) = He2_excit_1_2_janev(eb)
+            case (3)
+                sigma(3) = He2_excit_1_3_janev(eb)
+            case (4)
+                sigma(4) = He2_excit_1_4_janev(eb)
+            case (5)
+                sigma(5) = He2_excit_1_5_janev(eb)
+            case (6)
+                sigma(6) = He2_excit_1_6_janev(eb)
+            case DEFAULT
+                sigma(m) = He2_excit_1_m_janev(eb, m)
+        end select
+    enddo
+
+end function He2_excit_1_janev
+
+function He2_excit_2_3_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=2\) state to the \(m=3\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(2) \rightarrow A^{2+} + H(3) $$
+    !+
+    !+###References
+    !+* Page 92 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [1864.3d0, 19.395d0,   &
+                                                   0.13899d0, 2.4502d-3, &
+                                                   0.29660d0, -1.7558d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_2_3_janev
+
+function He2_excit_2_4_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=2\) state to the \(m=4\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(2) \rightarrow A^{2+} + H(4) $$
+    !+
+    !+###References
+    !+* Page 94 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [246.18d0, 27.764d0,   &
+                                                   0.39876d0, 1.9381d-3, &
+                                                   0.23304d0, -1.7165d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_2_4_janev
+
+function He2_excit_2_5_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=2\) state to the \(m=5\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(2) \rightarrow A^{2+} + H(5) $$
+    !+
+    !+###References
+    !+* Page 96 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [73.056d0, 37.946d0,  &
+                                                   1.4528d0, 2.4601d-3, &
+                                                   0.15855d0, -1.4775d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_2_5_janev
+
+function He2_excit_2_m_janev(eb,m) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=2\) state to the \(m>5\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(2) \rightarrow A^{2+} + H(m), m > 5$$
+    !+
+    !+###References
+    !+* Page 98 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)       :: m
+        !+ final energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: sig25
+
+    sig25 = He2_excit_2_5_janev(eb)
+    select case (m)
+        case (1:4)
+            sigma = 0.d0
+        case (5)
+            sigma = sig25
+        case (6)
+            sigma = 0.461d0 * sig25
+        case (7)
+            sigma = 0.2475d0 * sig25
+        case (8)
+            sigma = 0.1465d0 * sig25
+        case (9)
+            sigma = 0.0920d0 * sig25
+        case (10)
+            sigma = 0.0605d0 * sig25
+        case DEFAULT
+            sigma = 0.0605d0 * sig25 * (10.0/m)**3
+    end select
+
+end function He2_excit_2_m_janev
+
+function He2_excit_2_janev(eb, m_max) result(sigma)
+    !+Calculates an array of the excitation cross sections for a neutral Hydrogen atom transitioning from
+    !+the \(n=2\) state to the m=1..`m_max` states due to a collision with an fully stripped Helium ion energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(2) \rightarrow He^{2+} + H(m=1..m_{max}) $$
+    !+
+    !+###References
+    !+* Page 92-98 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in)       :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)             :: m_max
+        !+ Number of m states to calculate
+    real(Float64), dimension(m_max) :: sigma
+        !+ Array of cross sections where the m'th index refers to
+        !+an excitation from the \(n=1\) state to the m'th state [\(cm^2\)]
+
+    integer :: m
+
+    sigma = 0.d0
+    do m=1,m_max
+        select case (m)
+            case (1)
+                sigma(1) = 0.d0
+            case (2)
+                sigma(2) = 0.d0
+            case (3)
+                sigma(3) = He2_excit_2_3_janev(eb)
+            case (4)
+                sigma(4) = He2_excit_2_4_janev(eb)
+            case (5)
+                sigma(5) = He2_excit_2_5_janev(eb)
+            case DEFAULT
+                sigma(m) = He2_excit_2_m_janev(eb, m)
+        end select
+    enddo
+
+end function He2_excit_2_janev
+
+function He2_excit_3_4_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=3\) state to the \(m=4\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(3) \rightarrow A^{2+} + H(4) $$
+    !+
+    !+###References
+    !+* Page 100 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [4990.0d0, 22.638d0,  &
+                                                   1.3118d0, 0.014239d0, &
+                                                   0.260596d0, -1.2722d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_3_4_janev
+
+function He2_excit_3_5_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=3\) state to the \(m=5\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(3) \rightarrow A^{2+} + H(5) $$
+    !+
+    !+###References
+    !+* Page 100 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [762.36d0, 22.192d0,  &
+                                                   1.4549d0, 0.014996d0, &
+                                                   0.27088d0, -1.2894d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_3_5_janev
+
+function He2_excit_3_6_janev(eb) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=3\) state to the \(m=6\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(3) \rightarrow A^{2+} + H(6) $$
+    !+
+    !+###References
+    !+* Page 100 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(6), parameter :: A = [253.89d0, 23.014d0,   &
+                                                   2.1708d0, 0.015960d0, &
+                                                   0.26730d0, -1.2881d0 ]
+
+    sigma = 1.d-16*A(1)*(exp(-A(2)/eb)*log(1 + A(3)*eb)/eb &
+          + A(4)*exp(-A(5)*eb)/eb**A(6))
+
+end function He2_excit_3_6_janev
+
+function He2_excit_3_m_janev(eb,m) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n=3\) state to the \(m>6\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(3) \rightarrow A^{2+} + H(m), m > 6$$
+    !+
+    !+###References
+    !+* Page 102 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)       :: m
+        !+ final energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: sig36
+
+    sig36 = He2_excit_3_6_janev(eb)
+    select case (m)
+        case (1:5)
+            sigma = 0.d0
+        case (6)
+            sigma = sig36
+        case (7)
+            sigma = 0.4670d0 * sig36
+        case (8)
+            sigma = 0.2545d0 * sig36
+        case (9)
+            sigma = 0.1540d0 * sig36
+        case (10)
+            sigma = 0.1d0 * sig36
+        case DEFAULT
+            sigma = 0.1d0 * sig36 * (10.0/m)**3
+    end select
+
+end function He2_excit_3_m_janev
+
+function He2_excit_3_janev(eb, m_max) result(sigma)
+    !+Calculates an array of the excitation cross sections for a neutral Hydrogen atom transitioning from
+    !+the \(n=3\) state to the m=1..`m_max` states due to a collision with an fully stripped Helium ion energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(3) \rightarrow He^{2+} + H(m=1..m_{max}) $$
+    !+
+    !+###References
+    !+* Page 100-102 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in)       :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)             :: m_max
+        !+ Number of m states to calculate
+    real(Float64), dimension(m_max) :: sigma
+        !+ Array of cross sections where the m'th index refers to
+        !+an excitation from the \(n=1\) state to the m'th state [\(cm^2\)]
+
+    integer :: m
+
+    sigma = 0.d0
+    do m=1,m_max
+        select case (m)
+            case (1)
+                sigma(1) = 0.d0
+            case (2)
+                sigma(2) = 0.d0
+            case (3)
+                sigma(3) = 0.d0
+            case (4)
+                sigma(4) = He2_excit_3_4_janev(eb)
+            case (5)
+                sigma(5) = He2_excit_3_5_janev(eb)
+            case (6)
+                sigma(6) = He2_excit_3_6_janev(eb)
+            case DEFAULT
+                sigma(m) = He2_excit_3_m_janev(eb, m)
+        end select
+    enddo
+
+end function He2_excit_3_janev
+
+function He2_excit_n_m_janev(eb,n,m) result(sigma)
+    !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
+    !+the \(n>3\) state to the \(m>n\) state due to a collision an fully stripped Helium ion
+    !+
+    !+###Equation
+    !+$$ A^{2+} + H(n) \rightarrow A^{2+} + H(m), n > 3, m > n$$
+    !+
+    !+###References
+    !+* Page 104 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in) :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)       :: n
+        !+ initial energy level/state
+    integer, intent(in)       :: m
+        !+ final energy level/state
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: ep, A, D, L, F, G, H
+    real(Float64) :: s, C2p, C2m, zm, zp, y
+
+    ep = eb/50.0
+    s = m - n
+    D = exp(-1.0/(n*m*ep**2))
+    A = (8.0/(3.0*s))*(m/(s*n))**3 * (0.184 - 0.04/(s**(2.0/3.0)))*(1.0 - 0.02*s/(n*m))**(1.0 + 2.0*s)
+    G = 0.5*((ep*n**2.0)/(m - 1.0/m))**3.0
+    L = log((1.0 + 0.53*(ep**2)*n*(m - 2.0/m))/(1.0 + 0.4*ep))
+    F = (1.0 - 0.3*s*D/(n*m))**(1.0 + 2.0*s)
+    y = 1.0 / (1.0 - D*log(18.0*s)/(4.0*s))
+    zp = 2.0 / (ep * n**2.0 * (sqrt(2.0 - (1.0*n/m)**2) + 1.0))
+    zm = 2.0 / (ep * n**2.0 * (sqrt(2.0 - (1.0*n/m)**2) - 1.0))
+    C2p = (zp**2 * log(1.0 + 2.0*zp/3.0))/(2.0*y + 3.0*zp/2.0)
+    C2m = (zm**2 * log(1.0 + 2.0*zm/3.0))/(2.0*y + 3.0*zm/2.0)
+    H = C2m - C2p
+
+    sigma = 1.76d-16 * ((n**4.0)/ep)*(A*D*L + F*G*H)
+
+end function He2_excit_n_m_janev
+
+function He2_excit_n_janev(eb, n, m_max) result(sigma)
+    !+Calculates an array of the excitation cross sections for a neutral Hydrogen atom transitioning from
+    !+the \(n>3\) state to the m=1..`m_max` states due to a collision with an fully stripped Helium ion energy `eb`
+    !+
+    !+###Equation
+    !+$$ He^{2+} + H(n>3) \rightarrow He^{2+} + H(m=1..m_{max}) $$
+    !+
+    !+###References
+    !+* Page 104 in Ref. 5 [[atomic_tables(module)]]
+    !+
+    real(Float64), intent(in)       :: eb
+        !+ Collision energy [keV]
+    integer, intent(in)             :: n
+        !+ initial state
+    integer, intent(in)             :: m_max
+        !+ Number of m states to calculate
+    real(Float64), dimension(m_max) :: sigma
+        !+ Array of cross sections where the m'th index refers to
+        !+an excitation from the \(n=1\) state to the m'th state [\(cm^2\)]
+
+    integer :: m
+
+    sigma = 0.d0
+    do m=1,m_max
+        select case (m)
+            case (1:4)
+                sigma(m) = 0.d0
+            case DEFAULT
+                sigma(m) = He2_excit_n_m_janev(eb,n,m)
+        end select
+    enddo
+
+end function He2_excit_n_janev
+
 function Aq_excit_1_2_janev(eb, q) result(sigma)
     !+Calculates the excitation cross section for a neutral Hydrogen atom transitioning from
     !+the \(n=1\) state to the \(m=2\) state due to a collision an ion with charge `q` at energy `eb`
@@ -3986,15 +4768,8 @@ function Aq_excit_n(eb, q, n, m_max) result(sigma)
     !+$$ A^{q+} + H(n) \rightarrow A^{q+} + H(m=1..m_{max}), q \gt 3, m \gt n, n \gt 3 $$
     !+
     !+###References
-    !+* Page 132 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 134 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 136 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 138 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 140 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 142 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 142 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 144 in Ref. 5 [[atomic_tables(module)]]
-    !+* Page 146 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 84-104 in Ref. 5 [[atomic_tables(module)]]
+    !+* Page 132-146 in Ref. 5 [[atomic_tables(module)]]
     !+
     real(Float64), intent(in)       :: eb
         !+ Collision energy [keV]
@@ -4012,13 +4787,29 @@ function Aq_excit_n(eb, q, n, m_max) result(sigma)
         case (0)
             stop
         case (1)
-            sigma = Aq_excit_1_janev(eb, q, m_max)
+            if(q.eq.2) then
+                sigma = He2_excit_1_janev(eb, m_max)
+            else
+                sigma = Aq_excit_1_janev(eb, q, m_max)
+            endif
         case (2)
-            sigma = Aq_excit_2_janev(eb, q, m_max)
+            if(q.eq.2) then
+                sigma = He2_excit_2_janev(eb, m_max)
+            else
+                sigma = Aq_excit_2_janev(eb, q, m_max)
+            endif
         case (3)
-            sigma = Aq_excit_3_janev(eb, q, m_max)
+            if(q.eq.2) then
+                sigma = He2_excit_3_janev(eb, m_max)
+            else
+                sigma = Aq_excit_3_janev(eb, q, m_max)
+            endif
         case DEFAULT
-            sigma = Aq_excit_n_janev(eb, q, n, m_max)
+            if(q.eq.2) then
+                sigma = He2_excit_n_janev(eb, n, m_max)
+            else
+                sigma = Aq_excit_n_janev(eb, q, n, m_max)
+            endif
     end select
 
 end function Aq_excit_n
@@ -5156,6 +5947,9 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
         excit = 0.d0
 
         select case (q(iq))
+            case (2)
+                aname = "Helium"
+                asym = "H_He2"
             case (5)
                 aname = "Boron"
                 asym = "H_B5"
@@ -6066,7 +6860,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
     logical :: calculate
     integer :: q(10) = 0
-    real(Float64) :: mass
+    real(Float64) :: mass(10) = 0.d0
 
     real(Float64) :: emin
     real(Float64) :: emax
@@ -6103,7 +6897,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
     NAMELIST /H_Aq_rates/ calculate, q, mass, nenergy, emin, emax, ntemp, tmin, tmax
 
-    calculate = .True. ; q(1) = 6 ; mass = C_amu
+    calculate = .True. ; q(1) = C_q ; mass(1) = C12_amu
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
     inquire(file=namelist_file,exist=exis)
@@ -6129,6 +6923,9 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
 
         select case (q(iq))
+          case (2)
+              aname = "Helium"
+              asym = "H_He2"
           case (5)
               aname = "Boron"
               asym = "H_B5"
@@ -6158,7 +6955,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
         if(verbose) then
             write(*,'(a)') "---- H-"//trim(adjustl(aname))//" reaction rates settings ----"
             write(*,'(T2,"q = ", i2)') q(iq)
-            write(*,'(T2,"mass = ",f7.2, " amu")') mass
+            write(*,'(T2,"mass = ",f7.2, " amu")') mass(iq)
             write(*,'(T2,"Emin = ",e9.2, " keV/amu")') emin
             write(*,'(T2,"Emax = ",e9.2, " keV/amu")') emax
             write(*,'(T2,"Nenergy = ", i4)') nenergy
@@ -6178,21 +6975,21 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
                     do m=1, m_max
                         if(m.gt.n) then
                             call bt_maxwellian(Aq_excit_n_m, q(iq), ti, eb, &
-                                               mass, H1_amu, n, m, rate)
+                                               mass(iq), H1_amu, n, m, rate)
                             excit(n,m,ie,it) = rate
 
                             call bt_maxwellian(Aq_excit_n_m, q(iq), ti, eb, &
-                                               mass, H1_amu, n, m, &
+                                               mass(iq), H1_amu, n, m, &
                                                rate, deexcit=.True.)
                             excit(m,n,ie,it) = rate
                         endif
                     enddo
                     call bt_maxwellian(Aq_cx_n, q(iq), ti, eb, &
-                                       mass, H1_amu, n, rate)
+                                       mass(iq), H1_amu, n, rate)
                     cx(n,ie,it) = rate
 
                     call bt_maxwellian(Aq_ioniz_n, q(iq), ti, eb, &
-                                       mass, H1_amu, n, rate)
+                                       mass(iq), H1_amu, n, rate)
                     ioniz(n,ie,it) = rate
                 enddo
                 cnt = cnt + 1
@@ -6852,8 +7649,9 @@ subroutine print_default_namelist
     write(*,'(a)') "!Hydrogen-Impurity Cross Sections. Up to 10 impurity charges"
     write(*,'(a)') "&H_Aq_cross"
     write(*,'(a)') "calculate = T, !Calculate Table"
-    write(*,'(a)') "q(1) = 5,      !Impurity charge: Boron: 5, Carbon: 6, ..."
-    write(*,'(a)') "q(2) = 6,      !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(1) = 2,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(2) = 5,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(3) = 6,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
     write(*,'(a)') "nenergy = 200, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy/amu [keV/amu]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy/amu [keV/amu]"
@@ -6895,9 +7693,12 @@ subroutine print_default_namelist
     write(*,'(a)') "!Hydrogen-Impurity Reaction Rates. Up to 10 impurity charges"
     write(*,'(a)') "&H_Aq_rates"
     write(*,'(a)') "calculate = T, !Calculate Table"
-    write(*,'(a)') "q(1) = 5,      !Impurity charge: Boron: 5, Carbon: 6, ..."
-    write(*,'(a)') "q(2) = 6,      !Impurity charge: Boron: 5, Carbon: 6, ..."
-    write(*,'(a)') "mass = 12.011, !Impurity mass [amu]"
+    write(*,'(a)') "q(1) = 2,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(2) = 5,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(3) = 6,      !Impurity charge: Helium: 2, Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "mass(1) = 4.0026, !Helium Impurity mass [amu]"
+    write(*,'(a)') "mass(2) = 10.811, !Boron Impurity mass [amu]"
+    write(*,'(a)') "mass(3) = 12.011, !Carbon Impurity mass [amu]"
     write(*,'(a)') "nenergy = 100, !Number of energy/amu values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy/amu [keV/amu]"
     write(*,'(a)') "emax = 4.0E2,  !Maximum energy/amu [keV/amu]"
@@ -7031,7 +7832,7 @@ program generate_tables
 
     !! Calculate cross sections
     if(verbose) then
-        write(*,*) 'Cross Sections:   ',time(time_start)
+        write(*,*) 'Cross Sections:   ',time_string(time_start)
         write(*,*) ''
     endif
     call write_bb_H_H(gid, namelist_file, n_max, m_max)
@@ -7050,7 +7851,7 @@ program generate_tables
 
     !! Calculate reaction rates
     if(verbose) then
-        write(*,*) 'Reaction Rates:   ',time(time_start)
+        write(*,*) 'Reaction Rates:   ',time_string(time_start)
         write(*,*) ''
     endif
     call write_bt_H_H(gid, namelist_file, n_max, m_max)
@@ -7085,7 +7886,7 @@ program generate_tables
 #endif
 
     if(verbose) then
-        write(*,*) 'END: hour:minute:second ', time(time_start)
+        write(*,*) 'END: hour:minute:second ', time_string(time_start)
     endif
 
 end program

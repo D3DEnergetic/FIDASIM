@@ -885,7 +885,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name='',
                             except:
                                 pass  # Scale attachment is optional
 
-def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
+def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, return_g=False, **convert_COCOS_kw):
     """
     #+#read_geqdsk
     #+Reads an EFIT GEQDSK file
@@ -902,10 +902,12 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
     #+
     #+    **exp_Bp**: Argument for identify_COCOS. 0 if poloidal flux divided by 2 pi, 1 if using effective poloidal flux
     #+
+    #+    **return_g**: Also return the g-file dictionary
+    #+
     #+    **convert_COCOS_kw**: Keyword arguments to pass to convert_COCOS via transform_COCOS_from_geqdsk
     #+
     #+##Return Value
-    #+Electronmagnetic fields structure, rho, btipsign
+    #+Electronmagnetic fields structure, rho, btipsign, [g-file dictionary if return_g is True]
     #+
     #+##Example Usage
     #+```python
@@ -931,7 +933,7 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
 
     psi_arr = np.linspace(psiaxis, psiwall, len(fpol))
     fpol_itp = interp1d(psi_arr, fpol, 'cubic', fill_value=fpol[-1],bounds_error=False)
-    psirz_itp = RectBivariateSpline(r, z, g["psirz"])
+    psirz_itp = RectBivariateSpline(r, z, g["psirz"].T)
 
     if poloidal:
         rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
@@ -951,8 +953,10 @@ def read_geqdsk(filename, grid, poloidal=False, ccw_phi=True, exp_Bp=0, **conver
 
     equil = {"time":0.0,"data_source":os.path.abspath(filename), "mask":mask,
              "br":br,"bt":bt,"bz":bz,"er":er,"et":et,"ez":ez}
-
-    return equil, rhogrid, btipsign
+    if return_g:
+        return equil, rhogrid, btipsign, g
+    else:
+        return equil, rhogrid, btipsign
 
 def transform_COCOS_from_geqdsk(g, ccw_phi=True, exp_Bp=0, **convert_COCOS_kw):
     '''

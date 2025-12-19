@@ -11704,21 +11704,22 @@ subroutine dsigmadomega(bpitch, gamma, ppitch, pvector, ptensor, dsdo)
         w0 = 1.0 + a2 * legendre(x, 2, 0) + a4 * legendre(x, 4, 0)
 
         ! Eq. (9)
+        !!! TODO: check c and legendre indexing alignment
         ay = 0.0
         azz = 0.0
         axz = 0.0
         axxyy = 0.0
         do i = 1, 2
-            ay = ay + cay(i) * legendre(x, i, 1)
+            ay = ay + cay(i+1) * legendre(x, i, 1)
         enddo
         do i = 0, 4
-            azz = azz + cazz(i) * legendre(x, i, 0)
+            azz = azz + cazz(i+1) * legendre(x, i, 0)
         enddo
         do i = 1, 4
-            axz = axz + caxz(i) * legendre(x, i, 1)
+            axz = axz + caxz(i+1) * legendre(x, i, 1)
         enddo
         do i = 2, 4
-            axxyy = axxyy + caxxyy(i) * legendre(x, i, 2)
+            axxyy = axxyy + caxxyy(i+1) * legendre(x, i, 2)
         enddo
         ay = ay / w0
         azz = azz / w0
@@ -15299,7 +15300,9 @@ subroutine cfpd_f
                             eb = fbm%energy(ie)
 
                             !! Get the probability factor
-                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz,pgyro,gyro,mass_amu=mamu,gammaplus=gammaplus,gammaminus=gammaminus)
+                            call get_pgyro(fields,ctable%earray(ie3),eb,pitch,plasma,v3_xyz, &
+                                           pgyro,gyro,mass_amu=mamu,gammaplus=gammaplus, &
+                                           gammaminus=gammaminus)
 
                             !! Compute effects of spin polarization for D-D reactions
                             !!! TODO: Add SPF logical

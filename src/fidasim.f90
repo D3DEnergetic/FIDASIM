@@ -845,7 +845,6 @@ type Spectra
         !+ Half energy beam emission stark components: halfstokes(n_stark,4,lambda,chan)
     real(Float64), dimension(:,:,:,:), allocatable   :: thirdstokes
         !+ Third energy beam emission stark components: thirdstokes(n_stark,4,lambda,chan)
-
     real(Float64), dimension(:,:,:,:), allocatable :: dcx
         !+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)
     real(Float64), dimension(:,:,:,:,:), allocatable :: dcxstokes
@@ -13135,11 +13134,19 @@ subroutine dcx
     integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
+
     real(Float64):: tot_denn, photons  !! photon flux
+    real(Float64):: iflux, ipostflux, cur_birth  !! temp variables for birth/ioniz source info
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: fi_correction, dcx_dens
+    !! for storing birth/ioniz source info
+    real(Float64), dimension(:,:,:), allocatable :: ibirth, icerprev
+    allocate(ibirth(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(icerprev(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    ibirth=0.d0
+    icerprev=0.d0
 
     !! Initialized Neutral Population
     call init_neutral_population(neut%dcx)
@@ -13173,7 +13180,8 @@ subroutine dcx
        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction,iflux, &
+    !$OMP& ipostflux,cur_birth)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -13187,14 +13195,14 @@ subroutine dcx
                 call track(ri,vihalo,tracks,ntrack)
                 if(ntrack.eq.0) cycle loop_over_dcx
 
-                !! Calculate CX probability
+                !! Calculate CX probability, rates has units of 1/s
                 call get_total_cx_rate(tracks(1)%ind, ri, vihalo, neut_types, rates)
                 if(sum(rates).le.0.) cycle loop_over_dcx
 
                 !! Solve collisional radiative model along track
                 call get_plasma(plasma,pos=tracks(1)%pos)
 
-                !! Weight CX rates by ion source density
+                !! Weight CX rates by ion source density, states has units of 1/s/cm3
                 if(beam_mass.eq.thermal_mass(is)) then
                     states = rates*(plasma%deni(is) + plasma%denf)
                     if(sum(states).eq.0) cycle loop_over_dcx
@@ -13205,14 +13213,34 @@ subroutine dcx
                     fi_correction = 1.d0
                 endif
 
+                if(inputs%calc_birth.ge.1) then
+                   !! iflux has units of 1/s/m3, so does not need to be multiplied by beam_grid%dv
+                   !! divide by nlaunch because that is how many tracks we are going to launch
+                   !! Note: How should nlaunch be weighted if we don't get here because ntrack==0 or sum(rates)<=0 or sum(states)==0?
+                   iflux = sum(states)
+                   !$OMP ATOMIC UPDATE
+                   icerprev(i,j,k) = icerprev(i,j,k) + iflux/nlaunch(i,j,k)
+                endif
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
                     if(.not.plasma%in_plasma) exit loop_along_track
                     call colrad(plasma,thermal_mass(is),vihalo,tracks(jj)%time,states,denn,photons)
                     call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
 
+                    if(inputs%calc_birth.ge.1) then
+                       !! Check difference between 1/s/m3 of neutrals due to step along track
+                       ipostflux = sum(states)
+                       !! divide by nlaunch because that is how many tracks we are going to launch
+                       !! iflux has units of 1/s/m3, so does not need to be multiplied by beam_grid%dv
+                       cur_birth = (iflux - ipostflux)/nlaunch(i,j,k)
+                       !$OMP ATOMIC UPDATE
+                       ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3))= &
+                            ibirth(tracks(jj)%ind(1), tracks(jj)%ind(2), tracks(jj)%ind(3)) + cur_birth
+                       !$OMP END ATOMIC
+                       !! Save the current flux to compare with in the next step along track
+                       iflux=ipostflux
+                    endif
                     photons = fi_correction*photons !! Correct for including fast-ions in states
-
                     if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                         call store_photons(tracks(jj)%pos,vihalo, thermal_lambda0(is), photons/nlaunch(i,j,k),&
                             &spec%dcx(:,:,:,is),spec%dcxstokes(:,:,:,:,is))
@@ -13233,12 +13261,34 @@ subroutine dcx
     if(inputs%calc_dcx.ge.1) then
         call parallel_sum(spec%dcx)
     endif
+    if(inputs%calc_birth.ge.1) then
+       call parallel_sum(ibirth)
+       call parallel_sum(icerprev)
+    endif
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
             call parallel_merge_reservoirs(spatres%dcx(jj))
         enddo
     endif
 #endif
+    if(inputs%calc_birth.ge.1) then
+       ! Store information information about the dcx neutral source 
+       birth%dens(dcx_type,:,:,:) = ibirth
+       if(inputs%verbose.ge.1) then
+          write(*,'(T2,"Sum of full: ",e15.2," part/s/cm3")') sum(birth%dens(nbif_type,:,:,:))
+          write(*,'(T2,"Sum of dcx: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
+          write(*,'(T2,"Sum of dcx source: ",e15.2," part/s/cm3")') sum(icerprev)
+       endif
+       !! icerprev is the source rate for this generation due to H0(prev gen [NBI]) + H+ -> H+ + H0
+       !! Deduct this from the birth for the previous generation because it is not an electron thermal H+ source (if we are treating birth%dens as the thermal H+ source or e- source)
+       !! Probably should create a separate birth source, so that this does not interfere with calculating the fast ion birth profile?
+       !! Currently assume there is only full energy cold neutrals as gen0, assume half and third energy populations were 0, could allocate separately?
+       birth%dens(nbif_type,:,:,:) = birth%dens(nbif_type,:,:,:) - icerprev
+       if(inputs%verbose.ge.1) then
+          write(*,'(T2,"Sum of full - dcx source: ",e15.2," part/s/cm3")') sum(birth%dens(nbif_type,:,:,:))
+       endif
+    endif
+    deallocate(ibirth, icerprev)
 
     dcx_dens = sum(neut%dcx%dens)
     if((dcx_dens.eq.0).or.isnan(dcx_dens)) then
@@ -13265,6 +13315,7 @@ subroutine halo
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
     integer :: ii,jj,kk,it,is
     real(Float64) :: tot_denn, photons  !! photon flux
+    real(Float64):: iflux, ipostflux, cur_birth  !! temp variables for birth/ioniz source info
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -13277,7 +13328,12 @@ subroutine halo
     integer :: prev_type = 1  ! previous iteration
     integer :: cur_type = 2 ! current iteration
     real(Float64) :: fi_correction
-
+    !! for storing birth/ioniz source info
+    real(Float64), dimension(:,:,:), allocatable :: ibirth, icerprev
+    allocate(ibirth(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(icerprev(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    ibirth=0.d0
+    icerprev=0.d0
     !! Initialize Neutral Population
     call init_neutral_population(neut%halo)
 
@@ -13326,7 +13382,7 @@ subroutine halo
         endif
 
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction,iflux,ipostflux,cur_birth)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -13362,6 +13418,18 @@ subroutine halo
                         if(sum(states).eq.0) cycle loop_over_halos
                         fi_correction = 1.d0
                     endif
+                    if(inputs%calc_birth.ge.1) then
+                       iflux = sum(states)
+                       ! For halo 1 need to debit CE source from DCX, otherwise we debit from self
+                       if (hh.eq.1) then
+                          !$OMP ATOMIC UPDATE
+                          icerprev(i,j,k) = icerprev(i,j,k) + iflux/nlaunch(i,j,k)
+                       else
+                          !$OMP ATOMIC UPDATE
+                          ibirth(i,j,k) = ibirth(i,j,k) - iflux/nlaunch(i,j,k)
+                       endif
+
+                    endif
 
                     loop_along_track: do it=1,ntrack
                         call get_plasma(plasma,pos=tracks(it)%pos)
@@ -13370,6 +13438,14 @@ subroutine halo
 
                         !! Store Neutrals
                         call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
+                        if(inputs%calc_birth.ge.1) then
+                           ipostflux = sum(states)
+                           cur_birth = (iflux - ipostflux)/nlaunch(i,j,k)
+                           !$OMP ATOMIC UPDATE
+                           ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) = ibirth(tracks(it)%ind(1), tracks(it)%ind(2), tracks(it)%ind(3)) + cur_birth
+                           iflux=ipostflux
+                        endif
+
 
                         photons = fi_correction*photons !! Correct for including fast-ions in states
 
@@ -13423,13 +13499,32 @@ subroutine halo
     if(inputs%calc_halo.ge.1) then
         call parallel_sum(spec%halo)
     endif
+    if(inputs%calc_birth.ge.1) then
+       call parallel_sum(ibirth)
+       call parallel_sum(icerprev)
+    endif
     if(inputs%calc_res.ge.1) then
         do jj=1,spec_chords%nchan
             call parallel_merge_reservoirs(spatres%halo(jj))
         enddo
     endif
 #endif
-
+    if(inputs%calc_birth.ge.1) then
+       birth%dens(halo_type,:,:,:) = ibirth
+       if(inputs%verbose.ge.1) then
+          write(*,'(T2,"Sum of halo birth: ",e15.2," part/s/cm3")') sum(birth%dens(halo_type,:,:,:))
+          write(*,'(T2,"Sum of halo source: ",e15.2," part/s/cm3")') sum(icerprev)
+          write(*,'(T2,"Sum of dcx: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
+       endif
+       !! icerprev is the source rate for this generation due to H0(prev gen [dcx]) + H+ -> H+ + H0
+       !! Deduct this from the birth for the previous generation because it is not an electron thermal H+ source (if we are treating birth%dens as the thermal H+ source or e- source)
+       !! Probably should create a separate birth source, so that this does not interfere with calculating the fast ion birth profile?
+       birth%dens(dcx_type,:,:,:) = birth%dens(dcx_type,:,:,:) - icerprev
+       if(inputs%verbose.ge.1) then
+          write(*,'(T2,"Sum of dcx - halo source: ",e15.2," part/s/cm3")') sum(birth%dens(dcx_type,:,:,:))
+       endif
+    endif
+    deallocate(ibirth, icerprev)
 end subroutine halo
 
 subroutine nbi_spec
@@ -16807,7 +16902,7 @@ program fidasim
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
     if(inputs%calc_birth.ge.1) then
-        allocate(birth%dens(3, &
+        allocate(birth%dens(6, &
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
@@ -16987,14 +17082,6 @@ program fidasim
                 endif
                 call ndmc()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
-
-                if(inputs%calc_birth.eq.1)then
-                    if(inputs%verbose.ge.1) then
-                        write(*,*) 'write birth:    ' , time_string(time_start)
-                    endif
-                    call write_birth_profile()
-                    if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
-                endif
             endif
 
             !! ---------- DCX (Direct charge exchange) ---------- !!
@@ -17019,12 +17106,20 @@ program fidasim
             if(inputs%verbose.ge.1) then
                 write(*,*) 'write neutrals:    ' , time_string(time_start)
             endif
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 #ifdef _MPI
             if(my_rank().eq.0) call write_neutrals()
 #else
             call write_neutrals()
 #endif
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            if(inputs%calc_birth.eq.1)then
+               if(inputs%verbose.ge.1) then
+                  write(*,*) 'write birth:    ' , time_string(time_start)
+               endif
+               call write_birth_profile()
+               if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            endif
         endif
     endif
 

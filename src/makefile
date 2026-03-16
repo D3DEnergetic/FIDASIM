@@ -25,5 +25,11 @@ utilities.mod utilities.o: utilities.f90
 hdf5_utils.mod hdf5_utils.o: hdf5_utils.f90
 	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
 
+cx_helper.so: cx_helper.o $(FIDADEPS)
+	$(MPI_FC) $(C_FLAGS) $^ -o $@ -shared -fPIC $(L_FLAGS)
+
+cx_helper.mod cx_helper.o: cx_helper.f90
+	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
+
 clean:
 	-rm -f *.mod *.o

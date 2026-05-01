@@ -181,7 +181,11 @@ export L_FLAGS
 export I_FLAGS
 export NTHREADS
 
-fidasim: deps src tables python
+fidasim: deps src tables python regression_tests
+
+.PHONY: regression_tests
+regression_tests: src
+	@cd $(FIDASIM_DIR)/regression_tests; make
 
 .PHONY: deps
 deps:

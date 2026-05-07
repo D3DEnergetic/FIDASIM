@@ -3140,27 +3140,33 @@ subroutine read_vacuum_vessel
                        src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
                        src_n_wall
 
-                       !! TODO: add the source namelist variables to other namelists
-
   namelist /surface_2/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                       function_type, boundary_type, T, pabs, pspec, &
                       xmin, xmax, ymin, ymax, origin_x, origin_y, &
-                      rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+                      rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
+                      src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
+                      src_n_wall
 
   namelist /surface_3/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                        function_type, boundary_type, T, pabs, pspec, &
                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
-                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
+                       src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
+                       src_n_wall
 
   namelist /surface_4/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                         function_type, boundary_type, T, pabs, pspec, &
                         xmin, xmax, ymin, ymax, origin_x, origin_y, &
-                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
+                        src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
+                        src_n_wall
 
   namelist /surface_5/ is_active, surface_type, num_regions, origin, basis, cyl_R, &
                         function_type, boundary_type, T, pabs, pspec, &
                         xmin, xmax, ymin, ymax, origin_x, origin_y, &
-                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax
+                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
+                        src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
+                        src_n_wall
 
   ! Define vacuum vessel namelist file name:
   nml_filename = trim(adjustl(inputs%result_dir))//"/"//'vacuum_vessel.nml'
@@ -3209,7 +3215,7 @@ subroutine read_vacuum_vessel
     case (4)
       read(unit, nml=surface_4, iostat=ios)
     case (5)
-      read(unit, nml=surface_1, iostat=ios)
+      read(unit, nml=surface_5, iostat=ios)
     end select
 
     if (ios /= 0) then

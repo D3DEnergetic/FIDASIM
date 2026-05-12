@@ -186,6 +186,31 @@ type RayIntersection
 end type RayIntersection
 ! <<< [JFCM, 2025_08_01] <<<
 
+! >>> [JFCM, 2026_05_12] >>>
+type ray_collision_type
+  !+ Container used for storing ray-surface intersection events
+  integer :: n_events = 0
+    !+ Determines how collision events are stored in container: 0, 1 (for planes) or 2 (for cylinder)
+  type(collision_event_type), dimension(2) :: event
+    !+ Array of structures containing details of collision events
+end type ray_collision_type
+! <<< [JFCM, 2026_05_12] <<<
+
+! >>> [JFCM, 2026_05_12] >>>
+type collision_event_type
+  real(Float64) :: s = -huge(1.d0)
+    !+ Ray paramter ("time") to collision along ray in [s]
+  real(Float64), dimenion(3) :: p_coll_xyz
+    !+ Collision position in the beam grid frame XYZ
+  real(Float64), dimension(3) :: normal_xyz
+    !+ Surface normal at collision point in the beam grid frame XYZ
+  integer(Int32) :: surface_id = -1
+    !+ ID of surface where collision event occured
+  integer(Int32) :: region_id = -1
+    !+ ID of region where collision event occurred
+end type collision_event_type
+! <<< [JFCM, 2026_05_12] <<<
+
 ! >>> [JFCM, 2025_07_22] >>>
 type voxel_type
   !+ Stores surface-beam grid indexing information

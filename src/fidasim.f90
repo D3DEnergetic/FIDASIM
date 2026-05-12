@@ -155,6 +155,7 @@ program fidasim
         !! >>> [jfcm, 2024-11-23] >>>
 
         !! >>> [JFCM, 2025-09-02] >>>
+        ! TODO: need to allow using births_per_marker and more then one birth per marker for NBI
         n_birth_wall = 0
         do ss = 1,size(vessel%surface)
           do rr = 1,size(vessel%surface(ss)%region)

@@ -10351,321 +10351,335 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 end subroutine track
 
 !! >>> [JFCM, 2025-08-08] >>>
-! subroutine find_ray_surface_intersection(ray,ind,intersection)
-!     !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
-!     type(RayStruct), intent(in) :: ray
-!       !+ Contains data on initial ray state: origin [cm] and velocity [cm/s] in beam_grid frame
-!     integer, dimension(3), intent(in) :: ind
-!       !+ Indices of voxel in beam_grid
-!     type(RayIntersection), intent(out) :: intersection
-!       !+ Structure to store results of intersection event
-!
-!     ! Local variables:
-!     integer(Int32) :: nid
-!     integer(Int32), dimension(:), allocatable :: surf_list
-!     integer(Int32) :: ss, sid
-!     type(RayIntersection) :: isect
-!
-!     !! GET number of surfaces in current voxel:
-!     nid = 0
-!     nid = size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
-!     if (nid == 0) then
-!       stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
-!     end if
-!
-!     !! LOOP over surfaces:
-!     do ss = 1,nid
-!
-!       !! GET surface id:
-!       sid = vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
-!
-!       !! COMPUTE ray-surface intersection:
-!       select case (vessel%surface(sid)%primitive_type)
-!       case ("plane")
-!          call solve_ray_plane_intersection(ray,vessel%surface(sid),isect)
-!       case ("cyl")
-!         call solve_ray_cylinder_intersection(ray,vessel%surface(sid),isect,"first")
-!       case DEFAULT
-!         stop "Incorrect primitive_type selection"
-!       end select
-!
-!       ! CHECK hit:
-!       if (isect%hit) then
-!         if (isect%s_star(1) < intersection%s_star(1)) then
-!           intersection%hit = .TRUE.
-!           intersection%n_roots = 1;
-!           intersection%s_star(1) = isect%s_star(1)
-!           intersection%p_star(:,1) = isect%p_star(:,1)
-!           intersection%normal(:,1) = isect%normal(:,1)
-!           intersection%surface_id = sid
-!           intersection%region_id = isect%region_id
-!         end if
-!       end if
-!
-!     end do !! LOOP ss
-!
-! end subroutine find_ray_surface_intersection
+subroutine find_ray_surface_intersection(ray,ind,collision)
+    !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
+    type(RayStruct), intent(in) :: ray
+      !+ Ray state: origin [cm] and velocity [cm/s] in beam_grid frame.
+    integer, dimension(3), intent(in) :: ind
+      !+ Indices of voxel in beam_grid
+    type(ray_collision_type), intent(out) :: collision
+      !+ Closest valid collision event in this voxel.
+
+    ! Local variables:
+    integer(Int32) :: nid
+    integer(Int32), dimension(:), allocatable :: surf_list
+    integer(Int32) :: ss, sid
+    integer :: ee
+    type(ray_collision_type) :: candidate
+    real(Float64) :: s_best
+
+    ! INIT output:
+    collision%n_events = 0
+    s_best = huge(1.0d0)
+
+    !! GET number of surfaces in current voxel:
+    nid = size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
+    if (nid == 0) then
+      stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
+    end if
+
+    !! LOOP over candidate surfaces:
+    do ss = 1,nid
+
+      !! GET surface id:
+      sid = vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
+
+      ! RESET candidate collision:
+      candidate%n_events = 0
+
+      !! COMPUTE ray-surface collisions:
+      select case (trim(vessel%surface(sid)%primitive_type))
+      case ("plane")
+         call solve_ray_plane_intersection(ray,vessel%surface(sid),candidate)
+      case ("cyl")
+        call solve_ray_cylinder_intersection(ray,vessel%surface(sid),candidate,"first")
+      case DEFAULT
+        stop "find_ray_surface_intersection: incorrect primitive_type selection"
+      end select
+
+      ! SELECT closest event from this surface.
+      do ee = 1, candidate%n_events
+        if (candidate%event(ee)%s_coll < s_best) then
+          s_best = candidate%event(ee)%s_coll
+          collision%n_events = 1
+          collision%event(1) = candidate%event(ee)
+
+          ! The primitive solver knows the active region, but this wrapper
+          ! knows the parent surface id.
+          collision%event(1)%surface_id = sid
+        endif
+      enddo
+
+    end do !! LOOP ss
+
+end subroutine find_ray_surface_intersection
 !! <<< [JFCM, 2025-08-08] <<<
 
 
 !! >>> [JFCM, 2025-07-04] >>>
-! subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
-!     !+ Description:
-!     real(Float64), dimension(3), intent(in) :: rin
-!         !+ Initial position of particle
-!     real(Float64), dimension(3), intent(in) :: vin
-!       !+ Initial velocity of particle
-!     type(ParticleTrack), dimension(:), intent(out) :: tracks
-!         !+ Array of [[ParticleTrack]] type
-!     integer(Int32), intent(out)                      :: ntrack
-!         !+ Number of cells that a particle crosses
-!     logical, intent(out) :: pump_hit
-!         !+ logical flag indicating if particle was absorbed at the pump
-!
-!     real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
-!     integer, dimension(3) :: ind, sgn, gdims
-!     integer :: cc, mind
-!     real(Float64) :: T_wall, vT, p_specular, p_absorb, p_thermal
-!     real(Float64), dimension(1) :: randomu
-!     logical :: in_grid, hit, surface_in_voxel
-!     real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall, ndotv, delta_s
-!     type(RayStruct) :: ray, ray_test
-!     type(RayIntersection) :: intersection, intersection_test
-!     real(Float64) :: vmag, alpha, radius, rmax, zmax, zmin, zpos
-!     real(Float64), dimension(3) :: nhat, vhat
-!     real(Int32) :: surface_id
-!     character(len=16) :: behavior_type
-!
-!     vn = vin; rn = rin; sgn = 0;
-!
-!     ! CHECK: avoid zero velocity
-!     ! --------------------------
-!     if(dot_product(vin,vin).eq.0.0) then
-!         print *, "dot(vin,vin) == 0"
-!         return
-!     endif
-!
-!     !! INIT ray state:
-!     ! ----------------
-!     ! The ray has the following states:
-!     ! rn: ray position
-!     ! vn: ray velocity
-!     ! ind: beam grid cell indices containing ray
-!     ! ri_cell: cell center containing ray
-!     call get_indices(rn,ind)
-!     ri_cell = [beam_grid%xc(ind(1)), &
-!                beam_grid%yc(ind(2)), &
-!                beam_grid%zc(ind(3))]
-!
-!     !! INIT track structure:
-!     ! ---------------------
-!     tracks%time = 0.d0
-!     tracks%flux = 0.d0
-!     cc = 1
-!     ntrack = 0
-!
-!     !! INIT grid data:
-!     ! ---------------
-!     gdims(1) = beam_grid%nx
-!     gdims(2) = beam_grid%ny
-!     gdims(3) = beam_grid%nz
-!
-!     !! INIT flags:
-!     ! ------------------------
-!     pump_hit = .FALSE.
-!     in_grid = .TRUE.
-!     surface_in_voxel = .FALSE.
-!
-!     !! LOOP over track segments:
-!     ! -------------------------
-!     do while (in_grid .and. .not. pump_hit)
-!
-!       !! RESET surface hit flag:
-!       ! -----------------------
-!       hit = .FALSE.
-!
-!       !! COMPUTE time to next cell boundary:
-!       ! ------------------------------------
-!       call get_velocity_sign(sgn,vn)
-!       dr = beam_grid%dr*sgn
-!       inv_vn = 1/vn
-!       dt_arr = abs(( (ri_cell + 0.5*dr) - rn)*inv_vn)
-!       mind = minloc(dt_arr,1)
-!       dT_next = dt_arr(mind)
-!
-!       !! GET collision check flag:
-!       ! --------------------------
-!       surface_in_voxel = vessel%map(ind(1),ind(2),ind(3))%has_surfaces
-!
-!       !! COMPUTE collision time:
-!       ! ------------------------
-!       if (surface_in_voxel) then
-!
-!         ! SET ray object:
-!         ray%origin = rn
-!         ray%v = vn
-!
-!         ! COMPUTE intersection with surfaces:
-!         call find_ray_surface_intersection(ray,ind,intersection)
-!
-!         ! SET time to collision (choose 1st and closest root):
-!         dT_coll = intersection%s_star(1)
-!
-!         ! CHECK if collsion ocurred and compute correction:
-!         if (intersection%hit) then
-!
-!           ! DIAGNOSTIC:
-!           ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
-!           !   write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
-!           ! end if
-!
-!           ! COMPUTE effect of volumetrization:
-!           ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
-!           ! TODO: It will require a full general volumetrized calculation
-!           vmag = norm2(vn)
-!           alpha = vessel%surface_padding_epsilon
-!           delta_s = alpha*beam_grid%ds
-!           nhat = intersection%normal(:,1) ! Choose 1st root only
-!           vhat = vn/vmag
-!
-!           ! TODO: attempt to use volumetrization, may not be needed
-!           ! ndotv = abs(dot_product(nhat,vhat))
-!           ! ds_wall = delta_s/ndotv
-!
-!           ds_wall = delta_s
-!           dT_wall = ds_wall/vmag
-!
-!           ! CHECK dT_wall to prevent dT_coll < 0
-!           do while(dT_wall .ge. dT_coll)
-!             dT_wall = dT_wall*0.5
-!           end do
-!
-!           ! UPDATE collision time with volumetrized effect:
-!           dT_coll = dT_coll - dT_wall
-!
-!           ! DIAGNOSTIC CHECK:
-!           if (dT_coll < 0) then
-!             write(*,*) "dT_coll < 0"
-!           end if
-!
-!         end if
-!
-!       else
-!         dT_coll = huge(1.d0)
-!       end if
-!
-!       !! COMPARE time steps and SET hit flag:
-!       ! ------------------------------------------
-!       if (dT_coll < dT_next) then
-!         hit = .TRUE.
-!         dT = dT_coll
-!       else
-!         hit = .FALSE.
-!         dT = dT_next
-!       end if
-!
-!       !! STORE track data:
-!       ! ------------------
-!       tracks(cc)%vn = vn
-!       tracks(cc)%pos = rn + 0.5*dT*vn
-!       tracks(cc)%time = dT
-!       tracks(cc)%ind = ind
-!       cc = cc + 1
-!
-!       !! CHECK if limit of track segments has been reached:
-!       ! --------------------------------------------------
-!       if (cc > beam_grid%ntrack) then
-!           ! print *, "WARNING: track buffer full at cc =", cc
-!           exit
-!       end if
-!
-!       !! UPDATE ray states:
-!       ! -------------------
-!       rn = rn + dT*vn
-!
-!       !! CHECK hit flag and COMPUTE collision effects:
-!       ! ----------------------------------------------
-!       if (hit) then ! UPDATE ray velocity
-!         !! GET surface id:
-!         surface_id = intersection%surface_id
-!
-!         !! GET surface function
-!         !! TODO: at some point we need to also return the region ID (rid) from intersection
-!         behavior_type = trim(adjustl(vessel%surface(surface_id)%region(1)%behavior_type))
-!
-!         !! CHECK by function:
-!         select case (behavior_type)
-!           !! COMPUTE and update new ray velocity:
-!         case ("wall")
-!           !! STORE event in surface's reservoir or bucket:
-!
-!           !! GET surface properties:
-!           T_wall = vessel%surface(surface_id)%region(1)%wall_temp ! [keV]
-!           p_absorb = vessel%surface(surface_id)%region(1)%p_absorb
-!           p_specular = vessel%surface(surface_id)%region(1)%p_specular
-!           p_thermal = 1 - (p_absorb + p_specular)
-!
-!           !! GET uniform randon number:
-!           call randu(randomu)
-!
-!           !! CHECK and UPDATE surface normal:
-!           if (dot_product(nhat,vhat) > 0) nhat = -nhat
-!
-!           !! SELECT and COMPUTE reflection process:
-!           ! select case (randomu(1))
-!           ! case (:p_specular)  !! Specular reflection
-!           !     call specular_reflection(vn, nhat)
-!           ! case (p_specular:p_thermal+p_specular) !! Thermal emission
-!           !     vT = sqrt(T_wall / (v2_to_E_per_amu*thermal_mass(1)))
-!           !     call get_vn_thermal_wall_emission(vT, nhat, vn)
-!           ! case default !! Absorption process
-!           !     !! STORE event
-!           !     exit
-!           ! end select
-!
-!           !! SELECT and COMPUTE reflection process:
-!           if (randomu(1) < p_specular) then
-!             !! COMPUTE specular reflection:
-!             call specular_reflection(vn, nhat)
-!           elseif (randomu(1) < (p_specular + p_thermal)) then
-!             !! COMPUTE thermal velocity [cm/s]:
-!             vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
-!
-!             !! COMPUTE thermal emission from wall:
-!             call get_vn_thermal_wall_emission(vT,nhat,vn)
-!           else
-!             !! Absorption process:
-!             !! STORE event
-!             exit
-!           end if
-!
-!         case ("pump")
-!           ! STORE event
-!           pump_hit = .TRUE.
-!         case ("opening")
-!         case DEFAULT
-!           write(*,*) "This behavior_type is not defined: ", behavior_type
-!           stop
-!         end select
-!       else ! UPDATE ray index and cell position
-!         ind(mind) = ind(mind) + sgn(mind)
-!         ri_cell(mind) = ri_cell(mind) + dr(mind)
-!       end if
-!
-!       !! CHECK if ray has crossed beam grid boundaries:
-!       ! ----------------------------------------------
-!       if (any(ind > gdims) .or. any(ind < 1)) then
-!         ! Ray has reached limit of grid:
-!         in_grid = .FALSE.
-!       end if
-!
-!     end do !! WHILE
-!
-!     !! SET number of steps taken:
-!     ! --------------------------
-!     ntrack = cc - 1
-!
-! end subroutine track_to_wall
+subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
+    !+ Description:
+    real(Float64), dimension(3), intent(in) :: rin
+        !+ Initial position of particle
+    real(Float64), dimension(3), intent(in) :: vin
+      !+ Initial velocity of particle
+    type(ParticleTrack), dimension(:), intent(out) :: tracks
+        !+ Array of [[ParticleTrack]] type
+    integer(Int32), intent(out)                      :: ntrack
+        !+ Number of cells that a particle crosses
+    logical, intent(out) :: pump_hit
+        !+ logical flag indicating if particle was absorbed at the pump
+
+    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
+    integer, dimension(3) :: ind, sgn, gdims
+    integer :: cc, mind
+    real(Float64) :: T_wall, vT, p_specular, p_absorb, p_thermal
+    real(Float64), dimension(1) :: randomu
+    logical :: in_grid, hit, surface_in_voxel
+    real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall, ndotv, delta_s
+    type(RayStruct) :: ray, ray_test
+    ! type(RayIntersection) :: intersection, intersection_test
+    type(ray_collision_type) :: collision, collision_test
+    type(collision_event_type) :: event
+    real(Float64) :: vmag, alpha, radius, rmax, zmax, zmin, zpos
+    real(Float64), dimension(3) :: nhat, vhat
+    integer(Int32) :: surface_id, region_id
+    character(len=16) :: behavior_type
+    type(surface_region_type) :: region
+
+    vn = vin; rn = rin; sgn = 0;
+
+    ! CHECK: avoid zero velocity
+    ! --------------------------
+    if(dot_product(vin,vin).eq.0.0) then
+        print *, "dot(vin,vin) == 0"
+        return
+    endif
+
+    !! INIT ray state:
+    ! ----------------
+    ! The ray has the following states:
+    ! rn: ray position
+    ! vn: ray velocity
+    ! ind: beam grid cell indices containing ray
+    ! ri_cell: cell center containing ray
+    call get_indices(rn,ind)
+    ri_cell = [beam_grid%xc(ind(1)), &
+               beam_grid%yc(ind(2)), &
+               beam_grid%zc(ind(3))]
+
+    !! INIT track structure:
+    ! ---------------------
+    tracks%time = 0.d0
+    tracks%flux = 0.d0
+    cc = 1
+    ntrack = 0
+
+    !! INIT grid data:
+    ! ---------------
+    gdims(1) = beam_grid%nx
+    gdims(2) = beam_grid%ny
+    gdims(3) = beam_grid%nz
+
+    !! INIT flags:
+    ! ------------------------
+    pump_hit = .FALSE.
+    in_grid = .TRUE.
+    surface_in_voxel = .FALSE.
+
+    !! LOOP over track segments:
+    ! -------------------------
+    do while (in_grid .and. .not. pump_hit)
+
+      !! RESET surface hit flag:
+      ! -----------------------
+      hit = .FALSE.
+
+      !! COMPUTE time to next cell boundary:
+      ! ------------------------------------
+      call get_velocity_sign(sgn,vn)
+      dr = beam_grid%dr*sgn
+      inv_vn = 1/vn
+      dt_arr = abs(( (ri_cell + 0.5*dr) - rn)*inv_vn)
+      mind = minloc(dt_arr,1)
+      dT_next = dt_arr(mind)
+
+      !! GET collision check flag:
+      ! --------------------------
+      surface_in_voxel = vessel%map(ind(1),ind(2),ind(3))%has_surfaces
+
+      !! COMPUTE collision time:
+      ! ------------------------
+      if (surface_in_voxel) then
+
+        ! SET ray object:
+        ray%origin = rn
+        ray%v = vn
+
+        ! COMPUTE intersection with surfaces:
+        call find_ray_surface_intersection(ray,ind,collision)
+
+        ! CHECK if collsion ocurred and compute correction:
+        if (collision%n_events > 0) then
+
+          ! SET time to collision (choose 1st and closest root):
+          event = collision%event(1)
+          dT_coll = event%s_coll
+
+          ! DIAGNOSTIC:
+          ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
+          !   write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
+          ! end if
+
+          ! COMPUTE effect of volumetrization:
+          ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
+          ! TODO: It will require a full general volumetrized calculation
+          vmag = norm2(vn)
+          alpha = vessel%surface_padding_epsilon
+          delta_s = alpha*beam_grid%ds
+          nhat = event%normal
+          vhat = vn/vmag
+
+          ! TODO: attempt to use volumetrization, may not be needed
+          ! ndotv = abs(dot_product(nhat,vhat))
+          ! ds_wall = delta_s/ndotv
+
+          ds_wall = delta_s
+          dT_wall = ds_wall/vmag
+
+          ! CHECK dT_wall to prevent dT_coll < 0
+          do while(dT_wall .ge. dT_coll)
+            dT_wall = dT_wall*0.5
+          end do
+
+          ! UPDATE collision time with volumetrized effect:
+          dT_coll = dT_coll - dT_wall
+
+          ! DIAGNOSTIC CHECK:
+          if (dT_coll < 0) then
+            write(*,*) "dT_coll < 0"
+          end if
+
+        end if
+
+      else
+        dT_coll = huge(1.d0)
+      end if
+
+      !! COMPARE time steps and SET hit flag:
+      ! ------------------------------------------
+      if (dT_coll < dT_next) then
+        hit = .TRUE.
+        dT = dT_coll
+      else
+        hit = .FALSE.
+        dT = dT_next
+      end if
+
+      !! STORE track data:
+      ! ------------------
+      tracks(cc)%vn = vn
+      tracks(cc)%pos = rn + 0.5*dT*vn
+      tracks(cc)%time = dT
+      tracks(cc)%ind = ind
+      cc = cc + 1
+
+      !! CHECK if limit of track segments has been reached:
+      ! --------------------------------------------------
+      if (cc > beam_grid%ntrack) then
+          ! print *, "WARNING: track buffer full at cc =", cc
+          exit
+      end if
+
+      !! UPDATE ray states:
+      ! -------------------
+      rn = rn + dT*vn
+
+      !! CHECK hit flag and COMPUTE collision effects:
+      ! ----------------------------------------------
+      if (hit) then ! UPDATE ray velocity
+        !! GET surface and region id:
+        surface_id = event%surface_id
+        region_id  = event%region_id
+        region = vessel%surface(surface_id)%region(region_id)
+
+        !! GET surface behavior:
+        behavior_type = trim(adjustl(region%behavior_type))
+
+        !! CHECK by function:
+        select case (behavior_type)
+          !! COMPUTE and update new ray velocity:
+        case ("wall")
+          !! STORE event in surface's reservoir or bucket:
+
+          !! GET surface properties:
+          T_wall = region%wall%temp ! [keV]
+          p_absorb = region%wall%p_absorb
+          p_specular = region%wall%p_specular
+          p_thermal = 1.d0 - (p_absorb + p_specular)
+
+          !! GET uniform randon number:
+          call randu(randomu)
+
+          !! CHECK and UPDATE surface normal:
+          if (dot_product(nhat,vhat) > 0) nhat = -nhat
+
+          !! SELECT and COMPUTE reflection process:
+          ! select case (randomu(1))
+          ! case (:p_specular)  !! Specular reflection
+          !     call specular_reflection(vn, nhat)
+          ! case (p_specular:p_thermal+p_specular) !! Thermal emission
+          !     vT = sqrt(T_wall / (v2_to_E_per_amu*thermal_mass(1)))
+          !     call get_vn_thermal_wall_emission(vT, nhat, vn)
+          ! case default !! Absorption process
+          !     !! STORE event
+          !     exit
+          ! end select
+
+          !! SELECT and COMPUTE reflection process:
+          if (randomu(1) < p_specular) then
+            !! COMPUTE specular reflection:
+            call specular_reflection(vn, nhat)
+          elseif (randomu(1) < (p_specular + p_thermal)) then
+            !! COMPUTE thermal velocity [cm/s]:
+            vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
+
+            !! COMPUTE thermal emission from wall:
+            call get_vn_thermal_wall_emission(vT,nhat,vn)
+          else
+            !! Absorption process:
+            !! STORE event
+            exit
+          end if
+
+        case ("pump")
+          ! STORE event
+          pump_hit = .TRUE.
+        case ("opening")
+          cycle
+        case DEFAULT
+          write(*,*) "This behavior_type is not defined: ", behavior_type
+          stop
+        end select
+      else ! UPDATE ray index and cell position
+        ind(mind) = ind(mind) + sgn(mind)
+        ri_cell(mind) = ri_cell(mind) + dr(mind)
+      end if
+
+      !! CHECK if ray has crossed beam grid boundaries:
+      ! ----------------------------------------------
+      if (any(ind > gdims) .or. any(ind < 1)) then
+        ! Ray has reached limit of grid:
+        in_grid = .FALSE.
+      end if
+
+    end do !! WHILE
+
+    !! SET number of steps taken:
+    ! --------------------------
+    ntrack = cc - 1
+
+end subroutine track_to_wall
 !! <<< [JFCM, 2025-07-04] <<<
 
 !! >>> [JFCM, 2025-07-04] >>>
@@ -14138,6 +14152,10 @@ subroutine ndmc
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
     logical :: err
+    ! >>> [JFCM, 2026_05_01] <<<
+    logical :: pump_hit
+    ! <<< [JFCM, 2026_05_01] <<<
+
 
     !! Initialize Neutral Population
     call init_neutral_population(neut%full)
@@ -14160,7 +14178,7 @@ subroutine ndmc
     nlaunch=real(inputs%n_nbi)
     !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(vnbi,rnbi,tracks,ntrack,plasma,fields,randi,flux_tot, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err,ri,ri_gc,r_gyro)
+    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err,ri,ri_gc,r_gyro, pump_hit)
     loop_over_markers: do ii=istart,inputs%n_nbi,istep
         energy_fractions: do neut_type=1,3
             !! (type = 1: full energy, =2: half energy, =3: third energy
@@ -14169,8 +14187,14 @@ subroutine ndmc
             call mc_nbi(vnbi,neut_type,rnbi,err)
             if(err) cycle energy_fractions
 
-            call track(rnbi,vnbi,tracks,ntrack)
-            if(ntrack.eq.0) cycle energy_fractions
+            ! call track(rnbi,vnbi,tracks,ntrack)
+            ! if(ntrack.eq.0) cycle energy_fractions
+            pump_hit = .FALSE.
+            call track_to_wall(rnbi,vnbi,tracks,ntrack,pump_hit)
+            if (ntrack .eq. 0) then
+              write (*,*) "ntrack .eq. 0 (ndmc)"
+              stop
+            endif
 
             !! Solve collisional radiative model along track
             flux_tot = 0.d0
@@ -14199,21 +14223,22 @@ subroutine ndmc
                 !! Sample according to deposited flux along neutral trajectory
                 !$OMP CRITICAL(ndmc_birth)
                 do kk=1,inputs%n_birth
-                    call randind(tracks(1:ntrack)%flux,randi)
-                    call randu(randomu)
-                    birth%part(birth%cnt)%neut_type = neut_type
-                    birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
-                    birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
-                    birth%part(birth%cnt)%ind = tracks(randi(1))%ind
-                    birth%part(birth%cnt)%vi = vnbi
-                    ri = tracks(randi(1))%pos + vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
-                    birth%part(birth%cnt)%ri = ri
-
-                    call get_fields(fields,pos=ri)
-                    birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vnbi/norm2(vnbi))
-                    call gyro_step(vnbi,fields,beam_mass,r_gyro)
-                    birth%part(birth%cnt)%ri_gc = ri + r_gyro
-                    birth%cnt = birth%cnt + 1
+                    ! call randind(tracks(1:ntrack)%flux,randi)
+                    ! call randu(randomu)
+                    ! birth%part(birth%cnt)%neut_type = neut_type
+                    ! birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
+                    ! birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
+                    ! birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+                    ! birth%part(birth%cnt)%vi = vnbi
+                    ! ri = tracks(randi(1))%pos + vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
+                    ! birth%part(birth%cnt)%ri = ri
+                    !
+                    ! call get_fields(fields,pos=ri)
+                    ! birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vnbi/norm2(vnbi))
+                    ! call gyro_step(vnbi,fields,beam_mass,r_gyro)
+                    ! birth%part(birth%cnt)%ri_gc = ri + r_gyro
+                    ! birth%cnt = birth%cnt + 1
+                    call store_birth_particle(tracks,ntrack,beam_mass,flux_tot/inputs%n_birth,neut_type)
                 enddo
                 !$OMP END CRITICAL(ndmc_birth)
             endif
@@ -17123,283 +17148,290 @@ subroutine reset_birth_data
 end subroutine reset_birth_data
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
+!! >>> [JFCM,2026_05_12] >>>
+function sample_angle_between_dir(tmin, tmax, direction, u) result(t)
+  real(Float64), intent(in) :: tmin, tmax
+  character(len=*), intent(in) :: direction
+  real(Float64), intent(in) :: u
+  real(Float64) :: t
+  real(Float64) :: span
+
+  select case (trim(adjustl(direction)))
+  case ("CCW", "ccw")
+    span = modulo(tmax - tmin, 2.0d0*pi)
+    t = modulo(tmin + u*span, 2.0d0*pi)
+  case ("CW", "cw")
+    span = modulo(tmin - tmax, 2.0d0*pi)
+    t = modulo(tmin - u*span, 2.0d0*pi)
+  case default
+    stop "sample_angle_between_dir: unknown direction"
+  end select
+
+end function sample_angle_between_dir
+!! <<< [JFCM,2026_05_12] <<<
+
 !! >>> [JFCM,2025-09-02] >>>
-! subroutine mc_wall_source(ss,rr,rp,vp,err)
-!   !+ Samples the source located on surface "ss" and region "ss"
-!   integer, intent(in) :: ss
-!     !+ Surface id
-!   integer, intent(in) :: rr
-!     !+ Region id
-!   real(Float64), dimension(3), intent(out) :: rp
-!     !+ Neutral particle position in beam_grid frame [cm]
-!   real(Float64), dimension(3), intent(out) :: vp
-!     !+ Neutral particle velocity in beam_grid frame [cm/s]
-!   integer, intent(out) :: err
-!     !+ Container for communicating internal errors
-!
-!   !! Locals:
-!   character(len=16) :: primitive_type, region_type, behavior_type
-!   type(source_type) :: source
-!   type(surface_region_type) :: region
-!   real(Float64) :: v_drift, vT, mass
-!   real(Float64) :: random2(2), random3(3), v_thermal(3)
-!   real(Float64) :: zmin, zmax, tmin, tmax, t, radius
-!   real(Float64) :: xmin, xmax, ymin, ymax
-!   real(Float64), dimension(3,3) :: basis, inv_basis
-!   real(Float64), dimension(3) :: origin, nhat, rhat, vhat
-!   real(Float64), dimension(3) :: rp_prime, vp_prime, rhat_prime
-!   integer :: normal_dir
-!
-!   !! INIT variables:
-!   rp = 0.d0
-!   vp = 0.d0
-!   err = 0
-!
-!   !! CHECK that source is valid:
-!   source = vessel%surface(ss)%region(rr)%source
-!   if (.not.source%is_active) then
-!     err = 1
-!   elseif (source%T .le. 0) then
-!     err = 2
-!   elseif (source%E .lt. 0) then
-!     err = 3
-!   elseif (source%rate .le. 0) then
-!     err = 4
-!   elseif (source%mass .le. 0) then
-!     err = 5
-!   end if
-!
-!   !! CHECK region:
-!   if (rr .eq. 1) then
-!     err = 6
-!     write(*,*) "region(1) cannot be a source, Error in mc_wall_source"
-!   end if
-!
-!   !! CHECK error:
-!   if (err .gt. 0) return
-!
-!   !! GET source parameters:
-!   mass = source%mass ! [AMU]
-!   vT = sqrt(source%T*0.5/(v2_to_E_per_amu*mass)) ! [cm/s]
-!   v_drift = sqrt(source%E/(v2_to_E_per_amu*mass)) ! [cm/s]
-!   normal_dir = source%normal_dir
-!
-!   !! GET surface parameters:
-!   primitive_type = vessel%surface(ss)%primitive_type
-!   region = vessel%surface(ss)%region(rr)
-!   region_type = region%region_type
-!
-!   !! SAMPLE particle position in local frame:
-!   select case(trim(adjustl(primitive_type)))
-!   !! PLANE: ----------------------------------------------------------
-!   case ("plane")
-!
-!     !! GET plane geometry in the beam_grid frame:
-!     basis = vessel%surface(ss)%plane%basis
-!     inv_basis = vessel%surface(ss)%plane%inv_basis
-!     origin = vessel%surface(ss)%plane%origin
-!     nhat = vessel%surface(ss)%plane%normal
-!
-!     ! SELECT boundary:
-!     select case(trim(adjustl(region_type)))
-!     case ("rect")
-!
-!       !! GET bounds of region:
-!       xmin = region%plane_rect%xmin
-!       xmax = region%plane_rect%xmax
-!       ymin = region%plane_rect%ymin
-!       ymax = region%plane_rect%ymax
-!
-!       !! SAMPLE particle position in surface's frame:
-!       call randu(random2)
-!       rp_prime(1) = xmin + random2(1)*(xmax - xmin)
-!       rp_prime(2) = ymin + random2(2)*(ymax - ymin)
-!       rp_prime(3) = 0.d0
-!
-!     case ("circ")
-!       write(*,*) "plane-circ sampling not developed. Error in mc_wall_source"
-!       stop
-!     end select
-!
-!   !! CYLINDER: -------------------------------------------------------
-!   case ("cyl")
-!
-!     !! GET cylinder geomtry:
-!     basis = vessel%surface(ss)%cyl%basis
-!     inv_basis = vessel%surface(ss)%cyl%inv_basis
-!     origin = vessel%surface(ss)%cyl%origin
-!     radius = vessel%surface(ss)%cyl%radius
-!
-!     !! SELECT boundary:
-!     select case(trim(adjustl(region_type)))
-!     case ("rect")
-!
-!       !! GET bounds of region:
-!       zmin = region%cyl_rect%zmin
-!       zmax = region%cyl_rect%zmax
-!       tmin = region%cyl_rect%tmin
-!       tmax = region%cyl_rect%tmax
-!
-!       !! SAMPLE particle position:
-!       call randu(random2)
-!       t = tmin + random2(1)*(tmax - tmin)
-!       rp_prime(1) = radius*cos(t)
-!       rp_prime(2) = radius*sin(t)
-!       rp_prime(3) = zmin + random2(2)*(zmax - zmin)
-!
-!       !! COMPUTE normal:
-!       rhat_prime = [rp_prime(1), rp_prime(2), 0.d0]
-!       rhat_prime = rhat_prime/norm2(rhat_prime)
-!       rhat = matmul(basis,rhat_prime)
-!       nhat = rhat
-!
-!     case ("circ")
-!       write(*,*) "cyl-circ sampling does not exist. Error in mc_wall_source"
-!       stop
-!     end select
-!   case default
-!     write(*,*) "surface type missing, error in mc_wall_source"
-!     stop
-!   end select
-!
-!   !! Convert rp_prime to beam grid frame:
-!   rp = matmul(basis,rp_prime) + origin
-!
-!   !! Offset rp a small amount from surface:
-!   vhat = nhat*normal_dir
-!   rp = rp + vhat*vessel%surface_padding_epsilon*beam_grid%ds
-!
-!   !! SAMPLE particle velocity:
-!   call  get_vn_thermal_wall_emission(vT,vhat,v_thermal)
-!   vp = v_drift*vhat + v_thermal
-!
-! end subroutine mc_wall_source
+subroutine mc_wall_source(ss,rr,rp,vp,err)
+  !+ Samples the source located on surface "ss" and region "ss"
+  integer, intent(in) :: ss
+    !+ Surface id
+  integer, intent(in) :: rr
+    !+ Region id
+  real(Float64), dimension(3), intent(out) :: rp
+    !+ Neutral particle position in beam_grid frame [cm]
+  real(Float64), dimension(3), intent(out) :: vp
+    !+ Neutral particle velocity in beam_grid frame [cm/s]
+  integer, intent(out) :: err
+    !+ Container for communicating internal errors
+
+  !! Locals:
+  character(len=16) :: primitive_type, region_type, behavior_type
+  type(source_type) :: source
+  type(surface_region_type) :: region
+  real(Float64) :: v_drift, vT, mass
+  real(Float64) :: random2(2), random3(3), v_thermal(3)
+  real(Float64) :: zmin, zmax, phimin, phimax, phi, radius
+  real(Float64) :: xmin, xmax, ymin, ymax
+  real(Float64), dimension(3,3) :: basis, inv_basis
+  real(Float64), dimension(3) :: origin, nhat, rhat, vhat
+  real(Float64), dimension(3) :: rp_prime, vp_prime, rhat_prime
+  integer :: normal_dir
+
+  !! INIT variables:
+  rp = 0.d0
+  vp = 0.d0
+  err = 0
+
+  !! CHECK that source is enabled:
+  if (.not. vessel%surface(ss)%region(rr)%enable_source) then
+    err = 1
+    return
+  endif
+
+  !! GET source parameters:
+  source = vessel%surface(ss)%region(rr)%source
+  mass = source%mass_amu ! [AMU]
+  vT = sqrt(source%temp*0.5/(v2_to_E_per_amu*mass)) ! [cm/s]
+  v_drift = sqrt(source%energy/(v2_to_E_per_amu*mass)) ! [cm/s]
+  normal_dir = source%normal_direction
+
+  !! GET surface parameters:
+  primitive_type = vessel%surface(ss)%primitive_type
+  region = vessel%surface(ss)%region(rr)
+  region_type = region%region_type
+
+  !! SAMPLE particle position in local frame:
+  select case(trim(adjustl(primitive_type)))
+  !! PLANE: ----------------------------------------------------------
+  case ("plane")
+
+    !! GET plane geometry in the beam_grid frame:
+    basis = vessel%surface(ss)%basis_xyz
+    inv_basis = vessel%surface(ss)%inv_basis_xyz
+    origin = vessel%surface(ss)%origin_xyz
+    nhat = vessel%surface(ss)%normal_xyz
+
+    ! SELECT boundary:
+    select case(trim(adjustl(region_type)))
+    case ("rect")
+
+      !! GET bounds of region:
+      xmin = region%xmin
+      xmax = region%xmax
+      ymin = region%ymin
+      ymax = region%ymax
+
+      !! SAMPLE particle position in surface's frame:
+      call randu(random2)
+      rp_prime(1) = xmin + random2(1)*(xmax - xmin)
+      rp_prime(2) = ymin + random2(2)*(ymax - ymin)
+      rp_prime(3) = 0.d0
+
+    case ("circ")
+      write(*,*) "plane-circ sampling not developed. Error in mc_wall_source"
+      stop
+    end select
+
+  !! CYLINDER: -------------------------------------------------------
+  case ("cyl")
+
+    !! GET cylinder geomtry:
+    basis = vessel%surface(ss)%basis_xyz
+    inv_basis = vessel%surface(ss)%inv_basis_xyz
+    origin = vessel%surface(ss)%origin_xyz
+    radius = vessel%surface(ss)%cyl_radius
+
+    !! SELECT boundary:
+    select case(trim(adjustl(region_type)))
+    case ("rect")
+
+      !! GET bounds of region:
+      zmin = region%zmin
+      zmax = region%zmax
+      phimin = region%phimin
+      phimax = region%phimax
+
+      !! SAMPLE particle position:
+      call randu(random2)
+      phi = sample_angle_between_dir(phimin, phimax, &
+                                   region%phi_direction, random2(1))
+      rp_prime(1) = radius*cos(phi)
+      rp_prime(2) = radius*sin(phi)
+      rp_prime(3) = zmin + random2(2)*(zmax - zmin)
+
+      !! COMPUTE normal:
+      rhat_prime = [rp_prime(1), rp_prime(2), 0.d0]
+      rhat_prime = rhat_prime/norm2(rhat_prime)
+      rhat = matmul(basis,rhat_prime)
+      nhat = rhat
+
+    case ("circ")
+      write(*,*) "cyl-circ sampling does not exist. Error in mc_wall_source"
+      stop
+    end select
+  case default
+    write(*,*) "surface type missing, error in mc_wall_source"
+    stop
+  end select
+
+  !! Convert rp_prime to beam grid frame:
+  rp = matmul(basis,rp_prime) + origin
+
+  !! Offset rp a small amount from surface:
+  vhat = nhat*normal_dir
+  rp = rp + vhat*vessel%surface_padding_epsilon*beam_grid%ds
+
+  !! SAMPLE particle velocity:
+  call  get_vn_thermal_wall_emission(vT,vhat,v_thermal)
+  vp = v_drift*vhat + v_thermal
+
+end subroutine mc_wall_source
 !! <<< [JFCM,2025-09-02] <<<
 
 !! >>> [JFCM,2025-09-02] >>>
-! subroutine calculate_wall_source_process(ss,rr)
-!   !+ Compute ray-tracing process associated with wall sources
-!   use omp_lib
-!   integer :: ss
-!     !+ surface id
-!   integer :: rr
-!     !+ Region id
-!
-!   !! Locals:
-!   integer :: nlaunch
-!   integer(Int32) :: ii, jj
-!   real(Float64), dimension(3) :: rp, vp
-!   logical :: pump_hit
-!   integer :: ntrack, err
-!   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
-!   real(Float64) :: rate, mass
-!   real(Float64) :: tot_flux_dep, starting_flux, initial_flux, final_flux
-!   real(Float64), dimension(nlevs) :: states, denn
-!   type(LocalProfiles) :: plasma
-!   real(Float64) :: photons, weight
-!   integer :: neut_type
-!   character(len=charlim) :: filename
-!   integer(Int64) :: pid = 1
-!
-!   !! Initialize Neutral Population
-!   if (.not.allocated(neut%full%dens)) then
-!     call init_neutral_population(neut%full)
-!   end if
-!
-!   !! DEFINE neutral type:
-!   ! SEED (Primary): 1,2,3 for full, half and third
-!   ! SCATTERED (Secondary): 4, 5 for dcx and halo
-!   neut_type = 1
-!
-!   !! Get number of markers:
-!   nlaunch = vessel%surface(ss)%region(rr)%source%n_wall
-!
-!   !! Get source parameters:
-!   rate = vessel%surface(ss)%region(rr)%source%rate ! [p/s]:
-!   mass = vessel%surface(ss)%region(rr)%source%mass ! [AMU]
-!
-!   !$OMP PARALLEL DO schedule(dynamic,1) &
-!   !$OMP& private(ii,jj,rp,vp,err,tracks,ntrack,tot_flux_dep,states,denn, &
-!   !$OMP& starting_flux,pump_hit,initial_flux,final_flux,plasma,photons, &
-!   !$OMP& weight)
-!   loop_over_markers: do ii=istart,nlaunch,istep
-!
-!     !! SAMPLE neutral from source:
-!     call mc_wall_source(ss,rr,rp,vp,err)
-!     if (err .ne. 0) then
-!       write(*,*) "Error in mc_wall_source: ", err
-!       stop
-!     end if
-!
-!     !! COMPUTE neutral trajectory:
-!     pump_hit = .FALSE.
-!     call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
-!
-!     tot_flux_dep = 0.d0
-!     states = 0.d0
-!     states(1) = rate/beam_grid%dv ! [p/s cm^-3]
-!     starting_flux = sum(states)
-!
-!     !! LOOP over tracks:
-!     loop_along_track: do jj=1,ntrack
-!
-!       !! Flux of marker entering cell:
-!       initial_flux = sum(states)
-!
-!       ! GET plasma profiles seen by marker:
-!       call get_plasma(plasma,pos=tracks(jj)%pos)
-!
-!       ! CALCULATE attenuation using COLRAD:
-!       call colrad(plasma,mass,tracks(jj)%vn,tracks(jj)%time,states,denn,photons)
-!
-!       ! STORE neutral density per marker on beam_grid:
-!        call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,tracks(jj)%vn,neut_type,denn/nlaunch)
-!
-!        !! CALCULATE neutral flux per marker lost to cell due to COLRAD:
-!        final_flux = sum(states)
-!        tracks(jj)%flux = (initial_flux - final_flux)/nlaunch ! [p/s cm^-3]
-!        tot_flux_dep = tot_flux_dep + tracks(jj)%flux*beam_grid%dv ! [p/s]
-!
-!        !! STORE new ion birth flux on beam_grid:
-!        call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
-!
-!        !! STORE photons: see NDMC for details
-!
-!        !! CHECK ray attenuation:
-!        if (final_flux/starting_flux .lt. 1E-3) then
-!          exit loop_along_track
-!        endif
-!
-!     enddo loop_along_track
-!
-!     !! WRITE tracks data:
-! #ifdef _OPENMP
-!     if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
-!         filename = "tracks_wall_source.dat"
-!         filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
-!         call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
-!         pid = pid + 1
-!     endif
-! #else
-!     if (.TRUE.) then
-!         filename = "tracks_wall_source.dat"
-!         filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
-!         call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
-!         pid = pid + 1
-!     endif
-! #endif
-!
-!     !! STORE birth particles:
-!     !$OMP CRITICAL
-!     call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
-!     !$OMP END CRITICAL
-!
-!   enddo loop_over_markers
-!   !$OMP END PARALLEL DO
-!
-!   !! TODO: NEED to add MPI merge steps, see NDMC
-!
-! end subroutine calculate_wall_source_process
+subroutine calculate_wall_source_process(ss,rr)
+  !+ Compute ray-tracing process associated with wall sources
+  use omp_lib
+  integer :: ss
+    !+ surface id
+  integer :: rr
+    !+ Region id
+
+  !! Locals:
+  integer :: nlaunch
+  integer(Int32) :: ii, jj
+  real(Float64), dimension(3) :: rp, vp
+  logical :: pump_hit
+  integer :: ntrack, err
+  type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+  real(Float64) :: rate, mass
+  real(Float64) :: tot_flux_dep, starting_flux, initial_flux, final_flux
+  real(Float64), dimension(nlevs) :: states, denn
+  type(LocalProfiles) :: plasma
+  real(Float64) :: photons, weight
+  integer :: neut_type
+  character(len=charlim) :: filename
+  integer(Int64) :: pid = 1
+
+  !! Initialize Neutral Population
+  if (.not.allocated(neut%full%dens)) then
+    call init_neutral_population(neut%full)
+  end if
+
+  !! DEFINE neutral type:
+  ! SEED (Primary): 1,2,3 for full, half and third
+  ! SCATTERED (Secondary): 4, 5 for dcx and halo
+  neut_type = 1
+
+  !! Get number of markers:
+  nlaunch = vessel%surface(ss)%region(rr)%source%num_markers
+
+  !! Get source parameters:
+  rate = vessel%surface(ss)%region(rr)%source%rate ! [p/s]:
+  mass = vessel%surface(ss)%region(rr)%source%mass_amu ! [AMU]
+
+  !$OMP PARALLEL DO schedule(dynamic,1) &
+  !$OMP& private(ii,jj,rp,vp,err,tracks,ntrack,tot_flux_dep,states,denn, &
+  !$OMP& starting_flux,pump_hit,initial_flux,final_flux,plasma,photons, &
+  !$OMP& weight)
+  loop_over_markers: do ii=istart,nlaunch,istep
+
+    !! SAMPLE neutral from source:
+    call mc_wall_source(ss,rr,rp,vp,err)
+    if (err .ne. 0) then
+      write(*,*) "Error in mc_wall_source: ", err
+      stop
+    end if
+
+    !! COMPUTE neutral trajectory:
+    pump_hit = .FALSE.
+    call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
+
+    tot_flux_dep = 0.d0
+    states = 0.d0
+    states(1) = rate/beam_grid%dv ! [p/s cm^-3]
+    starting_flux = sum(states)
+
+    !! LOOP over tracks:
+    loop_along_track: do jj=1,ntrack
+
+      !! Flux of marker entering cell:
+      initial_flux = sum(states)
+
+      ! GET plasma profiles seen by marker:
+      call get_plasma(plasma,pos=tracks(jj)%pos)
+
+      ! CALCULATE attenuation using COLRAD:
+      call colrad(plasma,mass,tracks(jj)%vn,tracks(jj)%time,states,denn,photons)
+
+      ! STORE neutral density per marker on beam_grid:
+       call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,tracks(jj)%vn,neut_type,denn/nlaunch)
+
+       !! CALCULATE neutral flux per marker lost to cell due to COLRAD:
+       final_flux = sum(states)
+       tracks(jj)%flux = (initial_flux - final_flux)/nlaunch ! [p/s cm^-3]
+       tot_flux_dep = tot_flux_dep + tracks(jj)%flux*beam_grid%dv ! [p/s]
+
+       !! STORE new ion birth flux on beam_grid:
+       call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
+
+       !! STORE photons: see NDMC for details
+
+       !! CHECK ray attenuation:
+       if (final_flux/starting_flux .lt. 1E-3) then
+         exit loop_along_track
+       endif
+
+    enddo loop_along_track
+
+    !! WRITE tracks data:
+#ifdef _OPENMP
+    if (OMP_get_thread_num() == 0 .AND. .TRUE.) then
+        filename = "tracks_wall_source.dat"
+        filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+        call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+        pid = pid + 1
+    endif
+#else
+    if (.TRUE.) then
+        filename = "tracks_wall_source.dat"
+        filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
+        call write_particle_tracks_to_file(filename,tracks,ntrack,pid,50)
+        pid = pid + 1
+    endif
+#endif
+
+    !! STORE birth particles:
+    !$OMP CRITICAL
+    call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
+    !$OMP END CRITICAL
+
+  enddo loop_over_markers
+  !$OMP END PARALLEL DO
+
+  !! TODO: NEED to add MPI merge steps, see NDMC
+
+end subroutine calculate_wall_source_process
 !! <<< [2025-09-02] <<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
@@ -17516,7 +17548,7 @@ subroutine calculate_dcx_process
 
               ! Compute neutral particle track across beam_grid:
               pump_hit = .FALSE.
-              ! call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
+              call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
               if (ntrack .eq. 0) then
                 write (*,*) "ntrack .eq. 0 (calculate_dcx_process)"
                 stop
@@ -17796,7 +17828,7 @@ subroutine calculate_halo_process
 
           !! Compute neutral particle track accross the beam grid:
           pump_hit = .FALSE.
-          ! call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
+          call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
           if (ntrack .eq. 0) then
               write (*,*) "ntrack .eq. 0 (calculate_halo_process)"
               stop

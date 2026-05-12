@@ -187,6 +187,21 @@ end type RayIntersection
 ! <<< [JFCM, 2025_08_01] <<<
 
 ! >>> [JFCM, 2026_05_12] >>>
+type collision_event_type
+  real(Float64) :: s_coll = -huge(1.d0)
+    !+ Ray paramter ("time") to collision along ray in [s]
+  real(Float64), dimension(3) :: p_coll
+    !+ Collision position in the beam grid frame XYZ
+  real(Float64), dimension(3) :: normal
+    !+ Surface normal at collision point in the beam grid frame XYZ
+  integer(Int32) :: surface_id = -1
+    !+ ID of surface where collision event occured
+  integer(Int32) :: region_id = -1
+    !+ ID of region where collision event occurred
+end type collision_event_type
+! <<< [JFCM, 2026_05_12] <<<
+
+! >>> [JFCM, 2026_05_12] >>>
 type ray_collision_type
   !+ Container used for storing ray-surface intersection events
   integer :: n_events = 0
@@ -194,21 +209,6 @@ type ray_collision_type
   type(collision_event_type), dimension(2) :: event
     !+ Array of structures containing details of collision events
 end type ray_collision_type
-! <<< [JFCM, 2026_05_12] <<<
-
-! >>> [JFCM, 2026_05_12] >>>
-type collision_event_type
-  real(Float64) :: s = -huge(1.d0)
-    !+ Ray paramter ("time") to collision along ray in [s]
-  real(Float64), dimenion(3) :: p_coll_xyz
-    !+ Collision position in the beam grid frame XYZ
-  real(Float64), dimension(3) :: normal_xyz
-    !+ Surface normal at collision point in the beam grid frame XYZ
-  integer(Int32) :: surface_id = -1
-    !+ ID of surface where collision event occured
-  integer(Int32) :: region_id = -1
-    !+ ID of region where collision event occurred
-end type collision_event_type
 ! <<< [JFCM, 2026_05_12] <<<
 
 ! >>> [JFCM, 2025_07_22] >>>
@@ -317,7 +317,7 @@ type surface_region_type
     real(Float64) :: x0, y0
       !+ Center coordinates [cm] for plane-circ regions in local (x',y') coordinates.
     real(Float64) :: phi0, z0
-      !+ Center coordinates [deg] and [cm] for cyl-circ regions in local (phi,z) coordinates.
+      !+ Center coordinates [rad] and [cm] for cyl-circ regions in local (phi,z) coordinates.
     real(Float64) :: rmin, rmax
       !+ Minimum and maximum "r" extent in [cm] in local flattened surface region
     real(Float64) :: thetamin, thetamax
@@ -4039,10 +4039,10 @@ end function get_active_plane_region_id
 ! <<< [JFCM, 2026_05_12] <<<
 
 ! >>> [JFCM, 2025-08-06] >>>
-subroutine solve_ray_plane_intersection(ray, surface, isect)
+subroutine solve_ray_plane_intersection(ray, surface, collision)
   type(RayStruct), intent(in) :: ray
   type(analytic_surface_type), intent(in) :: surface
-  type(RayIntersection), intent(inout) :: isect
+  type(ray_collision_type), intent(inout) :: collision
 
   ! Local variables:
   real(Float64) :: va, Ka, s_coll
@@ -4052,8 +4052,7 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   type(surface_region_type) :: region
 
   ! INIT default output structure:
-  isect%hit = .false.
-  isect%n_roots = 0
+  collision%n_events = 0
 
   ! CHECK surface type
   if (trim(surface%primitive_type) /= 'plane') stop 'solve_ray_plane_intersection: surface must be plane'
@@ -4070,7 +4069,7 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   Ka = dot_product(K, plane_normal)
 
   ! CHECK parallel condition:
-  if (abs(va) < 1e-12) then
+  if (abs(va) < 1d-12) then
     return ! Ray is effectively parallel to plane
   endif
 
@@ -4078,8 +4077,8 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   s_coll = -Ka / va
 
   ! CHECK negative intersection times:
-  if (s_coll <= 0) then
-   return ! Collison point is in opposite direction to ray:
+  if (s_coll <= 0d0) then
+   return ! Collision point is in opposite direction to ray:
  endif
 
   ! COMPUTE collision point
@@ -4098,12 +4097,11 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
   ! SELECT outcome based on active region behavior_type:
   select case (trim(region%behavior_type))
   case ("wall")
-    isect%hit = .true.
-    isect%n_roots = 1
-    isect%s_star(1) = s_coll
-    isect%p_star(:,1) = p_coll
-    isect%normal(:,1) = plane_normal
-    isect%region_id = region_id
+    collision%n_events = 1
+    collision%event(1)%s_coll = s_coll
+    collision%event(1)%p_coll = p_coll
+    collision%event(1)%normal = plane_normal
+    collision%event(1)%region_id = region_id
   case ("opening")
     return ! No collision
   case DEFAULT
@@ -4113,38 +4111,132 @@ subroutine solve_ray_plane_intersection(ray, surface, isect)
 end subroutine solve_ray_plane_intersection
 ! <<< [JFCM, 2025-08-06] <<<
 
+! >>> [JFCM, 2026-05-12] >>>
+function signed_angle_difference(phi, phi0) result(dphi)
+  real(Float64), intent(in) :: phi
+  real(Float64), intent(in) :: phi0
+  real(Float64) :: dphi
+
+  dphi = modulo(phi - phi0 + pi, 2.0d0*pi) - pi
+
+end function signed_angle_difference
+! <<< [JFCM, 2026-05-12] <<<
+
+! >>> [JFCM, 2026-05-12] >>>
+function point_inside_cyl_region(p_local, cyl_radius, region) result(in_region)
+  !+ Checks whether a point on a cylinder primitive lies inside a specified region.
+  !+
+  !+ The point p_local is expressed in the local coordinate system of the
+  !+ parent cylinder primitive. The region geometry is interpreted according
+  !+ to region%region_type.
+
+  real(Float64), dimension(3), intent(in) :: p_local
+  real(Float64), intent(in) :: cyl_radius
+  type(surface_region_type), intent(in) :: region
+
+  real(Float64) :: x, y, z, phi
+  real(Float64) :: phimin, phimax, zmin, zmax
+  logical :: in_region
+  logical :: in_phi, in_z
+  real(Float64) :: dphi, q_phi, q_z
+  real(Float64) :: r, theta
+  logical :: in_radius, in_theta
+
+  in_region = .false.
+
+  x = p_local(1)
+  y = p_local(2)
+  z = p_local(3)
+
+  phi = modulo(atan2(y,x), 2.0d0*pi)
+
+  select case (trim(region%region_type))
+  case ("rect")
+    phimin = region%phimin
+    phimax = region%phimax
+    zmin = region%zmin
+    zmax = region%zmax
+
+    in_phi = is_angle_between_dir(phi, phimin, phimax, region%phi_direction)
+    in_z = (z >= zmin) .and. (z <= zmax)
+
+    in_region = in_phi .and. in_z
+
+  case ("circ")
+    dphi = signed_angle_difference(phi,region%phi0)
+
+    q_phi = cyl_radius*dphi
+    q_z   = z - region%z0
+
+    r = sqrt(q_phi**2 + q_z**2)
+    theta = modulo(atan2(q_z, q_phi), 2.0d0*pi)
+
+    in_radius = (r >= region%rmin) .and. (r <= region%rmax)
+    in_theta = is_angle_between_dir(theta, region%thetamin, region%thetamax, &
+                                    region%theta_direction)
+
+    in_region = in_radius .and. in_theta
+
+  case default
+    stop "point_inside_cyl_region: unsupported region_type"
+  end select
+
+end function point_inside_cyl_region
+! <<< [JFCM, 2025-08-06] <<<
+
+! >>> [JFCM, 2025-08-06] >>>
+function get_active_cyl_region_id(p_local, cyl_radius, surface) result(region_id)
+  real(Float64), dimension(3), intent(in) :: p_local
+  real(Float64), intent(in) :: cyl_radius
+  type(analytic_surface_type), intent(in) :: surface
+
+  integer(Int32) :: region_id
+  integer :: iregion
+
+  region_id = 0
+
+  if (.not. point_inside_cyl_region(p_local, cyl_radius, surface%region(1))) then
+    return
+  endif
+
+  region_id = 1
+
+  do iregion = 2, size(surface%region)
+    if (point_inside_cyl_region(p_local, cyl_radius, surface%region(iregion))) then
+      region_id = iregion
+    endif
+  enddo
+
+end function get_active_cyl_region_id
+! <<< [JFCM, 2025-08-06] <<<
+
 ! >>> [JFCM, 2025-08-01] >>>
-subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
+subroutine solve_ray_cylinder_intersection(ray,surface,collision,mode)
   !+ Solves ray-cylinder intersection for a bounded cylindrical analytic surface.
   !+ Returns up to two valid intersection points and normals based on mode.
   type(RayStruct), intent(in) :: ray
     !+ Defines the ray's initial state
   type(analytic_surface_type), intent(in) :: surface
     !+ Structure containing information about surface
+  type(ray_collision_type), intent(inout) :: collision
+    !+ Structure to store and return the intersection result
   character(len=*), intent(in) :: mode
     !+ Defines how many roots to return: (1) "first" or (2) "all"
-  type(RayIntersection), intent(inout) :: isect
-    !+ Structure to store and return the intersection result
 
   ! Local variables
   real(Float64) :: A, B, C, D, sqrtD, R, dummy
   real(Float64) :: s_roots(2), s_coll(2)
   real(FLoat64) :: s_pos(2)
-  real(Float64) :: padding_dist, padding_s
   real(Float64), dimension(3) :: ray_origin, ray_v, cyl_origin, cyl_axis, K, vper, Kper, p
   real(Float64), dimension(3) :: p_coll, p_coll_prime, nhat, nhat_prime, vhat
-  real(Float64) :: x, y, z, t, rho
-  integer :: ii, n_pos, rr
-  logical :: in_theta, in_height, in_bounds
+  real(Float64) :: x, y, rho
+  integer :: n_pos, rr
   type(surface_region_type) :: region
-  real(Float64) :: tmin, tmax, zmin, zmax
   real(Float64), parameter :: eps_s = 1d-18, eps_A = 1d-18, tol = 1d-10
+  integer(Int32) :: region_id
 
   ! INIT variables:
   s_pos = 0.d0
-  in_theta  = .false.
-  in_height = .false.
-  in_bounds = .false.
 
   ! CHECK surface type:
   if (trim(surface%primitive_type) /= "cyl") then
@@ -4160,8 +4252,7 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
   end if
 
   ! INIT default output
-  isect%hit = .false.
-  isect%n_roots = 0
+  collision%n_events = 0
 
   ! COMPUTE Geometric terms
   ray_origin = ray%origin
@@ -4222,8 +4313,8 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
 
   ! CHECK output mode:
   select case (trim(mode))
-  case ('first'); n_pos = 1
-  case ('all');   continue
+  case ('first', 'all')
+    continue
   case default
     stop "ERROR: incorrect selection for 'mode'"
   end select
@@ -4237,55 +4328,46 @@ subroutine solve_ray_cylinder_intersection(ray,surface,mode,isect)
     ! COMPUTE collision point transformation to local cylinder frame:
     p_coll_prime = matmul(surface%inv_basis_xyz, p_coll - cyl_origin)
 
-    ! GET local cartesian coordinates:
-    x = p_coll_prime(1)
-    y = p_coll_prime(2)
-    z = p_coll_prime(3)
+    ! Get active region_id:
+    region_id = get_active_cyl_region_id(p_coll_prime, R, surface)
+    if (region_id == 0) cycle
 
-    ! COMPUTE local cylindrical coordinates:
-    rho = sqrt(x**2 + y**2)
-    t = atan2(y,x)
-    t = modulo(t, 2d0*pi) ! Ensure [0, 2pi)
+    region = surface%region(region_id)
 
-    ! GET region bounds:
-    ! TODO: upgrade to multi-region
-    ! TODO: How to ensure that angles are entered in radians?
-    tmin = region%phimin ! [rad]
-    tmax = region%phimax ! [rad]
-    zmin = region%zmin ! [cm]
-    zmax = region%zmax ! [cm]
+    select case (trim(region%behavior_type))
+    case ("wall")
 
-    in_theta = is_angle_between_dir(t, tmin, tmax, region%phi_direction)
-    in_height = (z >= zmin) .and. (z <= zmax)
-    in_bounds = in_theta .and. in_height
-
-    ! CHECK region bounds:
-    if (in_bounds) then
-
-      ! UPDATE return structure:
-      isect%hit = .true.
-      isect%n_roots = isect%n_roots + 1
-      isect%s_star(isect%n_roots) = s_pos(rr)
-      isect%p_star(:,isect%n_roots) = p_coll
+      ! GET coordinates in local frame:
+      x = p_coll_prime(1)
+      y = p_coll_prime(2)
+      rho = sqrt(x**2 + y**2)
 
       ! COMPUTE surface normal in local frame:
       nhat_prime = (/ x, y, 0d0 /)
       nhat_prime = nhat_prime / max(rho, tol)
 
-      ! COMPUTE surface normal in beam grid frame:
+      ! COMPUTE surface normal in beam grid frame XYZ:
       nhat = matmul(surface%basis_xyz, nhat_prime)
 
       ! COMPUTE normal consistent with reflection process:
       vhat = ray_v/norm2(ray_v)
-      if (dot_product(vhat,nhat) > 1e-10) nhat = -nhat
+      if (dot_product(vhat, nhat) > 1d-10) nhat = -nhat
 
       ! UPDATE return structure:
-      isect%normal(:,isect%n_roots) = nhat
+      collision%n_events = collision%n_events + 1
+      collision%event(collision%n_events)%s_coll = s_pos(rr)
+      collision%event(collision%n_events)%p_coll = p_coll
+      collision%event(collision%n_events)%normal = nhat
+      collision%event(collision%n_events)%region_id = region_id
 
       ! CHECK result mode:
-      if (trim(mode) == 'first') exit
-    end if
+      if (trim(mode) == "first") exit
 
+    case ("opening")
+      cycle ! No collision recorded
+    case default
+      stop "solve_ray_cylinder_intersection: unknown behavior_type"
+    end select
   end do ! LOOP rr over roots
 end subroutine solve_ray_cylinder_intersection
 ! <<< [JFCM, 2025-08-01] <<<
@@ -4309,7 +4391,7 @@ subroutine index_surface_to_beam_grid(surf,map)
   real(Float64), dimension(3,2) :: p_coll
   real(Float64), dimension(2,4) :: corners
   type(RayStruct) :: ray
-  type(RayIntersection) :: isect
+  type(ray_collision_type) :: collision
   real(Float64), allocatable :: edge(:), edge1(:), edge2(:)
   integer :: N, N1, N2
   character(len=16) :: mode = "all"
@@ -4388,22 +4470,22 @@ subroutine index_surface_to_beam_grid(surf,map)
           ! COMPUTE ray-surface intersection:
           select case (trim(surf%primitive_type))
           case ("plane")
-            call solve_ray_plane_intersection(ray,surf,isect)
+            call solve_ray_plane_intersection(ray,surf,collision)
           case ("cyl")
-            call solve_ray_cylinder_intersection(ray,surf,mode,isect)
+            call solve_ray_cylinder_intersection(ray,surf,collision,mode)
           end select
 
           ! CHECK if intersection happens:
-          if (isect%hit) then
+          if (collision%n_events > 0) then
 
             ! LOOP over roots:
-            do rr = 1,isect%n_roots
+            do rr = 1,collision%n_events
 
               ! COMPUTE intersection point at zero-thickness surface:
-              p = ray%origin + (isect%s_star(rr)*ray%v)
+              p = ray%origin + (collision%event(rr)%s_coll*ray%v)
 
               ! COMPUTE projection of surface normal on ray direction:
-              nhat = isect%normal(:,rr)
+              nhat = collision%event(rr)%normal
               ndotv = dot_product(nhat,vhat)
 
               ! COMPUTE wall thickness projected in ray direction:
@@ -4421,7 +4503,7 @@ subroutine index_surface_to_beam_grid(surf,map)
               ! LOOP over volumetrized collision points:
               do vv = 1,2
 
-                ! COMPUTE collison point index along projection axis:
+                ! COMPUTE collision point index along projection axis:
                 id = floor((p_coll(proj_axis,vv) - edge(1))/ds) + 1
 
                 ! CHECK if intersection index lies inside the beam_grid:
@@ -10269,60 +10351,60 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 end subroutine track
 
 !! >>> [JFCM, 2025-08-08] >>>
-subroutine find_ray_surface_intersection(ray,ind,intersection)
-    !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
-    type(RayStruct), intent(in) :: ray
-      !+ Contains data on initial ray state: origin [cm] and velocity [cm/s] in beam_grid frame
-    integer, dimension(3), intent(in) :: ind
-      !+ Indices of voxel in beam_grid
-    type(RayIntersection), intent(out) :: intersection
-      !+ Structure to store results of intersection event
-
-    ! Local variables:
-    integer(Int32) :: nid
-    integer(Int32), dimension(:), allocatable :: surf_list
-    integer(Int32) :: ss, sid
-    type(RayIntersection) :: isect
-
-    !! GET number of surfaces in current voxel:
-    nid = 0
-    nid = size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
-    if (nid == 0) then
-      stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
-    end if
-
-    !! LOOP over surfaces:
-    do ss = 1,nid
-
-      !! GET surface id:
-      sid = vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
-
-      !! COMPUTE ray-surface intersection:
-      select case (vessel%surface(sid)%primitive_type)
-      case ("plane")
-         call solve_ray_plane_intersection(ray,vessel%surface(sid),isect)
-      case ("cyl")
-        call solve_ray_cylinder_intersection(ray,vessel%surface(sid),"first",isect)
-      case DEFAULT
-        stop "Incorrect primitive_type selection"
-      end select
-
-      ! CHECK hit:
-      if (isect%hit) then
-        if (isect%s_star(1) < intersection%s_star(1)) then
-          intersection%hit = .TRUE.
-          intersection%n_roots = 1;
-          intersection%s_star(1) = isect%s_star(1)
-          intersection%p_star(:,1) = isect%p_star(:,1)
-          intersection%normal(:,1) = isect%normal(:,1)
-          intersection%surface_id = sid
-          intersection%region_id = isect%region_id
-        end if
-      end if
-
-    end do !! LOOP ss
-
-end subroutine find_ray_surface_intersection
+! subroutine find_ray_surface_intersection(ray,ind,intersection)
+!     !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
+!     type(RayStruct), intent(in) :: ray
+!       !+ Contains data on initial ray state: origin [cm] and velocity [cm/s] in beam_grid frame
+!     integer, dimension(3), intent(in) :: ind
+!       !+ Indices of voxel in beam_grid
+!     type(RayIntersection), intent(out) :: intersection
+!       !+ Structure to store results of intersection event
+!
+!     ! Local variables:
+!     integer(Int32) :: nid
+!     integer(Int32), dimension(:), allocatable :: surf_list
+!     integer(Int32) :: ss, sid
+!     type(RayIntersection) :: isect
+!
+!     !! GET number of surfaces in current voxel:
+!     nid = 0
+!     nid = size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
+!     if (nid == 0) then
+!       stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
+!     end if
+!
+!     !! LOOP over surfaces:
+!     do ss = 1,nid
+!
+!       !! GET surface id:
+!       sid = vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
+!
+!       !! COMPUTE ray-surface intersection:
+!       select case (vessel%surface(sid)%primitive_type)
+!       case ("plane")
+!          call solve_ray_plane_intersection(ray,vessel%surface(sid),isect)
+!       case ("cyl")
+!         call solve_ray_cylinder_intersection(ray,vessel%surface(sid),isect,"first")
+!       case DEFAULT
+!         stop "Incorrect primitive_type selection"
+!       end select
+!
+!       ! CHECK hit:
+!       if (isect%hit) then
+!         if (isect%s_star(1) < intersection%s_star(1)) then
+!           intersection%hit = .TRUE.
+!           intersection%n_roots = 1;
+!           intersection%s_star(1) = isect%s_star(1)
+!           intersection%p_star(:,1) = isect%p_star(:,1)
+!           intersection%normal(:,1) = isect%normal(:,1)
+!           intersection%surface_id = sid
+!           intersection%region_id = isect%region_id
+!         end if
+!       end if
+!
+!     end do !! LOOP ss
+!
+! end subroutine find_ray_surface_intersection
 !! <<< [JFCM, 2025-08-08] <<<
 
 

@@ -156,10 +156,10 @@ program fidasim
 
         !! >>> [JFCM, 2025-09-02] >>>
         n_birth_wall = 0
-        do ss = 1,size(vacuum_vessel%surface)
-          do rr = 1,size(vacuum_vessel%surface(ss)%region)
-            if (vacuum_vessel%surface(ss)%region(rr)%source%is_active) then
-              n_birth_wall = n_birth_wall + vacuum_vessel%surface(ss)%region(rr)%source%n_wall
+        do ss = 1,size(vessel%surface)
+          do rr = 1,size(vessel%surface(ss)%region)
+            if (vessel%surface(ss)%region(rr)%enable_source) then
+              n_birth_wall = n_birth_wall + vessel%surface(ss)%region(rr)%source%num_markers
             endif
           end do
         end do
@@ -332,11 +332,11 @@ program fidasim
 
                 ! >>> [JFCM, 2025-09-02] >>>
                 ! Wall source calculation:
-                do ss = 1,size(vacuum_vessel%surface)
-                  do rr = 1,size(vacuum_vessel%surface(ss)%region)
-                    if (vacuum_vessel%surface(ss)%region(rr)%source%is_active) then
+                do ss = 1,size(vessel%surface)
+                  do rr = 1,size(vessel%surface(ss)%region)
+                    if (vessel%surface(ss)%region(rr)%enable_source) then
                       write(*,*) "calculate wall source"
-                      call calculate_wall_source_process(ss,rr)
+                      ! call calculate_wall_source_process(ss,rr)
                     endif
                 end do
               end do

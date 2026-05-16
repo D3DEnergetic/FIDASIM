@@ -10157,6 +10157,135 @@ subroutine find_ray_surface_intersection(ray,ind,collision)
 end subroutine find_ray_surface_intersection
 !! <<< [JFCM, 2025-08-08] <<<
 
+!! >>> [JFCM, 2026-05-16] >>>
+subroutine apply_wall_interaction(vn, event, region, absorbed)
+    !+ Apply wall interaction model at a collision event.
+    !+
+    !+ Possible outcomes:
+    !+   1. specular reflection
+    !+   2. thermal wall emission
+    !+   3. absorption
+
+    real(Float64), dimension(3), intent(inout) :: vn
+        !+ Particle velocity [cm/s]. Updated if reflected or thermally emitted.
+    type(collision_event_type), intent(in) :: event
+        !+ Collision event containing surface normal and collision metadata.
+    type(surface_region_type), intent(in) :: region
+        !+ Surface region containing wall properties.
+    logical, intent(out) :: absorbed
+        !+ True if particle is absorbed at the wall.
+
+    real(Float64) :: T_wall, v_thermal
+    real(Float64) :: p_absorb, p_specular, p_thermal, p_reflect
+    real(Float64), dimension(1) :: randomu
+    real(Float64), dimension(3) :: nhat, vhat
+
+    absorbed = .FALSE.
+
+    !! GET wall normal:
+    nhat = event%normal
+
+    !! Orient normal against incoming velocity:
+    vhat = vn / norm2(vn)
+    if (dot_product(nhat, vhat) > 0.d0) nhat = -nhat
+
+    !! GET wall properties:
+    T_wall    = region%wall%temp      ! [keV]
+    p_absorb  = region%wall%p_absorb
+    p_specular = region%wall%p_specular
+    p_thermal = 1.d0 - (p_absorb + p_specular)
+    p_reflect = p_specular + p_thermal
+
+    !! Optional sanity check:
+    if (p_absorb < 0.d0 .or. p_specular < 0.d0 .or. p_thermal < 0.d0) then
+        write(*,*) "ERROR(apply_wall_interaction): invalid wall probabilities"
+        write(*,*) "p_absorb   = ", p_absorb
+        write(*,*) "p_specular = ", p_specular
+        write(*,*) "p_thermal  = ", p_thermal
+        stop
+    endif
+
+    !! SAMPLE interaction:
+    call randu(randomu)
+    if (randomu(1) < p_specular) then
+        call specular_reflection(vn, nhat)
+    elseif (randomu(1) < p_reflect) then
+        v_thermal = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
+        call get_vn_thermal_wall_emission(v_thermal, nhat, vn)
+    else
+        absorbed = .TRUE.
+    endif
+
+end subroutine apply_wall_interaction
+!! <<< [JFCM, 2026-05-16] <<<
+
+!! >>> [JFCM, 2026-05-16] >>>
+real(Float64) function apply_collision_padding(dT_coll, vn, normal, delta_s)
+
+    real(Float64), intent(in) :: dT_coll
+    real(Float64), dimension(3), intent(in) :: vn
+    real(Float64), dimension(3), intent(in) :: normal
+    real(Float64), intent(in) :: delta_s
+
+    real(Float64) :: vmag
+    real(Float64) :: ds_wall
+    real(Float64) :: dT_wall
+    real(Float64) :: ndotv
+    real(Float64), dimension(3) :: vhat
+
+    vmag = norm2(vn)
+
+    if (vmag <= 0.d0) then
+        write(*,*) "ERROR(apply_collision_padding): zero velocity magnitude"
+        stop
+    endif
+
+    vhat = vn / vmag
+
+    ! Current simple padding model:
+    ds_wall = delta_s
+
+    ! COMPUTE effect of volumetrization:
+    ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
+    ! TODO: It will require a full general volumetrized calculation
+
+    ! Future normal-projected version:
+    ! ndotv = abs(dot_product(normal, vhat))
+    ! if (ndotv > 0.d0) ds_wall = delta_s / ndotv
+    ! Apply a small path-length padding before the mathematical surface.
+    !
+    ! We currently use:
+    !
+    !     ds_wall = delta_s
+    !
+    ! instead of:
+    !
+    !     ds_wall = delta_s / abs(dot(normal,vhat))
+    !
+    ! because the projected form becomes singular for tangent trajectories
+    ! when abs(dot(normal,vhat)) -> 0, which can occur for cylindrical
+    ! surfaces and grazing-incidence rays.
+    !
+    ! A future implementation may use a more general volumetrization model.
+
+    dT_wall = ds_wall / vmag
+
+    apply_collision_padding = dT_coll
+
+    do while (dT_wall >= apply_collision_padding)
+        dT_wall = 0.5d0 * dT_wall
+    end do
+
+    apply_collision_padding = apply_collision_padding - dT_wall
+
+    if (apply_collision_padding < 0.d0) then
+        write(*,*) "ERROR(apply_collision_padding): negative collision time"
+        stop
+    endif
+
+end function apply_collision_padding
+!! <<< [JFCM, 2026-05-16] <<<
+
 !! >>> [JFCM, 2025-07-04] >>>
 subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
     !+ Description:
@@ -10317,39 +10446,11 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
             dT_coll = event%s_coll
             has_surface_collision = .TRUE.
 
-            ! DIAGNOSTIC:
-            ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
-            !   write(*,*) "collision_in_cell: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
-            ! end if
-
-            ! COMPUTE effect of volumetrization:
-            ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
-            ! TODO: It will require a full general volumetrized calculation
-            vmag = norm2(vn)
+            ! Apply wall padding to avoid numerical issues:
             alpha = vessel%surface_padding_epsilon
             delta_s = alpha*beam_grid%ds
             nhat = event%normal
-            vhat = vn/vmag
-
-            ! TODO: attempt to use volumetrization, may not be needed
-            ! ndotv = abs(dot_product(nhat,vhat))
-            ! ds_wall = delta_s/ndotv
-
-            ds_wall = delta_s
-            dT_wall = ds_wall/vmag
-
-            ! CHECK dT_wall to prevent dT_coll < 0
-            do while(dT_wall .ge. dT_coll)
-              dT_wall = dT_wall*0.5
-            end do
-
-            ! UPDATE collision time with volumetrized effect:
-            dT_coll = dT_coll - dT_wall
-
-            ! DIAGNOSTIC CHECK:
-            if (dT_coll < 0) then
-              write(*,*) "dT_coll < 0"
-            end if
+            dT_coll = apply_collision_padding(dT_coll,vn,nhat,delta_s)
 
           end if ! behavior_type == "opening"
         end if ! collision%n_events > 0
@@ -10396,37 +10497,14 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
             stop
         endif
 
-        !! COMPUTE and update new ray velocity:
+        !! COMPUTE and UPDATE new ray velocity:
         select case (behavior_type) !! CHECK by function:
         case ("wall")
           !! STORE event in surface's reservoir or bucket:
 
-          !! GET surface properties:
-          T_wall = region%wall%temp ! [keV]
-          p_absorb = region%wall%p_absorb
-          p_specular = region%wall%p_specular
-          p_thermal = 1.d0 - (p_absorb + p_specular)
-
-          !! GET uniform randon number:
-          call randu(randomu)
-
-          !! CHECK and UPDATE surface normal:
-          if (dot_product(nhat,vhat) > 0) nhat = -nhat
-
-          !! COMPUTE total reflection probability:
-          p_reflect = p_specular + p_thermal
-
-          !! SELECT and COMPUTE reflection process:
-          if (randomu(1) < p_specular) then !! COMPUTE specular reflection:
-            call specular_reflection(vn, nhat)
-          elseif (randomu(1) < p_reflect) then !! COMPUTE thermal emission from wall:
-            v_thermal = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
-            call get_vn_thermal_wall_emission(v_thermal,nhat,vn)
-          else !! Absorption process:
-            !! STORE event
-            absorbed = .TRUE.
-            exit
-          end if
+          !! COMPPUTE new vn based on wall interaction:
+          call apply_wall_interaction(vn, event, region, absorbed)
+          if (absorbed) exit !! If particle absorbed, exit while loop:
 
         case DEFAULT
           write(*,*) "This behavior_type is not defined: ", behavior_type

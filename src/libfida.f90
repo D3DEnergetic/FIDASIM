@@ -148,42 +148,13 @@ real(Float64) :: beam_lambda0 = 0.d0
 !real(Float64) :: fast_lambda0(max_species) = 0.d0
 !    !+ Reference wavelength for fast species
 
-! >>> [JFCM, 2025_07_04] >>>
-type AABB
-    !+ Defines an Axis-Aligned Bounding box type
-    real(Float64) :: xmin, xmax
-    real(Float64) :: ymin, ymax
-    real(Float64) :: zmin, zmax
-end type AABB
-! <<< [JFCM, 2025_07_04] <<<
-
 ! >>> [JFCM, 2025_08_01] >>>
-type RayStruct
+type ray_type
   real(Float64), dimension(3) :: origin
     !+ Position vector of ray in [cm] in the beam_grid frame
   real(Float64), dimension(3) :: v
     !+ Velocity vector of ray in [cm/s] in the beam_grid frame
-end type RayStruct
-! <<< [JFCM, 2025_08_01] <<<
-
-! >>> [JFCM, 2025_08_01] >>>
-type RayIntersection
-  !+ Structure to store ray-surface intersection information
-  logical :: hit = .FALSE.
-    !+ Logical flag indicating if ray has collided with a surface
-  integer :: n_roots = 0
-    !+ Number of valid intersection points, x1 for planes and x2 for cylinders
-  real(Float64), dimension(2) :: s_star = [huge(1.d0), huge(1.d0)]
-    !+ "time" parameter along the ray where intersection with surface occurs. Two roots of cylindrical surface
-  real(Float64), dimension(3,2) :: p_star
-    !+ Position vectors in [cm] in beam grid frame where intersections with surface occurs
-  real(Float64), dimension(3,2) :: normal
-    !+ Unit vectors normal to surface at point of intersectons in beam_grid frame
-  integer(Int32) :: surface_id = -1
-    !+ ID of surface in vessel%surface where collision occured
-  integer(Int32) :: region_id = -1
-    !+ ID of region where collision occured
-end type RayIntersection
+end type ray_type
 ! <<< [JFCM, 2025_08_01] <<<
 
 ! >>> [JFCM, 2026_05_12] >>>
@@ -475,11 +446,7 @@ type BeamGrid
     ! <<< [JFCM, 2025-07-03] <<<
     integer(Int32), dimension(:,:,:), allocatable :: in_plasma
         !+ Array with values .eq. 1 in locations with plasma, otherwise .eq. 0
-    ! >>> [JFCM, 2025-07-03] >>>
-    ! >>> [JFCM, 2025_07_04] >>>
-    type(AABB) :: gaabb
-        !+ Beam grid's Axis-Aligned bounding box
-    ! <<< [JFCM, 2025_07_04] <<<
+    ! <<< [JFCM, 2025-07-03] <<<
     ! >>> [JFCM, 2025_08_01] >>>
     real(Float64), dimension(:), allocatable :: xe
         !+ x positions of cell edges
@@ -487,7 +454,7 @@ type BeamGrid
         !+ y positions of cell edges
     real(Float64), dimension(:), allocatable :: ze
         !+ z positions of cell edges
-    ! >>> [JFCM, 2025_08_01] >>>
+    ! <<< [JFCM, 2025_08_01] <<<
     ! >>> [JFCM, 2025_08_06] >>>
     real(Float64) :: ds
         !+ Smallest grid increment [cm]
@@ -2842,16 +2809,6 @@ subroutine make_beam_grid
         beam_grid%zc(i) = beam_grid%zmin + (i-0.5)*dz
     enddo
 
-    !! >>> [JFCM, 2025_07_04] >>>
-    ! Populate AABB from grid bounds
-    beam_grid%gaabb%xmin = beam_grid%xmin
-    beam_grid%gaabb%xmax = beam_grid%xmax
-    beam_grid%gaabb%ymin = beam_grid%ymin
-    beam_grid%gaabb%ymax = beam_grid%ymax
-    beam_grid%gaabb%zmin = beam_grid%zmin
-    beam_grid%gaabb%zmax = beam_grid%zmax
-    !! <<< [JFCM, 2025_07_04] <<<
-
     beam_grid%dr(1) = abs(beam_grid%xc(2)-beam_grid%xc(1))
     beam_grid%dr(2) = abs(beam_grid%yc(2)-beam_grid%yc(1))
     beam_grid%dr(3) = abs(beam_grid%zc(2)-beam_grid%zc(1))
@@ -3114,7 +3071,7 @@ subroutine define_vacuum_vessel()
   character(len=16) :: geometry_type
 
   ! GET analytic surface info from namelist
-  call read_vacuum_vessel2()
+  call read_vacuum_vessel()
 
   ! ALLOCATE the voxel map
   allocate(vessel%map(beam_grid%nx, beam_grid%ny, beam_grid%nz))
@@ -3139,224 +3096,8 @@ subroutine define_vacuum_vessel()
 end subroutine define_vacuum_vessel
 ! <<< [JFCM, 2025-07-23] <<<
 
-! >>> [JFCM, 2025-07-23] >>>
-! subroutine read_vacuum_vessel
-!   !+ Reads the vacuum_vessel.nml file
-!   integer, parameter :: max_surfaces = 5, max_regions = 5
-!   integer :: ios, unit, ss, rr
-!   integer :: num_surfaces
-!   character(len=charlim) :: mesh_filename, nml_filename, geometry_type
-!   real(Float64) :: surface_padding_epsilon
-!   logical :: is_active
-!   character(len=16) :: primitive_type
-!   integer :: num_regions
-!   real(Float64) :: origin(3), origin_xyz(3)
-!   real(Float64) :: basis(3,3), basis_xyz(3,3)
-!   real(Float64) :: cyl_R
-!   character(len=16) :: behavior_type(max_regions)
-!   character(len=16) :: region_type(max_regions)
-!   real(Float64) :: wall_temp(max_regions)
-!   real(Float64) :: p_absorb(max_regions)
-!   real(Float64) :: p_specular(max_regions)
-!   real(Float64) :: xmin(max_regions), xmax(max_regions)
-!   real(Float64) :: ymin(max_regions), ymax(max_regions)
-!   real(Float64) :: origin_x(max_regions), origin_y(max_regions)
-!   real(Float64) :: rmin(max_regions), rmax(max_regions)
-!   real(Float64) :: circ_tmin(max_regions), circ_tmax(max_regions)
-!   real(Float64) :: zmin(max_regions), zmax(max_regions)
-!   real(Float64) :: cyl_tmin(max_regions), cyl_tmax(max_regions)
-!   real(FLoat64) :: src_T(max_regions), src_E(max_regions), src_mass(max_regions), src_rate(max_regions)
-!   integer :: src_normal_dir(max_regions)
-!   logical :: src_is_active(max_regions)
-!   real(Float64) :: src_n_wall(max_regions)
-!
-!   namelist /config/ geometry_type, num_surfaces, mesh_filename, surface_padding_epsilon
-!   namelist /surface_1/ is_active, primitive_type, num_regions, origin, basis, cyl_R, &
-!                        behavior_type, region_type, wall_temp, p_absorb, p_specular, &
-!                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
-!                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
-!                        src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
-!                        src_n_wall
-!
-!   namelist /surface_2/ is_active, primitive_type, num_regions, origin, basis, cyl_R, &
-!                       behavior_type, region_type, wall_temp, p_absorb, p_specular, &
-!                       xmin, xmax, ymin, ymax, origin_x, origin_y, &
-!                       rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
-!                       src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
-!                       src_n_wall
-!
-!   namelist /surface_3/ is_active, primitive_type, num_regions, origin, basis, cyl_R, &
-!                        behavior_type, region_type, wall_temp, p_absorb, p_specular, &
-!                        xmin, xmax, ymin, ymax, origin_x, origin_y, &
-!                        rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
-!                        src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
-!                        src_n_wall
-!
-!   namelist /surface_4/ is_active, primitive_type, num_regions, origin, basis, cyl_R, &
-!                         behavior_type, region_type, wall_temp, p_absorb, p_specular, &
-!                         xmin, xmax, ymin, ymax, origin_x, origin_y, &
-!                         rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
-!                         src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
-!                         src_n_wall
-!
-!   namelist /surface_5/ is_active, primitive_type, num_regions, origin, basis, cyl_R, &
-!                         behavior_type, region_type, wall_temp, p_absorb, p_specular, &
-!                         xmin, xmax, ymin, ymax, origin_x, origin_y, &
-!                         rmin, rmax, circ_tmin, circ_tmax, zmin, zmax, cyl_tmin, cyl_tmax, &
-!                         src_T, src_E, src_mass, src_rate, src_normal_dir, src_is_active, &
-!                         src_n_wall
-!
-!   ! Define vacuum vessel namelist file name:
-!   nml_filename = trim(adjustl(inputs%result_dir))//"/"//'vacuum_vessel.nml'
-!
-!   ! Set default values:
-!   src_is_active = .FALSE.
-!   src_T = 0.d0
-!   src_E = 0.d0
-!   src_mass = 2
-!   src_rate = 0.d0
-!   src_normal_dir = 1
-!   src_n_wall = 0
-!   ! NEED TO ADD MORE
-!
-!   ! Read config namelist:
-!   ! ========================
-!   open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
-!   if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
-!   read(unit, nml=config, iostat=ios)
-!   if (ios /= 0) stop 'Error reading vacuum_vessel_config.'
-!   close(unit)
-!
-!   if (num_surfaces > max_surfaces) then
-!     stop "ERROR: num_surfaces > max_surfaces"
-!   end if
-!
-!   ! Populate vacuum vessel config data:
-!   vessel%geometry_type = trim(adjustl(geometry_type))
-!   allocate(vessel%surface(num_surfaces))
-!   vessel%surface_padding_epsilon = surface_padding_epsilon
-!   vessel%mesh%filename = trim(adjustl(mesh_filename))
-!
-!   ! Read surface namelists:
-!   ! ========================
-!   open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
-!   if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
-!
-!   do ss = 1, num_surfaces
-!     select case (ss)
-!     case (1)
-!       read(unit, nml=surface_1, iostat=ios)
-!     case (2)
-!       read(unit, nml=surface_2, iostat=ios)
-!     case (3)
-!       read(unit, nml=surface_3, iostat=ios)
-!     case (4)
-!       read(unit, nml=surface_4, iostat=ios)
-!     case (5)
-!       read(unit, nml=surface_5, iostat=ios)
-!     end select
-!
-!     if (ios /= 0) then
-!       print *, 'ERROR reading surface ', ss
-!       select case (ios)
-!         case (5010)
-!           print *, 'Syntax error or missing variable in namelist.'
-!           stop 'Namelist read failed.'
-!         case (5050)
-!           print *, 'Namelist group not found.'
-!           print *, 'Continue program ...'
-!           continue
-!         case default
-!           print *, 'Unknown read error. IOSTAT =', ios
-!           stop
-!       end select
-!     end if
-!
-!     ! Check handedness of basis:
-!     call check_basis_diagnostics(basis, ss)
-!
-!     ! Compute surface's origin and basis in the beam grid frame:
-!     ! \vec{O_sb} = [ehat]([O_s] - [O_b]) and [ehat'] = [ehat][basis_b]
-!     ! \vec{O_sb} = [ehat'][invbasis_b]([O_s] - [O_b])
-!     ! [ehat''] = [ehat'][invbasis_b][basis_s]
-!     origin_xyz = matmul(beam_grid%inv_basis,origin - beam_grid%origin)
-!     basis_xyz = matmul(beam_grid%inv_basis,basis)
-!
-!     ! Populate surface structure:
-!     vessel%surface(ss)%is_active = is_active
-!     vessel%surface(ss)%primitive_type = primitive_type
-!     allocate(vessel%surface(ss)%region(num_regions))
-!     select case (trim(adjustl(primitive_type)))
-!     case ("plane")
-!       vessel%surface(ss)%plane%origin = origin_xyz
-!       vessel%surface(ss)%plane%basis = basis_xyz
-!       vessel%surface(ss)%plane%inv_basis = transpose(basis_xyz)
-!       vessel%surface(ss)%plane%normal = basis_xyz(:,3)
-!     case ("cyl")
-!       vessel%surface(ss)%cyl%origin = origin_xyz
-!       vessel%surface(ss)%cyl%basis = basis_xyz
-!       vessel%surface(ss)%cyl%inv_basis = transpose(basis_xyz)
-!       vessel%surface(ss)%cyl%axis = basis_xyz(:,3)
-!       vessel%surface(ss)%cyl%radius = cyl_R
-!     case default
-!       write(*,*) 'primitive_type on surface ', ss, ' is incorrect. primitive_type = ', trim(adjustl(primitive_type))
-!       stop
-!     end select
-!
-!     ! Populate regions, all positions given in local coordinate system: basis_xyz
-!     do rr = 1,num_regions
-!       vessel%surface(ss)%region(rr)%behavior_type = behavior_type(rr)
-!       vessel%surface(ss)%region(rr)%region_type = region_type(rr)
-!
-!       ! WALL:
-!       vessel%surface(ss)%region(rr)%wall_temp = wall_temp(rr)
-!       vessel%surface(ss)%region(rr)%p_absorb = p_absorb(rr)
-!       vessel%surface(ss)%region(rr)%p_specular = p_specular(rr)
-!       vessel%surface(ss)%region(rr)%p_thermal = 1 - (p_specular(rr) + p_absorb(rr))
-!
-!       ! SOURCE:
-!       vessel%surface(ss)%region(rr)%source%is_active = src_is_active(rr)
-!       if (src_is_active(rr)) then
-!         ! TODO: should add some checks on data consistency, like src_T > 0, src_rate > 1e15, n_wall > 0
-!         vessel%surface(ss)%region(rr)%source%T = src_T(rr)
-!         vessel%surface(ss)%region(rr)%source%E = src_E(rr)
-!         vessel%surface(ss)%region(rr)%source%mass = src_mass(rr)
-!         vessel%surface(ss)%region(rr)%source%rate = src_rate(rr)
-!         vessel%surface(ss)%region(rr)%source%normal_dir = src_normal_dir(rr)
-!         vessel%surface(ss)%region(rr)%source%n_wall = int(src_n_wall(rr))
-!       end if
-!
-!       ! PLANE-RECT:
-!       vessel%surface(ss)%region(rr)%plane_rect%xmin = xmin(rr)
-!       vessel%surface(ss)%region(rr)%plane_rect%xmax = xmax(rr)
-!       vessel%surface(ss)%region(rr)%plane_rect%ymin = ymin(rr)
-!       vessel%surface(ss)%region(rr)%plane_rect%ymax = ymax(rr)
-!
-!       ! PLANE-CIRC:
-!       vessel%surface(ss)%region(rr)%plane_circ%origin(1) = origin_x(rr)
-!       vessel%surface(ss)%region(rr)%plane_circ%origin(2) = origin_y(rr)
-!       vessel%surface(ss)%region(rr)%plane_circ%rmin = rmin(rr)
-!       vessel%surface(ss)%region(rr)%plane_circ%rmax = rmax(rr)
-!       vessel%surface(ss)%region(rr)%plane_circ%tmin = circ_tmin(rr)
-!       vessel%surface(ss)%region(rr)%plane_circ%tmax = circ_tmax(rr)
-!
-!       ! CYL-RECT:
-!       vessel%surface(ss)%region(rr)%cyl_rect%zmax = zmax(rr)
-!       vessel%surface(ss)%region(rr)%cyl_rect%zmin = zmin(rr)
-!       vessel%surface(ss)%region(rr)%cyl_rect%tmax = cyl_tmax(rr)
-!       vessel%surface(ss)%region(rr)%cyl_rect%tmin = cyl_tmin(rr)
-!
-!     end do ! LOOP rr over regions
-!   end do ! LOOP ss over surfaces
-!   close(unit)
-!
-!   ! TODO: Need to perform checks and validations
-!   ! check that regions(>1) are geometrically bounded by region(1)
-!
-! end subroutine read_vacuum_vessel
-! <<< [JFCM, 2025-07-23] <<<
-
-subroutine read_vacuum_vessel2
+! >>> [JFCM, 2026-05-12] >>>
+subroutine read_vacuum_vessel
   !+ Reads the vacuum_vessel.nml file
   integer, parameter :: max_surfaces = 15, max_regions = 15
   character(len=charlim) :: geometry_type
@@ -3721,7 +3462,8 @@ contains
     source_normal_direction = 0
 
   end subroutine set_surface_defaults
-end subroutine read_vacuum_vessel2
+end subroutine read_vacuum_vessel
+! >>> [JFCM, 2026-05-12] >>>
 
 ! >>> [JFCM, 2025-07-23] >>>
 subroutine check_basis_diagnostics(basis, surface_index)
@@ -4040,7 +3782,7 @@ end function get_active_plane_region_id
 
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine solve_ray_plane_intersection(ray, surface, collision)
-  type(RayStruct), intent(in) :: ray
+  type(ray_type), intent(in) :: ray
   type(analytic_surface_type), intent(in) :: surface
   type(ray_collision_type), intent(inout) :: collision
 
@@ -4214,7 +3956,7 @@ end function get_active_cyl_region_id
 subroutine solve_ray_cylinder_intersection(ray,surface,collision,mode)
   !+ Solves ray-cylinder intersection for a bounded cylindrical analytic surface.
   !+ Returns up to two valid intersection points and normals based on mode.
-  type(RayStruct), intent(in) :: ray
+  type(ray_type), intent(in) :: ray
     !+ Defines the ray's initial state
   type(analytic_surface_type), intent(in) :: surface
     !+ Structure containing information about surface
@@ -4390,7 +4132,7 @@ subroutine index_surface_to_beam_grid(surf,map)
   real(Float64), dimension(3) :: ray_origin, p, vhat, nhat
   real(Float64), dimension(3,2) :: p_coll
   real(Float64), dimension(2,4) :: corners
-  type(RayStruct) :: ray
+  type(ray_type) :: ray
   type(ray_collision_type) :: collision
   real(Float64), allocatable :: edge(:), edge1(:), edge2(:)
   integer :: N, N1, N2
@@ -10353,7 +10095,7 @@ end subroutine track
 !! >>> [JFCM, 2025-08-08] >>>
 subroutine find_ray_surface_intersection(ray,ind,collision)
     !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
-    type(RayStruct), intent(in) :: ray
+    type(ray_type), intent(in) :: ray
       !+ Ray state: origin [cm] and velocity [cm/s] in beam_grid frame.
     integer, dimension(3), intent(in) :: ind
       !+ Indices of voxel in beam_grid
@@ -10415,9 +10157,8 @@ subroutine find_ray_surface_intersection(ray,ind,collision)
 end subroutine find_ray_surface_intersection
 !! <<< [JFCM, 2025-08-08] <<<
 
-
 !! >>> [JFCM, 2025-07-04] >>>
-subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
+subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
     !+ Description:
     real(Float64), dimension(3), intent(in) :: rin
         !+ Initial position of particle
@@ -10427,19 +10168,18 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
         !+ Array of [[ParticleTrack]] type
     integer(Int32), intent(out)                      :: ntrack
         !+ Number of cells that a particle crosses
-    logical, intent(out) :: pump_hit
-        !+ logical flag indicating if particle was absorbed at the pump
+    logical, intent(out) :: absorbed
+        !+ logical flag indicating if particle was absorbed at a surface
 
-    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr, inv_vn, rn_next
+    real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr
     integer, dimension(3) :: ind, sgn, gdims
     integer :: cc, mind
-    real(Float64) :: T_wall, vT, p_specular, p_absorb, p_thermal
+    real(Float64) :: T_wall, v_thermal, p_specular, p_absorb, p_thermal, p_reflect
     real(Float64), dimension(1) :: randomu
-    logical :: in_grid, hit, surface_in_voxel
+    logical :: in_grid, collision_in_cell, surface_in_voxel, has_surface_collision
     real(Float64) :: dT_next, dT_coll, dT, ds_wall, dT_wall, ndotv, delta_s
-    type(RayStruct) :: ray, ray_test
-    ! type(RayIntersection) :: intersection, intersection_test
-    type(ray_collision_type) :: collision, collision_test
+    type(ray_type) :: ray
+    type(ray_collision_type) :: collision
     type(collision_event_type) :: event
     real(Float64) :: vmag, alpha, radius, rmax, zmax, zmin, zpos
     real(Float64), dimension(3) :: nhat, vhat
@@ -10483,24 +10223,35 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
 
     !! INIT flags:
     ! ------------------------
-    pump_hit = .FALSE.
+    absorbed = .FALSE.
     in_grid = .TRUE.
     surface_in_voxel = .FALSE.
 
     !! LOOP over track segments:
     ! -------------------------
-    do while (in_grid .and. .not. pump_hit)
+    do while (in_grid .and. .not. absorbed)
 
-      !! RESET surface hit flag:
-      ! -----------------------
-      hit = .FALSE.
+      !! RESET decision variables:
+      ! --------------------------
+      collision_in_cell = .FALSE.
+      surface_in_voxel = .FALSE.
+      has_surface_collision = .FALSE.
+      dT_next = huge(1.d0)
+      dT_coll = huge(1.d0)
+      dT = huge(1.d0)
+      surface_id = -1
+      region_id = -1
+      collision%n_events = 0
+      behavior_type= " "
 
       !! COMPUTE time to next cell boundary:
       ! ------------------------------------
       call get_velocity_sign(sgn,vn)
       dr = beam_grid%dr*sgn
-      inv_vn = 1/vn
-      dt_arr = abs(( (ri_cell + 0.5*dr) - rn)*inv_vn)
+      dt_arr = huge(1.d0)
+      where (vn /= 0.d0) ! Protect against vn(i) == 0
+          dt_arr = abs(((ri_cell + 0.5d0*dr) - rn) / vn)
+      end where
       mind = minloc(dt_arr,1)
       dT_next = dt_arr(mind)
 
@@ -10522,57 +10273,95 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
         ! CHECK if collsion ocurred and compute correction:
         if (collision%n_events > 0) then
 
-          ! SET time to collision (choose 1st and closest root):
+          ! GET collision event (choose 1st and closest root):
           event = collision%event(1)
-          dT_coll = event%s_coll
+          surface_id = event%surface_id
+          region_id  = event%region_id
 
-          ! DIAGNOSTIC:
-          ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
-          !   write(*,*) "Hit: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
-          ! end if
+          !! CHECK surface id:
+          if (surface_id < 1 .or. surface_id > size(vessel%surface)) then
+              write(*,*) "ERROR(track_to_wall): invalid surface_id = ", surface_id
+              write(*,*) "Number of surfaces = ", size(vessel%surface)
+              stop
+          endif
 
-          ! COMPUTE effect of volumetrization:
-          ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
-          ! TODO: It will require a full general volumetrized calculation
-          vmag = norm2(vn)
-          alpha = vessel%surface_padding_epsilon
-          delta_s = alpha*beam_grid%ds
-          nhat = event%normal
-          vhat = vn/vmag
+          !! CHECK region allocation:
+          if (.not. allocated(vessel%surface(surface_id)%region)) then
+              write(*,*) "ERROR(track_to_wall): region array not allocated"
+              write(*,*) "surface_id = ", surface_id
+              stop
+          endif
 
-          ! TODO: attempt to use volumetrization, may not be needed
-          ! ndotv = abs(dot_product(nhat,vhat))
-          ! ds_wall = delta_s/ndotv
+          !! CHECK region id:
+          if (region_id < 1 .or. &
+              region_id > size(vessel%surface(surface_id)%region)) then
 
-          ds_wall = delta_s
-          dT_wall = ds_wall/vmag
+              write(*,*) "ERROR(track_to_wall): invalid region_id = ", region_id
+              write(*,*) "surface_id = ", surface_id
+              write(*,*) "Number of regions = ", &
+                  size(vessel%surface(surface_id)%region)
 
-          ! CHECK dT_wall to prevent dT_coll < 0
-          do while(dT_wall .ge. dT_coll)
-            dT_wall = dT_wall*0.5
-          end do
+              stop
+          endif
 
-          ! UPDATE collision time with volumetrized effect:
-          dT_coll = dT_coll - dT_wall
+          !! GET region object:
+          region = vessel%surface(surface_id)%region(region_id)
 
-          ! DIAGNOSTIC CHECK:
-          if (dT_coll < 0) then
-            write(*,*) "dT_coll < 0"
-          end if
+          ! CHECK wall behavoir:
+          behavior_type = trim(adjustl(region%behavior_type))
 
-        end if
+          if (behavior_type == "opening") then
+            dT_coll = huge(1.d0)
+            has_surface_collision = .FALSE.
+          else
+            dT_coll = event%s_coll
+            has_surface_collision = .TRUE.
 
-      else
-        dT_coll = huge(1.d0)
-      end if
+            ! DIAGNOSTIC:
+            ! if (abs((dT_coll - dT_next)/dT_next) < 1e-16) then
+            !   write(*,*) "collision_in_cell: abs(dT_coll/dT_next - 1) = ", abs((dT_coll - dT_next)/dT_next)
+            ! end if
 
-      !! COMPARE time steps and SET hit flag:
+            ! COMPUTE effect of volumetrization:
+            ! TODO: this will fail with cylindrical surface when dot(nhat,vhat) == 0
+            ! TODO: It will require a full general volumetrized calculation
+            vmag = norm2(vn)
+            alpha = vessel%surface_padding_epsilon
+            delta_s = alpha*beam_grid%ds
+            nhat = event%normal
+            vhat = vn/vmag
+
+            ! TODO: attempt to use volumetrization, may not be needed
+            ! ndotv = abs(dot_product(nhat,vhat))
+            ! ds_wall = delta_s/ndotv
+
+            ds_wall = delta_s
+            dT_wall = ds_wall/vmag
+
+            ! CHECK dT_wall to prevent dT_coll < 0
+            do while(dT_wall .ge. dT_coll)
+              dT_wall = dT_wall*0.5
+            end do
+
+            ! UPDATE collision time with volumetrized effect:
+            dT_coll = dT_coll - dT_wall
+
+            ! DIAGNOSTIC CHECK:
+            if (dT_coll < 0) then
+              write(*,*) "dT_coll < 0"
+            end if
+
+          end if ! behavior_type == "opening"
+        end if ! collision%n_events > 0
+      end if ! surface_in_voxel
+
+      !! COMPARE time steps and SET collision_in_cell flag:
       ! ------------------------------------------
-      if (dT_coll < dT_next) then
-        hit = .TRUE.
+      if (has_surface_collision .and. dT_coll < dT_next) then
+        collision_in_cell = .TRUE.
         dT = dT_coll
       else
-        hit = .FALSE.
+        collision_in_cell = .FALSE.
         dT = dT_next
       end if
 
@@ -10595,20 +10384,20 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
       ! -------------------
       rn = rn + dT*vn
 
-      !! CHECK hit flag and COMPUTE collision effects:
+      !! CHECK collision_in_cell flag and COMPUTE collision effects:
       ! ----------------------------------------------
-      if (hit) then ! UPDATE ray velocity
-        !! GET surface and region id:
-        surface_id = event%surface_id
-        region_id  = event%region_id
-        region = vessel%surface(surface_id)%region(region_id)
+      if (collision_in_cell) then ! UPDATE ray velocity
 
-        !! GET surface behavior:
-        behavior_type = trim(adjustl(region%behavior_type))
+        ! At this point, opening events should already have been filtered out.
+        ! Therefore this should only be a physical wall interaction.
 
-        !! CHECK by function:
-        select case (behavior_type)
-          !! COMPUTE and update new ray velocity:
+        if (behavior_type == "opening") then
+            write(*,*) "ERROR: opening reached collision_in_cell block unexpectedly"
+            stop
+        endif
+
+        !! COMPUTE and update new ray velocity:
+        select case (behavior_type) !! CHECK by function:
         case ("wall")
           !! STORE event in surface's reservoir or bucket:
 
@@ -10624,43 +10413,26 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
           !! CHECK and UPDATE surface normal:
           if (dot_product(nhat,vhat) > 0) nhat = -nhat
 
-          !! SELECT and COMPUTE reflection process:
-          ! select case (randomu(1))
-          ! case (:p_specular)  !! Specular reflection
-          !     call specular_reflection(vn, nhat)
-          ! case (p_specular:p_thermal+p_specular) !! Thermal emission
-          !     vT = sqrt(T_wall / (v2_to_E_per_amu*thermal_mass(1)))
-          !     call get_vn_thermal_wall_emission(vT, nhat, vn)
-          ! case default !! Absorption process
-          !     !! STORE event
-          !     exit
-          ! end select
+          !! COMPUTE total reflection probability:
+          p_reflect = p_specular + p_thermal
 
           !! SELECT and COMPUTE reflection process:
-          if (randomu(1) < p_specular) then
-            !! COMPUTE specular reflection:
+          if (randomu(1) < p_specular) then !! COMPUTE specular reflection:
             call specular_reflection(vn, nhat)
-          elseif (randomu(1) < (p_specular + p_thermal)) then
-            !! COMPUTE thermal velocity [cm/s]:
-            vT = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
-
-            !! COMPUTE thermal emission from wall:
-            call get_vn_thermal_wall_emission(vT,nhat,vn)
-          else
-            !! Absorption process:
+          elseif (randomu(1) < p_reflect) then !! COMPUTE thermal emission from wall:
+            v_thermal = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
+            call get_vn_thermal_wall_emission(v_thermal,nhat,vn)
+          else !! Absorption process:
             !! STORE event
+            absorbed = .TRUE.
             exit
           end if
 
-        case ("pump")
-          ! STORE event
-          pump_hit = .TRUE.
-        case ("opening")
-          cycle
         case DEFAULT
           write(*,*) "This behavior_type is not defined: ", behavior_type
           stop
         end select
+
       else ! UPDATE ray index and cell position
         ind(mind) = ind(mind) + sgn(mind)
         ri_cell(mind) = ri_cell(mind) + dr(mind)
@@ -10680,57 +10452,6 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,pump_hit)
     ntrack = cc - 1
 
 end subroutine track_to_wall
-!! <<< [JFCM, 2025-07-04] <<<
-
-!! >>> [JFCM, 2025-07-04] >>>
-subroutine pad_aabb(box,pad)
-    !+ Pads an AABB structure in-place by a specified amount.
-    type(AABB), intent(inout) :: box
-        !+ Axis-Aligned bounding box
-    real(Float64), intent(in)  :: pad(:)
-        !+ scalar or 3-element array defining padding
-
-    real(Float64) :: pad_x, pad_y, pad_z
-
-    select case (size(pad))
-    case (1)
-        pad_x = pad(1)
-        pad_y = pad(1)
-        pad_z = pad(1)
-    case (3)
-        pad_x = pad(1)
-        pad_y = pad(2)
-        pad_z = pad(3)
-    case default
-        print *, "ERROR in pad_aabb: pad must be scalar or 3-vector"
-        stop
-    end select
-
-    !! Update the AABB:
-    box%xmin = box%xmin - pad_x
-    box%xmax = box%xmax + pad_x
-    box%ymin = box%ymin - pad_y
-    box%ymax = box%ymax + pad_y
-    box%zmin = box%zmin - pad_z
-    box%zmax = box%zmax + pad_z
-
-end subroutine pad_aabb
-!! <<< [JFCM, 2025-07-04] <<<
-
-!! >>> [JFCM, 2025-07-04] >>>
-logical function is_point_in_aabb(p, box)
-    !+ Checks whether a 3D point lies inside an axis-aligned bounding box (AABB)
-    real(Float64), intent(in) :: p(3)
-        !+ Point in 3D space
-    type(AABB),    intent(in) :: box
-        !+ Axis-Aligned Bounding Box to test
-
-        is_point_in_aabb = &
-                       (p(1) >= box%xmin) .and. (p(1) <= box%xmax) .and. &
-                       (p(2) >= box%ymin) .and. (p(2) <= box%ymax) .and. &
-                       (p(3) >= box%zmin) .and. (p(3) <= box%zmax)
-
-end function is_point_in_aabb
 !! <<< [JFCM, 2025-07-04] <<<
 
 !! >>> [JFCM, 2025-07-04] >>>
@@ -13491,50 +13212,6 @@ subroutine get_nlaunch_no_fill_min(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch_no_fill_min
 
-! >>>>>> [JFCM 2024-11-22] >>>>>>>>>
-subroutine get_nlaunch_from_birth_points(nlaunch,cell_ind,ncell)
-    !+ nlaunch represents a 3D histogram which determines the number of MC markers to be launched from each [[libfida:beam_grid]] cell. nlaunch is produced using the birth%parts(:)%ind locations. When carrying out the multistep CX calculation, this subroutine uses the current state of the birth object
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
-        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
-    integer, dimension(beam_grid%ngrid), intent(out) :: cell_ind
-        !+ Stores beam_grid linear indices (ic) which have mc particles to launch
-    integer, intent(out) :: ncell
-        !+ Total number of cells in beam_grid which have mc particles to launch
-
-    integer :: i,j,k,is,ib,ncnt
-    integer :: ic !! Linear index
-    integer,dimension(3) :: ind !! 3D index
-
-    !! Calculate histogram of ions to launch (nlaunch):
-    WRITE (*,*) "In get_nlaunch_from_birth_points: birth%cnt = ", birth%cnt
-    nlaunch = 0
-    loop_over_births: do ib=1,(birth%cnt-1)
-      ind = birth%part(ib)%ind ! 3D index
-      i = ind(1) ; j = ind(2) ; k = ind(3)
-      nlaunch(i,j,k) = nlaunch(i,j,k) + 1
-    enddo loop_over_births
-
-    !! Identify those cells in nlaunch with particles:
-    ncell = 0
-    loop_over_beamgrid: do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        if(nlaunch(i,j,k).gt.0.0) then
-            ncell = ncell + 1
-            cell_ind(ncell) = ic ! Linear index
-        endif
-    enddo loop_over_beamgrid
-
-    !! Diagnostic:
-    if(inputs%verbose.ge.1) then
-      ncnt = sum(nlaunch)
-      write(*,'(T6,"# of markers: ",i10)') ncnt
-      write(*,*) ''
-    endif
-
-end subroutine get_nlaunch_from_birth_points
-! <<<<< [JFCM 2024-11-22] <<<<<<<<<
-
 subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
@@ -13576,50 +13253,6 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
     endif
 
 end subroutine get_nlaunch_pass_grid
-
-! >>>>>>>>>> [jfcm, 2024-11-26] >>>>>>>>>>
-subroutine get_nlaunch_pass_grid_no_fill_min(nr_markers,papprox, nlaunch)
-    !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
-    integer(Int64), intent(in)                    :: nr_markers
-        !+ Approximate total number of markers to launch
-    real(Float64), dimension(:,:,:), intent(in)   :: papprox
-        !+ [[libfida:pass_grid]] cell weights
-    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
-        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
-
-    logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
-    real(Float64), dimension(pass_grid%ngrid) :: cdf
-    integer, dimension(1) :: randomi
-    type(rng_type) :: r
-    integer :: c, i, j, k, nc, nm, ind(3)
-    integer :: nmin = 0
-
-    !! Fill in minimum number of markers per cell
-    nlaunch = 0
-    mask = papprox.gt.0.0
-    where(mask)
-        nlaunch = nmin
-    endwhere
-
-    !! If there are any left over distribute according to papprox
-    nc = count(mask)
-    if(nr_markers.gt.(nmin*nc)) then
-        nm = nr_markers - nmin*nc
-
-        !! precalculate cdf to save time
-        call cumsum(reshape(papprox,[pass_grid%ngrid]), cdf)
-        !! use the same seed for all processes
-        call rng_init(r, 932117)
-        do c=1, nm
-            call randind_cdf(r, cdf, randomi)
-            call ind2sub(pass_grid%dims, randomi(1), ind)
-            i = ind(1) ; j = ind(2) ; k = ind(3)
-            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
-        enddo
-    endif
-
-end subroutine get_nlaunch_pass_grid_no_fill_min
-! <<<<<<<<<< [jfcm, 2024-11-26] <<<<<<<<<<
 
 subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
     !+ Calculates velocity vector from pitch, gyroangle and fields
@@ -14153,7 +13786,7 @@ subroutine ndmc
     integer, dimension(1) :: randi
     logical :: err
     ! >>> [JFCM, 2026_05_01] <<<
-    logical :: pump_hit
+    logical :: absorbed
     ! <<< [JFCM, 2026_05_01] <<<
 
 
@@ -14178,7 +13811,7 @@ subroutine ndmc
     nlaunch=real(inputs%n_nbi)
     !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(vnbi,rnbi,tracks,ntrack,plasma,fields,randi,flux_tot, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err,ri,ri_gc,r_gyro, pump_hit)
+    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err,ri,ri_gc,r_gyro, absorbed)
     loop_over_markers: do ii=istart,inputs%n_nbi,istep
         energy_fractions: do neut_type=1,3
             !! (type = 1: full energy, =2: half energy, =3: third energy
@@ -14189,8 +13822,8 @@ subroutine ndmc
 
             ! call track(rnbi,vnbi,tracks,ntrack)
             ! if(ntrack.eq.0) cycle energy_fractions
-            pump_hit = .FALSE.
-            call track_to_wall(rnbi,vnbi,tracks,ntrack,pump_hit)
+            absorbed = .FALSE.
+            call track_to_wall(rnbi,vnbi,tracks,ntrack,absorbed)
             if (ntrack .eq. 0) then
               write (*,*) "ntrack .eq. 0 (ndmc)"
               stop
@@ -17026,6 +16659,7 @@ end subroutine mc_sample_ion_f4d_gc
 ! <<< [JFCM, 2025-08-20] <<<
 
 !! >>>>>>>>>>> [jfcm, 2024_11_22] >>>>>>>>>>>>
+! needs to be deleted once replaced with "mc_sample_ion_f4d_gc" in non_thermal_beam_stopping options
 subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
   !+ Samples an ion velocity vector from the ion distribution function (thermal or nonthermal)
   !+ Given an input beam_grid 3D index "ind", neutral species index "is" and the inputs%non_thermal_beam_stopping flag, this subroutine calculates the neutral marker position "rn" on the beam_grid and produces a neutral particle velocity vector "vn" in XYZ beam_grid coordinates sampled from either a maxwellian ion distirbution or the non_thermal ion distribution stored in fbm interpolated at "rn" position. In addition, it returns a flag f4d_defined which is .True. the particle velocity is sampled from nonthermal ion distribution function. Generally, the nonthernal distribution function is defined only for rho < 1.
@@ -17122,31 +16756,6 @@ subroutine mc_ion_velocity_f4d(ind,is,rn,vn,denf4d,f4d_defined)
 
 end subroutine mc_ion_velocity_f4d
 !! <<<<<<<<<<< [jfcm, 2024_11_22] <<<<<<<<<<<<
-
-!! >>>>>>>>>>> [jfcm, 2024_11_23] >>>>>>>>>>>
-!! to be DELETED:
-subroutine reset_birth_data
-    !+ Subroutine to reset birth particles and birth density
-    type(BirthParticle) :: default_part
-    integer :: i
-
-    ! Reset the particle counter
-    birth%cnt = 1
-
-    ! Reset the particle array if it is allocated
-    if (allocated(birth%part)) then
-        do i = 1, size(birth%part)
-            birth%part(i) = default_part
-        end do
-    end if
-
-    ! Zero out the birth density array if it is allocated
-    if (allocated(birth%dens)) then
-        birth%dens = 0.d0
-    end if
-
-end subroutine reset_birth_data
-!! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 
 !! >>> [JFCM,2026_05_12] >>>
 function sample_angle_between_dir(tmin, tmax, direction, u) result(t)
@@ -17321,7 +16930,7 @@ subroutine calculate_wall_source_process(ss,rr)
   integer :: nlaunch
   integer(Int32) :: ii, jj
   real(Float64), dimension(3) :: rp, vp
-  logical :: pump_hit
+  logical :: absorbed
   integer :: ntrack, err
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
   real(Float64) :: rate, mass
@@ -17352,7 +16961,7 @@ subroutine calculate_wall_source_process(ss,rr)
 
   !$OMP PARALLEL DO schedule(dynamic,1) &
   !$OMP& private(ii,jj,rp,vp,err,tracks,ntrack,tot_flux_dep,states,denn, &
-  !$OMP& starting_flux,pump_hit,initial_flux,final_flux,plasma,photons, &
+  !$OMP& starting_flux,absorbed,initial_flux,final_flux,plasma,photons, &
   !$OMP& weight)
   loop_over_markers: do ii=istart,nlaunch,istep
 
@@ -17364,8 +16973,8 @@ subroutine calculate_wall_source_process(ss,rr)
     end if
 
     !! COMPUTE neutral trajectory:
-    pump_hit = .FALSE.
-    call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
+    absorbed = .FALSE.
+    call track_to_wall(rp,vp,tracks,ntrack,absorbed)
 
     tot_flux_dep = 0.d0
     states = 0.d0
@@ -17458,7 +17067,7 @@ subroutine calculate_dcx_process
   real(Float64) :: photons, weight
   real(Float64) :: denf4d, denf4d_per_marker, deni_gc
   !! >>> [JFCM, 2025-07-04] >>>
-  logical :: pump_hit
+  logical :: absorbed
   !! <<< [JFCM, 2025-07-04] <<<
   !! >>> [JFCM, 2025-07-01] >>>
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
@@ -17523,7 +17132,7 @@ subroutine calculate_dcx_process
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,jj, &
   !$OMP& rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
-  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,pump_hit, &
+  !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,absorbed, &
   !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp)
   loop_over_cells: do ic = istart, ncell, istep
 
@@ -17547,8 +17156,8 @@ subroutine calculate_dcx_process
               endif
 
               ! Compute neutral particle track across beam_grid:
-              pump_hit = .FALSE.
-              call track_to_wall(rp,vp,tracks,ntrack,pump_hit)
+              absorbed = .FALSE.
+              call track_to_wall(rp,vp,tracks,ntrack,absorbed)
               if (ntrack .eq. 0) then
                 write (*,*) "ntrack .eq. 0 (calculate_dcx_process)"
                 stop
@@ -17635,7 +17244,7 @@ subroutine calculate_dcx_process
 
               ! >>> [JFCM, 2025-07-04] >>>
               !! Check if end of tracks has been reached and attenuation is poor
-              if ( .FALSE. .AND. (.not. pump_hit) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
+              if ( .FALSE. .AND. (.not. absorbed) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
                 print *, "This particle did not reach pump and has poor atteuation, rel attenuation: ", final_flux/starting_flux
                 print *, "jj : ", jj
                 print *, "ntrack: ", ntrack
@@ -17692,7 +17301,7 @@ subroutine calculate_halo_process
   type(LocalProfiles) :: plasma
   real(Float64) , dimension(3) :: ri, vi
   logical :: f4d_defined
-  logical :: pump_hit
+  logical :: absorbed
   real(Float64) :: denf4d, starting_flux, denf4d_per_marker, initial_flux, final_flux
   real(Float64) :: weight, photons, flux_per_marker
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
@@ -17805,7 +17414,7 @@ subroutine calculate_halo_process
     birth%dens=0.d0
     sink%dens=0.d0
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,pump_hit,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,absorbed,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
     !$OMP& ntrack,ii,jj,kk,rates,states,denn,starting_flux,denf4d_per_marker,it,tot_flux_dep,initial_flux,weight, &
     !$OMP& photons,final_flux,plasma,flux_per_marker,denn_per_marker,fields,rgc,deni_gc,ind_p,ind_res,inp, &
     !$OMP& res_valid)
@@ -17827,8 +17436,8 @@ subroutine calculate_halo_process
           end if
 
           !! Compute neutral particle track accross the beam grid:
-          pump_hit = .FALSE.
-          call track_to_wall(ri,vi,tracks,ntrack,pump_hit)
+          absorbed = .FALSE.
+          call track_to_wall(ri,vi,tracks,ntrack,absorbed)
           if (ntrack .eq. 0) then
               write (*,*) "ntrack .eq. 0 (calculate_halo_process)"
               stop
@@ -18253,6 +17862,10 @@ subroutine mc_ion_loss_rate(plasma,is,ab,vn,H_H_depop)
   real(Float64) :: log_erel, logEmin, dLogE
   logical :: f4d_defined
   type(InterpolCoeffs1D) :: c
+  real(Float64), dimension(3) :: rgc
+  real(Float64) :: deni_gc
+  type(LocalEMFields) :: fields_gc
+  integer, dimension(3) :: ind_p
 
   ! If beam_grid has not been allocated, then we cant do anything so exit subroutine
   if(.not.allocated(beam_grid%xc)) then
@@ -18283,7 +17896,8 @@ subroutine mc_ion_loss_rate(plasma,is,ab,vn,H_H_depop)
   loop_over_ions: do ii = 1, num_ions
       ! Sample ion velocity vector from f4d:
       ! input: ind, is
-      call mc_ion_velocity_f4d(ind,is,ri,vi,f4d_defined=f4d_defined)
+      ! call mc_ion_velocity_f4d(ind,is,ri,vi,f4d_defined=f4d_defined)
+      call mc_sample_ion_f4d_gc(ind,is,rgc,deni_gc,fields_gc,ri,vi,ind_p,denf4d,f4d_defined)
       if (.not.f4d_defined) then
         ! If f4d is not defined, then skip entire loop
         exit loop_over_ions

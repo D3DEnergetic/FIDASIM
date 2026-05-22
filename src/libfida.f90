@@ -195,8 +195,8 @@ end type voxel_type
 ! >>> [JFCM, 2025_07_22] >>>
 type mesh_type
   !+ Holds all data relating to a surface mesh describing a boundary
-  character(len=charlim) :: filename
-    !+ Full path to .msh file
+  ! character(len=charlim) :: filename
+  !   !+ Full path to .msh file
   real(Float64), dimension(:,:), allocatable :: vertices
     !+ Store triangle vertices. dimensions are N_vert x 3
   Integer(Int32), dimension(:,:), allocatable :: triangles
@@ -370,14 +370,18 @@ type vacuum_vessel_type
     ! geometry framework is migrated into an independent module.
     character(len=16) :: geometry_type
       !+ Determines how the vacuum vessel is described: "mesh" or "analytic" surfaces
+    character(charlim) :: geometry_file
+      !+ Full path to file with the vacuum vessel description for mesh (.msh) or analytic surfaces (.nml)
     type(mesh_type) :: mesh
       !+ Store surface triangular mesh which describes the vacuum vessel
       !+ Only used when geometry_type == "mesh"
     type(analytic_surface_type), dimension(:), allocatable :: surface
       !+ Store collection of analytic surfaces which describes the vacuum vessel
       !+ Only used when geometry_type == "analytic"
+
     ! type(grid_type):: grid
       !+ Structured computational grid used to spatially index vessel surfaces into the voxel map.
+
     type(voxel_type), dimension(:,:,:), allocatable :: map
       !+ Surface-grid lookup map used to accelerate ray-surface intersection tests.
     real(Float64) :: surface_padding_epsilon
@@ -1317,8 +1321,7 @@ type SimulationInputs
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
 
     !! >>> [JFCM, 2025-10-27] >>>
-    integer(Int64) :: reservoir_size
-        !+ Neutral reservoir size requested by user
+
     !! <<< [JFCM, 2025-10-27] <<<
 
     !! Simulation switches
@@ -1377,22 +1380,30 @@ type SimulationInputs
     integer(Int32) :: stark_components
         !+ Output spectral stark components : 0=off, 1=on
 
-    !! Non-thermal beam deposition switches
-    ! integer(Int32) :: enable_nonthermal_calc
-    !     !+ Enable the use of the fast ion distribution for beam deposition calculations
+    !! >>> [JFCM, 2025_10_02] >>>
+    !! CompX variables:
     Integer(Int32) :: calc_sink
         !+ Calculate ion sink profile: 0 = off, 1=on
-    !! >>> [JFCM, 2025_10_02] >>>
     integer(Int32) :: enable_halo
         !+ Enable calculation of halo process
-    !! <<< [JFCM, 2025_10_02] <<<
-    !! >>> [JFCM, 2025_10_30] >>>
     integer(Int32) :: full_f
         !+ Describes how the f4d data is interpreted. 0: fast correction, 1: full distribution
     integer(Int32) :: non_thermal_beam_stopping
         !+ Enable use of f4d for beam stopping calculation. Increases computational time x10 at least
     integer(Int32) :: non_thermal_cx_sampling
         !+ Enable use of f4d for CX calculation.
+    integer(Int64) :: reservoir_size
+        !+ Neutral reservoir size requested by user
+    logical :: vessel_enabled
+        !+ Enable the use of the entire vacuum vessel module
+    logical :: enable_wall_interactions
+        !+ Enable ray-wall interation processes: reflection, absorption, thermal emission
+    logical :: enable_external_sources
+        !+ Enable the use of externally defined neutral gas sources on surface regions
+    character(charlim) :: vessel_geometry_type
+        !+ Define how the vacuum vessel is to be described: analytic surfaces or mesh
+    character(charlim) ::vessel_geometry_file
+        !+ Define the name of file with vessel representation
     !! <<< [JFCM, 2025_10_30] <<<
 
     !! Distribution settings
@@ -2327,9 +2338,11 @@ subroutine read_inputs
     real(Float64)      :: alpha,beta,gamma,origin(3)
     real(Float64)      :: split_tol
     logical            :: exis, error
-    ! integer            :: enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size
+    ! iCompX variables:
     integer            :: calc_sink, enable_halo, reservoir_size
     integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
+    logical :: vessel_enabled, enable_wall_interactions, enable_external_sources
+    character(charlim) :: vessel_geometry_type, vessel_geometry_file
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2344,9 +2357,11 @@ subroutine read_inputs
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
-        ! enable_nonthermal_calc, calc_sink, enable_halo, reservoir_size, &
+        ! CompX variables:
         calc_sink, enable_halo, reservoir_size, &
-        non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
+        non_thermal_beam_stopping, non_thermal_cx_sampling, full_f, &
+        vessel_enabled, enable_wall_interactions, enable_external_sources, &
+        vessel_geometry_type, vessel_geometry_file
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2426,14 +2441,18 @@ subroutine read_inputs
     max_cell_splits=1
     split_tol=0
 
-    ! Default values for non-thermal calculation if not included in namelist:
-    ! enable_nonthermal_calc=0
+    ! Default values for CompX variables:
     full_f=1
     non_thermal_beam_stopping= 0
     non_thermal_cx_sampling=1
     calc_sink=0
     enable_halo=0
     reservoir_size = 50
+    vessel_enabled = .FALSE.
+    enable_wall_interactions = .FALSE.
+    enable_external_sources = .FALSE.
+    vessel_geometry_type = "analytic"
+    vessel_geometry_file = "vacuum_vessel.nml"
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2509,13 +2528,48 @@ subroutine read_inputs
     inputs%calc_cfpd=calc_cfpd
     inputs%calc_res = calc_res
 
-    !! Non-thermal beam deposition switches
-    ! inputs%enable_nonthermal_calc = enable_nonthermal_calc
+    !! >>> [JFCM, 2025-10-27] >>>
+    !! Logic on CompX variables:
+    if (full_f == 0) then
+      non_thermal_beam_stopping = 0
+      non_thermal_cx_sampling = 0
+      write(*,*)
+      write(*,*) "full_f == 0, setting the following values:"
+      write(*,*) "non_thermal_beam_stopping = 0"
+      write(*,*) "non_thermal_cx_sampling = 0"
+    end if
+
+    if (calc_sink == 0) then
+      enable_halo = 0
+      write(*,*)
+      write(*,*) "calc_sink == 0, setting enable_halo = 0"
+    end if
+
+    if (.not. vessel_enabled) then
+      enable_wall_interactions = .false.
+      enable_external_sources = .false.
+      write(*,*)
+      write(*,*) "vessel_enabled == .false."
+      write(*,*) "Cannot support wall interations and wall sources"
+      write(*,*) "Setting the following:"
+      write(*,*) "enable_wall_interactions = .false."
+      write(*,*) "enable_external_sources = .false."
+    end if
+
+
+    !! Assign CompX variables:
     inputs%full_f = full_f
     inputs%non_thermal_beam_stopping = non_thermal_beam_stopping
     inputs%non_thermal_cx_sampling = non_thermal_cx_sampling
     inputs%calc_sink = calc_sink
     inputs%enable_halo = enable_halo
+    inputs%reservoir_size = reservoir_size
+    inputs%vessel_enabled = vessel_enabled
+    inputs%vessel_geometry_type = vessel_geometry_type
+    inputs%vessel_geometry_file = vessel_geometry_file
+    inputs%enable_wall_interactions = enable_wall_interactions
+    inputs%enable_external_sources = enable_external_sources
+        !! <<< [JFCM, 2025-10-27] <<<
 
     !! Misc. Settings
     inputs%load_neutrals=load_neutrals
@@ -2535,9 +2589,6 @@ subroutine read_inputs
     inputs%n_halo=max(10,n_halo)
     inputs%n_dcx=max(10,n_dcx)
     inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
-    !! >>> [JFCM, 2025-10-27] >>>
-    inputs%reservoir_size=reservoir_size
-    !! <<< [JFCM, 2025-10-27] <<<
 
     !!Neutral Beam Settings
     beam_mass=ab
@@ -3064,22 +3115,21 @@ end subroutine write_vessel_voxel_map
 
 ! >>> [JFCM, 2025-07-23] >>>
 subroutine define_vacuum_vessel()
-  !+ This routine sets up the vacuum vessel based on the description type.
+  !+ This routine sets up the vacuum vessel based on the geometry type.
   !+ It supports mesh or analytic surface descriptions.
-  !+ For analytic surfaces, it reads from input, applies padding, and maps them.
-  integer :: n
-  character(len=16) :: geometry_type
+  !+ For analytic surfaces, it reads from input namelist, applies padding, and maps them.
 
-  ! GET analytic surface info from namelist
-  call read_vacuum_vessel()
+  ! GET geometry type (mesh or analytic) and associated file:
+  vessel%geometry_type = inputs%vessel_geometry_type
+  vessel%geometry_file = inputs%vessel_geometry_file
 
   ! ALLOCATE the voxel map
   allocate(vessel%map(beam_grid%nx, beam_grid%ny, beam_grid%nz))
 
   ! CHECK and COMPUTE voxel map based on geometry type
-  geometry_type = vessel%geometry_type
-  select case (trim(adjustl(geometry_type)))
+  select case (trim(adjustl(vessel%geometry_type)))
     case ("analytic")
+        call read_vacuum_vessel_namelist()
         call map_vacuum_vessel_to_beam_grid()
     case ("mesh")
       ! Not yet implemented
@@ -3097,11 +3147,10 @@ end subroutine define_vacuum_vessel
 ! <<< [JFCM, 2025-07-23] <<<
 
 ! >>> [JFCM, 2026-05-12] >>>
-subroutine read_vacuum_vessel
+subroutine read_vacuum_vessel_namelist
   !+ Reads the vacuum_vessel.nml file
   integer, parameter :: max_surfaces = 15, max_regions = 15
-  character(len=charlim) :: geometry_type
-  character(len=charlim) :: mesh_filename, nml_filename
+  character(len=charlim) :: nml_filename
   integer :: num_surfaces
   real(Float64) :: surface_padding_epsilon
   logical :: is_active
@@ -3143,7 +3192,7 @@ subroutine read_vacuum_vessel
   character(len=512) :: iomsg
   real(Float64), parameter :: unset_real = -huge(1.d0)
 
-  namelist /config/ geometry_type, mesh_filename, num_surfaces, surface_padding_epsilon
+  namelist /config/ num_surfaces, surface_padding_epsilon
   namelist /surface/ is_active, primitive_type, num_regions, origin, frame_type, alpha, beta, gamma, &
   basis, cyl_radius, region_type, behavior_type, enable_source, xmin, xmax, ymin, ymax, zmin, zmax, &
   phimin, phimax, phi_direction, x0, y0, phi0, z0, rmin, rmax, thetamin, thetamax, theta_direction, &
@@ -3152,16 +3201,21 @@ subroutine read_vacuum_vessel
 
   ! Read config namelist:
   ! ========================
-  nml_filename = trim(adjustl(inputs%result_dir))//"/"//'vacuum_vessel_new.nml'
+  nml_filename = trim(adjustl(vessel%geometry_file))
   open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
-  if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
+  if (ios /= 0) then
+    write(*,*) 'Error opening vessel geometry file: ', nml_filename
+    stop
+  end if
   read(unit, nml=config, iostat=ios)
   if (ios /= 0) stop 'Error reading vacuum_vessel_config.'
   close(unit)
-  vessel%geometry_type = trim(adjustl(geometry_type))
+
   vessel%surface_padding_epsilon = surface_padding_epsilon
-  vessel%mesh%filename = trim(adjustl(mesh_filename))
   allocate(vessel%surface(num_surfaces))
+
+  write(*,*) "num_surfaces :", num_surfaces
+  write(*,*) "surface_padding_epsilon :", surface_padding_epsilon
 
   ! Read surface parameters:
   ! =========================
@@ -3462,7 +3516,7 @@ contains
     source_normal_direction = 0
 
   end subroutine set_surface_defaults
-end subroutine read_vacuum_vessel
+end subroutine read_vacuum_vessel_namelist
 ! >>> [JFCM, 2026-05-12] >>>
 
 ! >>> [JFCM, 2025-07-23] >>>
@@ -6303,9 +6357,20 @@ subroutine write_beam_grid(id, error)
 
     integer(HID_T) :: gid
     integer(HSIZE_T), dimension(3) :: dims
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: u_grid, v_grid, w_grid
+    ! >>> [JFCM, 2026_05_16] >>>
+    ! Stack overflow issue when grid becomes large
+    ! real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: u_grid, v_grid, w_grid
+    real(Float64), dimension(:,:,:), allocatable :: u_grid, v_grid, w_grid
+    ! <<< [JFCM, 2026_05_16] <<<
     real(Float64) :: xyz(3),uvw(3)
     integer :: i,j,k
+
+    ! >>> [JFCM, 2026_05_16] >>>
+    ! Stack overflow issue when grid becomes large
+    allocate(u_grid(beam_grid%nx, beam_grid%ny, beam_grid%nz))
+    allocate(v_grid(beam_grid%nx, beam_grid%ny, beam_grid%nz))
+    allocate(w_grid(beam_grid%nx, beam_grid%ny, beam_grid%nz))
+    ! <<< [JFCM, 2026_05_16] <<<
 
     !Create uvw grids
     do k=1, beam_grid%nz
@@ -6372,6 +6437,11 @@ subroutine write_beam_grid(id, error)
 
     !Close grid group
     call h5gclose_f(gid, error)
+
+    ! >>> [JFCM, 2026_05_16] >>>
+    ! Stack overflow issue when grid becomes large
+    deallocate(u_grid, v_grid, w_grid)
+    ! <<< [JFCM, 2026_05_16] <<<
 
 end subroutine write_beam_grid
 
@@ -6751,17 +6821,25 @@ subroutine write_sink_profile(gen)
 
   if(do_write) then
       !Open HDF5 interface
+      write(*,*) "Before h5open_f"
       call h5open_f(error)
+      write(*,*) "After h5open_f, error = ", error
 
       !Create file overwriting any existing file
+      write(*,*) "Before h5fcreate_f: ", trim(filename)
       call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+      write(*,*) "After h5fcreate_f: ", trim(filename)
 
       !Write variables
+      write(*,*) "Before write_beam_grid"
       call write_beam_grid(fid, error)
+      write(*,*) "After write_beam_grid, error = ", error
       d(1) = 1
       call h5ltmake_dataset_int_f(fid, "/n_sink", 0, d, [npart], error)
+      write(*,*) "Before write /dens, shape = ", shape(sink%dens)
       dim4 = shape(sink%dens)
       call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, sink%dens, error)
+      write(*,*) "After write /dens, error = ", error
       dim2 = [3, npart]
       call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
       call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
@@ -10386,7 +10464,9 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
 
       !! GET collision check flag:
       ! --------------------------
-      surface_in_voxel = vessel%map(ind(1),ind(2),ind(3))%has_surfaces
+      if (inputs%enable_wall_interactions) then
+        surface_in_voxel = vessel%map(ind(1),ind(2),ind(3))%has_surfaces
+      end if
 
       !! COMPUTE collision time:
       ! ------------------------
@@ -17418,12 +17498,20 @@ subroutine calculate_halo_process
   !! this is importnat if we happen to reduce the number of iterations from one run to another
   !! This will prevent carrying old source point files incorrecly
 
+  ! DEBUG:
+  write(*,*) "beam_grid dims:", beam_grid%nx, beam_grid%ny, beam_grid%nz
+  write(*,*) "beam_grid ngrid:", beam_grid%ngrid
+
   !! >>> [JFCM, 2025-10-20] >>>
   !! n_iter = 4
   n_iter = 3
   !! <<< [JFCM, 2025-10-20] <<<
   seed_dcx = 1.0
   iterations: do hh = 1,n_iter
+
+    ! DEBUG:
+    write(*,*) "HALO ITERATION START:", hh
+    write(*,*) "n_halo:", n_halo
 
     !! Clear current population:
     call init_neutral_population(cur_pop)
@@ -17451,7 +17539,14 @@ subroutine calculate_halo_process
     end do
 
     !! Distribute n_halo markers over reaction probability PDF:
+    write(*,*) "Before get_nlaunch_no_fill_min"
     call get_nlaunch_no_fill_min(n_halo, papprox, nlaunch)
+    write(*,*) "After get_nlaunch_no_fill_min"
+
+    ! DEBUG"
+    write(*,*) "sum(nlaunch):", sum(nlaunch)
+    write(*,*) "maxval(nlaunch):", maxval(nlaunch)
+    write(*,*) "ncell:", ncell
 
     !! >>> [JFCM, 2025-08-19] >>>
     if (hh .eq. 1) then
@@ -17485,10 +17580,12 @@ subroutine calculate_halo_process
     !! <<< [JFCM, 2025_09_15] <<<
 
     !! Allocate birth and sink containers for current halo iteration:
+    write(*,*) "Allocating birth/sink containers"
     allocate(birth%part(n_halo))
     allocate(sink%part(n_halo))
     allocate(birth%dens(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     allocate(sink%dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    write(*,*) "Finished allocating birth/sink containers"
     birth%dens=0.d0
     sink%dens=0.d0
 
@@ -17635,8 +17732,17 @@ subroutine calculate_halo_process
     !! DCX_PROCESS produces: birth_1, sink
     !! HALO_PROCESS produces: birth_(X), sink_(X-1) where X>1
     print *, "GEN: ", hh+1, " , CX flux: ", sum(sink%dens)
+    write(*,*) "Before write_sink_profile"
+    write(*,*) "sink%cnt = ", sink%cnt
+    write(*,*) "size(sink%part) = ", size(sink%part)
+    write(*,*) "sum(nlaunch) = ", sum(nlaunch)
+    write(*,*) "n_halo = ", n_halo
+    write(*,*) "n_thermal = ", n_thermal
     call write_sink_profile(gen=1+hh-1)
+    write(*,*) "After write_sink_profile"
+    write(*,*) "Before write_birth_profile"
     call write_birth_profile(gen=1+hh)
+    write(*,*) "After write_birth_profile"
     print *, "writing sources completed!"
 
     ! if (seed_dcx .lt. 0.01) then

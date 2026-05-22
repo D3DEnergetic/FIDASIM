@@ -117,7 +117,7 @@ program fidasim
     call read_equilibrium()
     call make_beam_grid()
     ! >>> [JFCM, 2025_07_23] >>>
-    call define_vacuum_vessel()
+    if (inputs%vessel_enabled) call define_vacuum_vessel()
     ! <<< [JFCM, 2025_07_23] <<<
     if(inputs%calc_beam.ge.1) call read_beam()
     call read_distribution()
@@ -157,13 +157,15 @@ program fidasim
         !! >>> [JFCM, 2025-09-02] >>>
         ! TODO: need to allow using births_per_marker and more then one birth per marker for NBI
         n_birth_wall = 0
-        do ss = 1,size(vessel%surface)
-          do rr = 1,size(vessel%surface(ss)%region)
-            if (vessel%surface(ss)%region(rr)%enable_source) then
-              n_birth_wall = n_birth_wall + vessel%surface(ss)%region(rr)%source%num_markers
-            endif
+        if (inputs%enable_external_sources) then
+          do ss = 1,size(vessel%surface)
+            do rr = 1,size(vessel%surface(ss)%region)
+              if (vessel%surface(ss)%region(rr)%enable_source) then
+                n_birth_wall = n_birth_wall + vessel%surface(ss)%region(rr)%source%num_markers
+              endif
+            end do
           end do
-        end do
+        end if
         !! <<< [JFCM, 2025-09-02] <<<
 
         !! >>> [JFCM, 2025-09-02] >>>
@@ -333,14 +335,16 @@ program fidasim
 
                 ! >>> [JFCM, 2025-09-02] >>>
                 ! Wall source calculation:
-                do ss = 1,size(vessel%surface)
-                  do rr = 1,size(vessel%surface(ss)%region)
-                    if (vessel%surface(ss)%region(rr)%enable_source) then
-                      write(*,*) "calculate wall source"
-                      ! call calculate_wall_source_process(ss,rr)
-                    endif
-                end do
-              end do
+                if (inputs%enable_external_sources) then
+                  do ss = 1,size(vessel%surface)
+                    do rr = 1,size(vessel%surface(ss)%region)
+                      if (vessel%surface(ss)%region(rr)%enable_source) then
+                        write(*,*) "calculate wall source"
+                        call calculate_wall_source_process(ss,rr)
+                      endif
+                    end do
+                  end do
+                end if
                 ! <<< [JFCM, 2025-09-02] <<<
 
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''

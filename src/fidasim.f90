@@ -176,15 +176,6 @@ program fidasim
 
     endif
 
-    if (inputs%calc_sink.ge.1) then
-      ! allocate(sink%dens(n_thermal, &
-      !                     beam_grid%nx, &
-      !                     beam_grid%ny, &
-      !                     beam_grid%nz))
-      ! allocate(sink%part(inputs%n_dcx))
-      ! allocate(sink%part(size(birth%part)))
-    endif
-
     !! Spectra
     if(inputs%calc_spec.ge.1) then
         if(inputs%calc_brems.ge.1) then

@@ -1320,10 +1320,6 @@ type SimulationInputs
     integer(Int64) :: n_birth
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
 
-    !! >>> [JFCM, 2025-10-27] >>>
-
-    !! <<< [JFCM, 2025-10-27] <<<
-
     !! Simulation switches
     integer(Int32) :: calc_spec
         !+ Calculate spectra: 0 = off, 1=on
@@ -3048,11 +3044,22 @@ subroutine write_vessel_voxel_map
   integer(HSIZE_T), dimension(2) :: dims2
   integer(HSIZE_T), dimension(3) :: dims3
   integer :: rank
-  character(len=256) :: filename, result_dir, full_file_name
+  character(len=256) :: filename, result_dir
   integer :: error
+  integer :: idx
+  character(len=256) :: vessel_geometry_file
 
   result_dir = inputs%result_dir
-  filename = 'vacuum_vessel.h5'
+  vessel_geometry_file = inputs%vessel_geometry_file
+
+  idx = index(trim(vessel_geometry_file), ".", back=.true.)
+  if (idx > 0) then
+      filename = &
+          trim(vessel_geometry_file(:idx-1)) // "_voxel_map.h5"
+  else
+      filename = &
+          trim(vessel_geometry_file) // "_voxel_map.h5"
+  endif
 
   dims3(1) = beam_grid%nx
   dims3(2) = beam_grid%ny
@@ -3078,11 +3085,12 @@ subroutine write_vessel_voxel_map
   call h5open_f(error)
 
   ! Create file:
-  full_file_name = trim(adjustl(result_dir)) // '/' // trim(adjustl(filename))
-  call h5fcreate_f(trim(adjustl(full_file_name)), H5F_ACC_TRUNC_F, h5file_id, error)
+  call h5fcreate_f(trim(adjustl(filename)), H5F_ACC_TRUNC_F, h5file_id, error)
+  if (error<0) write(*,*) "(write_vessel_voxel_map::h5fcreate_f) Error"
 
   ! Write intersect:
   call h5ltmake_compressed_dataset_int_f(h5file_id,"/has_surfaces", 3, dims3, has_surfaces, error)
+  if (error<0) write(*,*) "(write_vessel_voxel_map::has_surfaces) Error"
 
   ! Write nid:
   call h5ltmake_compressed_dataset_int_f(h5file_id,"/nid", 3, dims3, nid, error)
@@ -3191,6 +3199,7 @@ subroutine read_vacuum_vessel_namelist
   integer :: ios, unit, ss, rr
   character(len=512) :: iomsg
   real(Float64), parameter :: unset_real = -huge(1.d0)
+  logical :: exists
 
   namelist /config/ num_surfaces, surface_padding_epsilon
   namelist /surface/ is_active, primitive_type, num_regions, origin, frame_type, alpha, beta, gamma, &
@@ -3202,13 +3211,19 @@ subroutine read_vacuum_vessel_namelist
   ! Read config namelist:
   ! ========================
   nml_filename = trim(adjustl(vessel%geometry_file))
+  inquire(file=trim(nml_filename), exist=exists)
+  if (.not. exists) then
+      write(*,*) 'read_vacuum_vessel_namelist():: ERROR: file does not exist: ', trim(nml_filename)
+      stop
+  endif
+
   open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
   if (ios /= 0) then
-    write(*,*) 'Error opening vessel geometry file: ', nml_filename
+    write(*,*) 'read_vacuum_vessel_namelist()::ERROR: opening vessel geometry file: ', nml_filename
     stop
   end if
   read(unit, nml=config, iostat=ios)
-  if (ios /= 0) stop 'Error reading vacuum_vessel_config.'
+  if (ios /= 0) stop 'read_vacuum_vessel_namelist():: ERROR: reading vacuum_vessel_config.'
   close(unit)
 
   vessel%surface_padding_epsilon = surface_padding_epsilon
@@ -3220,7 +3235,7 @@ subroutine read_vacuum_vessel_namelist
   ! Read surface parameters:
   ! =========================
   open(newunit=unit, file=nml_filename, status='old', action='read', iostat=ios)
-  if (ios /= 0) stop 'Error opening vacuum_vessel.nml.'
+  if (ios /= 0) stop 'read_vacuum_vessel_namelist() :: ERROR: opening vessel geometry file'
 
   do ss = 1, num_surfaces
       call set_surface_defaults()
@@ -3228,7 +3243,7 @@ subroutine read_vacuum_vessel_namelist
 
       if (ios /= 0) then
           write(*,*)
-          write(*,*) "ERROR: failed to read &surface namelist block."
+          write(*,*) "read_vacuum_vessel_namelist():: ERROR: failed to read &surface namelist block."
           write(*,*) "Surface index : ", ss
           write(*,*) "IOSTAT code  : ", ios
           write(*,*) "IOMSG        : ", trim(iomsg)
@@ -6821,25 +6836,17 @@ subroutine write_sink_profile(gen)
 
   if(do_write) then
       !Open HDF5 interface
-      write(*,*) "Before h5open_f"
       call h5open_f(error)
-      write(*,*) "After h5open_f, error = ", error
 
       !Create file overwriting any existing file
-      write(*,*) "Before h5fcreate_f: ", trim(filename)
       call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-      write(*,*) "After h5fcreate_f: ", trim(filename)
 
       !Write variables
-      write(*,*) "Before write_beam_grid"
       call write_beam_grid(fid, error)
-      write(*,*) "After write_beam_grid, error = ", error
       d(1) = 1
       call h5ltmake_dataset_int_f(fid, "/n_sink", 0, d, [npart], error)
-      write(*,*) "Before write /dens, shape = ", shape(sink%dens)
       dim4 = shape(sink%dens)
       call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, sink%dens, error)
-      write(*,*) "After write /dens, error = ", error
       dim2 = [3, npart]
       call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
       call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
@@ -17498,10 +17505,6 @@ subroutine calculate_halo_process
   !! this is importnat if we happen to reduce the number of iterations from one run to another
   !! This will prevent carrying old source point files incorrecly
 
-  ! DEBUG:
-  write(*,*) "beam_grid dims:", beam_grid%nx, beam_grid%ny, beam_grid%nz
-  write(*,*) "beam_grid ngrid:", beam_grid%ngrid
-
   !! >>> [JFCM, 2025-10-20] >>>
   !! n_iter = 4
   n_iter = 3
@@ -17539,14 +17542,7 @@ subroutine calculate_halo_process
     end do
 
     !! Distribute n_halo markers over reaction probability PDF:
-    write(*,*) "Before get_nlaunch_no_fill_min"
     call get_nlaunch_no_fill_min(n_halo, papprox, nlaunch)
-    write(*,*) "After get_nlaunch_no_fill_min"
-
-    ! DEBUG"
-    write(*,*) "sum(nlaunch):", sum(nlaunch)
-    write(*,*) "maxval(nlaunch):", maxval(nlaunch)
-    write(*,*) "ncell:", ncell
 
     !! >>> [JFCM, 2025-08-19] >>>
     if (hh .eq. 1) then
@@ -17732,17 +17728,8 @@ subroutine calculate_halo_process
     !! DCX_PROCESS produces: birth_1, sink
     !! HALO_PROCESS produces: birth_(X), sink_(X-1) where X>1
     print *, "GEN: ", hh+1, " , CX flux: ", sum(sink%dens)
-    write(*,*) "Before write_sink_profile"
-    write(*,*) "sink%cnt = ", sink%cnt
-    write(*,*) "size(sink%part) = ", size(sink%part)
-    write(*,*) "sum(nlaunch) = ", sum(nlaunch)
-    write(*,*) "n_halo = ", n_halo
-    write(*,*) "n_thermal = ", n_thermal
     call write_sink_profile(gen=1+hh-1)
-    write(*,*) "After write_sink_profile"
-    write(*,*) "Before write_birth_profile"
     call write_birth_profile(gen=1+hh)
-    write(*,*) "After write_birth_profile"
     print *, "writing sources completed!"
 
     ! if (seed_dcx .lt. 0.01) then

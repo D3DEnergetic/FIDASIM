@@ -14,6 +14,9 @@ DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
+# >>> [JFCM, 2026-06-16] >>>
+REGRESSION_TESTS_DIR = $(FIDASIM_DIR)/regression_tests
+# <<< [JFCM, 2026-06-16] <<<
 
 PYTHON_EXEC = $(shell which python3 python 2> /dev/null | head -1)
 ifeq ($(PYTHON_EXEC),)
@@ -58,9 +61,27 @@ ifneq ($(BUILD),)
 	U_FLAGS := -D_VERSION=\"$(BUILD)\"
 endif
 
-# HDF5 variables
-HDF5_LIB = $(DEPS_DIR)/hdf5/lib
-HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
+# HDF5 variables:
+
+# >>> [JFCM, 2026-06-16] >>>
+# Bundled HDF5 build fails with latest gfortran
+# Here we allow to use externally provided HDF5
+# HDF5 build mode
+# USE_SYSTEM_HDF5=0 -> build bundled HDF5 in deps/
+# USE_SYSTEM_HDF5=1 -> use externally provided HDF5
+USE_SYSTEM_HDF5 ?= 0
+ifeq ($(USE_SYSTEM_HDF5),1)
+    ifeq ($(HDF5_DIR),)
+        $(error USE_SYSTEM_HDF5=1 but HDF5_DIR is not set)
+    endif
+    HDF5_INCLUDE ?= $(HDF5_DIR)/include
+    HDF5_LIB     ?= $(HDF5_DIR)/lib  
+else
+    HDF5_INCLUDE ?= $(DEPS_DIR)/hdf5/include
+    HDF5_LIB     ?= $(DEPS_DIR)/hdf5/lib
+endif
+# << [JFCM, 2026-06-16] <<<
+
 ifeq ($(OS),Linux)
 	HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
 endif
@@ -181,7 +202,13 @@ export L_FLAGS
 export I_FLAGS
 export NTHREADS
 
-fidasim: deps src tables python regression_tests
+# >>> [JFCM, 2026-06-16] >>>
+ifeq ($(USE_SYSTEM_HDF5),1)
+    fidasim: src tables python regression_tests
+else
+    fidasim: deps src tables python regression_tests
+endif
+# <<< [JFCM, 2026-06-16] <<<
 
 .PHONY: regression_tests
 regression_tests: src
@@ -214,7 +241,10 @@ python:
 
 clean_all: clean clean_deps clean_docs
 
-clean: clean_src clean_tables
+# >>> [JFCM, 2026-06-16] >>>
+#clean: clean_src clean_tables
+clean: clean_src clean_tables clean_regression_tests
+# <<< [JFCM, 2026-06-16] <<<
 	-rm -f *.mod *.o fidasim
 
 clean_src:
@@ -225,6 +255,11 @@ clean_deps:
 
 clean_tables:
 	@cd $(TABLES_DIR); make clean
+
+# >>> [JFCM, 2026-06-16] >>>	
+clean_regression_tests:
+	@cd $(REGRESSION_TESTS_DIR); make clean	
+# <<< [JFCM, 2026-06-16] <<<
 
 clean_docs:
 	-rm -rf $(DOCS_DIR)/html

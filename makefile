@@ -70,20 +70,26 @@ endif
 # USE_SYSTEM_HDF5=0 -> build bundled HDF5 in deps/
 # USE_SYSTEM_HDF5=1 -> use externally provided HDF5
 USE_SYSTEM_HDF5 ?= 0
+HDF5_EXTRA_LIBS ?=
 ifeq ($(USE_SYSTEM_HDF5),1)
-    ifeq ($(HDF5_DIR),)
-        $(error USE_SYSTEM_HDF5=1 but HDF5_DIR is not set)
+
+    ifeq ($(HDF5_INCLUDE),)
+        $(error USE_SYSTEM_HDF5=1 but HDF5_INCLUDE is not set)
     endif
-    HDF5_INCLUDE ?= $(HDF5_DIR)/include
-    HDF5_LIB     ?= $(HDF5_DIR)/lib  
+
+    ifeq ($(HDF5_LIB),)
+        $(error USE_SYSTEM_HDF5=1 but HDF5_LIB is not set)
+    endif
 else
-    HDF5_INCLUDE ?= $(DEPS_DIR)/hdf5/include
-    HDF5_LIB     ?= $(DEPS_DIR)/hdf5/lib
+    HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
+    HDF5_LIB     = $(DEPS_DIR)/hdf5/lib
 endif
 # << [JFCM, 2026-06-16] <<<
 
 ifeq ($(OS),Linux)
-	HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
+	HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic \
+				 -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 \
+				 -Wl,-Bdynamic -lz -ldl $(HDF5_EXTRA_LIBS)
 endif
 ifneq ($(findstring MINGW, $(OS)),)
 	HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lm -lz -lws2_32

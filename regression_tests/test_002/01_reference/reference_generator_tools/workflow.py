@@ -9,7 +9,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from .config import parse_config
+from regression_test_tools import print_config
+
+from .config import read_config
 from .readers import load_input_distribution
 
 
@@ -162,12 +164,14 @@ def generate_outputs(config_path):
 
     # Read the input configuration file:
     config_path = Path(config_path)
-    config = parse_config(config_path)
+    config = read_config(
+        config_filename=config_path,
+    )
 
     # Extract configuration blocks:
     input_config = config["input"]
-    plot_config = config["plot_data"]
-    save_config = config["save_data"]
+    plot_config = config["plot_data_block"]
+    save_config = config["save_data_block"]
 
     input_path = Path(input_config["input_filename"])
     output_filename = save_config["output_filename"]

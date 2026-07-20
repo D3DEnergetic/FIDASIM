@@ -2,7 +2,14 @@
 """Entry-point script for generating reference data for regression tests."""
 
 import argparse
+from pathlib import Path
+import sys
 
+# Make the shared regression-test tools importable without installing a package.
+regression_tests_directory = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(regression_tests_directory))
+
+from regression_test_tools import ConfigError
 from reference_generator_tools import generate_outputs
 
 
@@ -18,7 +25,12 @@ def main():
     args = parser.parse_args()
 
     # Generate the reference outputs based on the provided configuration file:
-    outputs = generate_outputs(args.config_path)
+    try:
+        outputs = generate_outputs(
+            config_path=args.config_path,
+        )
+    except ConfigError as error:
+        raise SystemExit(f"Configuration error: {error}") from None
     for output in outputs:
         print(output)
 

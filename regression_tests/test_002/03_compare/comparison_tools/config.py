@@ -3,23 +3,72 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-import f90nml
+from regression_test_tools import (
+    ConfigError,
+    as_list,
+    normalize_path,
+    normalize_string,
+    read_namelist,
+    require_boolean,
+    require_blocks,
+    require_choice,
+    require_existing_directory,
+    require_existing_file,
+    require_fields,
+    require_integer,
+    require_real,
+    require_string,
+    validate_schema,
+)
 
 
-SUPPORTED_SCALES = {"lin", "log"}
-SUPPORTED_COLORMAPS = {"viridis", "viridis_r", "hot", "hot_r"}
+# Define the complete structure of the Stage 3 namelist in one place.
+CONFIG_SCHEMA = {
+    "compare": {
+        "required": True,
+        "required_fields": [
+            "sampling_config_file",
+            "output_directory",
+        ],
+        "optional_fields": [
+            "generate_plots",
+        ],
+    },
+    "plot_data_block": {
+        "required": False,
+        "required_fields": [],
+        "optional_fields": [
+            "scale",
+            "fmin",
+            "fmax",
+            "enable_colorbar",
+            "colormap",
+        ],
+    },
+}
+
+SUPPORTED_SCALES = [
+    "lin",
+    "log",
+]
+SUPPORTED_COLORMAPS = [
+    "viridis",
+    "viridis_r",
+    "hot",
+    "hot_r",
+]
 
 
-@dataclass
-class ComparisonConfig:
-    sampling_config_file: Path
-    output_directory: Path
-    generate_plots: bool
-    scale: str
-    fmin: object
-    fmax: object
-    enable_colorbar: bool
-    colormap: str
+# Stage 3 consumes these fields from the Stage 2 configuration. Stage 2 owns
+# the complete run_test schema, so Stage 3 does not reject its other fields.
+SAMPLING_REQUIRED_BLOCKS = (
+    "run_test",
+)
+SAMPLING_REQUIRED_FIELDS = (
+    "n_reference_files",
+    "reference_files",
+    "output_directory",
+)
 
 
 @dataclass
@@ -28,110 +77,245 @@ class FilePair:
     sampled: Path
 
 
-def resolve_path(config_file, configured_path):
-    """Resolve a configured path relative to its namelist file."""
-    path = Path(configured_path).expanduser()
-    if not path.is_absolute():
-        path = config_file.parent / path
-    return path.resolve()
+def _normalize_plot_limit(value, field_label):
+    """Normalize an automatic or numerical plot limit.
+
+    Args:
+        value (object): Plot limit read from the namelist. Accepted values are
+        ``None``, the string ``"auto"``, or a real number.
+        field_label (str): Human-readable field label used in error messages.
+
+    Returns:
+        float, str, or None: ``None`` and ``"auto"`` retain their automatic
+        meaning. Numerical values are returned as Python ``float`` objects.
+
+    Raises:
+        ConfigError: If a string other than ``"auto"`` is supplied or the
+        value is not a real number.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        normalized_value = normalize_string(
+            value=value,
+        )
+        if normalized_value == "auto":
+            return normalized_value
+        raise ConfigError(f"{field_label} must be a real number or 'auto'.")
+
+    return require_real(
+        value=value,
+        field_label=field_label,
+    )
 
 
 def read_config(config_filename):
-    """Read and validate the comparison and plotting settings."""
-    config_file = Path(config_filename).resolve()
-    blocks = f90nml.read(config_file)
-    if "compare" not in blocks:
-        raise ValueError(f"Missing &compare block in {config_file}.")
+    """Read and validate the Stage 3 comparison configuration.
+
+    Args:
+        config_filename (str or Path): Path to the Stage 3 namelist file.
+
+    Returns:
+        dict: Canonical configuration organized under ``compare`` and
+        ``plot_data_block`` keys that match the namelist block names.
+
+    Raises:
+        ConfigError: If a required block or field is missing, a block contains
+        an unknown field, or a configured value is invalid.
+    """
+
+    # Step 1: read the namelist and validate its complete Stage 3 structure.
+    config_path, blocks = read_namelist(
+        config_path=config_filename,
+    )
+    validate_schema(
+        blocks=blocks,
+        schema=CONFIG_SCHEMA,
+    )
 
     compare_block = blocks["compare"]
     plot_block = blocks.get("plot_data_block", {})
 
-    sampling_config_value = compare_block.get("sampling_config_file")
-    output_directory_value = compare_block.get("output_directory")
-    if not isinstance(sampling_config_value, str) or not sampling_config_value.strip():
-        raise ValueError("sampling_config_file must be a non-empty path.")
-    if not isinstance(output_directory_value, str) or not output_directory_value.strip():
-        raise ValueError("output_directory must be a non-empty path.")
-
-    generate_plots = compare_block.get("generate_plots", True)
-    enable_colorbar = plot_block.get("enable_colorbar", True)
-    if not isinstance(generate_plots, bool):
-        raise ValueError("generate_plots must be .true. or .false.")
-    if not isinstance(enable_colorbar, bool):
-        raise ValueError("enable_colorbar must be .true. or .false.")
-
-    scale = str(plot_block.get("scale", "lin")).strip().lower()
-    colormap = str(plot_block.get("colormap", "viridis")).strip().lower()
-    if scale not in SUPPORTED_SCALES:
-        raise ValueError("scale must be 'lin' or 'log'.")
-    if colormap not in SUPPORTED_COLORMAPS:
-        choices = ", ".join(sorted(SUPPORTED_COLORMAPS))
-        raise ValueError(f"colormap must be one of: {choices}.")
-
-    return ComparisonConfig(
-        sampling_config_file=resolve_path(config_file, sampling_config_value),
-        output_directory=resolve_path(config_file, output_directory_value),
-        generate_plots=generate_plots,
-        scale=scale,
-        fmin=plot_block.get("fmin"),
-        fmax=plot_block.get("fmax"),
-        enable_colorbar=enable_colorbar,
-        colormap=colormap,
+    # Step 2: validate and resolve the required paths.
+    sampling_config_value = require_string(
+        value=compare_block["sampling_config_file"],
+        field_label="sampling_config_file",
     )
+    output_directory_value = require_string(
+        value=compare_block["output_directory"],
+        field_label="output_directory",
+    )
+
+    sampling_config_file = normalize_path(
+        value=sampling_config_value,
+        config_path=config_path,
+        field_label="sampling_config_file",
+    )
+    output_directory = normalize_path(
+        value=output_directory_value,
+        config_path=config_path,
+        field_label="output_directory",
+    )
+    require_existing_file(
+        path=sampling_config_file,
+        field_label="sampling_config_file",
+    )
+
+    # Step 3: validate the optional comparison and plotting settings.
+    generate_plots = require_boolean(
+        value=compare_block.get("generate_plots", True),
+        field_label="generate_plots",
+    )
+    enable_colorbar = require_boolean(
+        value=plot_block.get("enable_colorbar", True),
+        field_label="enable_colorbar",
+    )
+
+    scale = normalize_string(
+        value=plot_block.get("scale", "lin"),
+    )
+    scale = require_choice(
+        value=scale,
+        supported_values=SUPPORTED_SCALES,
+        field_label="scale",
+    )
+
+    colormap = normalize_string(
+        value=plot_block.get("colormap", "viridis"),
+    )
+    colormap = require_choice(
+        value=colormap,
+        supported_values=SUPPORTED_COLORMAPS,
+        field_label="colormap",
+    )
+
+    fmin = _normalize_plot_limit(
+        value=plot_block.get("fmin"),
+        field_label="fmin",
+    )
+    fmax = _normalize_plot_limit(
+        value=plot_block.get("fmax"),
+        field_label="fmax",
+    )
+
+    # Step 4: preserve the namelist block structure in the returned canonical
+    # configuration. Optional fields and blocks are populated with defaults.
+    return {
+        "compare": {
+            "sampling_config_file": sampling_config_file,
+            "output_directory": output_directory,
+            "generate_plots": generate_plots,
+        },
+        "plot_data_block": {
+            "scale": scale,
+            "fmin": fmin,
+            "fmax": fmax,
+            "enable_colorbar": enable_colorbar,
+            "colormap": colormap,
+        },
+    }
 
 
 def build_file_pairs(sampling_config_file):
-    """Construct ordered reference-sampled pairs from the Stage 2 namelist."""
-    if not sampling_config_file.is_file():
-        raise FileNotFoundError(
-            f"Sampling configuration not found: {sampling_config_file}"
-        )
+    """Construct ordered reference-sampled pairs from a Stage 2 namelist.
 
-    blocks = f90nml.read(sampling_config_file)
-    if "run_test" not in blocks:
-        raise ValueError(f"Missing &run_test block in {sampling_config_file}.")
+    Args:
+        sampling_config_file (str or Path): Path to the Stage 2 namelist used
+        to generate the sampled distributions.
+
+    Returns:
+        list of FilePair: Reference and sampled paths in the order configured
+        by Stage 2.
+
+    Raises:
+        ConfigError: If the required Stage 2 fields are invalid, directories
+        or files are missing, or reference basenames are duplicated.
+    """
+
+    # Step 1: read the Stage 2 namelist and require only the fields consumed by
+    # Stage 3. Other valid Stage 2 fields are deliberately ignored here.
+    sampling_config_path, blocks = read_namelist(
+        config_path=sampling_config_file,
+    )
+    require_blocks(
+        blocks=blocks,
+        required_blocks=SAMPLING_REQUIRED_BLOCKS,
+    )
+
     run_block = blocks["run_test"]
+    require_fields(
+        block=run_block,
+        required_fields=SAMPLING_REQUIRED_FIELDS,
+        block_label="&run_test",
+    )
 
-    number_of_files = run_block.get("n_reference_files")
-    reference_values = run_block.get("reference_files")
-    sampled_directory_value = run_block.get("output_directory")
+    # Step 2: validate the file count, reference list, and sampled directory.
+    number_of_files = require_integer(
+        value=run_block["n_reference_files"],
+        field_label="n_reference_files",
+    )
+    if number_of_files < 1:
+        raise ConfigError("n_reference_files must be positive.")
 
-    if not isinstance(number_of_files, int) or number_of_files < 1:
-        raise ValueError("n_reference_files in the sampling config must be positive.")
-    if isinstance(reference_values, str):
-        reference_values = [reference_values]
-    if not isinstance(reference_values, list):
-        raise ValueError("reference_files must be a path or an ordered path list.")
+    reference_values = as_list(
+        value=run_block["reference_files"],
+    )
     if len(reference_values) != number_of_files:
-        raise ValueError(
+        raise ConfigError(
             "n_reference_files does not match the number of configured "
             "reference_files."
         )
-    if not isinstance(sampled_directory_value, str) or not sampled_directory_value.strip():
-        raise ValueError("The Stage 2 output_directory must be a non-empty path.")
 
-    sampled_directory = resolve_path(sampling_config_file, sampled_directory_value)
+    sampled_directory_value = require_string(
+        value=run_block["output_directory"],
+        field_label="Stage 2 output_directory",
+    )
+    sampled_directory = normalize_path(
+        value=sampled_directory_value,
+        config_path=sampling_config_path,
+        field_label="Stage 2 output_directory",
+    )
+    require_existing_directory(
+        path=sampled_directory,
+        field_label="Stage 2 output_directory",
+    )
+
+    # Step 3: preserve the configured order while constructing each file pair.
     pairs = []
     used_basenames = set()
 
-    # Preserve the explicit sampling order and ignore unrelated directory files.
-    for reference_value in reference_values:
-        if not isinstance(reference_value, str) or not reference_value.strip():
-            raise ValueError("Every reference_files entry must be a non-empty path.")
+    for reference_index, reference_value in enumerate(reference_values, start=1):
+        reference_label = f"reference_files entry {reference_index}"
+        reference_value = require_string(
+            value=reference_value,
+            field_label=reference_label,
+        )
+        reference_file = normalize_path(
+            value=reference_value,
+            config_path=sampling_config_path,
+            field_label=reference_label,
+        )
+        require_existing_file(
+            path=reference_file,
+            field_label=reference_label,
+        )
 
-        reference_file = resolve_path(sampling_config_file, reference_value)
         basename = reference_file.name
         if basename in used_basenames:
-            raise ValueError(f"Duplicate reference basename: {basename}")
+            raise ConfigError(f"Duplicate reference basename: {basename}")
         used_basenames.add(basename)
 
         sampled_file = sampled_directory / basename
-        if not reference_file.is_file():
-            raise FileNotFoundError(f"Reference file not found: {reference_file}")
-        if not sampled_file.is_file():
-            raise FileNotFoundError(f"Sampled file not found: {sampled_file}")
+        require_existing_file(
+            path=sampled_file,
+            field_label=f"sampled file for {basename}",
+        )
 
-        pair = FilePair(reference=reference_file, sampled=sampled_file)
+        pair = FilePair(
+            reference=reference_file,
+            sampled=sampled_file,
+        )
         pairs.append(pair)
 
     return pairs

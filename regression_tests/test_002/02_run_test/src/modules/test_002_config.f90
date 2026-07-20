@@ -70,6 +70,7 @@ contains
     config%n_samples = n_samples
     config%seed = seed
     config%plot_data = plot_data
+
     config%output_directory = trim(output_directory)
     allocate(config%reference_files(n_reference_files))
     do i = 1, n_reference_files

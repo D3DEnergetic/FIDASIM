@@ -1,5 +1,7 @@
 """Format and write the text comparison report."""
 
+from datetime import datetime
+
 
 def _format_result(result):
     """Format one reference-sampled comparison as a readable section."""
@@ -26,7 +28,15 @@ def _format_result(result):
 
 def write_report(results, output_directory):
     """Write per-file moments and an overall maximum-error summary."""
-    report_lines = ["test_002 distribution comparison", "=" * 32, ""]
+    computation_time = datetime.now().astimezone()
+    formatted_time = computation_time.strftime("%Y-%m-%d %H:%M:%S %Z")
+
+    report_lines = [
+        "test_002 distribution comparison",
+        "=" * 32,
+        f"Computed: {formatted_time}",
+        "",
+    ]
 
     # Add one readable section for every configured reference-sampled pair.
     for result in results:

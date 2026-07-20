@@ -25,12 +25,21 @@ cd regression_tests/test_002/02_run_test
 ./run.sh
 ```
 
-Running from `02_run_test` is required because the namelist paths are relative
-to the working directory. `run.sh` executes:
+`run.sh` is the supported wrapper around the Fortran executable. Run it from
+`02_run_test`; it validates and normalizes the user configuration before
+starting Fortran, then runs the optional plotting stage. In outline, it
+executes:
 
 ```bash
-./test_002 input_config.nml
+python3 normalize_config.py input_config.nml build/normalized_input_config.nml
+./test_002 build/normalized_input_config.nml
 python3 plot_sampled_data.py input_config.nml
+```
+
+To use another configuration file, pass its path to the wrapper:
+
+```bash
+./run.sh path/to/input_config.nml
 ```
 
 ## Dependencies
@@ -57,6 +66,7 @@ Activate an environment containing these packages before running `run.sh`.
 ```text
 02_run_test/
 ├── input_config.nml
+├── normalize_config.py
 ├── plot_sampled_data.py
 ├── run.sh
 ├── build/                        # generated object and module files
@@ -75,9 +85,10 @@ artifacts are isolated in `build/`.
 
 ## Input configuration
 
-The configuration uses Fortran namelist syntax. Paths are interpreted relative
-to the directory from which the program is run; the supported workflow runs it
-from `02_run_test`.
+The user configuration uses Fortran namelist syntax. The Python normalization
+step interprets relative paths from the directory containing this file and
+writes absolute paths to `build/normalized_input_config.nml`. The generated
+file contains only the `run_test` block consumed by Fortran.
 
 ```fortran
 &run_test
@@ -135,10 +146,11 @@ with the same basename.
 
 ### Path resolution
 
-The Fortran executable and Python plotter interpret relative paths from the
-current working directory. The supported workflow runs both programs from
-`02_run_test`, so paths in the supplied configuration are relative to that
-directory. Absolute paths are also accepted.
+The Python wrapper resolves relative paths from the directory containing the
+user configuration file. It validates that every reference file exists and
+passes a generated namelist containing absolute paths to Fortran. The plotter
+applies the same path rule when it reads the original configuration. Absolute
+paths are accepted unchanged.
 
 ## HDF5 data contract
 

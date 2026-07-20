@@ -32,10 +32,33 @@ def _transform_distribution_for_plot(values, scale):
     return values.copy()
 
 
-def plot_marginals(pair, reference, sampled, result, config):
-    """Overlay reference and sampled f_E and f_P on a two-panel figure."""
-    reference_energy, reference_pitch = calculate_marginals(reference)
-    sampled_energy, sampled_pitch = calculate_marginals(sampled)
+def plot_marginals(
+    pair,
+    reference,
+    sampled,
+    result,
+    output_directory,
+    plot_config,
+):
+    """Overlay reference and sampled f_E and f_P on a two-panel figure.
+
+    Args:
+        pair (FilePair): Paths identifying the current reference-sampled pair.
+        reference (DistributionData): Validated reference distribution.
+        sampled (DistributionData): Validated sampled distribution.
+        result (ComparisonResult): Scalar comparison errors for the pair.
+        output_directory (Path): Directory in which to write the PNG file.
+        plot_config (dict): Canonical ``plot_data_block`` settings.
+
+    Returns:
+        None.
+    """
+    reference_energy, reference_pitch = calculate_marginals(
+        distribution=reference,
+    )
+    sampled_energy, sampled_pitch = calculate_marginals(
+        distribution=sampled,
+    )
 
     figure, axes = plt.subplots(1, 2, figsize=(11, 4.8))
 
@@ -70,7 +93,7 @@ def plot_marginals(pair, reference, sampled, result, config):
     axes[1].grid(True, alpha=0.3)
     axes[1].legend()
 
-    if config.scale == "log":
+    if plot_config["scale"] == "log":
         axes[0].set_yscale("log")
         axes[1].set_yscale("log")
 
@@ -89,7 +112,7 @@ def plot_marginals(pair, reference, sampled, result, config):
     figure.text(0.5, 0.02, metrics_text, ha="center")
     figure.tight_layout(rect=(0.0, 0.08, 1.0, 0.93))
 
-    output_filename = config.output_directory / (
+    output_filename = output_directory / (
         f"{pair.reference.stem}_marginals.png"
     )
     figure.savefig(output_filename)
@@ -97,21 +120,38 @@ def plot_marginals(pair, reference, sampled, result, config):
     print(f"Wrote plot: {output_filename}")
 
 
-def plot_distributions(pair, reference, sampled, config):
-    """Plot reference and sampled f(E, P) with one shared color scale."""
+def plot_distributions(
+    pair,
+    reference,
+    sampled,
+    output_directory,
+    plot_config,
+):
+    """Plot reference and sampled f(E, P) with one shared color scale.
+
+    Args:
+        pair (FilePair): Paths identifying the current reference-sampled pair.
+        reference (DistributionData): Validated reference distribution.
+        sampled (DistributionData): Validated sampled distribution.
+        output_directory (Path): Directory in which to write the PNG file.
+        plot_config (dict): Canonical ``plot_data_block`` settings.
+
+    Returns:
+        None.
+    """
     reference_values = _transform_distribution_for_plot(
-        reference.values,
-        config.scale,
+        values=reference.values,
+        scale=plot_config["scale"],
     )
     sampled_values = _transform_distribution_for_plot(
-        sampled.values,
-        config.scale,
+        values=sampled.values,
+        scale=plot_config["scale"],
     )
     vmin, vmax = _resolve_plot_limits(
-        reference_values,
-        sampled_values,
-        config.fmin,
-        config.fmax,
+        reference_values=reference_values,
+        sampled_values=sampled_values,
+        fmin=plot_config["fmin"],
+        fmax=plot_config["fmax"],
     )
 
     figure, axes = plt.subplots(
@@ -137,7 +177,7 @@ def plot_distributions(pair, reference, sampled, config):
         extent=extent,
         vmin=vmin,
         vmax=vmax,
-        cmap=config.colormap,
+        cmap=plot_config["colormap"],
     )
     axes[1].imshow(
         sampled_values,
@@ -146,7 +186,7 @@ def plot_distributions(pair, reference, sampled, config):
         extent=extent,
         vmin=vmin,
         vmax=vmax,
-        cmap=config.colormap,
+        cmap=plot_config["colormap"],
     )
 
     axes[0].set_title("Reference f(E, P)")
@@ -162,9 +202,9 @@ def plot_distributions(pair, reference, sampled, config):
         f"Z = {selected_z:.2f} cm"
     )
 
-    if config.enable_colorbar:
+    if plot_config["enable_colorbar"]:
         colorbar_label = reference.units
-        if config.scale == "log":
+        if plot_config["scale"] == "log":
             colorbar_label = f"log10({colorbar_label})"
         figure.colorbar(
             reference_image,
@@ -174,7 +214,7 @@ def plot_distributions(pair, reference, sampled, config):
             pad=0.03,
         )
 
-    output_filename = config.output_directory / (
+    output_filename = output_directory / (
         f"{pair.reference.stem}_distributions.png"
     )
     figure.savefig(output_filename)

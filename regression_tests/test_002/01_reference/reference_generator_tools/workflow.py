@@ -158,13 +158,6 @@ def _write_output_file(
         h5f.attrs["description"] = "Extracted energy-pitch distribution slice"
 
 
-def _select_plot_path(output_paths, output_filename, output_index, save_data):
-    """Choose the PNG base path explicitly for saved or plot-only output."""
-    if save_data:
-        return output_paths[-1]
-    return _build_output_path(output_filename, output_index)
-
-
 def generate_outputs(config_path):
 
     # Read the input configuration file:
@@ -204,9 +197,16 @@ def generate_outputs(config_path):
         f_slice = f[z_index, r_index, :, :]
         f_energy_pitch = np.transpose(f_slice)
 
-        if input_config["save_data"]:
+        # Use the same indexed base name for this location's HDF5 and PNG files.
+        if input_config["save_data"] or input_config["plot_data"]:
             output_path = _build_output_path(output_filename, output_index)
+
+        if input_config["save_data"]:
+
+            # Append the output path to the list of generated outputs for reporting back to the caller:
             output_paths.append(output_path)
+
+            # Write the selected distribution and its metadata to an HDF5 file:
             _write_output_file(
                 output_path,
                 energy,
@@ -222,20 +222,15 @@ def generate_outputs(config_path):
                 input_path,
             )
 
+        # If requested, generate a PNG plot of the selected distribution:
         if input_config["plot_data"]:
-            plot_path = _select_plot_path(
-                output_paths,
-                output_filename,
-                output_index,
-                input_config["save_data"],
-            )
             _plot_distribution(
                 f_energy_pitch,
                 pitch,
                 energy,
                 selected_r,
                 selected_z,
-                plot_path,
+                output_path,
                 plot_config,
             )
 

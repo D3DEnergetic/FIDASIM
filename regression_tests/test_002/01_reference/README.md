@@ -1,3 +1,9 @@
+[Regression tests](../../README.md) / [Test 002](../README.md) / Reference data
+
+**Navigation:** Previous: — | [Up: Test 002](../README.md) | [Next: Run the sampler](../02_run_test/README.md)
+
+---
+
 # 4D distribution reference-data generator
 
 This tool ingests a supported four-dimensional distribution and extracts a
@@ -280,3 +286,7 @@ reference_generator_tools/
 3. Add its selection branch to `load_input_distribution()` in
    `readers/dispatcher.py`.
 4. Document the source schema under “Supported input formats.”
+
+---
+
+**Navigation:** Previous: — | [Up: Test 002](../README.md) | [Next: Run the sampler](../02_run_test/README.md)

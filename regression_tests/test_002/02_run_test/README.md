@@ -1,3 +1,9 @@
+[Regression tests](../../README.md) / [Test 002](../README.md) / Run sampler
+
+**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 002](../README.md) | [Next: Compare results](../03_compare/README.md)
+
+---
+
 # Energy-pitch distribution sampler
 
 This stage applies FIDASIM's two-dimensional inverse-transform sampler to the
@@ -53,15 +59,19 @@ Activate an environment containing these packages before running `run.sh`.
 ├── input_config.nml
 ├── plot_sampled_data.py
 ├── run.sh
+├── build/                        # generated object and module files
 ├── src/
 │   ├── test_002.f90
-│   ├── test_002_hdf5.f90
-│   └── test_002_sampling.f90
+│   └── modules/
+│       ├── test_002_config.f90
+│       ├── test_002_hdf5.f90
+│       └── test_002_sampling.f90
 └── output_data/                 # generated HDF5 files and PNG plots
 ```
 
-The executable is built as `02_run_test/test_002`. Object and module files are
-kept under `src/`.
+The executable is built as `02_run_test/test_002`. The main program is kept at
+the top of `src/`, reusable test modules are under `src/modules/`, and compiler
+artifacts are isolated in `build/`.
 
 ## Input configuration
 
@@ -92,33 +102,43 @@ from `02_run_test`.
 /
 ```
 
-### Run-test fields
+### `run_test` schema
 
-| Field | Meaning |
-| --- | --- |
-| `n_reference_files` | Positive number of reference files, up to 256. |
-| `reference_files` | Explicit ordered list of reference HDF5 paths. The first `n_reference_files` entries are used. |
-| `output_directory` | Directory for sampled HDF5 files and plots. It is created when needed. |
-| `n_samples` | Positive Int64 sample count used independently for every reference distribution. |
-| `seed` | Positive deterministic Int32 RNG seed. |
-| `plot_data` | Enables or disables the Python plotting stage. |
+| Variable | Type | Required | Default | Allowed values and behavior |
+| --- | --- | --- | --- | --- |
+| `n_reference_files` | Integer (Int32) | Yes | None | Number of reference files. Must be from 1 through 256. |
+| `reference_files` | String array | Yes | None | Ordered list of reference HDF5 paths. The first `n_reference_files` entries must all be nonempty. |
+| `output_directory` | String | Yes | None | Nonempty directory path for sampled HDF5 files and plots. It is created when needed. |
+| `n_samples` | Integer (Int64) | Yes | None | Number of samples drawn independently from each reference distribution. Must be positive. |
+| `seed` | Integer (Int32) | Yes | None | Deterministic serial RNG seed. Must be positive. |
+| `plot_data` | Logical | No | `.false.` | Enables or disables the Python plotting stage. |
 
 The serial RNG stream is reinitialized with the same `seed` before sampling
 each reference file. A file's results therefore do not depend on its position
 in the list or on which other files are processed.
 
-### Plot-data fields
+### `plot_data_block` schema
 
-| Field | Meaning |
-| --- | --- |
-| `scale` | `lin` plots `f`; `log` plots `log10(f)` for positive values. |
-| `fmin` | Lower color limit. Leave empty or use `auto` for the data minimum. |
-| `fmax` | Upper color limit. Leave empty or use `auto` for the data maximum. |
-| `enable_colorbar` | Enables or disables the color bar. |
-| `colormap` | `viridis`, `viridis_r`, `hot`, or `hot_r`. |
+| Variable | Type | Required | Default | Allowed values and behavior |
+| --- | --- | --- | --- | --- |
+| `scale` | String | No | `'lin'` | `'lin'` plots `f`; `'log'` plots `log10(f)` for positive values. Choices are case-insensitive. |
+| `fmin` | Real or string | No | Automatic | Lower color limit. Leave empty or use `'auto'` to use the minimum of the plotted values. |
+| `fmax` | Real or string | No | Automatic | Upper color limit. Leave empty or use `'auto'` to use the maximum of the plotted values. |
+| `enable_colorbar` | Logical | No | `.true.` | Enables or disables the color bar. |
+| `colormap` | String | No | `'viridis'` | Must be `'viridis'`, `'viridis_r'`, `'hot'`, or `'hot_r'`. Choices are case-insensitive. |
+
+This block is consumed by `plot_sampled_data.py` and affects the workflow only
+when `plot_data = .true.` in the `run_test` block.
 
 The plotter processes every `.h5` file in `output_directory` and writes a PNG
 with the same basename.
+
+### Path resolution
+
+The Fortran executable and Python plotter interpret relative paths from the
+current working directory. The supported workflow runs both programs from
+`02_run_test`, so paths in the supplied configuration are relative to that
+directory. Absolute paths are also accepted.
 
 ## HDF5 data contract
 
@@ -199,3 +219,7 @@ Each sampled file uses the reference basename:
 
 The HDF5 file follows the shared data contract above. The PNG is generated only
 when `plot_data = .true.`.
+
+---
+
+**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 002](../README.md) | [Next: Compare results](../03_compare/README.md)

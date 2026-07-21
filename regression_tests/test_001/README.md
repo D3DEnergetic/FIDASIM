@@ -1,6 +1,6 @@
 [Regression tests](../README.md) / Test 001
 
-**Navigation:** Previous: — | [Up: Regression tests](../README.md) | [Next: Test 002](../test_002/README.md)
+**Navigation:** Previous: — | [Up: Regression tests](../README.md) | [Next: Test 003](../test_003/README.md)
 
 ---
 
@@ -43,4 +43,4 @@ this test.
 
 ---
 
-**Navigation:** Previous: — | [Up: Regression tests](../README.md) | [Next: Test 002](../test_002/README.md)
+**Navigation:** Previous: — | [Up: Regression tests](../README.md) | [Next: Test 003](../test_003/README.md)

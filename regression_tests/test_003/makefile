@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-TEST_NAME  := test_002
+TEST_NAME  := test_003
 TEST_DIR   := 02_run_test
 SRC_DIR    := $(TEST_DIR)/src
 MODULE_DIR := $(SRC_DIR)/modules

@@ -1,6 +1,6 @@
-[Regression tests](../../README.md) / [Test 002](../README.md) / Compare results
+[Regression tests](../../README.md) / [Test 003](../README.md) / Compare results
 
-**Navigation:** [Previous: Run the sampler](../02_run_test/README.md) | [Up: Test 002](../README.md) | Next: —
+**Navigation:** [Previous: Run the sampler](../02_run_test/README.md) | [Up: Test 003](../README.md) | Next: —
 
 ---
 
@@ -17,7 +17,7 @@ Run the comparison from this directory in a Python environment containing the
 dependencies listed below:
 
 ```bash
-cd regression_tests/test_002/03_compare
+cd regression_tests/test_003/03_compare
 ./run.sh
 ```
 
@@ -157,4 +157,4 @@ Generated files are written under `output_data/` and are excluded from Git.
 
 ---
 
-**Navigation:** [Previous: Run the sampler](../02_run_test/README.md) | [Up: Test 002](../README.md) | Next: —
+**Navigation:** [Previous: Run the sampler](../02_run_test/README.md) | [Up: Test 003](../README.md) | Next: —

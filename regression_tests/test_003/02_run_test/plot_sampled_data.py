@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot the sampled two-dimensional distributions produced by test_002."""
+"""Plot the sampled two-dimensional distributions produced by test_003."""
 
 from pathlib import Path
 import sys

@@ -1,4 +1,4 @@
-module test_002_config
+module test_003_config
   use iso_fortran_env, only: Int32 => int32, Int64 => int64, output_unit
   implicit none
   private
@@ -82,7 +82,7 @@ contains
     type(SamplerConfig), intent(in) :: config
     integer :: i
 
-    write(output_unit, '(a)') 'test_002 configuration'
+    write(output_unit, '(a)') 'test_003 configuration'
     write(output_unit, '(a,i0)') '  n_reference_files: ', config%n_reference_files
     do i = 1, config%n_reference_files
       write(output_unit, '(a,i0,a,a)') '  reference_files(', i, '): ', &
@@ -94,4 +94,4 @@ contains
     write(output_unit, '(a,l1)') '  plot_data: ', config%plot_data
   end subroutine print_config
 
-end module test_002_config
+end module test_003_config

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Command-line entry point for the test_002 comparison workflow."""
+"""Command-line entry point for the test_003 comparison workflow."""
 
 import argparse
 from pathlib import Path

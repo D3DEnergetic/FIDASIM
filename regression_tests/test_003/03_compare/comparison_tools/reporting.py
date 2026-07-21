@@ -32,7 +32,7 @@ def write_report(results, output_directory):
     formatted_time = computation_time.strftime("%Y-%m-%d %H:%M:%S %Z")
 
     report_lines = [
-        "test_002 distribution comparison",
+        "test_003 distribution comparison",
         "=" * 32,
         f"Computed: {formatted_time}",
         "",

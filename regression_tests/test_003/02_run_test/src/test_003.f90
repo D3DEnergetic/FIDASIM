@@ -1,10 +1,10 @@
-program test_002
+program test_003
   use iso_fortran_env, only: Int64 => int64, Float64 => real64
-  use test_002_config, only: SamplerConfig, read_config, print_config
-  use test_002_hdf5, only: DistributionFunction2D, &
+  use test_003_config, only: SamplerConfig, read_config, print_config
+  use test_003_hdf5, only: DistributionFunction2D, &
     read_reference_distribution, print_reference_distribution, &
     write_sampled_distribution
-  use test_002_sampling, only: initialize_serial_rng, sample_distribution, &
+  use test_003_sampling, only: initialize_serial_rng, sample_distribution, &
     print_sampling_summary
   implicit none
 
@@ -16,7 +16,7 @@ program test_002
   integer :: i
 
   if (command_argument_count() /= 1) then
-    write(*, '(a)') 'Usage: test_002 <input_config.nml>'
+    write(*, '(a)') 'Usage: test_003 <input_config.nml>'
     error stop 'Expected exactly one command-line argument'
   end if
 
@@ -37,4 +37,4 @@ program test_002
       distribution%f_array_dimensions, distribution%denergy, &
       distribution%dpitch, config%n_samples, config%seed)
   end do
-end program test_002
+end program test_003

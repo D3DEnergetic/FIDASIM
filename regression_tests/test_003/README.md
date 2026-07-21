@@ -1,12 +1,12 @@
-[Regression tests](../README.md) / Test 002
+[Regression tests](../README.md) / Test 003
 
 **Navigation:** [Previous: Test 001](../test_001/README.md) | [Up: Regression tests](../README.md) | [Next: Reference data](01_reference/README.md)
 
 ---
 
-# Test 002: energy-pitch distribution sampling
+# Test 003: energy-pitch distribution sampling
 
-`test_002` checks FIDASIM's statistical sampling of a two-dimensional fast-ion
+`test_003` checks FIDASIM's statistical sampling of a two-dimensional fast-ion
 distribution, `f(E, pitch)`, where `pitch = v_parallel/v`. The test starts from
 trusted distributions, samples them with the same random-selection primitives
 used by FIDASIM, reconstructs them on their original grids, and compares
@@ -54,7 +54,7 @@ conda activate FIDASIM_env
 cd "$FIDASIM_DIR"
 make regression_tests
 
-cd regression_tests/test_002
+cd regression_tests/test_003
 ./run.sh
 ```
 
@@ -100,7 +100,7 @@ the Stage 2 input configuration as the ordered source of file pairs.
 ## Directory structure
 
 ```text
-test_002/
+test_003/
 ├── README.md                       # this portal
 ├── makefile
 ├── run.sh                          # run sampling and comparison

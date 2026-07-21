@@ -1,4 +1,4 @@
-module test_002_hdf5
+module test_003_hdf5
   use iso_fortran_env, only: Int32 => int32, Int64 => int64, &
     Float64 => real64, output_unit
   use ieee_arithmetic, only: ieee_is_finite
@@ -320,4 +320,4 @@ contains
     end if
   end subroutine check_hdf5
 
-end module test_002_hdf5
+end module test_003_hdf5

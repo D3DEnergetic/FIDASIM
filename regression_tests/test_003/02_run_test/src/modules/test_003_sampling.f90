@@ -1,8 +1,8 @@
-module test_002_sampling
+module test_003_sampling
   use iso_fortran_env, only: Int32 => int32, Int64 => int64, &
     Float64 => real64, output_unit
   use utilities, only: rng, rng_init, randind, randu
-  use test_002_hdf5, only: DistributionFunction2D
+  use test_003_hdf5, only: DistributionFunction2D
   implicit none
   private
 
@@ -106,4 +106,4 @@ contains
     write(output_unit, '(a,es14.6)') '  sampled maximum:   ', maxval(sampled_f_array)
   end subroutine print_sampling_summary
 
-end module test_002_sampling
+end module test_003_sampling

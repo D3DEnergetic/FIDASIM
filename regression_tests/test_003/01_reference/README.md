@@ -1,6 +1,6 @@
-[Regression tests](../../README.md) / [Test 002](../README.md) / Reference data
+[Regression tests](../../README.md) / [Test 003](../README.md) / Reference data
 
-**Navigation:** Previous: — | [Up: Test 002](../README.md) | [Next: Run the sampler](../02_run_test/README.md)
+**Navigation:** Previous: — | [Up: Test 003](../README.md) | [Next: Run the sampler](../02_run_test/README.md)
 
 ---
 
@@ -36,7 +36,7 @@ conda activate reference_data_env
 Run the tool from its directory:
 
 ```bash
-cd regression_tests/test_002/01_reference
+cd regression_tests/test_003/01_reference
 python generate_reference_data.py input_config.nml
 ```
 
@@ -293,4 +293,4 @@ reference_generator_tools/
 
 ---
 
-**Navigation:** Previous: — | [Up: Test 002](../README.md) | [Next: Run the sampler](../02_run_test/README.md)
+**Navigation:** Previous: — | [Up: Test 003](../README.md) | [Next: Run the sampler](../02_run_test/README.md)

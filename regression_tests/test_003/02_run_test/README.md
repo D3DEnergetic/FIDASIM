@@ -1,6 +1,6 @@
-[Regression tests](../../README.md) / [Test 002](../README.md) / Run sampler
+[Regression tests](../../README.md) / [Test 003](../README.md) / Run sampler
 
-**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 002](../README.md) | [Next: Compare results](../03_compare/README.md)
+**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 003](../README.md) | [Next: Compare results](../03_compare/README.md)
 
 ---
 
@@ -21,7 +21,7 @@ below, then build from the FIDASIM repository root and run from `02_run_test`:
 cd "$FIDASIM_DIR"
 make regression_tests
 
-cd regression_tests/test_002/02_run_test
+cd regression_tests/test_003/02_run_test
 ./run.sh
 ```
 
@@ -32,7 +32,7 @@ executes:
 
 ```bash
 python3 normalize_config.py input_config.nml build/normalized_input_config.nml
-./test_002 build/normalized_input_config.nml
+./test_003 build/normalized_input_config.nml
 python3 plot_sampled_data.py input_config.nml
 ```
 
@@ -71,15 +71,15 @@ Activate an environment containing these packages before running `run.sh`.
 ├── run.sh
 ├── build/                        # generated object and module files
 ├── src/
-│   ├── test_002.f90
+│   ├── test_003.f90
 │   └── modules/
-│       ├── test_002_config.f90
-│       ├── test_002_hdf5.f90
-│       └── test_002_sampling.f90
+│       ├── test_003_config.f90
+│       ├── test_003_hdf5.f90
+│       └── test_003_sampling.f90
 └── output_data/                 # generated HDF5 files and PNG plots
 ```
 
-The executable is built as `02_run_test/test_002`. The main program is kept at
+The executable is built as `02_run_test/test_003`. The main program is kept at
 the top of `src/`, reusable test modules are under `src/modules/`, and compiler
 artifacts are isolated in `build/`.
 
@@ -243,4 +243,4 @@ when `plot_data = .true.`.
 
 ---
 
-**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 002](../README.md) | [Next: Compare results](../03_compare/README.md)
+**Navigation:** [Previous: Reference data](../01_reference/README.md) | [Up: Test 003](../README.md) | [Next: Compare results](../03_compare/README.md)

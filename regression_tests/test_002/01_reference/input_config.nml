@@ -1,0 +1,28 @@
+&input
+  input_file_type = 'cql3d_f4d'
+  input_filename = '/home/jfcm/Documents/compX/RFSCIDAC/FIDASIM_work/Step_11_compute_nonthermal_rates/Step_0_input/60keV_45deg_nstop_196/WHAM2expander_NB100_nitr40npz2_iter0_sh09_iy300jx300lz120_yup5_f4d_001.nc'
+
+  species = 'D'
+  atomic_number = 1
+  mass_number = 2
+  charge_state = 1
+
+  r_locations = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+  z_locations = 0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0
+
+  plot_data = .true.
+  save_data = .true.
+/
+
+&plot_data_block
+  scale = 'log'
+  fmin = 14
+  fmax = 20
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  contour_levels = 20
+/
+
+&save_data_block
+  output_filename = 'output_data/cql3d_f4d.h5'
+/

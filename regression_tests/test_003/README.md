@@ -1,6 +1,6 @@
 [Regression tests](../README.md) / Test 003
 
-**Navigation:** [Previous: Test 001](../test_001/README.md) | [Up: Regression tests](../README.md) | [Next: Reference data](01_reference/README.md)
+**Navigation:** [Previous: Test 002](../test_002/README.md) | [Up: Regression tests](../README.md) | [Next: Reference data](01_reference/README.md)
 
 ---
 
@@ -137,4 +137,4 @@ clarity.
 
 ---
 
-**Navigation:** [Previous: Test 001](../test_001/README.md) | [Up: Regression tests](../README.md) | [Next: Reference data](01_reference/README.md)
+**Navigation:** [Previous: Test 002](../test_002/README.md) | [Up: Regression tests](../README.md) | [Next: Reference data](01_reference/README.md)

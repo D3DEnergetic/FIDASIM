@@ -10,6 +10,7 @@ result in separate stages.
 | Test | Purpose | Documentation |
 | --- | --- | --- |
 | `test_001` | Mean-free-path regression workflow. | [Test 001 portal](test_001/README.md) |
+| `test_002` | Conversion of CQL3D velocity-space distributions into the FIDASIM energy-pitch representation. | [Test 002 portal](test_002/README.md) |
 | `test_003` | Two-dimensional inverse-transform sampling of fast-ion energy-pitch distributions. | [Test 003 portal](test_003/README.md) |
 
 ## Build

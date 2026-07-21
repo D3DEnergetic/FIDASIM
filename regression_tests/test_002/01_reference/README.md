@@ -172,9 +172,11 @@ This reader is implemented. It requires the following datasets:
 | `pitch` | Numeric, read as Float64 | `(npitch)` | Dimensionless | Pitch grid, $v_\parallel/v$. |
 | `energy` | Numeric, read as Float64 | `(nenergy)` | `keV` | Fast-ion energy grid. |
 | `f` | Numeric, read as Float64 | `(nz, nr, npitch, nenergy)` | `fast-ions/(dE*dP*cm^3)` | Distribution on the four grids. |
+| `denf` | Numeric, read as Float64 | `(nz, nr)` | `cm^-3` | Fast-ion density on the spatial grid. |
 
-The reader verifies that the shape of `f` matches the grid lengths. Additional
-datasets such as `denf`, `r2d`, `z2d`, and `time` are ignored.
+The reader verifies that the shapes of `f` and `denf` match the corresponding
+grid lengths. Additional datasets such as `r2d`, `z2d`, and `time` are
+ignored.
 
 The required input datasets do not reliably identify the particle species,
 atomic number, mass number, or charge state. Supply these values in the
@@ -204,6 +206,7 @@ extracts the corresponding distribution, and writes it with dimensions
 | `energy_grid` | Float64 | `(nenergy)` | `keV` | Energy coordinates of `f_array`. |
 | `pitch_grid` | Float64 | `(npitch)` | Dimensionless | Pitch coordinates of `f_array`. |
 | `f_array` | Float64 | `(nenergy, npitch)` | `fast-ions/(dE*dP*cm^3)` | Distribution at the selected spatial grid point. |
+| `denf` | Float64 | `(1)` | `cm^-3` | Fast-ion density supplied at the selected spatial grid point. |
 | `species` | UTF-8 string | Scalar | n/a | Normalized species label. |
 | `atomic_number` | Integer | Scalar | Dimensionless | Number of protons, $Z$. |
 | `mass_number` | Integer | Scalar | Dimensionless | Number of protons and neutrons, $A$. |
@@ -245,7 +248,7 @@ Each reader may interpret its source velocity coordinates and dimension order
 differently, but it must return:
 
 ```python
-z, r, pitch, energy, f
+z, r, pitch, energy, f, denf
 ```
 
 with this canonical representation:
@@ -257,6 +260,7 @@ with this canonical representation:
 | `pitch` | `(npitch)` | Dimensionless pitch grid |
 | `energy` | `(nenergy)` | Energy grid in `keV` |
 | `f` | `(nz, nr, npitch, nenergy)` | Distribution on the canonical grids |
+| `denf` | `(nz, nr)` | Fast-ion density on the spatial grid |
 
 The reader owns any coordinate conversion, unit conversion, and array
 reordering needed by its source format.

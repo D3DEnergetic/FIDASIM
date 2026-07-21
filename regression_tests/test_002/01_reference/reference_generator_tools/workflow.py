@@ -94,12 +94,14 @@ def _write_output_file(
     z_index,
     input_config,
     input_path,
+    source_density,
 ):
     """Write one selected distribution and its metadata to HDF5."""
     with h5py.File(output_path, "w") as h5f:
         h5f.create_dataset("energy_grid", data=energy)
         h5f.create_dataset("pitch_grid", data=pitch)
         h5f.create_dataset("f_array", data=distribution)
+        h5f.create_dataset("denf", data=np.array([source_density], dtype=float))
 
         string_type = h5py.string_dtype(encoding="utf-8")
         h5f.create_dataset(
@@ -120,6 +122,7 @@ def _write_output_file(
         h5f["energy_grid"].attrs["units"] = "keV"
         h5f["pitch_grid"].attrs["units"] = "dimensionless"
         h5f["f_array"].attrs["units"] = "fast-ions/(dE*dP*cm^3)"
+        h5f["denf"].attrs["units"] = "cm^-3"
         h5f["species"].attrs["units"] = "n/a"
         h5f["atomic_number"].attrs["units"] = "dimensionless"
         h5f["mass_number"].attrs["units"] = "dimensionless"
@@ -141,6 +144,9 @@ def _write_output_file(
         h5f["energy_grid"].attrs["description"] = "Fast-ion energy grid"
         h5f["pitch_grid"].attrs["description"] = "Fast-ion pitch grid"
         h5f["f_array"].attrs["description"] = "Selected fast-ion distribution"
+        h5f["denf"].attrs["description"] = (
+            "Fast-ion density at the selected spatial grid point"
+        )
         h5f["species"].attrs["description"] = "Normalized particle species label"
         h5f["atomic_number"].attrs["description"] = "Number of protons"
         h5f["mass_number"].attrs["description"] = (
@@ -179,7 +185,7 @@ def generate_outputs(config_path):
     # The reader dispatcher uses the configured input type to select the
     # appropriate reader. That reader returns the common representation used
     # by the format-independent workflow below.
-    z, r, pitch, energy, f = load_input_distribution(config)
+    z, r, pitch, energy, f, denf = load_input_distribution(config)
 
     r_locations = input_config["r_locations"]
     z_locations = input_config["z_locations"]
@@ -200,6 +206,9 @@ def generate_outputs(config_path):
 
         f_slice = f[z_index, r_index, :, :]
         f_energy_pitch = np.transpose(f_slice)
+
+        # Preserve the density supplied with the source FIDASIM distribution.
+        source_density = float(denf[z_index, r_index])
 
         # Use the same indexed base name for this location's HDF5 and PNG files.
         if input_config["save_data"] or input_config["plot_data"]:
@@ -224,6 +233,7 @@ def generate_outputs(config_path):
                 z_index,
                 input_config,
                 input_path,
+                source_density,
             )
 
         # If requested, generate a PNG plot of the selected distribution:

@@ -159,7 +159,16 @@ schema documented under
 [Generated output files](../01_reference/README.md#generated-output-files) in
 the `01_reference` README. Grid and particle metadata, datatypes, units, and
 descriptions are copied from the reference file. The sampled file replaces
-only the numerical contents and description of `f_array`.
+the numerical contents and description of `f_array`. It also replaces `denf`
+with the density calculated from the sampled energy-pitch distribution:
+
+```text
+denf = sum(f_array) * abs(denergy * dpitch)
+```
+
+Stage 3 does not compare this value yet. The density-preservation check will
+be enabled after the CQL3D-to-FIDASIM distribution convention is established
+by the dedicated conversion regression test.
 
 Before sampling, this stage additionally verifies that:
 

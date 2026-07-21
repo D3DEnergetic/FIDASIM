@@ -207,21 +207,25 @@ contains
   end subroutine print_reference_distribution
 
   subroutine write_sampled_distribution(reference_filename, output_directory, &
-      sampled_f_array, f_array_dimensions, number_of_samples, seed)
+      sampled_f_array, f_array_dimensions, denergy, dpitch, &
+      number_of_samples, seed)
     character(len=*), intent(in) :: reference_filename, output_directory
     real(Float64), intent(in) :: sampled_f_array(:,:)
     integer(HSIZE_T), intent(in) :: f_array_dimensions(:)
+    real(Float64), intent(in) :: denergy, dpitch
     integer(Int64), intent(in) :: number_of_samples
     integer(Int32), intent(in) :: seed
 
     character(len=4096) :: output_filename
     character(len=32) :: number_of_samples_string
-    character(len=32), parameter :: dataset_names(13) = [character(len=32) :: &
+    character(len=32), parameter :: dataset_names(14) = [character(len=32) :: &
       'energy_grid', 'pitch_grid', 'f_array', 'species', 'atomic_number', &
       'mass_number', 'charge_state', 'requested_r', 'requested_z', &
-      'selected_r', 'selected_z', 'r_index', 'z_index']
+      'selected_r', 'selected_z', 'r_index', 'z_index', 'denf']
     integer(HID_T) :: reference_id, output_id
-    integer(HID_T) :: f_array_id
+    integer(HID_T) :: f_array_id, denf_id
+    integer(HSIZE_T), parameter :: scalar_dimensions(1) = [1_HSIZE_T]
+    real(Float64) :: sampled_density
     integer :: error, i, exit_status
 
     call execute_command_line('mkdir -p "'//trim(output_directory)//'"', &
@@ -253,6 +257,19 @@ contains
     call h5ltset_attribute_string_f(output_id, 'f_array', 'description', &
       'Sampled reconstruction of the fast-ion distribution', error)
     call check_hdf5(error, 'setting f_array description', output_filename)
+
+    ! Store the density represented by the reconstructed energy-pitch array.
+    sampled_density = sum(sampled_f_array) * abs(denergy * dpitch)
+    call h5dopen_f(output_id, 'denf', denf_id, error)
+    call check_hdf5(error, 'opening sampled denf', output_filename)
+    call h5dwrite_f(denf_id, H5T_NATIVE_DOUBLE, [sampled_density], &
+      scalar_dimensions, error)
+    call check_hdf5(error, 'writing sampled denf', output_filename)
+    call h5dclose_f(denf_id, error)
+    call check_hdf5(error, 'closing sampled denf', output_filename)
+    call h5ltset_attribute_string_f(output_id, 'denf', 'description', &
+      'Density calculated from the sampled energy-pitch distribution', error)
+    call check_hdf5(error, 'setting denf description', output_filename)
 
     call h5ltset_attribute_string_f(output_id, '/', 'description', &
       'Sampled energy-pitch distribution reconstruction', error)

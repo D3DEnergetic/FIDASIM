@@ -34,6 +34,7 @@ program test_002
       sampled_f_array)
     call write_sampled_distribution(trim(config%reference_files(i)), &
       trim(config%output_directory), sampled_f_array, &
-      distribution%f_array_dimensions, config%n_samples, config%seed)
+      distribution%f_array_dimensions, distribution%denergy, &
+      distribution%dpitch, config%n_samples, config%seed)
   end do
 end program test_002

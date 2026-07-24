@@ -18,13 +18,13 @@ dependencies listed below:
 
 ```bash
 cd regression_tests/test_003/03_compare
-./run.sh
+./run.sh input_config_A.nml
 ```
 
 `run.sh` executes:
 
 ```bash
-python3 compare_distributions.py input_config.nml
+./run.sh input_config_A.nml
 ```
 
 ## Dependencies
@@ -39,7 +39,7 @@ python3 compare_distributions.py input_config.nml
 ```text
 03_compare/
 ├── compare_distributions.py       # thin command-line entry point
-├── input_config.nml
+├── input_config_A.nml
 ├── run.sh
 ├── comparison_tools/
 │   ├── __init__.py                # public run_comparison API
@@ -61,8 +61,9 @@ each step.
 
 ```fortran
 &compare
-  sampling_config_file = '../02_run_test/input_config.nml'
-  output_directory = 'output_data'
+  comment = 'Dataset A: 60 keV neutral beam at 45 degrees'
+  sampling_config_file = '../02_run_test/input_config_A.nml'
+  output_directory = 'output_data/dataset_A'
   generate_plots = .true.
 /
 
@@ -72,6 +73,7 @@ each step.
   fmax =
   enable_colorbar = .true.
   colormap = 'viridis'
+  emax = 150.0
 /
 ```
 
@@ -85,6 +87,7 @@ the same basename. It does not scan either directory for unrelated HDF5 files.
 
 | Variable | Type | Required | Default | Allowed values and behavior |
 | --- | --- | --- | --- | --- |
+| `comment` | String | No | None | Human-readable description of the dataset collection. |
 | `sampling_config_file` | String | Yes | None | Nonempty path to the Stage 2 configuration used for sampling. Stage 3 reads its ordered reference-file list and sampled-output directory. |
 | `output_directory` | String | Yes | None | Nonempty directory path for the comparison report and figures. It is created when needed. |
 | `generate_plots` | Logical | No | `.true.` | Enables or disables both comparison figures for every file pair. The text report is always written. |
@@ -98,6 +101,7 @@ the same basename. It does not scan either directory for unrelated HDF5 files.
 | `fmax` | Real or string | No | Automatic | Upper limit of the shared 2D color scale. Leave empty or use `'auto'` to use the maximum across both distributions. It does not set a marginal-axis limit. |
 | `enable_colorbar` | Logical | No | `.true.` | Enables or disables the shared color bar on the 2D comparison figure. |
 | `colormap` | String | No | `'viridis'` | Must be `'viridis'`, `'viridis_r'`, `'hot'`, or `'hot_r'`. Choices are case-insensitive. |
+| `emax` | Real | No | `150.0` | Maximum displayed energy in keV for the marginal and two-dimensional comparison figures. Must be positive. |
 
 The plotting choices intentionally match Stage 2. This block affects the
 workflow only when `generate_plots = .true.` in the `compare` block.

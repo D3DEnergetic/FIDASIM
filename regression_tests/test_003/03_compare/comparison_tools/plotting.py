@@ -72,6 +72,7 @@ def plot_marginals(
         linewidth=2,
     )
     axes[0].set_xlabel("Energy [keV]")
+    axes[0].set_xlim(0.0, plot_config["emax"])
     axes[0].set_ylabel(r"$f_E(E)$")
     axes[0].set_title("Pitch-integrated distribution")
     axes[0].grid(True, alpha=0.3)
@@ -193,6 +194,7 @@ def plot_distributions(
     axes[1].set_title("Sampled f(E, P)")
     for axis in axes:
         axis.set_xlabel("Pitch")
+        axis.set_ylim(0.0, plot_config["emax"])
     axes[0].set_ylabel("Energy [keV]")
 
     selected_r = reference.metadata["selected_r"]

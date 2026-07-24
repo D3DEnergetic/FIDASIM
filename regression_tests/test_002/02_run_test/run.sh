@@ -1,2 +1,9 @@
 #!/bin/bash
-python convert_distributions.py input_config.nml
+set -e
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ./run.sh <input_config.nml>"
+    exit 1
+fi
+
+python3 convert_distributions.py "$1"

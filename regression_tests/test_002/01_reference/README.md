@@ -31,11 +31,11 @@ From the Stage 1 directory:
 
 ```bash
 cd regression_tests/test_002/01_reference
-./run.sh
+./run.sh input_config_A.nml
 ```
 
-`run.sh` passes `input_config.nml` to `generate_reference_data.py`. Paths in
-the configuration are resolved relative to the configuration file.
+`run.sh` passes the selected configuration to `generate_reference_data.py`.
+Paths are resolved relative to that configuration file.
 
 ## Configuration
 
@@ -53,6 +53,7 @@ user-facing workflow.
 
 | Field | Required | Description |
 |---|---|---|
+| `comment` | No | Human-readable description of the dataset collection |
 | `input_file_type` | Yes | Input format; currently `cql3d_f4d` |
 | `input_filename` | Yes | CQL3D F4D NetCDF file |
 | `species` | Yes | Fast-ion species: `H`, `D`, or `T` |
@@ -72,8 +73,9 @@ This block is required by the Stage 1 workflow.
 |---|---|---|
 | `output_filename` | Yes | Base `.h5` or `.hdf5` path; a three-digit case number is inserted before the extension |
 
-For example, `output_data/cql3d_f4d.h5` produces
-`cql3d_f4d_001.h5`, `cql3d_f4d_002.h5`, and so on.
+For example, `output_data/dataset_A/cql3d_f4d.h5` produces
+`output_data/dataset_A/cql3d_f4d_001.h5`,
+`cql3d_f4d_002.h5`, and so on in the same dataset directory.
 
 ## Generated output files
 
@@ -82,8 +84,9 @@ For every configured location, Stage 1 writes:
 - One indexed HDF5 reference file containing the distribution and moments.
 - One same-basename PNG when `plot_data = .true.`.
 
-After all locations are processed, `reference_moments.txt` summarizes their
-density, parallel temperature, and perpendicular temperature.
+After all locations are processed, `reference_moments.txt` is written beside
+the indexed files and summarizes their density, parallel temperature, and
+perpendicular temperature.
 
 ## Reference HDF5 schema
 

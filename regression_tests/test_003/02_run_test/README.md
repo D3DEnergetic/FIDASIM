@@ -22,7 +22,7 @@ cd "$FIDASIM_DIR"
 make regression_tests
 
 cd regression_tests/test_003/02_run_test
-./run.sh
+./run.sh input_config_A.nml
 ```
 
 `run.sh` is the supported wrapper around the Fortran executable. Run it from
@@ -31,15 +31,15 @@ starting Fortran, then runs the optional plotting stage. In outline, it
 executes:
 
 ```bash
-python3 normalize_config.py input_config.nml build/normalized_input_config.nml
+python3 normalize_config.py input_config_A.nml build/normalized_input_config.nml
 ./test_003 build/normalized_input_config.nml
-python3 plot_sampled_data.py input_config.nml
+python3 plot_sampled_data.py input_config_A.nml
 ```
 
 To use another configuration file, pass its path to the wrapper:
 
 ```bash
-./run.sh path/to/input_config.nml
+./run.sh input_config_A.nml
 ```
 
 ## Dependencies
@@ -65,7 +65,7 @@ Activate an environment containing these packages before running `run.sh`.
 
 ```text
 02_run_test/
-├── input_config.nml
+├── input_config_A.nml
 ├── normalize_config.py
 ├── plot_sampled_data.py
 ├── run.sh
@@ -92,13 +92,16 @@ file contains only the `run_test` block consumed by Fortran.
 
 ```fortran
 &run_test
-  n_reference_files = 4
+  n_reference_files = 7
   reference_files =
-    '../01_reference/output_data/f_array_001.h5',
-    '../01_reference/output_data/f_array_002.h5',
-    '../01_reference/output_data/f_array_003.h5',
-    '../01_reference/output_data/f_array_004.h5'
-  output_directory = 'output_data'
+    '../01_reference/output_data/dataset_A/f_array_001.h5',
+    '../01_reference/output_data/dataset_A/f_array_002.h5',
+    '../01_reference/output_data/dataset_A/f_array_003.h5',
+    '../01_reference/output_data/dataset_A/f_array_004.h5',
+    '../01_reference/output_data/dataset_A/f_array_005.h5',
+    '../01_reference/output_data/dataset_A/f_array_006.h5',
+    '../01_reference/output_data/dataset_A/f_array_007.h5'
+  output_directory = 'output_data/dataset_A'
   n_samples = 1000000
   seed = 12345
   plot_data = .true.
@@ -110,6 +113,7 @@ file contains only the `run_test` block consumed by Fortran.
   fmax =
   enable_colorbar = .true.
   colormap = 'viridis'
+  emax = 150.0
 /
 ```
 
@@ -117,6 +121,7 @@ file contains only the `run_test` block consumed by Fortran.
 
 | Variable | Type | Required | Default | Allowed values and behavior |
 | --- | --- | --- | --- | --- |
+| `comment` | String | No | None | Human-readable description of the dataset collection. It is not passed to the Fortran executable. |
 | `n_reference_files` | Integer (Int32) | Yes | None | Number of reference files. Must be from 1 through 256. |
 | `reference_files` | String array | Yes | None | Ordered list of reference HDF5 paths. The first `n_reference_files` entries must all be nonempty. |
 | `output_directory` | String | Yes | None | Nonempty directory path for sampled HDF5 files and plots. It is created when needed. |
@@ -137,6 +142,7 @@ in the list or on which other files are processed.
 | `fmax` | Real or string | No | Automatic | Upper color limit. Leave empty or use `'auto'` to use the maximum of the plotted values. |
 | `enable_colorbar` | Logical | No | `.true.` | Enables or disables the color bar. |
 | `colormap` | String | No | `'viridis'` | Must be `'viridis'`, `'viridis_r'`, `'hot'`, or `'hot_r'`. Choices are case-insensitive. |
+| `emax` | Real | No | `150.0` | Maximum displayed energy in keV. Must be positive. |
 
 This block is consumed by `plot_sampled_data.py` and affects the workflow only
 when `plot_data = .true.` in the `run_test` block.
@@ -233,9 +239,9 @@ match apart from floating-point rounding.
 Each sampled file uses the reference basename:
 
 ```text
-01_reference/output_data/f_array_001.h5
-02_run_test/output_data/f_array_001.h5
-02_run_test/output_data/f_array_001.png
+01_reference/output_data/dataset_A/f_array_001.h5
+02_run_test/output_data/dataset_A/f_array_001.h5
+02_run_test/output_data/dataset_A/f_array_001.png
 ```
 
 The HDF5 file follows the shared data contract above. The PNG is generated only

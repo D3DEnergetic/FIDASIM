@@ -47,6 +47,7 @@ PLOT_DATA_SCHEMA = {
         "fmax",
         "enable_colorbar",
         "colormap",
+        "emax",
     ],
 }
 
@@ -199,6 +200,12 @@ def read_config(config_filename):
         value=plot_block.get("fmax"),
         field_label="fmax",
     )
+    emax = require_real(
+        value=plot_block.get("emax", 150.0),
+        field_label="emax",
+    )
+    if emax <= 0.0:
+        raise ConfigError("emax must be greater than zero.")
 
     # Step 4: return canonical blocks that preserve the namelist structure.
     return {
@@ -212,6 +219,7 @@ def read_config(config_filename):
             "fmax": fmax,
             "enable_colorbar": enable_colorbar,
             "colormap": colormap,
+            "emax": emax,
         },
     }
 
@@ -283,6 +291,7 @@ def plot_sampled_file(filename, plot_config):
     )
     axes.set_xlabel("pitch")
     axes.set_ylabel("energy [keV]")
+    axes.set_ylim(0.0, plot_config["emax"])
     axes.set_title(
         f"Sampled f(E, pitch) at R = {selected_r:.2f} cm, "
         f"Z = {selected_z:.2f} cm"

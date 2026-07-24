@@ -1,0 +1,25 @@
+&run_test
+  comment = 'Dataset A: 60 keV neutral beam at 45 degrees'
+  n_reference_files = 7
+  reference_files =
+    '../01_reference/output_data/dataset_A/f_array_001.h5',
+    '../01_reference/output_data/dataset_A/f_array_002.h5',
+    '../01_reference/output_data/dataset_A/f_array_003.h5',
+    '../01_reference/output_data/dataset_A/f_array_004.h5',
+    '../01_reference/output_data/dataset_A/f_array_005.h5',
+    '../01_reference/output_data/dataset_A/f_array_006.h5',
+    '../01_reference/output_data/dataset_A/f_array_007.h5'
+  output_directory = 'output_data/dataset_A'
+  n_samples = 1000000
+  seed = 12345
+  plot_data = .true.
+/
+
+&plot_data_block
+  scale = 'lin'
+  fmin = 'auto'
+  fmax = 'auto'
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  emax = 150.0
+/

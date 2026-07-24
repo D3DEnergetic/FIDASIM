@@ -1,7 +1,12 @@
 #!/bin/bash
 set -e
 
-config_file="${1:-input_config.nml}"
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ./run.sh <input_config.nml>"
+    exit 1
+fi
+
+config_file="$1"
 normalized_config="build/normalized_input_config.nml"
 
 python3 normalize_config.py "${config_file}" "${normalized_config}"

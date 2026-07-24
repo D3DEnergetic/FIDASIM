@@ -1,0 +1,20 @@
+&input
+  comment = 'Dataset A: 60 keV neutral beam at 45 degrees'
+  input_config = '../../test_002/02_run_test/input_config_A.nml'
+
+  plot_data = .true.
+  save_data = .true.
+/
+
+&plot_data_block
+  scale = 'lin'
+  fmin = 'auto'
+  fmax = 'auto'
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  emax = 150.0
+/
+
+&save_data_block
+  output_filename = 'output_data/dataset_A/f_array.h5'
+/

@@ -61,20 +61,38 @@ cd regression_tests/test_003
 If a different Conda environment contains the required packages, activate
 that environment instead.
 
-The top-level runner uses the committed reference HDF5 files. It runs the
-sampling workflow in `02_run_test` and then the comparison workflow in
-`03_compare`. It does not regenerate the trusted Stage 1 reference data.
+The top-level runner executes `02_run_test` and `03_compare` for each
+configuration listed in its short `config_files` array. Add or remove
+filenames in that array to control which collections are included in a
+regression run. Each listed filename must exist in both stages.
+
+Stage 1 reference generation is intentionally excluded. A developer must run
+the appropriate `01_reference/run.sh input_config_<letter>.nml` command
+manually when the committed reference data needs to be regenerated.
+
+## Dataset collections
+
+The same letter identifies a collection across Test 002 and Test 003. Test 003
+Stage 1 points to the matching Test 002 Stage 2 configuration and writes its
+compact sampler references under the corresponding output directory.
+
+| Collection | Output directory | Description |
+| --- | --- | --- |
+| `A` | `dataset_A` | 60 keV neutral beam at 45°, inherited from Test 002 collection A. |
+
+The descriptive `comment` field inside each configuration makes its physical
+meaning visible without encoding those details in the filename.
 
 ## Workflow
 
 | Stage | Purpose | Main outputs |
 | --- | --- | --- |
-| [`01_reference`](01_reference/README.md) | Extract trusted `f(E, pitch)` slices from a supported source distribution. | Reference HDF5 files and optional PNG plots. |
+| [`01_reference`](01_reference/README.md) | Adapt the correctly transformed Test 002 outputs into trusted compact `f(E, pitch)` fixtures. | Reference HDF5 files and optional PNG plots. |
 | [`02_run_test`](02_run_test/README.md) | Sample each reference distribution and reconstruct it on the same grid. | Sampled HDF5 files and optional PNG plots. |
 | [`03_compare`](03_compare/README.md) | Compare reference and sampled marginals, density, parallel temperature, and perpendicular temperature. | Comparison figures and a text report. |
 
 ```text
-Source fast-ion distribution
+Correct Test 002 FIDASIM distributions
             │
             ▼
       01_reference
@@ -97,33 +115,37 @@ Stage 2 preserves that dataset schema and metadata while replacing `f_array`
 with the sampled reconstruction and adding sampling provenance. Stage 3 uses
 the Stage 2 input configuration as the ordered source of file pairs.
 
+Test 003 Stage 1 follows the Test 002 Stage 2 configuration only when trusted
+references are intentionally regenerated. The seven compact Stage 1 fixtures
+are committed, so ordinary Test 003 runs remain self-contained.
+
 ## Directory structure
 
 ```text
 test_003/
 ├── README.md                       # this portal
 ├── makefile
-├── run.sh                          # run sampling and comparison
+├── run.sh                          # run sampling and comparison for every listed collection
 ├── 01_reference/
 │   ├── README.md
-│   ├── input_config.nml
+│   ├── input_config_A.nml
 │   ├── generate_reference_data.py
 │   ├── reference_generator_tools/
-│   └── output_data/
+│   └── output_data/dataset_A/
 ├── 02_run_test/
 │   ├── README.md
-│   ├── input_config.nml
+│   ├── input_config_A.nml
 │   ├── run.sh
 │   ├── plot_sampled_data.py
 │   ├── src/
-│   └── output_data/
+│   └── output_data/dataset_A/
 └── 03_compare/
     ├── README.md
-    ├── input_config.nml
+    ├── input_config_A.nml
     ├── run.sh
     ├── compare_distributions.py
     ├── comparison_tools/
-    └── output_data/
+    └── output_data/dataset_A/
 ```
 
 The tree omits individual generated output files and compiler artifacts for

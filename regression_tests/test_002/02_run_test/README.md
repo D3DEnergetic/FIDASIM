@@ -11,6 +11,20 @@ and pitch angle, $f_{\mathrm{CQL}}(\bar{u},\theta)$, to the FIDASIM
 energy-pitch density, $F(E,P)$. The transformation must preserve the number
 of particles represented by each phase-space region.
 
+## Run a dataset collection
+
+Select the Stage 2 configuration with the same collection letter used by Stage 1:
+
+```bash
+cd regression_tests/test_002/02_run_test
+./run.sh input_config_A.nml
+```
+
+For this collection, `reference_config` points to
+`../01_reference/input_config_A.nml`, and all converted HDF5 files,
+plots, and the moment report are written under
+`output_data/dataset_A/`.
+
 ## Relativistic coordinate transformation
 
 ### 1. Source density element

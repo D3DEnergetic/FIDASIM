@@ -34,6 +34,7 @@ RUN_TEST_REQUIRED_FIELDS = [
 ]
 
 RUN_TEST_OPTIONAL_FIELDS = [
+    "comment",
     "plot_data",
 ]
 

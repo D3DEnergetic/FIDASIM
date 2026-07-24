@@ -31,6 +31,7 @@ CONFIG_SCHEMA = {
             "output_directory",
         ],
         "optional_fields": [
+            "comment",
             "generate_plots",
         ],
     },
@@ -43,6 +44,7 @@ CONFIG_SCHEMA = {
             "fmax",
             "enable_colorbar",
             "colormap",
+            "emax",
         ],
     },
 }
@@ -198,6 +200,12 @@ def read_config(config_filename):
         value=plot_block.get("fmax"),
         field_label="fmax",
     )
+    emax = require_real(
+        value=plot_block.get("emax", 150.0),
+        field_label="emax",
+    )
+    if emax <= 0.0:
+        raise ConfigError("emax must be greater than zero.")
 
     # Step 4: preserve the namelist block structure in the returned canonical
     # configuration. Optional fields and blocks are populated with defaults.
@@ -213,6 +221,7 @@ def read_config(config_filename):
             "fmax": fmax,
             "enable_colorbar": enable_colorbar,
             "colormap": colormap,
+            "emax": emax,
         },
     }
 

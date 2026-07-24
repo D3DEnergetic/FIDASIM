@@ -1,5 +1,5 @@
-"""Public interface for input-distribution readers."""
+"""Internal reader for FIDASIM distributions produced by Test 002."""
 
-from .dispatcher import load_input_distribution
+from .fidasim_h5 import load_fidasim_h5_distribution
 
-__all__ = ["load_input_distribution"]
+__all__ = ["load_fidasim_h5_distribution"]

@@ -4,292 +4,139 @@
 
 ---
 
-# 4D distribution reference-data generator
+# Generate sampling references from Test 002
 
-This tool ingests a supported four-dimensional distribution and extracts a
-two-dimensional `f(E, pitch)` slice at each requested `(r, z)` location. It
-writes every slice to a separate HDF5 file and can create an associated PNG
-plot.
+Stage 1 adapts the correctly transformed FIDASIM distributions produced by
+Test 002 into compact two-dimensional fixtures for the Test 003 Fortran
+sampler. It does not transform, interpolate, or renormalize the distributions.
 
-The generated HDF5 files provide trusted reference data for subsequent
-regression-test work. Source formats may use different velocity-space
-coordinates or dimension ordering; their readers convert them to the common
-energy-pitch output representation.
+The selected Test 002 Stage 2 configuration is the single scientific input.
+Through that file, this stage discovers the ordered output files and inherits
+the requested locations and particle metadata from Test 002 Stage 1.
 
-## Quick start
+## Regenerate the trusted references
 
-The tool requires Python with these packages:
-
-- `f90nml`
-- `numpy`
-- `h5py`
-- `matplotlib`
-
-For example, create and activate a Conda environment:
-
-```bash
-conda create -n reference_data_env -c conda-forge \
-  python numpy h5py matplotlib f90nml
-conda activate reference_data_env
-```
-
-Run the tool from its directory:
+First run the selected Test 002 Stage 2 workflow so its indexed
+`fidasim_f4d_*.h5` files exist. Then run:
 
 ```bash
 cd regression_tests/test_003/01_reference
-python generate_reference_data.py input_config.nml
+./run.sh input_config_A.nml
 ```
 
-Set `input_filename` in [input_config.nml](input_config.nml) to the relative or
-absolute path of the source distribution.
+The regenerated HDF5 files and diagnostic PNGs are trusted artifacts and are
+committed. Ordinary Test 003 runs begin at Stage 2 and use these committed
+fixtures; they do not rerun Test 002 or regenerate Stage 1.
 
 ## Input configuration
 
-The input configuration file uses standard Fortran namelist syntax:
-
-- Blocks begin with `&name` and end with `/`.
-- Comments begin with `!`.
-- Strings use single or double quotes.
-- Logical values use `.true.` or `.false.`.
-- Arrays use comma-separated values.
-
 ```fortran
 &input
-  input_file_type = 'fidasim_h5'
-  input_filename = 'input_data/distribution.h5'
-  species = 'D'
-  atomic_number = 1
-  mass_number = 2
-  charge_state = 1
-  r_locations = 0.0, 0.1
-  z_locations = 0.0, 10.0
+  comment = 'Dataset A: 60 keV neutral beam at 45 degrees'
+  input_config = '../../test_002/02_run_test/input_config_A.nml'
   plot_data = .true.
   save_data = .true.
 /
 
 &plot_data_block
   scale = 'lin'
-  fmin =
-  fmax =
+  fmin = 'auto'
+  fmax = 'auto'
   enable_colorbar = .true.
-  colormap = 'viridis'
+  colormap = 'hot_r'
+  emax = 150.0
 /
 
 &save_data_block
-  output_filename = 'output_data/f_array.h5'
+  output_filename = 'output_data/dataset_A/f_array.h5'
 /
 ```
 
-Supported string choices are case-insensitive.
+Relative paths are resolved from the directory containing the configuration
+file. To use a different collection of CQL3D conditions, generate it through
+Test 002 and change only `input_config` to the corresponding Test 002 Stage 2
+configuration.
 
-### Path resolution
+### `&input` schema
 
-**Every relative path is resolved relative to the directory containing the
-input configuration file.** It is not resolved relative to the terminal's
-current directory. This gives each relative path a stable meaning.
-
-For example, if the configuration is:
-
-```text
-/project/reference/input_config.nml
-```
-
-then:
-
-```fortran
-input_filename = 'input_data/distribution.h5'
-output_filename = 'output_data/f_array.h5'
-```
-
-resolves to:
-
-```text
-/project/reference/input_data/distribution.h5
-/project/reference/output_data/f_array.h5
-```
-
-Absolute paths remain absolute, and `~` is expanded to the user home
-directory.
-
-### Input block
-
-| Variable | Type | Required | Units | Allowed values and behavior |
-| --- | --- | --- | --- | --- |
-| `input_file_type` | string | Yes | n/a | `fidasim_h5` or `cql3d_f4d`. See supported formats below. |
-| `input_filename` | string | Yes | n/a | Absolute path or path relative to the input configuration file. |
-| `species` | string | Yes | n/a | `H`, `D`, or `T`; stored in lowercase. |
-| `atomic_number` | integer | Yes | n/a | Positive proton count, $Z$. |
-| `mass_number` | integer | Yes | n/a | Proton-plus-neutron count, $A$, greater than or equal to `atomic_number`. |
-| `charge_state` | integer | Yes | elementary charge | Integer from zero through `atomic_number`. |
-| `r_locations` | real array | Yes | `cm` | Radial locations; must match the length of `z_locations`. |
-| `z_locations` | real array | Yes | `cm` | Axial locations; must match the length of `r_locations`. |
-| `plot_data` | logical | No | n/a | Defaults to `.false.`; enables PNG output. |
-| `save_data` | logical | No | n/a | Defaults to `.false.`; enables HDF5 output. |
-
-At least one `(r, z)` pair is required. The nearest spatial grid point is used;
-the tool does not interpolate.
-
-### Plot-data block
-
-This block is validated when `plot_data = .true.`.
-
-| Variable | Type | Required | Allowed values and behavior |
+| Variable | Type | Required | Meaning |
 | --- | --- | --- | --- |
-| `scale` | string | No | `lin` or `log`; defaults to `lin`. Log scale plots $\log_{10}(f)$ for positive values. |
-| `fmin` | real | No | Lower plot limit. Empty or `auto` uses the data minimum. |
-| `fmax` | real | No | Upper plot limit. Empty or `auto` uses the data maximum. |
-| `enable_colorbar` | logical | No | Defaults to `.true.`. |
-| `colormap` | string | No | `viridis`, `viridis_r`, `hot`, or `hot_r`; defaults to `viridis`. `_r` reverses the color order. |
+| `comment` | String | No | Human-readable description of the dataset collection. |
+| `input_config` | String | Yes | Test 002 Stage 2 configuration that identifies the source output collection. |
+| `plot_data` | Logical | No | Generate diagnostic PNGs; defaults to `.false.`. |
+| `save_data` | Logical | No | Generate compact HDF5 fixtures; defaults to `.false.`. |
 
-Plot titles contain `f(E, pitch)` and the selected R and Z grid values in cm.
+### `&plot_data_block` schema
 
-### Save-data block
-
-This block is validated when `save_data = .true.`.
-
-| Variable | Type | Required | Allowed values and behavior |
+| Variable | Type | Required | Meaning |
 | --- | --- | --- | --- |
-| `output_filename` | string | Yes | Path with a required `.h5` extension. May be absolute or relative to the input configuration file. |
+| `scale` | String | No | `lin` or `log`; defaults to `lin`. |
+| `fmin` | Real or `auto` | No | Lower color limit; defaults to the data minimum. |
+| `fmax` | Real or `auto` | No | Upper color limit; defaults to the data maximum. |
+| `enable_colorbar` | Logical | No | Enable the colorbar; defaults to `.true.`. |
+| `colormap` | String | No | `viridis`, `viridis_r`, `hot`, or `hot_r`. |
+| `emax` | Real | No | Maximum displayed energy in keV; defaults to `150.0` and must be positive. |
 
-The output directory is created automatically. A numeric suffix is inserted
-before the extension:
+### `&save_data_block` schema
 
-```text
-output_data/f_array_001.h5
-output_data/f_array_002.h5
-```
+`output_filename` is required whenever HDF5 or PNG output is enabled. It must
+have a `.h5` extension. A three-digit case index is inserted before the
+extension.
 
-## Supported input formats
+## Data discovery and validation
 
-### `fidasim_h5`
+The adapter follows `reference_config` in the selected Test 002 Stage 2
+configuration. The Test 002 Stage 1 configuration supplies:
 
-This reader is implemented. It requires the following datasets:
+- case count and ordering;
+- requested R and Z locations;
+- species, atomic number, mass number, and charge state.
 
-| Dataset | Type | Dimensions | Units | Description |
-| --- | --- | --- | --- | --- |
-| `z` | Numeric, read as Float64 | `(nz)` | `cm` | Axial grid. |
-| `r` | Numeric, read as Float64 | `(nr)` | `cm` | Radial grid. |
-| `pitch` | Numeric, read as Float64 | `(npitch)` | Dimensionless | Pitch grid, $v_\parallel/v$. |
-| `energy` | Numeric, read as Float64 | `(nenergy)` | `keV` | Fast-ion energy grid. |
-| `f` | Numeric, read as Float64 | `(nz, nr, npitch, nenergy)` | `fast-ions/(dE*dP*cm^3)` | Distribution on the four grids. |
-| `denf` | Numeric, read as Float64 | `(nz, nr)` | `cm^-3` | Fast-ion density on the spatial grid. |
+For every indexed Test 002 Stage 2 output, the adapter requires:
 
-The reader verifies that the shapes of `f` and `denf` match the corresponding
-grid lengths. Additional datasets such as `r2d`, `z2d`, and `time` are
-ignored.
+- one R location and one Z location;
+- one-dimensional energy and pitch grids with at least two points;
+- `f` with shape `(1, 1, npitch, nenergy)`;
+- finite, nonnegative distribution values;
+- a finite, positive `denf`;
+- a species attribute matching the Test 002 Stage 1 configuration.
 
-The required input datasets do not reliably identify the particle species,
-atomic number, mass number, or charge state. Supply these values in the
-`&input` block; the generator records them in every output file.
-
-### `cql3d_f4d`
-
-This input type is recognized, but its reader has not been implemented.
-Selecting it raises:
-
-```text
-NotImplementedError: The input distribution reader for 'cql3d_f4d' has not been implemented.
-```
-
-Its schema will be documented when the reader is implemented.
-
-## Generated output files
-
-For each requested location, the tool selects the nearest spatial indices,
-extracts the corresponding distribution, and writes it with dimensions
-`(nenergy, npitch)`.
-
-### Dataset schema
-
-| Dataset | HDF5 type | Dimensions | Units | Description |
-| --- | --- | --- | --- | --- |
-| `energy_grid` | Float64 | `(nenergy)` | `keV` | Energy coordinates of `f_array`. |
-| `pitch_grid` | Float64 | `(npitch)` | Dimensionless | Pitch coordinates of `f_array`. |
-| `f_array` | Float64 | `(nenergy, npitch)` | `fast-ions/(dE*dP*cm^3)` | Distribution at the selected spatial grid point. |
-| `denf` | Float64 | `(1)` | `cm^-3` | Fast-ion density supplied at the selected spatial grid point. |
-| `species` | UTF-8 string | Scalar | n/a | Normalized species label. |
-| `atomic_number` | Integer | Scalar | Dimensionless | Number of protons, $Z$. |
-| `mass_number` | Integer | Scalar | Dimensionless | Number of protons and neutrons, $A$. |
-| `charge_state` | Integer | Scalar | Elementary charge | Particle charge state. |
-| `requested_r` | Float64 | `(1)` | `cm` | Requested radial position. |
-| `requested_z` | Float64 | `(1)` | `cm` | Requested axial position. |
-| `selected_r` | Float64 | `(1)` | `cm` | Selected radial grid value. |
-| `selected_z` | Float64 | `(1)` | `cm` | Selected axial grid value. |
-| `r_index` | Integer | `(1)` | Dimensionless | Zero-based radial grid index. |
-| `z_index` | Integer | `(1)` | Dimensionless | Zero-based axial grid index. |
-
-Every dataset has `units` and `description` string attributes. Root attributes
-contain file-level provenance:
-
-| Root attribute | Type | Description |
-| --- | --- | --- |
-| `data_source_type` | String | Input distribution type. |
-| `data_source_name` | String | Absolute source-file path. |
-| `description` | String | Description of the generated file. |
-
-### Reading an output file
+The single spatial slice is converted only by array selection and transpose:
 
 ```python
-import h5py
-
-with h5py.File("f_array_001.h5", "r") as h5f:
-    distribution = h5f["f_array"][:]
-    energy_units = h5f["energy_grid"].attrs["units"]
-    species = h5f["species"].asstr()[()]
-    mass_number = h5f["mass_number"][()]
-    source_file = h5f.attrs["data_source_name"]
+f_array = f[0, 0, :, :].T
 ```
 
-## Developer notes
+Thus, `f_array` has shape `(nenergy, npitch)`. No values are rescaled.
 
-### Reader interface
+## Generated HDF5 schema
 
-Each reader may interpret its source velocity coordinates and dimension order
-differently, but it must return:
+| Dataset | Dimensions | Units | Description |
+| --- | --- | --- | --- |
+| `energy_grid` | `(nenergy)` | `keV` | Cell-centred energy grid. |
+| `pitch_grid` | `(npitch)` | Dimensionless | Cell-centred pitch grid. |
+| `f_array` | `(nenergy, npitch)` | `ions/(cm^3*keV*dP)` | Distribution consumed by the sampler. |
+| `denf` | `(1)` | `ions/cm^3` | Density supplied by Test 002. |
+| `species` | Scalar | n/a | Species inherited from Test 002. |
+| `atomic_number` | Scalar | Dimensionless | Proton count inherited from Test 002. |
+| `mass_number` | Scalar | Dimensionless | Nucleon count inherited from Test 002. |
+| `charge_state` | Scalar | Elementary charge | Charge state inherited from Test 002. |
+| `requested_r`, `requested_z` | `(1)` | `cm` | Locations requested by Test 002 Stage 1. |
+| `selected_r`, `selected_z` | `(1)` | `cm` | Locations stored in the Test 002 output. |
+| `r_index`, `z_index` | `(1)` | Dimensionless | Indices of the singleton spatial axes. |
 
-```python
-z, r, pitch, energy, f, denf
-```
+Root attributes identify the Test 002 output used for each fixture. Every
+dataset also contains `units` and `description` attributes.
 
-with this canonical representation:
+## Code organization
 
-| Value | Dimensions | Representation |
-| --- | --- | --- |
-| `z` | `(nz)` | Axial grid in `cm` |
-| `r` | `(nr)` | Radial grid in `cm` |
-| `pitch` | `(npitch)` | Dimensionless pitch grid |
-| `energy` | `(nenergy)` | Energy grid in `keV` |
-| `f` | `(nz, nr, npitch, nenergy)` | Distribution on the canonical grids |
-| `denf` | `(nz, nr)` | Fast-ion density on the spatial grid |
+- `config.py` validates this stage's input, plotting, and output controls.
+- `workflow.py` follows the Test 002 configurations, validates each source,
+  and writes the compact fixtures and plots.
+- `readers/fidasim_h5.py` reads the internal FIDASIM HDF5 schema.
 
-The reader owns any coordinate conversion, unit conversion, and array
-reordering needed by its source format.
-
-### Code organization
-
-```text
-reference_generator_tools/
-├── __init__.py
-├── config.py
-├── workflow.py
-└── readers/
-    ├── __init__.py
-    ├── dispatcher.py
-    └── fidasim_h5.py
-```
-
-- `config.py` handles the input configuration.
-- `workflow.py` selects slices, writes HDF5 files, and creates plots.
-- `readers/dispatcher.py` selects the reader for `input_file_type`.
-- `readers/fidasim_h5.py` implements the `fidasim_h5` reader.
-
-### Adding another reader
-
-1. Add a reader module that returns the canonical reader interface.
-2. Add its name to `SUPPORTED_INPUT_FILE_TYPES` in `config.py`.
-3. Add its selection branch to `load_input_distribution()` in
-   `readers/dispatcher.py`.
-4. Document the source schema under “Supported input formats.”
+Test 002 owns the CQL3D-to-FIDASIM transformation. New source formats or
+conversion methods belong there rather than in this adapter.
 
 ---
 

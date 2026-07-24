@@ -20,21 +20,21 @@ The Stage 1 and Stage 2 workflows must have been run first. From this directory,
 run:
 
 ```bash
-./run.sh
+./run.sh input_config_A.nml
 ```
 
 This is equivalent to:
 
 ```bash
-python3 compare_moments.py input_config.nml
+python3 compare_moments.py input_config_A.nml
 ```
 
 ## Input configuration
 
 ```fortran
 &compare
-  run_config = '../02_run_test/input_config.nml'
-  output_directory = 'output_data'
+  run_config = '../02_run_test/input_config_A.nml'
+  output_directory = 'output_data/dataset_A'
   generate_plot = .true.
 /
 ```
@@ -73,9 +73,9 @@ systems and grids.
 
 | File | Description |
 | --- | --- |
-| `output_data/moment_comparison.txt` | Reference value, converted value, and relative difference for all three moments and every case, followed by the maximum observed differences. |
-| `output_data/moment_values.png` | Reference and converted density, $T_\parallel$, and $T_\perp$ versus case index. |
-| `output_data/moment_relative_differences.png` | Density, $T_\parallel$, and $T_\perp$ relative differences versus case index. |
+| `output_data/dataset_<letter>/moment_comparison.txt` | Reference value, converted value, and relative difference for all three moments and every case, followed by the maximum observed differences. |
+| `output_data/dataset_<letter>/moment_values.png` | Reference and converted density, $T_\parallel$, and $T_\perp$ versus case index. |
+| `output_data/dataset_<letter>/moment_relative_differences.png` | Density, $T_\parallel$, and $T_\perp$ relative differences versus case index. |
 
 Case index is used instead of spatial position because the selected reference
 locations may be nonconsecutive or may not follow a one-dimensional spatial

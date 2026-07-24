@@ -30,7 +30,7 @@ CONFIG_SCHEMA = {
             "z_locations",
             "save_data",
         ],
-        "optional_fields": ["plot_data"],
+        "optional_fields": ["comment", "plot_data"],
     },
     "plot_data_block": {
         "required": False,

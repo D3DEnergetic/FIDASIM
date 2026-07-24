@@ -10,7 +10,7 @@ config_files=(
 # Run the test for each configuration file specified in the array.
 for config_file in "${config_files[@]}"; do
     echo
-    echo "Running Test 003: $config_file"
+    echo "Running Test 002: $config_file"
 
     cd 02_run_test
     ./run.sh "$config_file"

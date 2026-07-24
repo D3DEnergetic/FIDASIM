@@ -19,7 +19,7 @@ CONFIG_SCHEMA = {
     "input": {
         "required": True,
         "required_fields": ["reference_config", "nenergy", "npitch", "plot_data"],
-        "optional_fields": [],
+        "optional_fields": ["comment"],
     },
     "plot_data_block": {
         "required": False,

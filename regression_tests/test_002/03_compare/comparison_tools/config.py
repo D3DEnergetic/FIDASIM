@@ -19,7 +19,7 @@ CONFIG_SCHEMA = {
     "compare": {
         "required": True,
         "required_fields": ["run_config", "output_directory", "generate_plot"],
-        "optional_fields": [],
+        "optional_fields": ["comment"],
     },
 }
 

@@ -1,4 +1,4 @@
-"""Write self-describing deterministic ion-sink reference files."""
+"""Write self-describing deterministic ion-sink artifacts."""
 
 from pathlib import Path
 
@@ -33,7 +33,7 @@ def _text_dataset(group, name, value, description):
     return dataset
 
 
-def write_reference(
+def write_deterministic(
     filename,
     distribution,
     result,
@@ -41,12 +41,12 @@ def write_reference(
     case,
     provenance,
 ):
-    """Write one trusted Stage 1 HDF5 result."""
+    """Write one generated deterministic HDF5 result."""
     path = Path(filename)
     path.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(path, "w") as h5file:
         h5file.attrs["description"] = (
-            "Deterministic direct charge-exchange ion-sink reference"
+            "Deterministic direct charge-exchange ion-sink artifact"
         )
         h5file.attrs["source_distribution"] = _repository_relative(
             case["input_path"]
@@ -55,12 +55,19 @@ def write_reference(
             provenance["run_config"]
         )
         h5file.attrs["atomic_tables_file"] = _repository_relative(
-            config["reference"]["tables_filename"]
+            config["test_case"]["tables_filename"]
         )
         h5file.attrs["level_split_method"] = config["neutrals"][
             "level_split_method"
         ]
-        h5file.attrs["comment"] = config["reference"]["comment"]
+        h5file.attrs["test_case_config"] = _repository_relative(
+            config["test_case"]["config_path"]
+        )
+        h5file.attrs["test_case_comment"] = config["test_case"]["comment"]
+        h5file.attrs["implementation_comment"] = config["deterministic"][
+            "comment"
+        ]
+        h5file.attrs["comment"] = config["deterministic"]["comment"]
 
         _dataset(h5file, "energy", distribution.energy, "keV", "Ion energy grid")
         _dataset(

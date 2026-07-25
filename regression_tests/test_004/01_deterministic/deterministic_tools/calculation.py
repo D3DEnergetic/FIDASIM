@@ -13,13 +13,15 @@ V2_TO_ENERGY_PER_AMU = MASS_U / (2.0 * ELEMENTARY_CHARGE * 1.0e3) * 1.0e-4
 
 
 @dataclass
-class ReferenceResult:
+class DeterministicResult:
     sink_distribution: np.ndarray
     energy_marginal: np.ndarray
     pitch_marginal: np.ndarray
     kernel: np.ndarray
     total_rate: float
     neutral_velocity: np.ndarray
+    neutral_energy: float
+    neutral_pitch: float
     level_density: np.ndarray
     gyroangle: np.ndarray
 
@@ -38,7 +40,7 @@ def build_level_density(neutral_config):
     return density * fractions
 
 
-def calculate_reference(distribution, table, neutral_config, n_gyro):
+def calculate_deterministic(distribution, table, neutral_config, n_gyro):
     """Calculate the deterministic reaction-weighted sink distribution."""
     angle = np.deg2rad(neutral_config["injection_angle"])
     neutral_speed = np.sqrt(
@@ -48,6 +50,7 @@ def calculate_reference(distribution, table, neutral_config, n_gyro):
     neutral_velocity = neutral_speed * np.array(
         [np.sin(angle), 0.0, np.cos(angle)]
     )
+    neutral_pitch = float(neutral_velocity[2] / neutral_speed)
     level_density = build_level_density(neutral_config)
 
     gyroangle = 2.0 * np.pi * (
@@ -93,13 +96,15 @@ def calculate_reference(distribution, table, neutral_config, n_gyro):
     energy_marginal = np.sum(sink_distribution, axis=1) * dpitch
     pitch_marginal = np.sum(sink_distribution, axis=0) * denergy
 
-    return ReferenceResult(
+    return DeterministicResult(
         sink_distribution=sink_distribution,
         energy_marginal=energy_marginal,
         pitch_marginal=pitch_marginal,
         kernel=kernel,
         total_rate=total_rate,
         neutral_velocity=neutral_velocity,
+        neutral_energy=neutral_config["energy"],
+        neutral_pitch=neutral_pitch,
         level_density=level_density,
         gyroangle=gyroangle,
     )

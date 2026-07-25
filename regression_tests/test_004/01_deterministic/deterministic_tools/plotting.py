@@ -6,8 +6,15 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import FormatStrFormatter, ScalarFormatter
 import numpy as np
+
+
+class _TwoDecimalScalarFormatter(ScalarFormatter):
+    """Keep scientific-notation colorbar mantissas at two decimal places."""
+
+    def _set_format(self):
+        self.format = "%.2f"
 
 
 def _plot_limits(values, plot_config):
@@ -21,14 +28,18 @@ def _plot_limits(values, plot_config):
     maximum = plot_config["fmax"]
     if minimum in (None, "auto"):
         minimum = float(np.min(finite))
+    elif plot_config["scale"] == "log":
+        minimum = float(np.log10(minimum))
     if maximum in (None, "auto"):
         maximum = float(np.max(finite))
+    elif plot_config["scale"] == "log":
+        maximum = float(np.log10(maximum))
     if maximum <= minimum:
         raise ValueError("Plot fmax must be greater than fmin.")
     return plotted, minimum, maximum
 
 
-def plot_reference(filename, distribution, result, plot_config):
+def plot_deterministic(filename, distribution, result, plot_config):
     """Write the principal 2D reaction-weighted sink plot."""
     maximum_energy = plot_config["emax"]
     if maximum_energy in (None, "auto"):
@@ -55,19 +66,35 @@ def plot_reference(filename, distribution, result, plot_config):
     axis.set_xlabel("Pitch")
     axis.set_ylabel("Energy [keV]")
     axis.set_ylim(float(distribution.energy[0]), maximum_energy)
+    axis.scatter(
+        result.neutral_pitch,
+        result.neutral_energy,
+        s=90,
+        marker="o",
+        facecolor="limegreen",
+        edgecolor="black",
+        linewidth=1.0,
+        label="Injected neutral",
+        zorder=5,
+    )
+    axis.legend(loc="upper right", framealpha=0.9)
     axis.set_title(
         "Deterministic ion sink\n"
         f"R = {result.total_rate:.2e} ions cm$^{{-3}}$ s$^{{-1}}$"
     )
     if plot_config["enable_colorbar"]:
         label = r"$S(E,p)$ [ions cm$^{-3}$ s$^{-1}$ keV$^{-1}$]"
-        tick_format = FormatStrFormatter("%.2e")
+        tick_format = _TwoDecimalScalarFormatter()
+        tick_format.set_powerlimits((0, 0))
         if plot_config["scale"] == "log":
             label = r"$\log_{10} S(E,p)$"
             tick_format = FormatStrFormatter("%.2f")
-        colorbar = figure.colorbar(contour, ax=axis, label=label)
-        colorbar.ax.yaxis.set_major_formatter(tick_format)
-        colorbar.update_ticks()
+        figure.colorbar(
+            contour,
+            ax=axis,
+            label=label,
+            format=tick_format,
+        )
 
     path = Path(filename)
     path.parent.mkdir(parents=True, exist_ok=True)

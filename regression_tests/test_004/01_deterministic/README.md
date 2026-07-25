@@ -1,18 +1,18 @@
-[Regression tests](../../README.md) / [Test 004](../README.md) / Reference calculation
+[Regression tests](../../README.md) / [Test 004](../README.md) / Deterministic calculation
 
-**Navigation:** Previous: — | [Up: Test 004](../README.md) | [Next: Monte Carlo test](../02_run_test/README.md)
+**Navigation:** Previous: — | [Up: Test 004](../README.md) | [Next: Monte Carlo calculation](../02_monte_carlo/README.md)
 
 ---
 
-# Deterministic ion-sink reference
+# Deterministic ion-sink calculation
 
-Stage 1 reads every smooth FIDASIM energy-pitch distribution identified by a
-Test 002 Stage 2 configuration. It calculates the ion-sink distribution and
-total reaction rate by deterministic quadrature over energy, pitch, and
-gyrophase.
+The deterministic implementation reads every smooth FIDASIM energy-pitch
+distribution identified by a Test 002 Stage 2 configuration. It calculates
+the ion-sink distribution and total reaction rate by deterministic quadrature
+over energy, pitch, and gyrophase.
 
-The resulting HDF5 files and principal plots are trusted reference artifacts
-and are committed to the repository.
+The resulting HDF5 files and principal plots are generated artifacts under the
+common Test 004 output directory. They are not committed to the repository.
 
 ## Velocity construction
 
@@ -245,7 +245,7 @@ expression on the configured midpoint gyrophase grid.
 
 The `/cross/H_H/cx` dataset has axes
 `(relative energy, initial level, final level)`. For each $E,p,\phi$, the
-reference calculation follows `bb_cx_rates`: it linearly interpolates
+deterministic calculation follows `bb_cx_rates`: it linearly interpolates
 $\log_{10}\sigma_{m\leftarrow l}$ on the table's uniformly spaced
 $\log_{10}\varepsilon_{\rm rel}$ grid, clamps an out-of-range energy to the
 nearest endpoint, restores the cross section in `cm^2`, and evaluates
@@ -273,97 +273,56 @@ independently of `reservoir_size`.
 
 ## Input configuration
 
-The stage configuration contains four namelist blocks:
+The deterministic implementation reads the unified
+[`../input_config_A.nml`](../input_config_A.nml). The common `test_case` and
+`neutrals` blocks are shared unchanged with the Monte Carlo implementation.
+The `deterministic` block contains controls specific to this calculation.
+`plot_data_block` supplies common styling for both implementation plots, and
+`save_data_block` defines their common output root.
 
-- `reference` selects the upstream distribution collection, atomic tables,
-  gyrophase resolution, and enabled outputs.
-- `neutrals` defines the uniform neutral population.
-- `plot_data_block` controls diagnostic contour plots.
-- `save_data_block` selects the output directory.
+The [top-level Test 004 interface](../README.md#shared-input-configuration)
+documents every shared block, including units and path resolution.
 
-All relative paths are resolved from the directory containing the Test 004
-configuration file. Selector values are case-insensitive.
-
-### `reference` schema
+### `deterministic` schema
 
 | Variable | Type/size | Units | Required | Default | Allowed values and description |
 | --- | --- | --- | --- | --- | --- |
-| `comment` | String scalar | — | No | None | Human-readable description of the collection. |
-| `input_distribution_config` | String scalar | — | Yes | None | Existing Test 002 Stage 2 configuration used to discover the ordered smooth distributions. |
-| `tables_filename` | String scalar | — | Yes | None | Existing FIDASIM atomic-tables HDF5 file containing `/cross/H_H`. |
+| `comment` | String scalar | — | No | Empty | Human-readable description of the deterministic implementation. |
 | `n_gyro` | Integer scalar | — | Yes | None | Number of midpoint gyrophase points; must be positive. |
 | `plot_data` | Logical scalar | — | Yes | None | Enables diagnostic plots. |
-| `save_data` | Logical scalar | — | Yes | None | Enables reference HDF5 output. The committed configuration sets this to `.true.`. |
+| `save_data` | Logical scalar | — | Yes | None | Enables deterministic HDF5 output. |
 
-### `neutrals` schema
-
-| Variable | Type/size | Units | Required | Default | Allowed values and description |
-| --- | --- | --- | --- | --- | --- |
-| `density` | Real scalar | `cm^-3` | Yes | None | Total neutral density; must be positive. |
-| `energy` | Real scalar | `keV` | Yes | None | Total kinetic energy of each neutral; must be positive. |
-| `injection_angle` | Real scalar | degrees | Yes | None | Signed angle from `+z` toward `+x`; the velocity is proportional to `[sin(theta),0,cos(theta)]`. |
-| `level_split_method` | String scalar | — | Yes | None | `ground-only` or `exponential`. |
-| `level_decay` | Real scalar | — | Conditional | None | Required and positive for `exponential`; ignored for `ground-only`. |
-
-`ground-only` assigns the total density to level 1. `exponential` assigns
-normalized fractions proportional to
-$\exp[-\mathtt{level\_decay}(l-1)]$ over FIDASIM's six atomic levels.
-
-The neutral isotope is taken from each source distribution and must match its
-ion isotope.
-
-Stage 1 contains no random sampling, so it has no `seed` input. Random-number
-control belongs to the Monte Carlo configuration in Stage 2.
-
-### `plot_data_block` schema
-
-This block is required when `reference/plot_data=.true.` and ignored when
-plotting is disabled.
-
-| Variable | Type/size | Units | Required | Default | Allowed values and description |
-| --- | --- | --- | --- | --- | --- |
-| `scale` | String scalar | — | No | `lin` | `lin` or `log`. |
-| `emax` | Real or `auto` | `keV` | No | Automatic | Maximum displayed energy; it must be positive and greater than the distribution's minimum energy. This affects only the plot, not the calculation or saved data. |
-| `fmin` | Real or `auto` | Sink units | No | Automatic | Lower plotted color limit. An empty value or `auto` selects it from the data. |
-| `fmax` | Real or `auto` | Sink units | No | Automatic | Upper plotted color limit. An empty value or `auto` selects it from the data. |
-| `enable_colorbar` | Logical scalar | — | No | `.true.` | Enables the plot color bar. |
-| `colormap` | String scalar | — | No | `viridis` | `viridis`, `viridis_r`, `hot`, or `hot_r`. |
-| `contour_levels` | Integer scalar | — | No | `100` | Number of filled contour levels; must be at least 2. |
-
-### `save_data_block` schema
-
-This block is required whenever HDF5 or plot output is enabled.
-
-| Variable | Type/size | Units | Required | Default | Allowed values and description |
-| --- | --- | --- | --- | --- | --- |
-| `output_directory` | String scalar | — | Yes | None | Destination directory. It is created when needed and resolved relative to this configuration. |
+The deterministic implementation contains no random sampling, so its block
+has no `seed` field. Random-number control belongs to `monte_carlo`.
 
 One indexed HDF5 file and, when enabled, one same-basename PNG are generated
-for each converted Test 002 distribution.
+for each converted Test 002 distribution. Their basenames follow
+`fidasim_f4d_NNN_ion_sink`.
 
-## Discovery contract
+The principal plot marks the injected neutral with a filled green circle at
 
-`input_distribution_config` points to Test 002 Stage 2. Stage 1 reads its
-`save_data_block/output_filename`, discovers matching three-digit indexed
-files, and requires indices that are contiguous from `001`. It does not open
-the Test 002 Stage 1 configuration.
+$$
+(p_n,E_n)=\left(\frac{v_{n,z}}{|\boldsymbol v_n|},E_n\right)
+=\left(\cos\theta,E_n\right).
+$$
 
-Each converted file supplies its selected `r` and `z` coordinates and the
-scalar `species`, `atomic_number`, `mass_number`, `charge_state`, and `A`
-datasets. These species parameters must agree across the collection. The
-energy, pitch, `f`, and `denf` datasets must also be present.
+This places the neutral velocity on the same energy-pitch axes as the
+reaction-weighted ion-sink distribution.
 
-The converted files are generated artifacts rather than committed fixtures.
-If they are absent, first run:
+## Running the calculation
+
+The top-level README explains
+[how Test 004 finds and validates its shared input distributions](../README.md#how-test-004-finds-and-validates-its-input-distributions).
+After those converted distributions are available, run:
 
 ```bash
-cd regression_tests/test_002/02_run_test
-./run.sh input_config_A.nml
+cd regression_tests/test_004/01_deterministic
+./run.sh ../input_config_A.nml
 ```
 
 ## Output schema
 
-Each indexed reference HDF5 file contains the following datasets:
+Each indexed deterministic HDF5 file contains the following datasets:
 
 | Dataset | Shape | Units | Description |
 | --- | --- | --- | --- |
@@ -392,12 +351,13 @@ Each indexed reference HDF5 file contains the following datasets:
 Every dataset carries a description attribute and, except for `species`, a
 units attribute. Root attributes record repository-relative source
 distribution, Test 002 configuration, and atomic-table paths together with
-the neutral-level selector and calculation comment.
+the unified Test 004 configuration, neutral-level selector, common test-case
+comment, and deterministic implementation comment. The legacy `comment`
+attribute is retained as an alias for the implementation comment.
 
-The HDF5 files and their principal PNG plots are trusted reference artifacts
-and are committed to the repository. They are regenerated only when the
-reference inputs or deterministic formulation intentionally change.
+The HDF5 files and principal PNG plots are regenerated test artifacts. The
+committed source of the distribution data remains Test 002 Stage 1.
 
 ---
 
-**Navigation:** Previous: — | [Up: Test 004](../README.md) | [Next: Monte Carlo test](../02_run_test/README.md)
+**Navigation:** Previous: — | [Up: Test 004](../README.md) | [Next: Monte Carlo calculation](../02_monte_carlo/README.md)

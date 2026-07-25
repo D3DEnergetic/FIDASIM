@@ -1,31 +1,32 @@
-"""Orchestrate Test 004 deterministic reference generation."""
+"""Orchestrate the Test 004 deterministic calculation."""
 
 from pathlib import Path
 
 from regression_test_tools import ConfigError, print_config
 
 from .atomic import read_charge_exchange_table
-from .calculation import calculate_reference
-from .config import read_config
+from test_004_tools import discover_distributions, read_deterministic_config
+
+from .calculation import calculate_deterministic
 from .data import read_distribution
-from .discovery import discover_distributions
-from .output import write_reference
-from .plotting import plot_reference
+from .output import write_deterministic
+from .plotting import plot_deterministic
 
 
-def run_reference_workflow(config_filename):
+def run_deterministic_workflow(config_filename):
     """Process every smooth converted distribution selected through Test 002."""
-    config = read_config(config_filename)
+    config = read_deterministic_config(config_filename)
     print_config(config)
 
-    # Get the input distribution configuration from the reference section of the main configuration.
-    input_distribution_config = config["reference"]["input_distribution_config"]
+    input_distribution_config = config["test_case"][
+        "input_distribution_config"
+    ]
 
-    # Get a list of the ordered Test 002 distribution cases and their species parameters:
+    # Get the ordered Test 002 cases and their shared species parameters.
     provenance = discover_distributions(input_distribution_config)
 
-    table = read_charge_exchange_table(config["reference"]["tables_filename"])
-    output_directory = config["save_data_block"]["output_directory"]
+    table = read_charge_exchange_table(config["test_case"]["tables_filename"])
+    output_directory = config["save_data_block"]["deterministic_directory"]
 
     results = []
     for case in provenance["cases"]:
@@ -52,17 +53,17 @@ def run_reference_workflow(config_filename):
                 "the discovered case metadata."
             )
 
-        result = calculate_reference(
+        result = calculate_deterministic(
             distribution=distribution,
             table=table,
             neutral_config=config["neutrals"],
-            n_gyro=config["reference"]["n_gyro"],
+            n_gyro=config["deterministic"]["n_gyro"],
         )
-        stem = f"{Path(case['input_path']).stem}_ion_sink_reference"
+        stem = f"{Path(case['input_path']).stem}_ion_sink"
         hdf5_path = None
         plot_path = None
-        if config["reference"]["save_data"]:
-            hdf5_path = write_reference(
+        if config["deterministic"]["save_data"]:
+            hdf5_path = write_deterministic(
                 filename=output_directory / f"{stem}.h5",
                 distribution=distribution,
                 result=result,
@@ -70,8 +71,8 @@ def run_reference_workflow(config_filename):
                 case=case,
                 provenance=provenance,
             )
-        if config["reference"]["plot_data"]:
-            plot_path = plot_reference(
+        if config["deterministic"]["plot_data"]:
+            plot_path = plot_deterministic(
                 filename=output_directory / f"{stem}.png",
                 distribution=distribution,
                 result=result,

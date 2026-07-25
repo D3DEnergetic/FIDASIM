@@ -1,0 +1,43 @@
+&test_case
+  comment = 'Dataset A: direct charge-exchange ion-sink test'
+  input_distribution_config = '../test_002/02_run_test/input_config_A.nml'
+  tables_filename = '../../tables/atomic_tables.h5'
+/
+
+&neutrals
+  density = 1.0e10
+  energy = 60.0
+  injection_angle = 45.0
+  level_split_method = 'ground-only'
+  level_decay = 1.0
+/
+
+&deterministic
+  comment = 'Deterministic energy-pitch-gyrophase integration'
+  n_gyro = 24
+  plot_data = .true.
+  save_data = .true.
+/
+
+&monte_carlo
+  comment = 'Monte Carlo ion sampling and sink storage'
+  n_markers = 1000000
+  reservoir_size = 50
+  seed = 12345
+  plot_data = .true.
+  save_data = .true.
+/
+
+&plot_data_block
+  scale = 'lin'
+  emax = 150
+  fmin = 'auto'
+  fmax = 'auto'
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  contour_levels = 30
+/
+
+&save_data_block
+  output_directory = 'output_data/dataset_A'
+/

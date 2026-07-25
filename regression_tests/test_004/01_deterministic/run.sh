@@ -6,4 +6,4 @@ if [ "$#" -ne 1 ]; then
   exit 2
 fi
 
-python generate_reference.py "$1"
+python3 generate_deterministic.py "$1"

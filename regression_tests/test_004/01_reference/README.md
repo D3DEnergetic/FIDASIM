@@ -33,7 +33,7 @@ $$
 For an ion with kinetic energy $E$, mass $M_i$, and charge $q_i$, define
 
 $$
-s_q=\operatorname{sgn}(q_i).
+s_q=\frac{q_i}{|q_i|}.
 $$
 
 The ion speed and its parallel and perpendicular components are

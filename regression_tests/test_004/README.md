@@ -33,8 +33,8 @@ $$
 R=\int S(E,p)\,dE\,dp.
 $$
 
-Here \(n_i\) is the ion density, \(g(E,p)\) is the normalized ion distribution,
-and \(\left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p)\) is the
+Here $n_i$ is the ion density, $g(E,p)$ is the normalized ion distribution,
+and $\left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p)$ is the
 state-resolved, gyrophase-averaged charge-exchange reactivity:
 
 $$
@@ -44,7 +44,7 @@ $$
 \right\rangle_{\phi}.
 $$
 
-For any gyrophase-dependent quantity \(q(\phi)\), the gyro-averaging operator
+For any gyrophase-dependent quantity $q(\phi)$, the gyro-averaging operator
 is
 
 $$
@@ -52,10 +52,10 @@ $$
 =\frac{1}{2\pi}\int_0^{2\pi}q(\phi)\,d\phi.
 $$
 
-The index \(l\) identifies the initial atomic energy level of the target
-neutral and \(n_l\) is its number density. The index \(m\) identifies the
+The index $l$ identifies the initial atomic energy level of the target
+neutral and $n_l$ is its number density. The index $m$ identifies the
 atomic energy level populated by charge exchange.
-\(\sigma_{m\leftarrow l}\) is directional: it is the cross section for
+$\sigma_{m\leftarrow l}$ is directional: it is the cross section for
 
 $$
 \mathrm{H}^{+}+\mathrm{H}(l)
@@ -63,7 +63,7 @@ $$
 \mathrm{H}(m)+\mathrm{H}^{+}.
 $$
 
-For ion mass \(M_i\) and neutral mass \(M_n\), the physical centre-of-mass
+For ion mass $M_i$ and neutral mass $M_n$, the physical centre-of-mass
 collision energy is
 
 $$
@@ -81,7 +81,7 @@ $$
 =\frac{1}{2}m_u v_{\rm rel}^{2},
 $$
 
-expressed in `keV/amu`, where \(m_u\) is the atomic mass constant. The relative
+expressed in `keV/amu`, where $m_u$ is the atomic mass constant. The relative
 speed is
 
 $$

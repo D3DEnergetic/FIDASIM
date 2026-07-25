@@ -30,7 +30,7 @@ p=\frac{v_\parallel}{v}
 =\frac{v_z}{v}.
 $$
 
-For an ion with kinetic energy \(E\), mass \(M_i\), and charge \(q_i\), define
+For an ion with kinetic energy $E$, mass $M_i$, and charge $q_i$, define
 
 $$
 s_q=\operatorname{sgn}(q_i).
@@ -46,7 +46,7 @@ v_\parallel=pv,
 v_\perp=v\sqrt{1-p^2}.
 $$
 
-The gyrophase \(\phi\in[0,2\pi)\) is treated as a positive geometric angle.
+The gyrophase $\phi\in[0,2\pi)$ is treated as a positive geometric angle.
 The direction of gyromotion is included explicitly through the ion charge
 sign. The ion velocity is therefore
 
@@ -59,8 +59,8 @@ v_\parallel
 \end{bmatrix}.
 $$
 
-For a positive ion, \(s_q=+1\), so an ion initially moving along `+x` turns
-toward `-y`. For a negative ion, \(s_q=-1\), and the direction of gyromotion
+For a positive ion, $s_q=+1$, so an ion initially moving along `+x` turns
+toward `-y`. For a negative ion, $s_q=-1$, and the direction of gyromotion
 is reversed.
 
 ### General neutral velocity
@@ -164,9 +164,9 @@ particular gyrophase.
 
 ### Neutral injection in the `x-z` plane
 
-For the present geometry, the neutral is injected at a signed angle \(\theta\)
-measured from `+z` toward `+x`. For neutral kinetic energy \(E_n\) and mass
-\(M_n\),
+For the present geometry, the neutral is injected at a signed angle $\theta$
+measured from `+z` toward `+x`. For neutral kinetic energy $E_n$ and mass
+$M_n$,
 
 $$
 v_n=\sqrt{\frac{2E_n}{M_n}},
@@ -228,7 +228,7 @@ v_\perp^2\sin^2\phi+
 }.
 $$
 
-Because the neutral has no `y` velocity component, \(v_{n,y}=0\), the
+Because the neutral has no `y` velocity component, $v_{n,y}=0$, the
 explicitly charge-dependent term vanishes. Consequently, the relative speed
 at a given sampled gyrophase is independent of the charge sign for this
 particular neutral injection geometry.
@@ -244,10 +244,10 @@ expression on the configured midpoint gyrophase grid.
 ## Atomic-rate evaluation
 
 The `/cross/H_H/cx` dataset has axes
-`(relative energy, initial level, final level)`. For each \(E,p,\phi\), the
+`(relative energy, initial level, final level)`. For each $E,p,\phi$, the
 reference calculation follows `bb_cx_rates`: it linearly interpolates
-\(\log_{10}\sigma_{m\leftarrow l}\) on the table's uniformly spaced
-\(\log_{10}\varepsilon_{\rm rel}\) grid, clamps an out-of-range energy to the
+$\log_{10}\sigma_{m\leftarrow l}$ on the table's uniformly spaced
+$\log_{10}\varepsilon_{\rm rel}$ grid, clamps an out-of-range energy to the
 nearest endpoint, restores the cross section in `cm^2`, and evaluates
 
 $$
@@ -307,7 +307,7 @@ configuration file. Selector values are case-insensitive.
 
 `ground-only` assigns the total density to level 1. `exponential` assigns
 normalized fractions proportional to
-\(\exp[-\mathtt{level\_decay}(l-1)]\) over FIDASIM's six atomic levels.
+$\exp[-\mathtt{level\_decay}(l-1)]$ over FIDASIM's six atomic levels.
 
 The neutral isotope is taken from each source distribution and must match its
 ion isotope.

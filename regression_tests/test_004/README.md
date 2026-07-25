@@ -22,7 +22,7 @@ The energy-pitch-resolved ion-sink distribution is
 
 $$
 S(E,p)=
-n_i\,g(E,p)
+n_i\ g(E,p)
 \sum_{l,m=1}^{6}n_l
 \left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p),
 $$
@@ -30,7 +30,7 @@ $$
 and the total volumetric ion-sink reaction rate is
 
 $$
-R=\int S(E,p)\,dE\,dp.
+R=\int S(E,p)\ dE\ dp.
 $$
 
 Here $n_i$ is the ion density, $g(E,p)$ is the normalized ion distribution,
@@ -49,7 +49,7 @@ is
 
 $$
 \left\langle q\right\rangle_\phi
-=\frac{1}{2\pi}\int_0^{2\pi}q(\phi)\,d\phi.
+=\frac{1}{2\pi}\int_0^{2\pi}q(\phi)\ d\phi.
 $$
 
 The index $l$ identifies the initial atomic energy level of the target
@@ -68,7 +68,7 @@ collision energy is
 
 $$
 E_{\rm rel}=\frac{1}{2}\mu v_{\rm rel}^{2},
-\qquad
+\quad
 \mu=\frac{M_iM_n}{M_i+M_n}.
 $$
 
@@ -93,9 +93,9 @@ Finally, the normalized ion distribution is
 
 $$
 g(E,p)=\frac{f(E,p)}
-{\int f(E,p)\,dE\,dp},
+{\int f(E,p)\ dE\ dp},
 \qquad
-\int g(E,p)\,dE\,dp=1.
+\int g(E,p)\ dE\ dp=1.
 $$
 
 The deterministic and Monte Carlo implementations evaluate these same

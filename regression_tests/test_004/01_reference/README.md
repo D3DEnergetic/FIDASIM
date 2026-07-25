@@ -18,46 +18,46 @@ and are committed to the repository.
 
 Assume that the magnetic field is directed along the Cartesian `+z` direction,
 
-\[
+$$
 \boldsymbol B=B\widehat{\boldsymbol z},
 \qquad B>0.
-\]
+$$
 
 The distribution pitch is therefore
 
-\[
+$$
 p=\frac{v_\parallel}{v}
 =\frac{v_z}{v}.
-\]
+$$
 
 For an ion with kinetic energy \(E\), mass \(M_i\), and charge \(q_i\), define
 
-\[
+$$
 s_q=\operatorname{sgn}(q_i).
-\]
+$$
 
 The ion speed and its parallel and perpendicular components are
 
-\[
+$$
 v=\sqrt{\frac{2E}{M_i}},
 \qquad
 v_\parallel=pv,
 \qquad
 v_\perp=v\sqrt{1-p^2}.
-\]
+$$
 
 The gyrophase \(\phi\in[0,2\pi)\) is treated as a positive geometric angle.
 The direction of gyromotion is included explicitly through the ion charge
 sign. The ion velocity is therefore
 
-\[
+$$
 \boldsymbol v_i(E,p,\phi)=
 \begin{bmatrix}
 v_\perp\cos\phi\\
 -s_qv_\perp\sin\phi\\
 v_\parallel
 \end{bmatrix}.
-\]
+$$
 
 For a positive ion, \(s_q=+1\), so an ion initially moving along `+x` turns
 toward `-y`. For a negative ion, \(s_q=-1\), and the direction of gyromotion
@@ -68,25 +68,25 @@ is reversed.
 First consider an arbitrary neutral velocity with all three Cartesian
 components:
 
-\[
+$$
 \boldsymbol v_n=
 \begin{bmatrix}
 v_{n,x}\\
 v_{n,y}\\
 v_{n,z}
 \end{bmatrix}.
-\]
+$$
 
 The relative velocity vector is
 
-\[
+$$
 \boldsymbol v_{\rm rel}
 =\boldsymbol v_i-\boldsymbol v_n,
-\]
+$$
 
 or explicitly,
 
-\[
+$$
 \boldsymbol v_{\rm rel}
 =
 \begin{bmatrix}
@@ -94,22 +94,22 @@ v_\perp\cos\phi-v_{n,x}\\
 -s_qv_\perp\sin\phi-v_{n,y}\\
 v_\parallel-v_{n,z}
 \end{bmatrix}.
-\]
+$$
 
 The corresponding relative speed is
 
-\[
+$$
 v_{\rm rel}=
 \sqrt{
 \left(v_\perp\cos\phi-v_{n,x}\right)^2+
 \left(-s_qv_\perp\sin\phi-v_{n,y}\right)^2+
 \left(v_\parallel-v_{n,z}\right)^2
 }.
-\]
+$$
 
 Expanding the squared relative speed gives
 
-\[
+$$
 \begin{aligned}
 v_{\rm rel}^2
 ={}&
@@ -125,25 +125,25 @@ v_\parallel^2
 -2v_\parallel v_{n,z}
 +v_{n,z}^2.
 \end{aligned}
-\]
+$$
 
 Using
 
-\[
+$$
 \cos^2\phi+\sin^2\phi=1,
 \qquad
 v_\perp^2+v_\parallel^2=v^2,
-\]
+$$
 
 and
 
-\[
+$$
 v_n^2=v_{n,x}^2+v_{n,y}^2+v_{n,z}^2,
-\]
+$$
 
 the result becomes
 
-\[
+$$
 \boxed{
 v_{\rm rel}^2=
 v^2+v_n^2
@@ -151,13 +151,13 @@ v^2+v_n^2
 +2s_qv_\perp v_{n,y}\sin\phi
 -2v_\parallel v_{n,z}.
 }
-\]
+$$
 
 The term
 
-\[
+$$
 2s_qv_\perp v_{n,y}\sin\phi
-\]
+$$
 
 shows explicitly where the ion charge sign enters the relative speed at a
 particular gyrophase.
@@ -168,43 +168,43 @@ For the present geometry, the neutral is injected at a signed angle \(\theta\)
 measured from `+z` toward `+x`. For neutral kinetic energy \(E_n\) and mass
 \(M_n\),
 
-\[
+$$
 v_n=\sqrt{\frac{2E_n}{M_n}},
-\]
+$$
 
 and the neutral velocity is
 
-\[
+$$
 \boldsymbol v_n=
 \begin{bmatrix}
 v_n\sin\theta\\
 0\\
 v_n\cos\theta
 \end{bmatrix}.
-\]
+$$
 
 Thus,
 
-\[
+$$
 v_{n,x}=v_n\sin\theta,
 \qquad
 v_{n,y}=0,
 \qquad
 v_{n,z}=v_n\cos\theta.
-\]
+$$
 
 Substitution into the general result gives
 
-\[
+$$
 v_{\rm rel}^2=
 v^2+v_n^2
 -2v_\perp v_n\sin\theta\cos\phi
 -2v_\parallel v_n\cos\theta.
-\]
+$$
 
 Therefore,
 
-\[
+$$
 \boxed{
 v_{\rm rel}=
 \sqrt{
@@ -215,18 +215,18 @@ v_\parallel\cos\theta
 \right)
 }.
 }
-\]
+$$
 
 Equivalently, before expansion,
 
-\[
+$$
 v_{\rm rel}=
 \sqrt{
 \left(v_\perp\cos\phi-v_n\sin\theta\right)^2+
 v_\perp^2\sin^2\phi+
 \left(v_\parallel-v_n\cos\theta\right)^2
 }.
-\]
+$$
 
 Because the neutral has no `y` velocity component, \(v_{n,y}=0\), the
 explicitly charge-dependent term vanishes. Consequently, the relative speed
@@ -250,21 +250,21 @@ reference calculation follows `bb_cx_rates`: it linearly interpolates
 \(\log_{10}\varepsilon_{\rm rel}\) grid, clamps an out-of-range energy to the
 nearest endpoint, restores the cross section in `cm^2`, and evaluates
 
-\[
+$$
 r_m(E,p,\phi)
 =v_{\rm rel}\sum_{l=1}^{6}\sigma_{m\leftarrow l}
 (\varepsilon_{\rm rel})n_l.
-\]
+$$
 
 Table entries below the smallest positive tabulated cross section are restored
 as zero, matching `bb_cx_rates`. The scalar kernel used by the ion sink is
 
-\[
+$$
 K(E,p)=\frac{1}{N_\phi}
 \sum_{j=1}^{N_\phi}\sum_{m=1}^{6}r_m(E,p,\phi_j),
 \qquad
 \phi_j=\frac{2\pi(j-\tfrac12)}{N_\phi}.
-\]
+$$
 
 This is the deterministic counterpart of `get_total_cx_rate` for one neutral
 type. In the Monte Carlo calculation, identical reservoir-marker velocities

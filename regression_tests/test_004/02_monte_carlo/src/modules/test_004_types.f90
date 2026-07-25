@@ -8,6 +8,7 @@ module test_004_types
   integer, parameter, public :: comment_length = 1024
   integer, parameter, public :: selector_length = 64
   integer, parameter, public :: species_length = 16
+  integer, parameter, public :: number_of_atomic_levels = 6
 
   type, public :: MonteCarloConfig
     integer(Int32) :: n_cases = 0
@@ -47,5 +48,12 @@ module test_004_types
     integer(Int32) :: charge_state = 0
     real(Float64) :: atomic_mass = 0.0_Float64
   end type DistributionCase
+
+  type, public :: NeutralParameters
+    real(Float64) :: atomic_mass = 0.0_Float64
+    real(Float64) :: speed = 0.0_Float64
+    real(Float64) :: velocity(3) = 0.0_Float64
+    real(Float64) :: level_density(number_of_atomic_levels) = 0.0_Float64
+  end type NeutralParameters
 
 end module test_004_types

@@ -29,10 +29,11 @@ The Monte Carlo workflow uses Python wrappers around the Fortran calculation:
    requested plots and other presentation-level results.
 
 At the present development stage, the first step, the Fortran configuration
-reader, and the Fortran HDF5 distribution reader are implemented. The program
-prints the normalized configuration and a summary of every input distribution
-to the terminal; it does not yet calculate the ion sink. The output-processing
-Python wrapper will be added after the Fortran calculation produces output.
+and HDF5 readers, and neutral-parameter construction are implemented. The
+program prints the normalized configuration, each input distribution, and the
+derived six-level neutral population and velocity to the terminal; it does not
+yet calculate the ion sink. The output-processing Python wrapper will be added
+after the Fortran calculation produces output.
 
 Run the current workflow from the FIDASIM repository root:
 
@@ -217,9 +218,9 @@ one serial Fortran executable.
 
 ### Source tree
 
-The normalizer, Fortran configuration boundary, HDF5 distribution reader, and
-launcher are implemented. The fixture, sink, and plotter components shown
-below remain planned:
+The normalizer, Fortran configuration boundary, HDF5 distribution reader,
+neutral construction, and launcher are implemented. The fixture, sink, and
+plotter components shown below remain planned:
 
 ```text
 02_monte_carlo/
@@ -233,6 +234,7 @@ below remain planned:
         ├── test_004_types.f90
         ├── test_004_config.f90
         ├── test_004_hdf5.f90
+        ├── test_004_neutral.f90
         ├── test_004_fixture.f90
         └── test_004_sink.f90
 ```
@@ -298,9 +300,10 @@ match FIDASIM's fixed character fields.
 `test_004_types` defines `MonteCarloConfig`, which owns every normalized
 scalar and exact-size arrays for the distribution paths and run IDs, and
 `DistributionCase`, which owns one loaded smooth distribution and its
-location and species metadata. It does not use `libfida` or HDF5. Types for
-the neutral parameters and sink summary will be introduced with the modules
-that need them.
+location and species metadata, and `NeutralParameters`, which owns the
+six-level density vector, mass, speed, and Cartesian velocity. It does not use
+`libfida` or HDF5. The sink-summary type will be introduced with the module
+that needs it.
 
 `test_004_config` provides:
 
@@ -339,6 +342,20 @@ It reads the energy and pitch grids, the single spatial slice of the smooth
 distribution, `denf`, selected `R` and `Z`, species, atomic number, mass
 number, charge state, and physical mass `A`. The future output writer will add
 the corresponding Test 004 metadata to the sink files.
+
+`test_004_neutral` provides:
+
+```fortran
+call build_neutral_parameters(config, distribution, neutral)
+call print_neutral_parameters(neutral)
+```
+
+It uses the distribution's physical isotope mass and the configured total
+neutral energy to calculate the speed in `cm/s`. The signed injection angle is
+then applied as
+`[vx,vy,vz] = speed*[sin(angle),0,cos(angle)]`. The configured total density is
+split across exactly six atomic levels using the same `ground-only` or
+normalized exponential rule as the deterministic implementation.
 
 `test_004_fixture` owns all allocation and initialization of FIDASIM global
 structures. It provides:

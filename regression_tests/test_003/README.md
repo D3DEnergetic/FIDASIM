@@ -61,14 +61,9 @@ cd regression_tests/test_003
 If a different Conda environment contains the required packages, activate
 that environment instead.
 
-The top-level runner executes `02_run_test` and `03_compare` for each
-configuration listed in its short `config_files` array. Add or remove
-filenames in that array to control which collections are included in a
-regression run. Each listed filename must exist in both stages.
-
-Stage 1 reference generation is intentionally excluded. A developer must run
-the appropriate `01_reference/run.sh input_config_<letter>.nml` command
-manually when the committed reference data needs to be regenerated.
+The top-level runner executes reference validation, sampling, and comparison
+for each configuration listed in its short `config_files` array. Each listed
+filename must exist in all three stages.
 
 ## Dataset collections
 
@@ -87,7 +82,7 @@ meaning visible without encoding those details in the filename.
 
 | Stage | Purpose | Main outputs |
 | --- | --- | --- |
-| [`01_reference`](01_reference/README.md) | Adapt the correctly transformed Test 002 outputs into trusted compact `f(E, pitch)` fixtures. | Reference HDF5 files and optional PNG plots. |
+| [`01_reference`](01_reference/README.md) | Validate the shared Test 002 Stage 2 distribution collection. | Validation summary; no copied data. |
 | [`02_run_test`](02_run_test/README.md) | Sample each reference distribution and reconstruct it on the same grid. | Sampled HDF5 files and optional PNG plots. |
 | [`03_compare`](03_compare/README.md) | Compare reference and sampled marginals, density, parallel temperature, and perpendicular temperature. | Comparison figures and a text report. |
 
@@ -109,15 +104,12 @@ Correct Test 002 FIDASIM distributions
 
 ## Data contract
 
-Stage 1 defines the common energy-pitch HDF5 schema under
-[Generated output files](01_reference/README.md#generated-output-files).
-Stage 2 preserves that dataset schema and metadata while replacing `f_array`
-with the sampled reconstruction and adding sampling provenance. Stage 3 uses
-the Stage 2 input configuration as the ordered source of file pairs.
+Test 002 Stage 2 owns the native reference schema. Test 003 Stage 2 reads that
+schema directly and writes compact sampled reconstructions. Stage 3 reads both
+layouts and compares their common physical data and metadata.
 
-Test 003 Stage 1 follows the Test 002 Stage 2 configuration only when trusted
-references are intentionally regenerated. The seven compact Stage 1 fixtures
-are committed, so ordinary Test 003 runs remain self-contained.
+Test 003 depends on the generated Test 002 Stage 2 outputs. Its Stage 1
+validator makes this dependency explicit and checks the collection before use.
 
 ## Directory structure
 
@@ -129,9 +121,8 @@ test_003/
 ├── 01_reference/
 │   ├── README.md
 │   ├── input_config_A.nml
-│   ├── generate_reference_data.py
-│   ├── reference_generator_tools/
-│   └── output_data/dataset_A/
+│   ├── validate_reference_data.py
+│   └── reference_generator_tools/
 ├── 02_run_test/
 │   ├── README.md
 │   ├── input_config_A.nml

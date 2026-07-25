@@ -31,6 +31,8 @@ import numpy as np
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import normalize_config as sampler_config
+
 
 # The Python plotter consumes only these fields from the Fortran-owned block.
 RUN_TEST_CONSUMED_FIELDS = [
@@ -329,11 +331,14 @@ def main():
 
     # Check that sampled HDF5 files are available.
     output_directory = run_config["output_directory"]
-    output_files = sorted(output_directory.glob("*.h5"))
-    if not output_files:
-        raise FileNotFoundError(
-            f"No sampled HDF5 files found in {output_directory}."
-        )
+    sampling = sampler_config.read_config(sys.argv[1])["run_test"]
+    output_files = [
+        output_directory / Path(reference_file).name
+        for reference_file in sampling["reference_files"]
+    ]
+    missing_files = [path for path in output_files if not path.is_file()]
+    if missing_files:
+        raise FileNotFoundError(f"Missing sampled HDF5 file: {missing_files[0]}")
 
     # Plot each sampled HDF5 file.
     for filename in output_files:

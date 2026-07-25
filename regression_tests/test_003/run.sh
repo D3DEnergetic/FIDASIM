@@ -12,7 +12,10 @@ for config_file in "${config_files[@]}"; do
     echo
     echo "Running Test 003: $config_file"
 
-    cd 02_run_test
+    cd 01_reference
+    ./run.sh "$config_file"
+
+    cd ../02_run_test
     ./run.sh "$config_file"
 
     cd ../03_compare

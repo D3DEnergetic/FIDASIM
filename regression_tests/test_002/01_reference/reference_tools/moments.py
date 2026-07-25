@@ -8,15 +8,12 @@ import numpy as np
 
 from regression_test_tools import ConfigError
 
+from .particle_metadata import SPECIES_MASS_AMU
 
-# Physical constants and isotope masses match the values used by FIDASIM.
+
+# Physical constants match the values used by FIDASIM.
 SPEED_OF_LIGHT_CM_PER_SECOND = 2.99792458e10
 ATOMIC_MASS_ENERGY_KEV = 9.3149410242e5
-SPECIES_MASS_AMU = {
-    "h": 1.007276466879,
-    "d": 2.013553212745,
-    "t": 3.01550071632,
-}
 
 
 @dataclass

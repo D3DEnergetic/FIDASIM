@@ -4,6 +4,39 @@ import numpy as np
 import h5py
 
 
+def load_fidasim_h5_species_parameters(input_path):
+    """Load scalar particle metadata from a Test 002 Stage 2 output."""
+    required_datasets = (
+        "species",
+        "atomic_number",
+        "mass_number",
+        "charge_state",
+        "A",
+    )
+    with h5py.File(input_path, "r") as h5f:
+        missing_datasets = [
+            dataset_name
+            for dataset_name in required_datasets
+            if dataset_name not in h5f
+        ]
+        if missing_datasets:
+            missing_names = ", ".join(missing_datasets)
+            raise KeyError(f"Missing particle datasets: {missing_names}")
+
+        species = h5f["species"][()]
+        particle = {
+            "atomic_number": int(h5f["atomic_number"][()]),
+            "mass_number": int(h5f["mass_number"][()]),
+            "charge_state": int(h5f["charge_state"][()]),
+            "A": float(h5f["A"][()]),
+        }
+
+    if isinstance(species, bytes):
+        species = species.decode("utf-8")
+    particle["species"] = str(species).strip().lower()
+    return particle
+
+
 def load_fidasim_h5_distribution(input_path):
     """Load a FIDASIM file into the canonical energy-pitch representation.
 

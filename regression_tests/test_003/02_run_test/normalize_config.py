@@ -2,6 +2,7 @@
 """Validate Stage 2 settings and write a normalized Fortran namelist."""
 
 from pathlib import Path
+import re
 import sys
 
 # Make the shared regression-test tools importable without installing a package.
@@ -10,7 +11,6 @@ sys.path.insert(0, str(regression_tests_directory))
 
 from regression_test_tools import (
     ConfigError,
-    as_list,
     normalize_path,
     read_namelist,
     reject_unknown_fields,
@@ -26,8 +26,7 @@ import f90nml
 
 
 RUN_TEST_REQUIRED_FIELDS = [
-    "n_reference_files",
-    "reference_files",
+    "input_distribution_config",
     "output_directory",
     "n_samples",
     "seed",
@@ -81,17 +80,6 @@ def read_config(config_filename):
         block_label="&run_test",
     )
 
-    # Validate the scalar sampling controls.
-    n_reference_files = require_integer(
-        value=run_block["n_reference_files"],
-        field_label="n_reference_files",
-    )
-    if n_reference_files < 1 or n_reference_files > MAX_REFERENCE_FILES:
-        raise ConfigError(
-            "n_reference_files must be from 1 through "
-            f"{MAX_REFERENCE_FILES}."
-        )
-
     n_samples = require_integer(
         value=run_block["n_samples"],
         field_label="n_samples",
@@ -111,31 +99,25 @@ def read_config(config_filename):
         field_label="plot_data",
     )
 
-    # Normalize and verify every reference path before starting Fortran.
-    configured_reference_files = as_list(run_block["reference_files"])
-    if len(configured_reference_files) != n_reference_files:
+    distribution_config_value = require_string(
+        value=run_block["input_distribution_config"],
+        field_label="input_distribution_config",
+    )
+    distribution_config = normalize_path(
+        value=distribution_config_value,
+        config_path=config_path,
+        field_label="input_distribution_config",
+    )
+    require_existing_file(
+        path=distribution_config,
+        field_label="input_distribution_config",
+    )
+    reference_files = _discover_reference_files(distribution_config)
+    n_reference_files = len(reference_files)
+    if n_reference_files > MAX_REFERENCE_FILES:
         raise ConfigError(
-            "n_reference_files must equal the number of entries in "
-            "reference_files."
+            f"No more than {MAX_REFERENCE_FILES} reference files are supported."
         )
-
-    reference_files = []
-    for file_index, configured_path in enumerate(configured_reference_files):
-        field_label = f"reference_files({file_index + 1})"
-        path_value = require_string(
-            value=configured_path,
-            field_label=field_label,
-        )
-        reference_path = normalize_path(
-            value=path_value,
-            config_path=config_path,
-            field_label=field_label,
-        )
-        require_existing_file(
-            path=reference_path,
-            field_label=field_label,
-        )
-        reference_files.append(str(reference_path))
 
     output_directory_value = require_string(
         value=run_block["output_directory"],
@@ -157,6 +139,52 @@ def read_config(config_filename):
             "plot_data": plot_data,
         }
     }
+
+
+def _discover_reference_files(distribution_config):
+    """Discover contiguous Test 002 Stage 2 outputs from its configuration."""
+    distribution_path, blocks = read_namelist(config_path=distribution_config)
+    require_blocks(blocks=blocks, required_blocks=["save_data_block"])
+    save_block = blocks["save_data_block"]
+    require_fields(
+        block=save_block,
+        required_fields=["output_filename"],
+        block_label="Test 002 &save_data_block",
+    )
+    output_value = require_string(
+        value=save_block["output_filename"],
+        field_label="Test 002 output_filename",
+    )
+    output_base = normalize_path(
+        value=output_value,
+        config_path=distribution_path,
+        field_label="Test 002 output_filename",
+    )
+
+    pattern = re.compile(
+        rf"{re.escape(output_base.stem)}_(\d{{3}})"
+        rf"{re.escape(output_base.suffix)}"
+    )
+    indexed_paths = []
+    for path in output_base.parent.glob(
+        f"{output_base.stem}_*{output_base.suffix}"
+    ):
+        match = pattern.fullmatch(path.name)
+        if match is not None and path.is_file():
+            indexed_paths.append((int(match.group(1)), path.resolve()))
+    indexed_paths.sort(key=lambda item: item[0])
+
+    indices = [index for index, _ in indexed_paths]
+    if not indexed_paths:
+        raise ConfigError(
+            "No Test 002 Stage 2 outputs were found. Run "
+            f"'{distribution_path.parent}/run.sh {distribution_path.name}' first."
+        )
+    if indices != list(range(1, len(indices) + 1)):
+        raise ConfigError(
+            "Test 002 output indices must be contiguous and start at 001."
+        )
+    return [str(path) for _, path in indexed_paths]
 
 
 def write_config(config, output_filename):

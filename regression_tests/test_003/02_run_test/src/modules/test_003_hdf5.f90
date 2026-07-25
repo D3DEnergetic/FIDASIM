@@ -33,9 +33,9 @@ contains
     call h5fopen_f(trim(filename), H5F_ACC_RDONLY_F, file_id, error)
     call check_hdf5(error, 'opening reference file', filename)
 
-    call read_grid(file_id, 'energy_grid', distribution%energy_grid, filename)
-    call read_grid(file_id, 'pitch_grid', distribution%pitch_grid, filename)
-    call read_dataset_dimensions(file_id, 'f_array', &
+    call read_grid(file_id, 'energy', distribution%energy_grid, filename)
+    call read_grid(file_id, 'pitch', distribution%pitch_grid, filename)
+    call read_dataset_dimensions(file_id, 'f', &
       distribution%f_array_dimensions, filename)
     call read_f_array(file_id, distribution, filename)
     call validate_reference_data(distribution, filename)
@@ -67,26 +67,53 @@ contains
     integer(HID_T), intent(in) :: file_id
     type(DistributionFunction2D), intent(inout) :: distribution
     character(len=*), intent(in) :: filename
+    integer(HID_T) :: dataset_id, file_space_id, memory_space_id
+    integer(HSIZE_T) :: memory_dimensions(2)
+    integer(HSIZE_T) :: start(4), count(4)
     integer :: error, nenergy, npitch
 
     nenergy = size(distribution%energy_grid)
     npitch = size(distribution%pitch_grid)
-    if (size(distribution%f_array_dimensions) /= 2) then
-      error stop 'f_array must be two-dimensional in '//trim(filename)
+    if (size(distribution%f_array_dimensions) /= 4) then
+      error stop 'f must be four-dimensional in '//trim(filename)
     end if
-    if (distribution%f_array_dimensions(1) /= npitch .or. &
-        distribution%f_array_dimensions(2) /= nenergy) then
-      write(*, '(a)') 'f_array dimensions do not match the energy and pitch grids'
-      write(*, '(a,2(1x,i0))') '  HDF5 dimensions:', &
+    if (distribution%f_array_dimensions(1) /= nenergy .or. &
+        distribution%f_array_dimensions(2) /= npitch .or. &
+        distribution%f_array_dimensions(3) /= 1 .or. &
+        distribution%f_array_dimensions(4) /= 1) then
+      write(*, '(a)') 'f dimensions do not match the expected Test 002 layout'
+      write(*, '(a,4(1x,i0))') '  HDF5 dimensions:', &
         distribution%f_array_dimensions
-      write(*, '(a,2(1x,i0))') '  Expected:', npitch, nenergy
+      write(*, '(a,4(1x,i0))') '  Expected:', nenergy, npitch, 1, 1
       error stop trim(filename)
     end if
 
     allocate(distribution%f_array(nenergy, npitch))
-    call h5ltread_dataset_double_f(file_id, 'f_array', distribution%f_array, &
-      distribution%f_array_dimensions, error)
-    call check_hdf5(error, 'reading f_array', filename)
+    memory_dimensions = [int(nenergy, HSIZE_T), int(npitch, HSIZE_T)]
+    start = [0_HSIZE_T, 0_HSIZE_T, 0_HSIZE_T, 0_HSIZE_T]
+    count = distribution%f_array_dimensions
+
+    call h5dopen_f(file_id, 'f', dataset_id, error)
+    call check_hdf5(error, 'opening f', filename)
+    call h5dget_space_f(dataset_id, file_space_id, error)
+    call check_hdf5(error, 'getting f dataspace', filename)
+    call h5sselect_hyperslab_f(file_space_id, H5S_SELECT_SET_F, start, &
+      count, error)
+    call check_hdf5(error, 'selecting f spatial slice', filename)
+    call h5screate_simple_f(2, memory_dimensions, memory_space_id, error)
+    call check_hdf5(error, 'creating f memory space', filename)
+    call h5dread_f(dataset_id, H5T_NATIVE_DOUBLE, distribution%f_array, &
+      memory_dimensions, error, memory_space_id, file_space_id)
+    call check_hdf5(error, 'reading f spatial slice', filename)
+    call h5sclose_f(memory_space_id, error)
+    call check_hdf5(error, 'closing f memory space', filename)
+    call h5sclose_f(file_space_id, error)
+    call check_hdf5(error, 'closing f dataspace', filename)
+    call h5dclose_f(dataset_id, error)
+    call check_hdf5(error, 'closing f', filename)
+
+    distribution%f_array_dimensions = [int(npitch, HSIZE_T), &
+      int(nenergy, HSIZE_T)]
   end subroutine read_f_array
 
   subroutine validate_reference_data(distribution, filename)
@@ -218,12 +245,10 @@ contains
 
     character(len=4096) :: output_filename
     character(len=32) :: number_of_samples_string
-    character(len=32), parameter :: dataset_names(14) = [character(len=32) :: &
-      'energy_grid', 'pitch_grid', 'f_array', 'species', 'atomic_number', &
-      'mass_number', 'charge_state', 'requested_r', 'requested_z', &
-      'selected_r', 'selected_z', 'r_index', 'z_index', 'denf']
-    integer(HID_T) :: reference_id, output_id
-    integer(HID_T) :: f_array_id, denf_id
+    character(len=32), parameter :: metadata_names(5) = [character(len=32) :: &
+      'species', 'atomic_number', 'mass_number', 'charge_state', 'A']
+    real(Float64), allocatable :: output_f_array(:,:)
+    integer(HID_T) :: reference_id, output_id, f_array_id, f_array_space_id
     integer(HSIZE_T), parameter :: scalar_dimensions(1) = [1_HSIZE_T]
     real(Float64) :: sampled_density
     integer :: error, i, exit_status
@@ -241,32 +266,48 @@ contains
     call h5fcreate_f(trim(output_filename), H5F_ACC_TRUNC_F, output_id, error)
     call check_hdf5(error, 'creating sampled file', output_filename)
 
-    do i = 1, size(dataset_names)
-      call h5ocopy_f(reference_id, trim(dataset_names(i)), output_id, &
-        trim(dataset_names(i)), error)
-      call check_hdf5(error, 'copying '//trim(dataset_names(i)), output_filename)
+    call h5ocopy_f(reference_id, 'energy', output_id, 'energy_grid', error)
+    call check_hdf5(error, 'copying energy grid', output_filename)
+    call h5ocopy_f(reference_id, 'pitch', output_id, 'pitch_grid', error)
+    call check_hdf5(error, 'copying pitch grid', output_filename)
+    call h5ocopy_f(reference_id, 'r', output_id, 'selected_r', error)
+    call check_hdf5(error, 'copying selected R', output_filename)
+    call h5ocopy_f(reference_id, 'z', output_id, 'selected_z', error)
+    call check_hdf5(error, 'copying selected Z', output_filename)
+    do i = 1, size(metadata_names)
+      call h5ocopy_f(reference_id, trim(metadata_names(i)), output_id, &
+        trim(metadata_names(i)), error)
+      call check_hdf5(error, 'copying '//trim(metadata_names(i)), output_filename)
     end do
 
-    call h5dopen_f(output_id, 'f_array', f_array_id, error)
-    call check_hdf5(error, 'opening sampled f_array', output_filename)
-    call h5dwrite_f(f_array_id, H5T_NATIVE_DOUBLE, sampled_f_array, &
+    call h5screate_simple_f(2, f_array_dimensions, f_array_space_id, error)
+    call check_hdf5(error, 'creating f_array dataspace', output_filename)
+    call h5dcreate_f(output_id, 'f_array', H5T_NATIVE_DOUBLE, &
+      f_array_space_id, f_array_id, error)
+    call check_hdf5(error, 'creating sampled f_array', output_filename)
+    output_f_array = transpose(sampled_f_array)
+    call h5dwrite_f(f_array_id, H5T_NATIVE_DOUBLE, output_f_array, &
       f_array_dimensions, error)
     call check_hdf5(error, 'writing sampled f_array', output_filename)
     call h5dclose_f(f_array_id, error)
     call check_hdf5(error, 'closing sampled f_array', output_filename)
+    call h5sclose_f(f_array_space_id, error)
+    call check_hdf5(error, 'closing f_array dataspace', output_filename)
+    call h5ltset_attribute_string_f(output_id, 'f_array', 'units', &
+      'ions/(cm^3*keV*dP)', error)
+    call check_hdf5(error, 'setting f_array units', output_filename)
     call h5ltset_attribute_string_f(output_id, 'f_array', 'description', &
       'Sampled reconstruction of the fast-ion distribution', error)
     call check_hdf5(error, 'setting f_array description', output_filename)
 
     ! Store the density represented by the reconstructed energy-pitch array.
     sampled_density = sum(sampled_f_array) * abs(denergy * dpitch)
-    call h5dopen_f(output_id, 'denf', denf_id, error)
-    call check_hdf5(error, 'opening sampled denf', output_filename)
-    call h5dwrite_f(denf_id, H5T_NATIVE_DOUBLE, [sampled_density], &
-      scalar_dimensions, error)
-    call check_hdf5(error, 'writing sampled denf', output_filename)
-    call h5dclose_f(denf_id, error)
-    call check_hdf5(error, 'closing sampled denf', output_filename)
+    call h5ltmake_dataset_double_f(output_id, 'denf', 1, scalar_dimensions, &
+      [sampled_density], error)
+    call check_hdf5(error, 'creating sampled denf', output_filename)
+    call h5ltset_attribute_string_f(output_id, 'denf', 'units', &
+      'ions/cm^3', error)
+    call check_hdf5(error, 'setting denf units', output_filename)
     call h5ltset_attribute_string_f(output_id, 'denf', 'description', &
       'Density calculated from the sampled energy-pitch distribution', error)
     call check_hdf5(error, 'setting denf description', output_filename)

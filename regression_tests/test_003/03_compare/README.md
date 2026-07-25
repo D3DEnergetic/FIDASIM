@@ -79,16 +79,16 @@ each step.
 
 Paths are resolved relative to the configuration file that contains them.
 `sampling_config_file` points to the exact Stage 2 configuration used for the
-sampling run. The comparison reads its ordered `reference_files` list and
-`output_directory`, then pairs every reference file with the sampled file of
-the same basename. It does not scan either directory for unrelated HDF5 files.
+sampling run. The comparison follows its `input_distribution_config`,
+discovers the contiguous native Test 002 references, and pairs each with the
+sampled file of the same basename.
 
 ### `compare` schema
 
 | Variable | Type | Required | Default | Allowed values and behavior |
 | --- | --- | --- | --- | --- |
 | `comment` | String | No | None | Human-readable description of the dataset collection. |
-| `sampling_config_file` | String | Yes | None | Nonempty path to the Stage 2 configuration used for sampling. Stage 3 reads its ordered reference-file list and sampled-output directory. |
+| `sampling_config_file` | String | Yes | None | Stage 2 configuration used for sampling. Stage 3 discovers the same Test 002 references and sampled-output directory from it. |
 | `output_directory` | String | Yes | None | Nonempty directory path for the comparison report and figures. It is created when needed. |
 | `generate_plots` | Logical | No | `.true.` | Enables or disables both comparison figures for every file pair. The text report is always written. |
 
@@ -108,21 +108,17 @@ workflow only when `generate_plots = .true.` in the `compare` block.
 
 ### Path resolution
 
-Stage 3 resolves a relative `sampling_config_file` or `output_directory`
-against the directory containing its own configuration file. When it reads the
-Stage 2 configuration, it likewise resolves Stage 2 reference and output paths
-against the directory containing that configuration. The meanings of these
-paths therefore do not depend on the terminal's current working directory.
+Stage 3 resolves each relative path against the configuration file containing
+it. Path meanings therefore do not depend on the terminal's working directory.
 
 ## Validation
 
 Before calculating results, the script checks that each pair has:
 
-- the shared HDF5 schema defined by Stage 1;
+- the native Test 002 reference schema and compact Test 003 sampled schema;
 - matching energy and pitch grids and `f_array` dimensions;
 - matching `f_array` units;
-- matching species, ion, selected-position, requested-position, and grid-index
-  metadata;
+- matching species parameters and selected-position metadata;
 - finite, nonnegative distribution values with a positive integral; and
 - strictly monotonic, uniformly spaced energy and pitch grids.
 

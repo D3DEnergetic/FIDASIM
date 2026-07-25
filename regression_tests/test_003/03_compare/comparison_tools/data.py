@@ -6,34 +6,17 @@ import h5py
 import numpy as np
 
 
-REQUIRED_DATASETS = (
-    "energy_grid",
-    "pitch_grid",
-    "f_array",
+COMMON_METADATA = (
     "species",
     "atomic_number",
     "mass_number",
     "charge_state",
-    "requested_r",
-    "requested_z",
+    "A",
     "selected_r",
     "selected_z",
-    "r_index",
-    "z_index",
 )
 
-MATCHED_METADATA = (
-    "species",
-    "atomic_number",
-    "mass_number",
-    "charge_state",
-    "requested_r",
-    "requested_z",
-    "selected_r",
-    "selected_z",
-    "r_index",
-    "z_index",
-)
+MATCHED_METADATA = COMMON_METADATA
 
 
 @dataclass
@@ -82,20 +65,46 @@ def _validate_uniform_grid(grid, grid_name, filename):
 
 
 def read_distribution(filename):
-    """Read one distribution and enforce the shared Stage 1/Stage 2 schema."""
+    """Read a native Test 002 reference or compact Test 003 sampled file."""
     with h5py.File(filename, "r") as h5file:
-        missing = [name for name in REQUIRED_DATASETS if name not in h5file]
+        sampled_layout = "f_array" in h5file
+        if sampled_layout:
+            required = ("energy_grid", "pitch_grid", "f_array", *COMMON_METADATA)
+        else:
+            required = ("energy", "pitch", "f", "r", "z", *COMMON_METADATA[:-2])
+        missing = [name for name in required if name not in h5file]
         if missing:
             names = ", ".join(missing)
             raise ValueError(f"{filename}: missing required datasets: {names}")
 
-        energy = np.asarray(h5file["energy_grid"][:], dtype=float)
-        pitch = np.asarray(h5file["pitch_grid"][:], dtype=float)
-        values = np.asarray(h5file["f_array"][:], dtype=float)
+        if sampled_layout:
+            energy = np.asarray(h5file["energy_grid"][:], dtype=float)
+            pitch = np.asarray(h5file["pitch_grid"][:], dtype=float)
+            values = np.asarray(h5file["f_array"][:], dtype=float)
+            selected_r = _read_scalar(h5file["selected_r"])
+            selected_z = _read_scalar(h5file["selected_z"])
+            units = _decode_text(h5file["f_array"].attrs.get("units", ""))
+        else:
+            energy = np.asarray(h5file["energy"][:], dtype=float)
+            pitch = np.asarray(h5file["pitch"][:], dtype=float)
+            raw = np.asarray(h5file["f"][:], dtype=float)
+            expected_raw_shape = (1, 1, pitch.size, energy.size)
+            if raw.shape != expected_raw_shape:
+                raise ValueError(
+                    f"{filename}: f shape {raw.shape} does not match "
+                    f"{expected_raw_shape}."
+                )
+            values = raw[0, 0, :, :].T
+            selected_r = _read_scalar(h5file["r"])
+            selected_z = _read_scalar(h5file["z"])
+            units = _decode_text(h5file["f"].attrs.get("units", ""))
+
         metadata = {
-            name: _read_scalar(h5file[name]) for name in MATCHED_METADATA
+            name: _read_scalar(h5file[name])
+            for name in COMMON_METADATA[:-2]
         }
-        units = _decode_text(h5file["f_array"].attrs.get("units", ""))
+        metadata["selected_r"] = selected_r
+        metadata["selected_z"] = selected_z
 
     _validate_uniform_grid(energy, "energy_grid", filename)
     _validate_uniform_grid(pitch, "pitch_grid", filename)

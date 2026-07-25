@@ -8,6 +8,8 @@ from netCDF4 import Dataset
 
 from regression_test_tools import ConfigError
 
+from ..particle_metadata import write_particle_metadata
+
 
 R_DIMENSION = "dim_nr_f4d"
 Z_DIMENSION = "dim_nz_f4d"
@@ -158,10 +160,10 @@ def extract_cql3d_f4d_location(
                 destination.attrs["requested_z_cm"] = requested_z
                 destination.attrs["selected_r_index"] = r_index
                 destination.attrs["selected_z_index"] = z_index
-                destination.attrs["species"] = particle["species"]
-                destination.attrs["atomic_number"] = particle["atomic_number"]
-                destination.attrs["mass_number"] = particle["mass_number"]
-                destination.attrs["charge_state"] = particle["charge_state"]
+                write_particle_metadata(
+                    h5file=destination,
+                    particle=particle,
+                )
     except (OSError, RuntimeError) as error:
         raise ConfigError(f"Could not extract CQL3D F4D data: {error}") from error
 

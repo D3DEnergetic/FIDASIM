@@ -12,14 +12,14 @@ MOMENT_NAMES = (
 )
 
 
-def _read_text_attribute(attributes, name, filename):
-    """Read an HDF5 text attribute and normalize it for comparison."""
-    if name not in attributes:
-        raise ConfigError(f"{filename} is missing the {name} attribute.")
-    value = attributes[name]
-    if isinstance(value, bytes):
-        value = value.decode("utf-8")
-    return str(value).strip().lower()
+def _read_species(h5file, filename):
+    """Read and normalize the scalar species dataset."""
+    if "species" not in h5file:
+        raise ConfigError(f"{filename} is missing the species dataset.")
+    species = h5file["species"][()]
+    if isinstance(species, bytes):
+        species = species.decode("utf-8")
+    return str(species).strip().lower()
 
 
 def _read_moments(filename, file_kind):
@@ -41,9 +41,8 @@ def _read_moments(filename, file_kind):
 
             return {
                 "path": filename,
-                "species": _read_text_attribute(
-                    attributes=h5file.attrs,
-                    name="species",
+                "species": _read_species(
+                    h5file=h5file,
                     filename=filename,
                 ),
                 "selected_r": selected_r,

@@ -12,10 +12,69 @@ from .plotting import plot_converted_distribution
 from .remapping import remap_to_uniform_grid
 from .reporting import write_moment_report
 from .transformation import (
+    ATOMIC_MASS_GRAMS,
     ERG_PER_KEV,
-    SPECIES_MASS_AMU,
     transform_to_nonrelativistic_energy_pitch,
 )
+
+
+PARTICLE_DATASETS = (
+    "species",
+    "atomic_number",
+    "mass_number",
+    "charge_state",
+    "A",
+)
+
+
+def _read_particle_metadata(h5file, filename):
+    """Read scalar particle metadata from one Stage 1 reference file."""
+    missing_datasets = [
+        dataset_name
+        for dataset_name in PARTICLE_DATASETS
+        if dataset_name not in h5file
+    ]
+    if missing_datasets:
+        missing_names = ", ".join(missing_datasets)
+        raise ConfigError(
+            f"{filename} is missing particle datasets: {missing_names}"
+        )
+
+    species = h5file["species"][()]
+    if isinstance(species, bytes):
+        species = species.decode("utf-8")
+
+    metadata = {
+        "species": str(species).strip().lower(),
+        "atomic_number": int(h5file["atomic_number"][()]),
+        "mass_number": int(h5file["mass_number"][()]),
+        "charge_state": int(h5file["charge_state"][()]),
+        "A": float(h5file["A"][()]),
+    }
+    metadata["attributes"] = {
+        dataset_name: dict(h5file[dataset_name].attrs)
+        for dataset_name in PARTICLE_DATASETS
+    }
+    return metadata
+
+
+def _write_particle_metadata(h5file, particle):
+    """Copy scalar particle metadata into one Stage 2 output file."""
+    string_type = h5py.string_dtype(encoding="utf-8")
+    for dataset_name in PARTICLE_DATASETS:
+        if dataset_name == "species":
+            output_dataset = h5file.create_dataset(
+                dataset_name,
+                data=particle[dataset_name],
+                dtype=string_type,
+            )
+        else:
+            output_dataset = h5file.create_dataset(
+                dataset_name,
+                data=particle[dataset_name],
+            )
+        for attribute_name, value in particle["attributes"][dataset_name].items():
+            output_dataset.attrs[attribute_name] = value
 
 
 def _indexed_path(base_path, case_index):
@@ -75,8 +134,14 @@ def _calculate_output_moments(energy, pitch, f_array, mass_grams):
     return density, parallel_pressure / density, perpendicular_pressure / density
 
 
-def _write_output(output_path, reference_path, reference, uniform, moments):
-    """Write one single-location distribution using the FIDASIM HDF5 schema."""
+def _write_output(
+    output_path,
+    reference_path,
+    reference,
+    uniform,
+    moments,
+):
+    """Write one self-describing distribution using the FIDASIM HDF5 schema."""
     energy = uniform["energy"]
     pitch = uniform["pitch"]
     f_array = uniform["f_array"]
@@ -94,7 +159,10 @@ def _write_output(output_path, reference_path, reference, uniform, moments):
         h5file.create_dataset("z", data=np.array([reference["selected_z"]]))
         h5file.create_dataset("denf", data=np.array([[density]]))
         h5file.create_dataset("f", data=f_array.T[np.newaxis, np.newaxis, :, :])
-        h5file.create_dataset("A", data=SPECIES_MASS_AMU[reference["species"]])
+        _write_particle_metadata(
+            h5file=h5file,
+            particle=reference,
+        )
 
         moments_group = h5file.create_group("moments")
         moments_group.create_dataset("density", data=density)
@@ -113,7 +181,6 @@ def _write_output(output_path, reference_path, reference, uniform, moments):
         moments_group["parallel_temperature"].attrs["units"] = "keV"
         moments_group["perpendicular_temperature"].attrs["units"] = "keV"
         h5file.attrs["source_reference"] = str(reference_path.resolve())
-        h5file.attrs["species"] = reference["species"]
 
 
 def run_conversion(config_path):
@@ -127,9 +194,13 @@ def run_conversion(config_path):
     report_results = []
     for case_index, reference_path in enumerate(references, start=1):
         with h5py.File(reference_path, mode="r") as h5file:
-            species = str(h5file.attrs["species"]).lower()
+            particle = _read_particle_metadata(
+                h5file=h5file,
+                filename=reference_path,
+            )
+            species = particle["species"]
             reference = {
-                "species": species,
+                **particle,
                 "selected_r": float(h5file["selected_r"][()]),
                 "selected_z": float(h5file["selected_z"][()]),
             }
@@ -143,7 +214,7 @@ def run_conversion(config_path):
                 u_bar=h5file["u_bar"][:],
                 theta=h5file["theta"][:],
                 u_norm=float(h5file["u_norm"][()]),
-                species=species,
+                mass_amu=particle["A"],
             )
 
         uniform = remap_to_uniform_grid(
@@ -154,7 +225,7 @@ def run_conversion(config_path):
             nenergy=input_config["nenergy"],
             npitch=input_config["npitch"],
         )
-        mass_grams = SPECIES_MASS_AMU[species] * 1.66053906660e-24
+        mass_grams = reference["A"] * ATOMIC_MASS_GRAMS
         moments = _calculate_output_moments(
             energy=uniform["energy"],
             pitch=uniform["pitch"],
@@ -162,7 +233,13 @@ def run_conversion(config_path):
             mass_grams=mass_grams,
         )
         output_path = _indexed_path(output_base, case_index)
-        _write_output(output_path, reference_path, reference, uniform, moments)
+        _write_output(
+            output_path=output_path,
+            reference_path=reference_path,
+            reference=reference,
+            uniform=uniform,
+            moments=moments,
+        )
         print(f"Wrote converted file: {output_path}")
         output_paths.append(output_path)
 

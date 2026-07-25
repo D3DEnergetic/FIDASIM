@@ -8,14 +8,9 @@ from regression_test_tools import ConfigError
 SPEED_OF_LIGHT_CM_PER_SECOND = 2.99792458e10
 ERG_PER_KEV = 1.602176634e-9
 ATOMIC_MASS_GRAMS = 1.66053906660e-24
-SPECIES_MASS_AMU = {
-    "h": 1.007276466879,
-    "d": 2.013553212745,
-    "t": 3.01550071632,
-}
 
 
-def _validate_inputs(f_u_theta, u_bar, theta, u_norm, species):
+def _validate_inputs(f_u_theta, u_bar, theta, u_norm, mass_amu):
     """Check the arrays and physical values used by the transformation."""
     expected_shape = (theta.size, u_bar.size)
     if f_u_theta.shape != expected_shape:
@@ -31,8 +26,8 @@ def _validate_inputs(f_u_theta, u_bar, theta, u_norm, species):
         raise ConfigError("u_bar must be uniformly spaced.")
     if u_norm <= 0.0:
         raise ConfigError("u_norm must be greater than zero.")
-    if species not in SPECIES_MASS_AMU:
-        raise ConfigError(f"Unsupported species for transformation: {species}")
+    if mass_amu <= 0.0:
+        raise ConfigError("The isotope mass A must be greater than zero.")
     if not np.all(np.isfinite(f_u_theta)) or np.any(f_u_theta < 0.0):
         raise ConfigError("f_u_theta must contain finite, nonnegative values.")
 
@@ -42,7 +37,7 @@ def transform_to_nonrelativistic_energy_pitch(
     u_bar,
     theta,
     u_norm,
-    species,
+    mass_amu,
 ):
     """Transform CQL3D values onto their corresponding nonuniform E-P points.
 
@@ -55,7 +50,7 @@ def transform_to_nonrelativistic_energy_pitch(
         u_bar (array-like): Normalized proper-velocity coordinates.
         theta (array-like): Pitch-angle coordinates in radians.
         u_norm (float): Proper-velocity normalization in cm/s.
-        species (str): Ion species identifier: ``h``, ``d``, or ``t``.
+        mass_amu (float): Physical isotope mass in atomic mass units.
 
     Returns:
         dict: Nonuniform energy grid, increasing pitch grid, transformed
@@ -65,17 +60,17 @@ def transform_to_nonrelativistic_energy_pitch(
     u_bar = np.asarray(u_bar, dtype=float)
     theta = np.asarray(theta, dtype=float)
     u_norm = float(u_norm)
-    species = species.strip().lower()
+    mass_amu = float(mass_amu)
 
     _validate_inputs(
         f_u_theta=f_u_theta,
         u_bar=u_bar,
         theta=theta,
         u_norm=u_norm,
-        species=species,
+        mass_amu=mass_amu,
     )
 
-    mass_grams = SPECIES_MASS_AMU[species] * ATOMIC_MASS_GRAMS
+    mass_grams = mass_amu * ATOMIC_MASS_GRAMS
     u = u_bar * u_norm
 
     # FIDASIM interprets energy using the nonrelativistic relation E=m*u^2/2.

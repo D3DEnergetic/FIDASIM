@@ -93,26 +93,35 @@ perpendicular temperature.
 Each selected location produces one indexed HDF5 file with the following
 datasets:
 
-| Dataset | Shape | Description |
-|---|---:|---|
-| `mnemonic` | scalar | CQL3D run identifier |
-| `version` | scalar | CQL3D version identifier |
-| `enorm` | scalar | CQL3D energy normalization in keV |
-| `k` | scalar | CQL3D species number |
-| `u_norm` | scalar | Proper-velocity normalization in cm/s |
-| `selected_r` | scalar | Selected radial coordinate in cm |
-| `selected_z` | scalar | Selected axial coordinate in cm |
-| `u_bar` | `(nu,)` | Normalized proper-velocity grid |
-| `theta` | `(ntheta,)` | Pitch-angle grid in radians |
-| `u_bar_weight` | `(nu,)` | Integration weights $\bar{u}^2d\bar{u}$ |
-| `theta_weight` | `(ntheta,)` | Integration weights $2\pi\sin\theta\,d\theta$ |
-| `f_u_theta` | `(ntheta, nu)` | Distribution at the selected location, in `ions*u_norm**3/(cm**3*(cm/sec)**3)` |
-| `moments/density` | scalar | Fast-ion density in ions/cm³ |
-| `moments/parallel_temperature` | scalar | Relativistic parallel pressure-equivalent temperature in keV |
-| `moments/perpendicular_temperature` | scalar | Relativistic perpendicular pressure-equivalent temperature in keV |
+| Dataset | Shape | Units | Description |
+|---|---:|---|---|
+| `mnemonic` | scalar | — | CQL3D run identifier |
+| `version` | scalar | — | CQL3D version identifier |
+| `enorm` | scalar | keV | CQL3D energy normalization |
+| `k` | scalar | dimensionless | CQL3D species number |
+| `u_norm` | scalar | cm/s | Proper-velocity normalization |
+| `selected_r` | scalar | cm | Selected radial coordinate |
+| `selected_z` | scalar | cm | Selected axial coordinate |
+| `u_bar` | `(nu,)` | dimensionless | Normalized proper-velocity grid |
+| `theta` | `(ntheta,)` | radians | Pitch-angle grid |
+| `u_bar_weight` | `(nu,)` | dimensionless | Integration weights $\bar{u}^2d\bar{u}$ |
+| `theta_weight` | `(ntheta,)` | dimensionless | Integration weights $2\pi\sin\theta\,d\theta$ |
+| `f_u_theta` | `(ntheta, nu)` | `ions*u_norm**3/(cm**3*(cm/sec)**3)` | Distribution at the selected location |
+| `species` | scalar | — | Canonical fast-ion species identifier, such as `d` |
+| `atomic_number` | scalar | dimensionless | Number of protons in the ion nucleus |
+| `mass_number` | scalar | dimensionless | Integer isotope mass number: protons plus neutrons |
+| `charge_state` | scalar | elementary charge | Ion charge state |
+| `A` | scalar | amu | Physical isotope mass |
+| `moments/density` | scalar | ions/cm³ | Fast-ion density |
+| `moments/parallel_temperature` | scalar | keV | Relativistic parallel pressure-equivalent temperature |
+| `moments/perpendicular_temperature` | scalar | keV | Relativistic perpendicular pressure-equivalent temperature |
 
-The file attributes record the source path, requested location, selected source
-indices, species, atomic number, mass number, and charge state.
+The particle datasets make every reference file self-describing. In particular,
+`mass_number` is the integer isotope identifier, whereas `A` is the precise
+physical isotope mass used in calculations.
+
+The root attributes contain provenance: the source path, requested location,
+and selected source indices.
 
 The HDF5 moment datasets retain full numerical precision and are the
 authoritative inputs for later comparisons. `reference_moments.txt` presents

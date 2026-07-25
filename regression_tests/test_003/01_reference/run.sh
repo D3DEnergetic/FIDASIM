@@ -6,4 +6,4 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-python3 generate_reference_data.py "$1"
+python3 validate_reference_data.py "$1"

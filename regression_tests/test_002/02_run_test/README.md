@@ -25,6 +25,37 @@ For this collection, `reference_config` points to
 plots, and the moment report are written under
 `output_data/dataset_A/`.
 
+## Converted HDF5 schema
+
+Each indexed output is a self-describing, single-location FIDASIM
+energy-pitch distribution. Its root datasets are:
+
+| Dataset | Shape | Units | Description |
+|---|---:|---|---|
+| `nenergy` | scalar | dimensionless | Number of energy-grid points |
+| `npitch` | scalar | dimensionless | Number of pitch-grid points |
+| `nr` | scalar | dimensionless | Number of radial-grid points; one for this test |
+| `nz` | scalar | dimensionless | Number of axial-grid points; one for this test |
+| `energy` | `(nenergy,)` | keV | Uniform kinetic-energy grid |
+| `pitch` | `(npitch,)` | dimensionless | Uniform pitch grid |
+| `r` | `(1,)` | cm | Selected radial coordinate |
+| `z` | `(1,)` | cm | Selected axial coordinate |
+| `denf` | `(1, 1)` | ions/cm³ | Fast-ion density |
+| `f` | `(1, 1, npitch, nenergy)` | `ions/(cm^3*keV*dP)` | FIDASIM distribution |
+| `species` | scalar | — | Canonical fast-ion species identifier, such as `d` |
+| `atomic_number` | scalar | dimensionless | Number of protons in the ion nucleus |
+| `mass_number` | scalar | dimensionless | Integer isotope mass number: protons plus neutrons |
+| `charge_state` | scalar | elementary charge | Ion charge state |
+| `A` | scalar | amu | Physical isotope mass |
+| `moments/density` | scalar | ions/cm³ | Fast-ion density |
+| `moments/parallel_temperature` | scalar | keV | Parallel temperature |
+| `moments/perpendicular_temperature` | scalar | keV | Perpendicular temperature |
+
+Stage 2 copies the five particle datasets from its Stage 1 reference. Thus,
+`mass_number` remains the integer isotope identifier while `A` retains the
+precise physical isotope mass used in calculations. The `source_reference`
+root attribute records the reference-file provenance.
+
 ## Relativistic coordinate transformation
 
 ### 1. Source density element

@@ -33,12 +33,14 @@ contains
     character(len=512) :: iomsg
     integer :: unit, ios, i
 
+    ! Define namelist that matches the normalized configuration file structure:
     namelist /run_test/ n_cases, distribution_files, runids, &
       tables_filename, test_config, input_distribution_config, &
       output_directory, case_comment, implementation_comment, n_markers, &
       reservoir_size, seed, save_data, neutral_density, neutral_energy, &
       injection_angle, level_split_method, level_decay
 
+    ! Set default values for the configuration parameters:
     n_cases = 0
     distribution_files = ''
     runids = ''
@@ -58,6 +60,7 @@ contains
     level_split_method = ''
     level_decay = 0.0_Float64
 
+    ! Open the configuration file:
     open(newunit=unit, file=trim(filename), status='old', action='read', &
       iostat=ios, iomsg=iomsg)
     if (ios /= 0) then
@@ -66,6 +69,7 @@ contains
       error stop 'Configuration file open failed'
     end if
 
+    ! Read the configuration parameters from the namelist:
     read(unit, nml=run_test, iostat=ios, iomsg=iomsg)
     close(unit)
     if (ios /= 0) then
@@ -91,6 +95,7 @@ contains
       end if
     end do
 
+    ! Assign the validated values to the output configuration type:
     config%n_cases = n_cases
     config%tables_filename = trim(tables_filename)
     config%test_config = trim(test_config)
@@ -108,12 +113,14 @@ contains
     config%level_split_method = trim(level_split_method)
     config%level_decay = level_decay
 
+    ! Allocate and assign the distribution file paths and run IDs:
     allocate(config%distribution_files(n_cases))
     allocate(config%runids(n_cases))
     do i = 1, n_cases
       config%distribution_files(i) = trim(distribution_files(i))
       config%runids(i) = trim(runids(i))
     end do
+
   end subroutine read_config
 
   subroutine print_config(config)

@@ -7,7 +7,6 @@ module test_004_types
   integer, parameter, public :: fidasim_string_length = 200
   integer, parameter, public :: comment_length = 1024
   integer, parameter, public :: selector_length = 64
-  integer, parameter, public :: species_length = 16
   integer, parameter, public :: number_of_atomic_levels = 6
 
   type, public :: MonteCarloConfig
@@ -42,7 +41,6 @@ module test_004_types
     real(Float64) :: denf = 0.0_Float64
     real(Float64) :: selected_r = 0.0_Float64
     real(Float64) :: selected_z = 0.0_Float64
-    character(len=species_length) :: species = ''
     integer(Int32) :: atomic_number = 0
     integer(Int32) :: mass_number = 0
     integer(Int32) :: charge_state = 0

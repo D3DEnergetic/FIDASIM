@@ -28,12 +28,12 @@ The Monte Carlo workflow uses Python wrappers around the Fortran calculation:
 3. After Fortran runs, Python will read the output files and produce the
    requested plots and other presentation-level results.
 
-At the present development stage, the first step, the Fortran configuration
-and HDF5 readers, and neutral-parameter construction are implemented. The
-program prints the normalized configuration, each input distribution, and the
-derived six-level neutral population and velocity to the terminal; it does not
-yet calculate the ion sink. The output-processing Python wrapper will be added
-after the Fortran calculation produces output.
+At the present development stage, the Python input wrapper, Fortran
+configuration and HDF5 readers, neutral-parameter construction, and artificial
+FIDASIM grid/plasma/field/FBM test setup are implemented. The program prints a
+summary of each stage to the terminal; it does not yet populate the neutral
+reservoir or calculate the ion sink. The output-processing Python wrapper will
+be added after the Fortran calculation produces output.
 
 Run the current workflow from the FIDASIM repository root:
 
@@ -78,7 +78,7 @@ All relative paths are resolved from the unified configuration file.
 Monte Carlo files are written beneath
 `save_data_block/output_directory/monte_carlo`.
 
-## Fixed numerical fixture
+## Fixed numerical test setup
 
 The following values define the regression problem and are not configurable:
 
@@ -206,7 +206,7 @@ and appends `/test_004` metadata:
 - `n_markers`, `reservoir_size`, and seed;
 - saved scalar center-cell sink-rate density and summed particle rate divided
   by the cell volume;
-- fixed fixture and coordinate-convention metadata.
+- fixed test setup and coordinate-convention metadata.
 
 This preserves the production sink format while making every Monte Carlo file
 self-contained for the future Python plotting and comparison workflow.
@@ -219,8 +219,8 @@ one serial Fortran executable.
 ### Source tree
 
 The normalizer, Fortran configuration boundary, HDF5 distribution reader,
-neutral construction, and launcher are implemented. The fixture, sink, and
-plotter components shown below remain planned:
+neutral construction, artificial test setup, and launcher are implemented. The
+sink and plotter components shown below remain planned:
 
 ```text
 02_monte_carlo/
@@ -233,15 +233,15 @@ plotter components shown below remain planned:
     └── modules/
         ├── test_004_types.f90
         ├── test_004_config.f90
+        ├── test_004_hdf5_utils.f90
         ├── test_004_hdf5.f90
         ├── test_004_neutral.f90
-        ├── test_004_fixture.f90
+        ├── test_004_setup.f90
         └── test_004_sink.f90
 ```
 
-The Test 004 makefile currently builds the data-types, configuration, and HDF5
-reader modules. It links HDF5 but does not yet link the FIDASIM calculation
-modules.
+The Test 004 makefile builds the implemented modules and links the FIDASIM and
+HDF5 objects required by the artificial test setup.
 
 ### Python normalization
 
@@ -300,7 +300,7 @@ match FIDASIM's fixed character fields.
 `test_004_types` defines `MonteCarloConfig`, which owns every normalized
 scalar and exact-size arrays for the distribution paths and run IDs, and
 `DistributionCase`, which owns one loaded smooth distribution and its
-location and species metadata, and `NeutralParameters`, which owns the
+location and numerical isotope metadata, and `NeutralParameters`, which owns the
 six-level density vector, mass, speed, and Cartesian velocity. It does not use
 `libfida` or HDF5. The sink-summary type will be introduced with the module
 that needs it.
@@ -328,9 +328,15 @@ make
 
 The current executable reads and prints the normalized configuration, then
 loads every discovered Test 002 HDF5 file and prints its grid, distribution,
-density, location, and species summary.
+density, location, and numerical isotope summary.
 
-`test_004_hdf5` provides:
+`test_004_hdf5_utils` contains the test-local, schema-independent HDF5
+operations used to read real vectors, one-value arrays, real and integer
+scalars, and array dimensions. It also provides common HDF5 status handling.
+Its diagnostics describe only the failed HDF5 operation, dataset, and file;
+they do not refer to Test 002 or Test 004.
+
+`test_004_hdf5` provides the Test 002 distribution-specific interface:
 
 ```fortran
 call read_distribution(filename, distribution)
@@ -339,9 +345,11 @@ call release_distribution(distribution)
 ```
 
 It reads the energy and pitch grids, the single spatial slice of the smooth
-distribution, `denf`, selected `R` and `Z`, species, atomic number, mass
-number, charge state, and physical mass `A`. The future output writer will add
-the corresponding Test 004 metadata to the sink files.
+distribution, `denf`, selected `R` and `Z`, atomic number, mass number, charge
+state, and physical mass `A`. The human-readable `species` dataset is retained
+in the upstream file for provenance but is not required or read by the Fortran
+calculation. The future output writer will add the corresponding Test 004
+metadata to the sink files.
 
 `test_004_neutral` provides:
 
@@ -357,20 +365,23 @@ then applied as
 split across exactly six atomic levels using the same `ground-only` or
 normalized exponential rule as the deterministic implementation.
 
-`test_004_fixture` owns all allocation and initialization of FIDASIM global
-structures. It provides:
+`test_004_setup` constructs the artificial FIDASIM state required by each
+distribution case. It provides:
 
 ```fortran
-call build_neutral_parameters(config, distribution, neutral)
-call setup_fixture(config, distribution, neutral)
-call teardown_fixture()
+call initialize_test_setup(distribution)
+call print_test_setup()
+call teardown_test_setup()
 ```
 
-`setup_fixture` owns the required initialization order: inputs and species,
-interpolation grid, equilibrium, beam grid, FBM, atomic tables, and neutral
-population. `teardown_fixture` releases only structures allocated by this
-module; it does not touch sink arrays after the production writer has released
-them.
+`initialize_test_setup` initializes the production controls and species mass,
+the `6x9x1` interpolation grid, uniform equilibrium, `3x3x3` beam grid, and
+the spatially replicated FBM. Its cylindrical interpolation domain,
+`R=[0,2.5] cm` and `Z=[-2,2] cm`, encloses the Cartesian beam-grid volume.
+The equilibrium mask is established before `make_beam_grid` classifies its 27
+cells. The source distribution is deliberately replicated over the complete
+interpolation grid to represent a spatially uniform ion population. Atomic
+tables and the type-1 neutral population remain part of the next checkpoint.
 
 `test_004_sink` provides:
 
@@ -395,10 +406,10 @@ read normalized configuration
 for each case
     read distribution
     construct neutral parameters
-    setup fixture
+    initialize test setup
     run sink case and optionally write the production file
     if a file was written, append Test 004 metadata
-    teardown fixture
+    teardown test setup
     release distribution
 end for
 ```

@@ -12,10 +12,14 @@ program test_004
   use test_004_neutral, &
     only: &
       build_neutral_parameters, &
-      print_neutral_parameters
+      print_neutral_parameters, &
+      initialize_neutral_population, &
+      print_neutral_population, &
+      release_neutral_population
   use test_004_setup, &
     only: &
       configure_fidasim, &
+      initialize_serial_rng, &
       initialize_atomic_tables, &
       print_atomic_table_setup, &
       initialize_test_setup, &
@@ -40,6 +44,7 @@ program test_004
   call configure_fidasim(config)
   call initialize_atomic_tables()
   call print_atomic_table_setup()
+  call initialize_serial_rng()
 
   ! Loop over each distribution case specified in the configuration file:
   do case_index = 1, config%n_cases
@@ -50,6 +55,9 @@ program test_004
     call print_neutral_parameters(neutral)
     call initialize_test_setup(distribution)
     call print_test_setup()
+    call initialize_neutral_population(config, neutral)
+    call print_neutral_population(config, neutral)
+    call release_neutral_population()
     call teardown_test_setup()
     call release_distribution(distribution)
   end do

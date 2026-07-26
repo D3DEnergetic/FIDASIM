@@ -32,9 +32,11 @@ At the present development stage, the Python input wrapper, Fortran
 configuration and HDF5 readers, neutral-parameter construction, and artificial
 FIDASIM grid/plasma/field/FBM test setup are implemented. The configured
 atomic tables are loaded once before the distribution cases are processed.
-The program prints a summary of each stage to the terminal; it does not yet
-populate the neutral reservoir or calculate the ion sink. The output-processing
-Python wrapper will be added after the Fortran calculation produces output.
+For each case, the type-1 neutral density and reservoir are populated only in
+the central beam cell and then released. The program prints and verifies a
+summary of each stage; it does not yet sample ions or calculate the ion sink.
+The output-processing Python wrapper will be added after the Fortran
+calculation produces output.
 
 After reading the normalized configuration, `configure_fidasim` translates
 the shared Test 004 settings into the case-independent FIDASIM controls. This

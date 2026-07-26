@@ -13,6 +13,7 @@ module test_004_setup
       inputs, &
       tables, &
       impurity_charge, &
+      reservoir_size, &
       n_thermal, &
       thermal_mass, &
       read_tables, &
@@ -26,6 +27,10 @@ module test_004_setup
     only: &
       MonteCarloConfig, &
       DistributionCase
+  use utilities, &
+    only: &
+      rng, &
+      rng_init
   implicit none
   private
 
@@ -44,6 +49,7 @@ module test_004_setup
 
   public :: &
     configure_fidasim, &
+    initialize_serial_rng, &
     initialize_atomic_tables, &
     print_atomic_table_setup, &
     initialize_test_setup, &
@@ -67,13 +73,29 @@ contains
     inputs%calc_neutron = 0 ! Neutron calculation is not used in this test.
     inputs%calc_cfpd = 0 ! CFPD calculation is not used in this test.
     inputs%verbose = 0 ! Verbose output is not used in this test.
+    inputs%seed = config%seed
+    inputs%reservoir_size = config%reservoir_size
     n_thermal = 1 ! Only one ion species is used in this test.
+    reservoir_size = config%reservoir_size
 
     ! read_tables always loads one impurity-transition table. Carbon is used
     ! only to satisfy that production interface; the test impurity density is
     ! zero, so this table does not contribute to the ion-sink calculation.
     impurity_charge = carbon_charge_state
   end subroutine configure_fidasim
+
+  subroutine initialize_serial_rng()
+    !+ Initialize the single FIDASIM random-number stream from the test seed.
+
+    if (.not. allocated(rng)) then
+      allocate(rng(1))
+    else if (size(rng) /= 1) then
+      deallocate(rng)
+      allocate(rng(1))
+    end if
+
+    call rng_init(rng(1), inputs%seed)
+  end subroutine initialize_serial_rng
 
   subroutine initialize_atomic_tables()
     !+ Load the production atomic data selected by configure_fidasim.

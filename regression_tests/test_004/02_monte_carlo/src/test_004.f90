@@ -19,6 +19,7 @@ program test_004
   use test_004_setup, &
     only: &
       configure_fidasim, &
+      configure_fidasim_case, &
       initialize_serial_rng, &
       reset_serial_rng, &
       initialize_atomic_tables, &
@@ -30,7 +31,7 @@ program test_004
     only: &
       calculate_ion_sink, &
       print_ion_sink, &
-      release_ion_sink
+      finalize_ion_sink
   implicit none
 
   type(MonteCarloConfig) :: config
@@ -54,6 +55,7 @@ program test_004
 
   ! Loop over each distribution case specified in the configuration file:
   do case_index = 1, config%n_cases
+    call configure_fidasim_case(config, case_index)
     call read_distribution( &
       trim(config%distribution_files(case_index)), distribution)
     call print_distribution(distribution)
@@ -66,7 +68,7 @@ program test_004
     call reset_serial_rng()
     call calculate_ion_sink(config, distribution)
     call print_ion_sink(config)
-    call release_ion_sink()
+    call finalize_ion_sink(config)
     call release_neutral_population()
     call teardown_test_setup()
     call release_distribution(distribution)

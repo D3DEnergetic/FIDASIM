@@ -39,8 +39,9 @@ show the production sampling interface. The complete configured marker loop
 then samples the nonthermal distribution, calculates type-1 CX rates, and
 stores both the central-cell sink density and production sink particles. The
 particle count, spatial support, and agreement between the density and summed
-particle weights are verified. Production HDF5 output and its Python
-postprocessor are not yet implemented.
+particle weights are verified. When saving is enabled, the production
+`write_sink_profile` routine writes and releases each case's sink data. The
+Python postprocessor is not yet implemented.
 
 After reading the normalized configuration, `configure_fidasim` translates
 the shared Test 004 settings into the case-independent FIDASIM controls. This

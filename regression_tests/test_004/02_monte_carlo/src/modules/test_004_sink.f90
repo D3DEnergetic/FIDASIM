@@ -8,11 +8,13 @@ module test_004_sink
   use libfida, &
     only: &
       beam_grid, &
+      inputs, &
       sink, &
       nbif_type, &
       get_total_cx_rate, &
       store_sinks, &
-      store_sink_particle
+      store_sink_particle, &
+      write_sink_profile
   use test_004_types, &
     only: &
       MonteCarloConfig, &
@@ -31,7 +33,7 @@ module test_004_sink
   integer(Int32), parameter :: neutral_types(1) = [nbif_type]
   real(Float64), parameter :: maximum_relative_rate_error = 1.0e-12_Float64
 
-  public :: calculate_ion_sink, print_ion_sink, release_ion_sink
+  public :: calculate_ion_sink, print_ion_sink, finalize_ion_sink
 
 contains
 
@@ -132,11 +134,36 @@ contains
       '    relative rate difference: ', relative_rate_error
   end subroutine print_ion_sink
 
-  subroutine release_ion_sink()
-    !+ Release sink storage when no production HDF5 writer is called.
-    sink%cnt = 1
-    if (allocated(sink%part)) deallocate(sink%part)
-    if (allocated(sink%dens)) deallocate(sink%dens)
-  end subroutine release_ion_sink
+  subroutine finalize_ion_sink(config)
+    !+ Write the production sink file or release unsaved sink storage.
+    type(MonteCarloConfig), intent(in) :: config
+      !+ Configuration selecting whether the production output is saved.
+    character(len=4096) :: output_filename
+    logical :: output_exists
+
+    if (config%save_data) then
+      output_filename = trim(inputs%result_dir)//'/'// &
+        trim(inputs%runid)//'_sink.h5'
+
+      ! The production writer resets sink%cnt and releases both sink arrays.
+      call write_sink_profile()
+
+      inquire(file=trim(output_filename), exist=output_exists)
+      if (.not. output_exists) then
+        error stop 'The production ion-sink file was not created'
+      end if
+      if (sink%cnt /= 1 .or. allocated(sink%part) .or. &
+          allocated(sink%dens)) then
+        error stop 'The production sink writer did not release sink storage'
+      end if
+
+      write(output_unit, '(a,a)') '    production sink file: ', &
+        trim(output_filename)
+    else
+      sink%cnt = 1
+      if (allocated(sink%part)) deallocate(sink%part)
+      if (allocated(sink%dens)) deallocate(sink%dens)
+    end if
+  end subroutine finalize_ion_sink
 
 end module test_004_sink

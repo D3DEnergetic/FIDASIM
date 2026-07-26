@@ -49,6 +49,7 @@ module test_004_setup
 
   public :: &
     configure_fidasim, &
+    configure_fidasim_case, &
     initialize_serial_rng, &
     reset_serial_rng, &
     initialize_atomic_tables, &
@@ -66,6 +67,7 @@ contains
 
     ! Set the FIDASIM input configuration to match the Test 004 requirements.
     inputs%tables_file = trim(config%tables_filename)
+    inputs%result_dir = trim(config%output_directory)
     inputs%full_f = 1 ! Distribution is a full distirbution not a correction to a thermal distribution.
     inputs%non_thermal_beam_stopping = 0 ! Non-thermal beam stopping is not used in this test.
     inputs%non_thermal_cx_sampling = 1 ! Non-thermal CX sampling is used in this test.
@@ -76,6 +78,7 @@ contains
     inputs%verbose = 0 ! Verbose output is not used in this test.
     inputs%seed = config%seed
     inputs%reservoir_size = config%reservoir_size
+    inputs%n_dcx = config%n_markers
     n_thermal = 1 ! Only one ion species is used in this test.
     reservoir_size = config%reservoir_size
 
@@ -84,6 +87,16 @@ contains
     ! zero, so this table does not contribute to the ion-sink calculation.
     impurity_charge = carbon_charge_state
   end subroutine configure_fidasim
+
+  subroutine configure_fidasim_case(config, case_index)
+    !+ Select the FIDASIM run ID used to name one case's sink file.
+    type(MonteCarloConfig), intent(in) :: config
+      !+ Configuration containing the normalized per-case run IDs.
+    integer, intent(in) :: case_index
+      !+ Current position in the ordered distribution collection.
+
+    inputs%runid = trim(config%runids(case_index))
+  end subroutine configure_fidasim_case
 
   subroutine initialize_serial_rng()
     !+ Initialize the single FIDASIM random-number stream from the test seed.

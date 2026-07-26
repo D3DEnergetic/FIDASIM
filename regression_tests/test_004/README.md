@@ -221,7 +221,9 @@ output.
 The implementation-specific schemas are documented with the
 [deterministic interface](01_deterministic/README.md#input-configuration) and
 [Monte Carlo interface](02_monte_carlo/README.md#input-configuration).
-The comparison stage will own a separate configuration under `03_compare`.
+The comparison stage owns a
+[separate configuration and schema](03_compare/README.md#input-configuration)
+under `03_compare`.
 
 ## How Test 004 finds and validates its input distributions
 

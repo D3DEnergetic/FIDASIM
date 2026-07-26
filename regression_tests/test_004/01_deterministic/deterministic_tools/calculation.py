@@ -77,7 +77,7 @@ def calculate_deterministic(distribution, table, neutral_config, n_gyro):
     relative_energy = V2_TO_ENERGY_PER_AMU * relative_speed**2
     cross_section = interpolate_cross_sections(table, relative_energy)
 
-    # On disk the final two axes are initial neutral level and final level.
+    # The table reader presents the final two axes as (initial, final).
     state_rates = np.einsum(
         "...lm,l,...->...m",
         cross_section,

@@ -243,12 +243,19 @@ expression on the configured midpoint gyrophase grid.
 
 ## Atomic-rate evaluation
 
-The `/cross/H_H/cx` dataset has axes
-`(relative energy, initial level, final level)`. For each $E,p,\phi$, the
-deterministic calculation follows `bb_cx_rates`: it linearly interpolates
-$\log_{10}\sigma_{m\leftarrow l}$ on the table's uniformly spaced
-$\log_{10}\varepsilon_{\rm rel}$ grid, clamps an out-of-range energy to the
-nearest endpoint, restores the cross section in `cm^2`, and evaluates
+The atomic table is written through the Fortran HDF5 interface in the logical
+order `cx(initial level, final level, relative energy)`. Consequently, h5py
+exposes `/cross/H_H/cx` in the reversed storage order
+`(relative energy, final level, initial level)`. The deterministic reader
+swaps the two level axes once and presents the calculation with the canonical
+order `(relative energy, initial level, final level)`, matching FIDASIM's
+internal `bb_cx_rates` matrix.
+
+For each $E,p,\phi$, the deterministic calculation follows `bb_cx_rates`: it
+linearly interpolates $\log_{10}\sigma_{m\leftarrow l}$ on the table's
+uniformly spaced $\log_{10}\varepsilon_{\rm rel}$ grid, clamps an out-of-range
+energy to the nearest endpoint, restores the cross section in `cm^2`, and
+evaluates
 
 $$
 r_m(E,p,\phi)

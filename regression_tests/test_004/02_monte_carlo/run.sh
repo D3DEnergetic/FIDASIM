@@ -15,3 +15,5 @@ python3 normalize_config.py "${config_file}" "${normalized_config}"
 make -C ..
 
 ./test_004 "${normalized_config}"
+
+python3 postprocess_monte_carlo.py "${config_file}"

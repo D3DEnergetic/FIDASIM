@@ -5,10 +5,13 @@ from pathlib import Path
 from regression_test_tools import ConfigError, print_config
 
 from .atomic import read_charge_exchange_table
-from test_004_tools import discover_distributions, read_deterministic_config
+from test_004_tools import (
+    discover_distributions,
+    read_deterministic_config,
+    read_distribution,
+)
 
 from .calculation import calculate_deterministic
-from .data import read_distribution
 from .output import write_deterministic
 from .plotting import plot_deterministic
 

@@ -1,0 +1,17 @@
+&compare
+  comment = 'Dataset A: deterministic and Monte Carlo ion-sink comparison'
+  test_config = '../input_config_A.nml'
+  rate_relative_tolerance = 0.02
+  rate_sigma_tolerance = 3.0
+  generate_plots = .true.
+/
+
+&plot_data_block
+  scale = 'lin'
+  emax = 150
+  fmin = 'auto'
+  fmax = 'auto'
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  contour_levels = 30
+/

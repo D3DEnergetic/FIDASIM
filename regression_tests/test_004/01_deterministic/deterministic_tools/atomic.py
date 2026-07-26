@@ -32,8 +32,11 @@ def read_charge_exchange_table(filename):
     if raw.shape[1] < N_LEVELS or raw.shape[2] < N_LEVELS:
         raise ConfigError(f"{filename}: H-H CX table has fewer than six levels.")
 
-    # The HDF5 axes are (energy, initial neutral level, final neutral level).
-    cross_section = raw[:, :N_LEVELS, :N_LEVELS]
+    # The Fortran table writer stores cx(initial, final, energy). HDF5 exposes
+    # those dimensions to h5py in reverse order as (energy, final, initial).
+    # Swap the level axes here so the Python-facing table has the explicit
+    # semantic order (energy, initial, final) used by the calculation.
+    cross_section = raw[:, :N_LEVELS, :N_LEVELS].swapaxes(1, 2)
     positive = cross_section[cross_section > 0.0]
     if positive.size == 0:
         raise ConfigError(f"{filename}: H-H CX table has no positive entries.")

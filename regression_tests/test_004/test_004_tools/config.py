@@ -119,7 +119,13 @@ def _optional_comment(block, field_label):
 
 
 def _positive_integer(block, field_name, maximum=None):
-    value = require_integer(block[field_name], field_name)
+    raw_value = block[field_name]
+    if isinstance(raw_value, bool) or not isinstance(raw_value, (int, float)):
+        raise ConfigError(f"{field_name} must be an integer value.")
+    if isinstance(raw_value, float):
+        if not math.isfinite(raw_value) or not raw_value.is_integer():
+            raise ConfigError(f"{field_name} must be an integer value.")
+    value = int(raw_value)
     if value < 1:
         raise ConfigError(f"{field_name} must be positive.")
     if maximum is not None and value > maximum:

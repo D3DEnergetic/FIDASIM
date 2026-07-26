@@ -25,8 +25,8 @@ The Monte Carlo workflow uses Python wrappers around the Fortran calculation:
    flattened temporary namelist for Fortran.
 2. Fortran reads that normalized namelist and performs the Monte Carlo
    calculation.
-3. After Fortran runs, Python will read the output files and produce the
-   requested plots and other presentation-level results.
+3. After Fortran runs, Python reads the output files, constructs the
+   energy-pitch sink products, and produces the requested plots.
 
 At the present development stage, the Python input wrapper, Fortran
 configuration and HDF5 readers, neutral-parameter construction, and artificial
@@ -41,7 +41,9 @@ stores both the central-cell sink density and production sink particles. The
 particle count, spatial support, and agreement between the density and summed
 particle weights are verified. When saving is enabled, the production
 `write_sink_profile` routine writes and releases each case's sink data. The
-Python postprocessor is not yet implemented.
+Python postprocessor then validates the complete output collection, appends
+the weighted energy-pitch products under `/test_004`, and, when requested,
+writes one PNG ion-sink plot per case.
 
 After reading the normalized configuration, `configure_fidasim` translates
 the shared Test 004 settings into the case-independent FIDASIM controls. This
@@ -66,7 +68,7 @@ The implementation-specific portion of
 ```fortran
 &monte_carlo
   comment = 'Monte Carlo ion sampling and sink storage'
-  n_markers = 1000000
+  n_markers = 5e5
   reservoir_size = 50
   seed = 12345
   plot_data = .true.
@@ -84,9 +86,9 @@ All relative paths are resolved from the unified configuration file.
 | Variable | Type/size | Units | Required | Default | Allowed values and description |
 | --- | --- | --- | --- | --- | --- |
 | `comment` | String scalar | — | No | Empty | Human-readable description of the Monte Carlo implementation. |
-| `n_markers` | Integer scalar | — | Yes | None | Number of ion markers sampled independently for each distribution; range `1` to `2^63-1`. |
-| `reservoir_size` | Integer scalar | — | Yes | None | Number of representative neutral particles in the central-cell reservoir; range `1` to `2^31-1`. |
-| `seed` | Integer scalar | — | Yes | None | Serial RNG seed in the range `1` to `2^31-1`; reset for every distribution. |
+| `n_markers` | Integer-valued scalar | — | Yes | None | Number of ion markers sampled independently for each distribution; range `1` to `2^63-1`. Integral scientific notation such as `1e5` is accepted and normalized to an integer. |
+| `reservoir_size` | Integer-valued scalar | — | Yes | None | Number of representative neutral particles in the central-cell reservoir; range `1` to `2^31-1`. |
+| `seed` | Integer-valued scalar | — | Yes | None | Serial RNG seed in the range `1` to `2^31-1`; reset for every distribution. |
 | `plot_data` | Logical scalar | — | Yes | None | Enables the weighted Monte Carlo energy-pitch sink plot; requires `save_data=.true.`. |
 | `save_data` | Logical scalar | — | Yes | None | Enables the production sink HDF5 output. |
 
@@ -195,6 +197,12 @@ The deterministic and Monte Carlo directories therefore contain identical
 basenames in the same case order, allowing the two output collections to be
 paired without a separate mapping.
 
+When `monte_carlo/plot_data=.true.`, each HDF5 file is accompanied by a PNG
+with the same stem, for example `fidasim_f4d_001_ion_sink.png`. The plot reads
+only the self-contained `/test_004` group. It shows the weighted ion-sink
+distribution in energy-pitch space and marks the injected neutral with a
+green circle. Zero-valued bins are omitted on a logarithmic scale.
+
 The standard FIDASIM sink datasets remain authoritative:
 
 | Dataset | Units | Description |
@@ -210,21 +218,20 @@ The standard FIDASIM sink datasets remain authoritative:
 | `/atomic_mass` | `amu` | Ion mass associated with every sink particle. |
 | `/grid/*` | mixed | Artificial beam-grid definition written by `write_beam_grid`. |
 
-After `write_sink_profile` closes the file, a test-specific writer reopens it
-and appends `/test_004` metadata:
+After Fortran finishes, the Python postprocessor checks that every expected
+production file exists before modifying any of them. It then validates the
+particle count, central-cell indices, positive weights, spatial support, and
+agreement between `/dens` and the summed particle weights. It replaces the
+derived `/test_004` group on each run, leaving all production datasets intact.
 
-- source energy grid, pitch grid, smooth distribution, and `denf`;
-- source distribution and configuration provenance;
-- isotope and charge;
-- neutral velocity and six-level density vector;
-- neutral energy, injection angle, and level-split settings;
-- `n_markers`, `reservoir_size`, and seed;
-- saved scalar center-cell sink-rate density and summed particle rate divided
-  by the cell volume;
-- fixed test setup and coordinate-convention metadata.
+The group contains the same `energy`, `pitch`, `f_array`, `denf`,
+`sink_distribution`, `energy_marginal`, `pitch_marginal`, and
+`total_reaction_rate` names and units used by the deterministic artifacts. It
+also stores `sample_standard_deviation`, `standard_error`, the cell volume,
+Monte Carlo controls, neutral parameters, isotope metadata, selected source
+location, and input provenance.
 
-This preserves the production sink format while making every Monte Carlo file
-self-contained for the future Python plotting and comparison workflow.
+This makes every Monte Carlo file self-contained for plotting and comparison.
 
 ## Internal design
 
@@ -233,16 +240,19 @@ one serial Fortran executable.
 
 ### Source tree
 
-The normalizer, Fortran configuration boundary, HDF5 distribution reader,
-neutral construction, artificial test setup, and launcher are implemented. The
-sink and plotter components shown below remain planned:
+The input normalizer, Fortran calculation, production writer, Python
+postprocessor, and plotting layer are implemented:
 
 ```text
 02_monte_carlo/
 ├── normalize_config.py
-├── plot_monte_carlo.py
+├── postprocess_monte_carlo.py
 ├── run.sh
 ├── build/
+├── monte_carlo_tools/
+│   ├── __init__.py
+│   ├── postprocessing.py
+│   └── plotting.py
 └── src/
     ├── test_004.f90
     └── modules/
@@ -306,10 +316,10 @@ All normalized paths are absolute because the file is a transient
 Python-to-Fortran interface rather than committed provenance. At most 256
 distribution cases are supported. When `save_data=.true.`, normalization also
 creates the Monte Carlo output directory required by `write_sink_profile`.
-`plot_data` remains Python-facing and will be read from the unified
-configuration by `plot_monte_carlo.py`. Production-facing table paths, output
-paths, run IDs, and complete sink filenames are limited to 200 characters to
-match FIDASIM's fixed character fields.
+`plot_data` remains Python-facing and is read from the unified configuration
+by the postprocessing layer. Production-facing table paths, output paths, run
+IDs, and complete sink filenames are limited to 200 characters to match
+FIDASIM's fixed character fields.
 
 ### Fortran data types
 
@@ -396,26 +406,24 @@ the spatially replicated FBM. Its cylindrical interpolation domain,
 `R=[0,2.5] cm` and `Z=[-2,2] cm`, encloses the Cartesian beam-grid volume.
 The equilibrium mask is established before `make_beam_grid` classifies its 27
 cells. The source distribution is deliberately replicated over the complete
-interpolation grid to represent a spatially uniform ion population. Atomic
-tables and the type-1 neutral population remain part of the next checkpoint.
+interpolation grid to represent a spatially uniform ion population.
 
 `test_004_sink` provides:
 
 ```fortran
-call run_sink_case(config, distribution, neutral, summary, sink_filename)
+call calculate_ion_sink(config, distribution)
+call print_ion_sink(config)
+call finalize_ion_sink(config)
 ```
 
-This routine alone owns sink allocation, serial RNG initialization, the
-production marker loop, runtime assertions, conditional output, and sink-array
-cleanup. When saving is enabled, it returns the completed filename and summary
-after `write_sink_profile` has closed the file and released the sink arrays.
-When saving is disabled, it returns an empty filename after releasing those
-arrays itself.
+These routines own sink allocation, the production marker loop, runtime
+assertions, conditional output, and sink-array cleanup. The production writer
+owns cleanup when saving is enabled; otherwise `finalize_ion_sink` releases
+the arrays directly.
 
-### Planned main-program lifecycle
+### Main-program lifecycle
 
-Once the remaining modules are implemented, `test_004.f90` will contain only
-the following orchestration:
+`test_004.f90` performs the following orchestration:
 
 ```text
 read normalized configuration
@@ -423,12 +431,17 @@ for each case
     read distribution
     construct neutral parameters
     initialize test setup
-    run sink case and optionally write the production file
-    if a file was written, append Test 004 metadata
+    initialize the type-1 neutral population
+    reset the RNG and calculate the ion sink
+    verify and optionally write the production sink file
+    release the neutral population
     teardown test setup
     release distribution
 end for
 ```
+
+After the executable returns, `postprocess_monte_carlo.py` validates the
+complete production output collection and appends `/test_004`.
 
 The launcher performs:
 

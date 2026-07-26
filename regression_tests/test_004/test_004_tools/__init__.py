@@ -6,9 +6,12 @@ from .config import (
     read_test_config,
 )
 from .discovery import discover_distributions
+from .distribution import Distribution, read_distribution
 
 __all__ = [
+    "Distribution",
     "discover_distributions",
+    "read_distribution",
     "read_deterministic_config",
     "read_monte_carlo_config",
     "read_test_config",

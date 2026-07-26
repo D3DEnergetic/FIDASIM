@@ -1,4 +1,4 @@
-"""Read and validate smooth FIDASIM energy-pitch distributions."""
+"""Read and validate shared smooth Test 002 energy-pitch distributions."""
 
 from dataclasses import dataclass
 
@@ -24,11 +24,15 @@ class Distribution:
 
 
 def _scalar(dataset):
-    return float(np.asarray(dataset[...]).reshape(-1)[0])
+    """Return the only numerical value stored in a scalar dataset."""
+    values = np.asarray(dataset[...]).reshape(-1)
+    if values.size != 1:
+        raise ConfigError(f"{dataset.file.filename}: {dataset.name} must be scalar.")
+    return float(values[0])
 
 
 def read_distribution(filename):
-    """Read one single-location Test 002 Stage 2 output."""
+    """Return one validated single-location Test 002 Stage 2 distribution."""
     with h5py.File(filename, "r") as h5file:
         required = [
             "energy",
@@ -86,7 +90,9 @@ def read_distribution(filename):
     dpitch = np.diff(pitch)
     if np.any(denergy <= 0.0) or np.any(dpitch <= 0.0):
         raise ConfigError(f"{filename}: grids must be strictly increasing.")
-    if not np.allclose(denergy, denergy[0]) or not np.allclose(dpitch, dpitch[0]):
+    if not np.allclose(denergy, denergy[0]) or not np.allclose(
+        dpitch, dpitch[0]
+    ):
         raise ConfigError(f"{filename}: grids must be uniformly spaced.")
 
     return Distribution(

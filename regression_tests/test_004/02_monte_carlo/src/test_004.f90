@@ -20,16 +20,24 @@ program test_004
     only: &
       configure_fidasim, &
       initialize_serial_rng, &
+      reset_serial_rng, &
       initialize_atomic_tables, &
       print_atomic_table_setup, &
       initialize_test_setup, &
       print_test_setup, &
       teardown_test_setup
+  use test_004_sampling, &
+    only: &
+      IonSample, &
+      sample_ion, &
+      validate_ion_sample, &
+      print_ion_sample
   implicit none
 
   type(MonteCarloConfig) :: config
   type(DistributionCase) :: distribution
   type(NeutralParameters) :: neutral
+  type(IonSample) :: ion_sample
   character(len=4096) :: config_filename
   integer :: case_index
 
@@ -57,6 +65,10 @@ program test_004
     call print_test_setup()
     call initialize_neutral_population(config, neutral)
     call print_neutral_population(config, neutral)
+    call reset_serial_rng()
+    call sample_ion(distribution, ion_sample)
+    call validate_ion_sample(distribution, ion_sample)
+    call print_ion_sample(ion_sample)
     call release_neutral_population()
     call teardown_test_setup()
     call release_distribution(distribution)

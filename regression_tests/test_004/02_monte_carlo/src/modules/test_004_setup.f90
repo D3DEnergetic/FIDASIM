@@ -50,6 +50,7 @@ module test_004_setup
   public :: &
     configure_fidasim, &
     initialize_serial_rng, &
+    reset_serial_rng, &
     initialize_atomic_tables, &
     print_atomic_table_setup, &
     initialize_test_setup, &
@@ -96,6 +97,11 @@ contains
 
     call rng_init(rng(1), inputs%seed)
   end subroutine initialize_serial_rng
+
+  subroutine reset_serial_rng()
+    !+ Restore the configured seed before sampling ions for one case.
+    call rng_init(rng(1), inputs%seed)
+  end subroutine reset_serial_rng
 
   subroutine initialize_atomic_tables()
     !+ Load the production atomic data selected by configure_fidasim.

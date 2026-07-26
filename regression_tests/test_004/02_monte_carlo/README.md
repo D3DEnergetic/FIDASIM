@@ -34,9 +34,11 @@ FIDASIM grid/plasma/field/FBM test setup are implemented. The configured
 atomic tables are loaded once before the distribution cases are processed.
 For each case, the type-1 neutral density and reservoir are populated only in
 the central beam cell and then released. The program prints and verifies a
-summary of each stage; it does not yet sample ions or calculate the ion sink.
-The output-processing Python wrapper will be added after the Fortran
-calculation produces output.
+summary of each stage. One ion is sampled through `mc_sample_ion_f4d_gc` to
+verify the production sampling interface, including the nonthermal-selection,
+central-cell, density, energy-pitch, and `flr=0` conditions. The full marker
+loop and ion-sink calculation are not yet implemented. The output-processing
+Python wrapper will be added after the Fortran calculation produces output.
 
 After reading the normalized configuration, `configure_fidasim` translates
 the shared Test 004 settings into the case-independent FIDASIM controls. This
@@ -247,6 +249,7 @@ sink and plotter components shown below remain planned:
         ├── test_004_hdf5.f90
         ├── test_004_neutral.f90
         ├── test_004_setup.f90
+        ├── test_004_sampling.f90
         └── test_004_sink.f90
 ```
 

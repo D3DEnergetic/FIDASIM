@@ -30,10 +30,18 @@ The Monte Carlo workflow uses Python wrappers around the Fortran calculation:
 
 At the present development stage, the Python input wrapper, Fortran
 configuration and HDF5 readers, neutral-parameter construction, and artificial
-FIDASIM grid/plasma/field/FBM test setup are implemented. The program prints a
-summary of each stage to the terminal; it does not yet populate the neutral
-reservoir or calculate the ion sink. The output-processing Python wrapper will
-be added after the Fortran calculation produces output.
+FIDASIM grid/plasma/field/FBM test setup are implemented. The configured
+atomic tables are loaded once before the distribution cases are processed.
+The program prints a summary of each stage to the terminal; it does not yet
+populate the neutral reservoir or calculate the ion sink. The output-processing
+Python wrapper will be added after the Fortran calculation produces output.
+
+After reading the normalized configuration, `configure_fidasim` translates
+the shared Test 004 settings into the case-independent FIDASIM controls. This
+explicit boundary selects the configured atomic tables, full-distribution
+charge-exchange sampling without FLR displacement, and disables unrelated
+beam-stopping and nuclear calculations. Atomic tables are then loaded before
+the case loop. Isotope-dependent state remains part of each case setup.
 
 Run the current workflow from the FIDASIM repository root:
 
@@ -122,8 +130,8 @@ For every smooth distribution discovered through
    and spatially replicated FBM.
 3. Set the production controls required by the stripped-down path:
    `n_thermal=1`, the isotope mass, `inputs%flr=0`,
-   `inputs%non_thermal_cx_sampling=1`, the atomic-tables path, and
-   `reservoir_size`.
+   `inputs%non_thermal_cx_sampling=1`, and `reservoir_size`. The shared atomic
+   tables were loaded once before entering the case loop.
 4. Initialize `neut%full`, then populate its center-cell density and reservoir
    through `update_neutrals` as described above.
 5. Allocate `sink%part(n_markers)` and

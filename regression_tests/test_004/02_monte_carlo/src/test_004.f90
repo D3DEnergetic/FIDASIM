@@ -15,6 +15,9 @@ program test_004
       print_neutral_parameters
   use test_004_setup, &
     only: &
+      configure_fidasim, &
+      initialize_atomic_tables, &
+      print_atomic_table_setup, &
       initialize_test_setup, &
       print_test_setup, &
       teardown_test_setup
@@ -34,6 +37,9 @@ program test_004
   call get_command_argument(1, config_filename)
   call read_config(trim(config_filename), config)
   call print_config(config)
+  call configure_fidasim(config)
+  call initialize_atomic_tables()
+  call print_atomic_table_setup()
 
   ! Loop over each distribution case specified in the configuration file:
   do case_index = 1, config%n_cases

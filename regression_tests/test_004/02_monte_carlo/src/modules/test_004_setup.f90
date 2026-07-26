@@ -11,8 +11,11 @@ module test_004_setup
       equil, &
       fbm, &
       inputs, &
+      tables, &
+      impurity_charge, &
       n_thermal, &
       thermal_mass, &
+      read_tables, &
       make_beam_grid, &
       LocalEMFields, &
       LocalProfiles, &
@@ -21,6 +24,7 @@ module test_004_setup
       get_distribution
   use test_004_types, &
     only: &
+      MonteCarloConfig, &
       DistributionCase
   implicit none
   private
@@ -36,24 +40,67 @@ module test_004_setup
   real(Float64), parameter :: magnetic_field_z_tesla = 1.0_Float64
   real(Float64), parameter :: two_pi = &
     2.0_Float64 * acos(-1.0_Float64)
+  integer, parameter :: carbon_charge_state = 6
 
-  public :: initialize_test_setup, print_test_setup, teardown_test_setup
+  public :: &
+    configure_fidasim, &
+    initialize_atomic_tables, &
+    print_atomic_table_setup, &
+    initialize_test_setup, &
+    print_test_setup, &
+    teardown_test_setup
 
 contains
+
+  subroutine configure_fidasim(config)
+    !+ Translate the Test 004 configuration into FIDASIM global input configuration.
+    type(MonteCarloConfig), intent(in) :: config
+      !+ Validated, normalized configuration shared by all distribution cases.
+
+    ! Set the FIDASIM input configuration to match the Test 004 requirements.
+    inputs%tables_file = trim(config%tables_filename)
+    inputs%full_f = 1 ! Distribution is a full distirbution not a correction to a thermal distribution.
+    inputs%non_thermal_beam_stopping = 0 ! Non-thermal beam stopping is not used in this test.
+    inputs%non_thermal_cx_sampling = 1 ! Non-thermal CX sampling is used in this test.
+    inputs%flr = 0 ! Non-thermal FLR is not used in this test, approximates a very high B field case.
+    inputs%dist_type = 1 ! Distribution is grid based not monte-carlo sampled.
+    inputs%calc_neutron = 0 ! Neutron calculation is not used in this test.
+    inputs%calc_cfpd = 0 ! CFPD calculation is not used in this test.
+    inputs%verbose = 0 ! Verbose output is not used in this test.
+    n_thermal = 1 ! Only one ion species is used in this test.
+
+    ! read_tables always loads one impurity-transition table. Carbon is used
+    ! only to satisfy that production interface; the test impurity density is
+    ! zero, so this table does not contribute to the ion-sink calculation.
+    impurity_charge = carbon_charge_state
+  end subroutine configure_fidasim
+
+  subroutine initialize_atomic_tables()
+    !+ Load the production atomic data selected by configure_fidasim.
+    call read_tables()
+  end subroutine initialize_atomic_tables
+
+  subroutine print_atomic_table_setup()
+    !+ Print a concise summary confirming which atomic data were loaded.
+
+    write(output_unit, '(a)') 'Atomic-table setup:'
+    write(output_unit, '(a,a)') '  file: ', trim(inputs%tables_file)
+    write(output_unit, '(a,i0)') '  atomic levels: ', &
+      tables%H_H_cx_cross%n_max
+    write(output_unit, '(a,i0)') '  H-H CX cross-section energies: ', &
+      tables%H_H_cx_cross%nenergy
+    write(output_unit, '(a,i0)') '  H-H CX rate energies: ', &
+      tables%H_H_cx_rate%nenergy
+    write(output_unit, '(a,i0)') '  H-H CX rate temperatures: ', &
+      tables%H_H_cx_rate%ntemp
+  end subroutine print_atomic_table_setup
 
   subroutine initialize_test_setup(distribution)
     !+ Populate the minimal FIDASIM global state used by the ion-sink test.
     type(DistributionCase), intent(in) :: distribution
       !+ Smooth Test 002 distribution and isotope metadata for the current case.
 
-    ! Select guiding-center sampling without a finite-Larmor-radius displacement.
-    inputs%flr = 0
-    inputs%non_thermal_cx_sampling = 1
-    inputs%dist_type = 1
-    inputs%verbose = 0
-
-    ! Use the distribution isotope as the single ion species in the test setup.
-    n_thermal = 1
+    ! Use the current distribution isotope for the configured ion species.
     thermal_mass = 0.0_Float64
     thermal_mass(1) = distribution%atomic_mass
 

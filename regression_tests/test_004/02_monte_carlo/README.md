@@ -35,10 +35,12 @@ atomic tables are loaded once before the distribution cases are processed.
 For each case, the type-1 neutral density and reservoir are populated only in
 the central beam cell and then released. The program prints and verifies a
 summary of each stage. One ion is sampled through `mc_sample_ion_f4d_gc` to
-verify the production sampling interface, including the nonthermal-selection,
-central-cell, density, energy-pitch, and `flr=0` conditions. The full marker
-loop and ion-sink calculation are not yet implemented. The output-processing
-Python wrapper will be added after the Fortran calculation produces output.
+show the production sampling interface. The complete configured marker loop
+then samples the nonthermal distribution, calculates type-1 CX rates, and
+stores both the central-cell sink density and production sink particles. The
+particle count, spatial support, and agreement between the density and summed
+particle weights are verified. Production HDF5 output and its Python
+postprocessor are not yet implemented.
 
 After reading the normalized configuration, `configure_fidasim` translates
 the shared Test 004 settings into the case-independent FIDASIM controls. This

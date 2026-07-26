@@ -26,18 +26,16 @@ program test_004
       initialize_test_setup, &
       print_test_setup, &
       teardown_test_setup
-  use test_004_sampling, &
+  use test_004_sink, &
     only: &
-      IonSample, &
-      sample_ion, &
-      validate_ion_sample, &
-      print_ion_sample
+      calculate_ion_sink, &
+      print_ion_sink, &
+      release_ion_sink
   implicit none
 
   type(MonteCarloConfig) :: config
   type(DistributionCase) :: distribution
   type(NeutralParameters) :: neutral
-  type(IonSample) :: ion_sample
   character(len=4096) :: config_filename
   integer :: case_index
 
@@ -66,9 +64,9 @@ program test_004
     call initialize_neutral_population(config, neutral)
     call print_neutral_population(config, neutral)
     call reset_serial_rng()
-    call sample_ion(distribution, ion_sample)
-    call validate_ion_sample(distribution, ion_sample)
-    call print_ion_sample(ion_sample)
+    call calculate_ion_sink(config, distribution)
+    call print_ion_sink(config)
+    call release_ion_sink()
     call release_neutral_population()
     call teardown_test_setup()
     call release_distribution(distribution)

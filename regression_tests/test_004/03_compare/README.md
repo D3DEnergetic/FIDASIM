@@ -176,8 +176,8 @@ Generated files are written beneath
   the injected-neutral marker;
 - `reaction_rate_summary.png` compares rates and relative differences across
   all cases; and
-- `comparison_report.txt` records all metrics, criteria, and per-case and
-  overall status.
+- `comparison_report.txt` begins with a prominent overall `PASS` or `FAIL`
+  banner, then records all criteria, metrics, and per-case details.
 
 ## Code organization
 

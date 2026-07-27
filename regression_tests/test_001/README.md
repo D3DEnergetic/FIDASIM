@@ -41,6 +41,13 @@ make regression_tests
 The stage directories contain the legacy MATLAB and Fortran workflow used by
 this test.
 
+Stage 3 passes when the maximum relative error in the mean free path is no
+greater than `0.12` (12%). Its terminal output and optional text report begin
+with the overall `PASS` or `FAIL` status, measured maximum, and tolerance.
+Diagnostic figures and report output are produced before MATLAB raises an
+error for a failed comparison, so a batch run returns a nonzero exit status
+without discarding the useful failure details.
+
 ---
 
 **Navigation:** Previous: — | [Up: Regression tests](../README.md) | [Next: Test 002](../test_002/README.md)

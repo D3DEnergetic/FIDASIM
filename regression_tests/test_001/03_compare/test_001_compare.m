@@ -7,6 +7,9 @@ clc
 save_figure = 1;
 save_data = 0;
 
+% Acceptance criterion:
+mfp_relative_error_tolerance = 0.12; % Maximum allowed relative error (12%).
+
 %% GET reference data:
 source_dir = "../01_reference/";
 file_name = "reference.h5";
@@ -105,9 +108,23 @@ max_err  = max(rel_err(:));
 mean_err = mean(rel_err(:),'omitnan');
 std_err = std(rel_err(:),'omitnan');
 
+regression_passed = isfinite(max_err) && ...
+                    max_err <= mfp_relative_error_tolerance;
+if regression_passed
+    regression_status = 'PASS';
+else
+    regression_status = 'FAIL';
+end
+
 %% PLOT relative error:
 
 report = sprintf([ ...
+    '==============================================\n' ...
+    ' OVERALL REGRESSION STATUS: %s\n' ...
+    ' Maximum MFP relative error [%%]: %.2f\n' ...
+    ' Acceptance tolerance [%%]       : %.2f\n' ...
+    ' Acceptance check: %.2f%% <= %.2f%%\n' ...
+    '==============================================\n' ...
     '\n' ...
     '----------------------------------------------\n' ...
     ' Mean Free Path Regression Test Summary\n' ...
@@ -117,6 +134,8 @@ report = sprintf([ ...
     '  Std. relative error [%%]  : %.2f\n' ...
     '----------------------------------------------\n' ...
     '\n'], ...
+    regression_status, max_err*1e2, mfp_relative_error_tolerance*1e2, ...
+    max_err*1e2, mfp_relative_error_tolerance*1e2, ...
     max_err*1e2, mean_err*1e2, std_err*1e2);
 
 fprintf('%s', report);
@@ -158,7 +177,7 @@ for nn = 1:nden
     
     title("Relative error [$\%$]",'Interpreter','latex',FontSize=font_size.title)
     ylabel("rel. err. [$\%$]", 'Interpreter','latex','FontSize',font_size.label)
-    ylim([0,0.12]*1e2)
+    ylim([0,mfp_relative_error_tolerance]*1e2)
     xlabel("T [keV]", 'Interpreter','latex','FontSize',font_size.label)          
     
     if save_figure
@@ -174,7 +193,7 @@ end
 y_scale = 'lin'; % lin or log
 
 % Get indices of largest error:
-[max_err, idx] = max(rel_err(:), [], 'omitnan');
+[~, idx] = max(rel_err(:), [], 'omitnan');
 [nn,ee,tt] = ind2sub(size(rel_err), idx);
 
 % nn = 2;
@@ -231,6 +250,13 @@ title(title_str,"interpreter","latex","FontSize",font_size.title)
 if save_figure
     figure_name = "max" + "_relative_error_profiles";
     save_figure_to_file("./figures",figure_name)
+end
+
+if ~regression_passed
+    error('test_001:RegressionFailed', ...
+        ['Test 001 failed: maximum MFP relative error %.2f%% exceeds ' ...
+         'the %.2f%% tolerance.'], ...
+        max_err*1e2, mfp_relative_error_tolerance*1e2);
 end
 
 return

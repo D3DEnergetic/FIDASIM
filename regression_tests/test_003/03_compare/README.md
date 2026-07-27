@@ -24,8 +24,11 @@ cd regression_tests/test_003/03_compare
 `run.sh` executes:
 
 ```bash
-./run.sh input_config_A.nml
+python3 compare_distributions.py input_config_A.nml
 ```
+
+The command prints each case status followed by the overall Test 003 `PASS` or
+`FAIL` status. A failed comparison returns a nonzero exit status.
 
 ## Dependencies
 
@@ -65,6 +68,7 @@ each step.
   sampling_config_file = '../02_run_test/input_config_A.nml'
   output_directory = 'output_data/dataset_A'
   generate_plots = .true.
+  moment_relative_tolerance = 0.002
 /
 
 &plot_data_block
@@ -90,7 +94,8 @@ sampled file of the same basename.
 | `comment` | String | No | None | Human-readable description of the dataset collection. |
 | `sampling_config_file` | String | Yes | None | Stage 2 configuration used for sampling. Stage 3 discovers the same Test 002 references and sampled-output directory from it. |
 | `output_directory` | String | Yes | None | Nonempty directory path for the comparison report and figures. It is created when needed. |
-| `generate_plots` | Logical | No | `.true.` | Enables or disables both comparison figures for every file pair. The text report is always written. |
+| `generate_plots` | Logical | No | `.true.` | Enables or disables both per-pair comparison figures and the collection-level moment-error figure. The text report is always written. |
+| `moment_relative_tolerance` | Real | Yes | None | Positive, finite maximum absolute relative error accepted for every density and temperature moment. |
 
 ### `plot_data_block` schema
 
@@ -136,9 +141,24 @@ T_parallel = 2/density * sum E*P^2*f(E,P) * abs(dE*dP)
 T_perpendicular = 1/density * sum E*(1-P^2)*f(E,P) * abs(dE*dP)
 ```
 
-It reports absolute relative errors for density, `T_parallel`, and
-`T_perpendicular`. No acceptance threshold or pass/fail decision is imposed;
-the report provides diagnostic values for review.
+For each physical moment $q$, the absolute relative error is
+
+$$
+\epsilon_q =
+\left|
+\frac{q_{\mathrm{sampled}}-q_{\mathrm{reference}}}
+{q_{\mathrm{reference}}}
+\right|.
+$$
+
+A case passes only when the density, `T_parallel`, and `T_perpendicular`
+errors all satisfy
+
+$$
+\epsilon_q \leq \mathtt{moment\_relative\_tolerance}.
+$$
+
+The complete regression test passes only when every configured case passes.
 
 ## Output files
 
@@ -149,9 +169,15 @@ For each configured pair, two figures are written:
 - `<basename>_distributions.png` places reference and sampled `f(E,P)` side by
   side using the same colormap and exactly the same color limits.
 
-`comparison_report.txt` records the reference value, sampled value, and
-relative error for each physical quantity, followed by the maximum relative
-error across all file pairs.
+One collection-level figure is also written:
+
+- `moment_relative_errors.png` shows all three moment errors for every case
+  with the configured acceptance tolerance.
+
+`comparison_report.txt` begins with a prominent overall `PASS` or `FAIL`
+banner and a concise summary. It then records the per-case and per-moment
+statuses, reference values, sampled values, relative errors, acceptance
+criterion, and detailed overall summary.
 
 Generated files are written under `output_data/` and are excluded from Git.
 

@@ -1,6 +1,7 @@
 """Read comparison settings and identify reference-sampled file pairs."""
 
 from dataclasses import dataclass
+import math
 from pathlib import Path
 import re
 
@@ -28,6 +29,7 @@ CONFIG_SCHEMA = {
         "required_fields": [
             "sampling_config_file",
             "output_directory",
+            "moment_relative_tolerance",
         ],
         "optional_fields": [
             "comment",
@@ -167,6 +169,18 @@ def read_config(config_filename):
         value=compare_block.get("generate_plots", True),
         field_label="generate_plots",
     )
+    moment_relative_tolerance = require_real(
+        value=compare_block["moment_relative_tolerance"],
+        field_label="moment_relative_tolerance",
+    )
+    if (
+        not math.isfinite(moment_relative_tolerance)
+        or moment_relative_tolerance <= 0.0
+    ):
+        raise ConfigError(
+            "moment_relative_tolerance must be finite and greater than zero."
+        )
+
     enable_colorbar = require_boolean(
         value=plot_block.get("enable_colorbar", True),
         field_label="enable_colorbar",
@@ -212,6 +226,7 @@ def read_config(config_filename):
             "sampling_config_file": sampling_config_file,
             "output_directory": output_directory,
             "generate_plots": generate_plots,
+            "moment_relative_tolerance": moment_relative_tolerance,
         },
         "plot_data_block": {
             "scale": scale,

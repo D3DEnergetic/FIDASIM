@@ -29,6 +29,9 @@ This is equivalent to:
 python3 compare_moments.py input_config_A.nml
 ```
 
+The command prints the status of each case followed by the overall Test 002
+`PASS` or `FAIL` status. A failed comparison returns a nonzero exit status.
+
 ## Input configuration
 
 ```fortran
@@ -36,6 +39,7 @@ python3 compare_moments.py input_config_A.nml
   run_config = '../02_run_test/input_config_A.nml'
   output_directory = 'output_data/dataset_A'
   generate_plot = .true.
+  moment_relative_tolerance = 0.002
 /
 ```
 
@@ -46,6 +50,7 @@ python3 compare_moments.py input_config_A.nml
 | `run_config` | string | Path to the Stage 2 configuration. Relative paths are resolved from the Stage 3 configuration file. |
 | `output_directory` | string | Directory for the comparison report and plot. Relative paths are resolved from the Stage 3 configuration file. |
 | `generate_plot` | logical | Generate the relative-difference summary plot when `.true.`. |
+| `moment_relative_tolerance` | real | Positive maximum absolute relative difference accepted for every density and temperature moment. |
 
 The Stage 2 configuration identifies both its converted output basename and
 the Stage 1 configuration. Stage 3 follows these links to construct every
@@ -56,33 +61,38 @@ the comparison configuration.
 
 For each quantity $q$, the absolute relative difference is
 
-\[
+$$
 \epsilon_q=
 \left|
 \frac{q_{\mathrm{converted}}-q_{\mathrm{reference}}}
 {q_{\mathrm{reference}}}
 \right|.
-\]
+$$
 
 Before calculating the differences, each pair is checked for matching species
 and selected $(R,Z)$ location. Stage 3 does not compare the distribution arrays
 point by point because the source and converted arrays use different coordinate
 systems and grids.
 
+A case passes only when all three moment differences satisfy
+
+$$
+\epsilon_q \leq \mathtt{moment\_relative\_tolerance}.
+$$
+
+The complete test passes only when every configured case passes.
+
 ## Generated outputs
 
 | File | Description |
 | --- | --- |
-| `output_data/dataset_<letter>/moment_comparison.txt` | Reference value, converted value, and relative difference for all three moments and every case, followed by the maximum observed differences. |
+| `output_data/dataset_<letter>/moment_comparison.txt` | Acceptance criterion, per-moment and per-case status, numerical differences, maximum observed differences, and overall status. |
 | `output_data/dataset_<letter>/moment_values.png` | Reference and converted density, $T_\parallel$, and $T_\perp$ versus case index. |
 | `output_data/dataset_<letter>/moment_relative_differences.png` | Density, $T_\parallel$, and $T_\perp$ relative differences versus case index. |
 
 Case index is used instead of spatial position because the selected reference
 locations may be nonconsecutive or may not follow a one-dimensional spatial
 scan.
-
-No pass/fail tolerance is imposed at this stage. The report records the
-observed error introduced by coordinate transformation and interpolation.
 
 ---
 

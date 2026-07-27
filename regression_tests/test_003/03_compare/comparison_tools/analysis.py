@@ -14,12 +14,17 @@ class PhysicalMoments:
 
 @dataclass
 class ComparisonResult:
+    case_index: int
     basename: str
     reference_moments: PhysicalMoments
     sampled_moments: PhysicalMoments
     density_error: float
     parallel_temperature_error: float
     perpendicular_temperature_error: float
+    density_passed: bool
+    parallel_temperature_passed: bool
+    perpendicular_temperature_passed: bool
+    passed: bool
 
 
 def calculate_marginals(distribution):
@@ -66,8 +71,14 @@ def _relative_error(reference_value, sampled_value):
     return abs(sampled_value - reference_value) / abs(reference_value)
 
 
-def compare_moments(basename, reference_moments, sampled_moments):
-    """Assemble the scalar comparison results for one file pair."""
+def compare_moments(
+    case_index,
+    basename,
+    reference_moments,
+    sampled_moments,
+    relative_tolerance,
+):
+    """Compare all three physical moments for one file pair."""
     density_error = _relative_error(
         reference_moments.density,
         sampled_moments.density,
@@ -81,11 +92,31 @@ def compare_moments(basename, reference_moments, sampled_moments):
         sampled_moments.perpendicular_temperature,
     )
 
+    # Each physical moment is an independent acceptance condition. A case
+    # passes only when all three conditions are satisfied.
+    density_passed = density_error <= relative_tolerance
+    parallel_temperature_passed = (
+        parallel_temperature_error <= relative_tolerance
+    )
+    perpendicular_temperature_passed = (
+        perpendicular_temperature_error <= relative_tolerance
+    )
+    passed = (
+        density_passed
+        and parallel_temperature_passed
+        and perpendicular_temperature_passed
+    )
+
     return ComparisonResult(
+        case_index=case_index,
         basename=basename,
         reference_moments=reference_moments,
         sampled_moments=sampled_moments,
         density_error=density_error,
         parallel_temperature_error=parallel_temperature_error,
         perpendicular_temperature_error=perpendicular_temperature_error,
+        density_passed=density_passed,
+        parallel_temperature_passed=parallel_temperature_passed,
+        perpendicular_temperature_passed=perpendicular_temperature_passed,
+        passed=passed,
     )

@@ -55,7 +55,11 @@ def plot_moment_values(results, output_directory):
     return output_path
 
 
-def plot_relative_differences(results, output_directory):
+def plot_relative_differences(
+    results,
+    relative_tolerance,
+    output_directory,
+):
     """Plot density and temperature relative differences versus case index."""
     case_indices = [result["case_index"] for result in results]
     density_errors = [result["errors"]["density"] for result in results]
@@ -70,6 +74,13 @@ def plot_relative_differences(results, output_directory):
     axes.plot(case_indices, density_errors, "o-", label="Density")
     axes.plot(case_indices, parallel_errors, "s-", label=r"$T_\parallel$")
     axes.plot(case_indices, perpendicular_errors, "^-", label=r"$T_\perp$")
+    axes.axhline(
+        relative_tolerance,
+        color="black",
+        linestyle="--",
+        linewidth=1.5,
+        label="Acceptance tolerance",
+    )
     axes.set_xlabel("Case index")
     axes.set_xticks(case_indices)
     axes.set_ylabel("Absolute relative difference")

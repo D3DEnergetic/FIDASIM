@@ -62,7 +62,7 @@ def _relative_difference(reference_value, converted_value, quantity):
     return abs(converted_value - reference_value) / abs(reference_value)
 
 
-def compare_file_pair(pair, case_index):
+def compare_file_pair(pair, case_index, relative_tolerance):
     """Validate one file pair and compare its three physical moments."""
     reference = _read_moments(pair["reference"], file_kind="reference")
     converted = _read_moments(pair["converted"], file_kind="converted")
@@ -77,11 +77,15 @@ def compare_file_pair(pair, case_index):
         raise ConfigError(f"Locations differ for comparison case {case_index:03d}.")
 
     errors = {}
+    moment_passed = {}
     for moment_name in MOMENT_NAMES:
         errors[moment_name] = _relative_difference(
             reference_value=reference["moments"][moment_name],
             converted_value=converted["moments"][moment_name],
             quantity=moment_name,
+        )
+        moment_passed[moment_name] = (
+            errors[moment_name] <= relative_tolerance
         )
 
     return {
@@ -89,4 +93,6 @@ def compare_file_pair(pair, case_index):
         "reference": reference,
         "converted": converted,
         "errors": errors,
+        "moment_passed": moment_passed,
+        "passed": all(moment_passed.values()),
     }

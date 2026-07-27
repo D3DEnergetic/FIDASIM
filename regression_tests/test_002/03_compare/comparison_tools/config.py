@@ -1,5 +1,6 @@
 """Read Stage 3 settings and discover the files produced by Stages 1 and 2."""
 
+import math
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +11,7 @@ from regression_test_tools import (
     read_namelist,
     require_boolean,
     require_existing_file,
+    require_real,
     require_string,
     validate_schema,
 )
@@ -18,7 +20,12 @@ from regression_test_tools import (
 CONFIG_SCHEMA = {
     "compare": {
         "required": True,
-        "required_fields": ["run_config", "output_directory", "generate_plot"],
+        "required_fields": [
+            "run_config",
+            "output_directory",
+            "generate_plot",
+            "moment_relative_tolerance",
+        ],
         "optional_fields": ["comment"],
     },
 }
@@ -65,12 +72,24 @@ def read_config(config_filename):
     generate_plot = require_boolean(
         value=compare_block["generate_plot"], field_label="generate_plot"
     )
+    moment_relative_tolerance = require_real(
+        value=compare_block["moment_relative_tolerance"],
+        field_label="moment_relative_tolerance",
+    )
+    if (
+        not math.isfinite(moment_relative_tolerance)
+        or moment_relative_tolerance <= 0.0
+    ):
+        raise ConfigError(
+            "moment_relative_tolerance must be finite and greater than zero."
+        )
 
     return {
         "compare": {
             "run_config": run_config,
             "output_directory": output_directory,
             "generate_plot": generate_plot,
+            "moment_relative_tolerance": moment_relative_tolerance,
         }
     }
 

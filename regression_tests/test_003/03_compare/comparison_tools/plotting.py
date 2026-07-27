@@ -106,6 +106,7 @@ def plot_marginals(
     )
 
     metrics_text = (
+        f"Status: {'PASS' if result.passed else 'FAIL'} | "
         f"Relative errors: density = {result.density_error:.2e}, "
         f"T_parallel = {result.parallel_temperature_error:.2e}, "
         f"T_perpendicular = {result.perpendicular_temperature_error:.2e}"
@@ -117,6 +118,57 @@ def plot_marginals(
         f"{pair.reference.stem}_marginals.png"
     )
     figure.savefig(output_filename)
+    plt.close(figure)
+    print(f"Wrote plot: {output_filename}")
+
+
+def plot_moment_relative_errors(
+    results,
+    relative_tolerance,
+    output_directory,
+):
+    """Plot all moment errors together with the acceptance tolerance."""
+    case_indices = [result.case_index for result in results]
+    density_errors = [result.density_error for result in results]
+    parallel_errors = [
+        result.parallel_temperature_error for result in results
+    ]
+    perpendicular_errors = [
+        result.perpendicular_temperature_error for result in results
+    ]
+
+    figure, axes = plt.subplots(figsize=(7.5, 5.0))
+    axes.plot(case_indices, density_errors, "o-", label="Density")
+    axes.plot(
+        case_indices,
+        parallel_errors,
+        "s-",
+        label=r"$T_\parallel$",
+    )
+    axes.plot(
+        case_indices,
+        perpendicular_errors,
+        "^-",
+        label=r"$T_\perp$",
+    )
+    axes.axhline(
+        relative_tolerance,
+        color="black",
+        linestyle="--",
+        linewidth=1.5,
+        label="Acceptance tolerance",
+    )
+    axes.set_xlabel("Case index")
+    axes.set_xticks(case_indices)
+    axes.set_ylabel("Absolute relative error")
+    axes.set_title("Moment agreement after distribution sampling")
+    axes.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    axes.grid(True, alpha=0.3)
+    axes.legend()
+    figure.tight_layout()
+
+    output_filename = output_directory / "moment_relative_errors.png"
+    figure.savefig(output_filename, dpi=150)
     plt.close(figure)
     print(f"Wrote plot: {output_filename}")
 

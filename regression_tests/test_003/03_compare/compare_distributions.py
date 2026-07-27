@@ -23,9 +23,14 @@ def main():
 
     # The package API performs the complete comparison workflow.
     try:
-        run_comparison(config_path=arguments.config_path)
+        all_passed = run_comparison(config_path=arguments.config_path)
     except ConfigError as error:
         raise SystemExit(f"Configuration error: {error}") from None
+
+    if not all_passed:
+        raise SystemExit(
+            "Test 003 comparison failed its configured moment tolerance."
+        )
 
 
 if __name__ == "__main__":

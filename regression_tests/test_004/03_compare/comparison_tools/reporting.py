@@ -51,9 +51,14 @@ def write_report(results, comparison_config, output_directory):
     all_passed = all(result.passed for result in results)
 
     lines = [
+        "=" * 46,
+        f"OVERALL REGRESSION STATUS: {_status(all_passed)}",
+        "=" * 46,
+        "",
         "test_004 ion-sink comparison",
         "=" * 32,
         f"Computed: {timestamp}",
+        "",
         f"Comment: {comparison_config['comment']}",
         f"Unified Test 004 config: {comparison_config['test_config']}",
         "",

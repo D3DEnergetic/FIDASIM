@@ -2,10 +2,10 @@
 
 from .remapping import remap_to_uniform_grid
 from .transformation import transform_to_nonrelativistic_energy_pitch
-from .workflow import run_conversion
+from .workflow import convert_reference_distributions_to_fidasim
 
 __all__ = [
+    "convert_reference_distributions_to_fidasim",
     "remap_to_uniform_grid",
-    "run_conversion",
     "transform_to_nonrelativistic_energy_pitch",
 ]

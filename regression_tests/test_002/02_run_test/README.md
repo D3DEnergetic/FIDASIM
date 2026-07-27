@@ -598,7 +598,10 @@ P_j=-1+\left(j+\frac{1}{2}\right)\Delta P.
 
 These pitch cells exactly cover $[-1,1]$. The nonuniform transformed
 distribution is linearly interpolated onto the target cell centers. The output
-array is stored in FIDASIM order, `f_array(nenergy, npitch)`.
+array retains the h5py order `(npitch, nenergy)` used by the interpolator.
+After singleton spatial axes are added, the HDF5 dataset has shape
+`(nz=1, nr=1, npitch, nenergy)`. The Fortran HDF5 interface presents this to
+FIDASIM in its logical order `(nenergy, npitch, nr=1, nz=1)`.
 
 ---
 

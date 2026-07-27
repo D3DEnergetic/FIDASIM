@@ -18,7 +18,7 @@ from .transformation import (
 )
 
 
-PARTICLE_DATASETS = (
+SPECIES_DATASETS = (
     "species",
     "atomic_number",
     "mass_number",
@@ -27,19 +27,55 @@ PARTICLE_DATASETS = (
 )
 
 
-def _read_particle_metadata(h5file, filename):
-    """Read scalar particle metadata from one Stage 1 reference file."""
-    missing_datasets = [
-        dataset_name
-        for dataset_name in PARTICLE_DATASETS
-        if dataset_name not in h5file
-    ]
+def _read_species_metadata(h5file, label):
+    """Read and normalize species metadata from an open HDF5 file.
+
+    Args:
+        h5file (h5py.File or h5py.Group): Open object containing the required
+            scalar species datasets.
+        label (str or Path): Diagnostic name used to identify the source in
+            validation errors.
+
+    Returns:
+        dict: Species values and their original HDF5 dataset attributes with
+        the following schema::
+
+            {
+                "species": str,
+                "atomic_number": int,
+                "mass_number": int,
+                "charge_state": int,
+                "A": float,
+                "attributes": {
+                    "species": dict,
+                    "atomic_number": dict,
+                    "mass_number": dict,
+                    "charge_state": dict,
+                    "A": dict,
+                },
+            }
+
+        ``species`` is decoded, stripped, and converted to lowercase. Each
+        nested attribute dictionary contains the attributes copied from its
+        corresponding source dataset.
+
+    Raises:
+        ConfigError: If any required species dataset is missing.
+    """
+    missing_datasets = []
+    for dataset_name in SPECIES_DATASETS:
+        if dataset_name not in h5file:
+            missing_datasets.append(dataset_name)
+
     if missing_datasets:
         missing_names = ", ".join(missing_datasets)
         raise ConfigError(
-            f"{filename} is missing particle datasets: {missing_names}"
+            f"{label} is missing species datasets: {missing_names}"
         )
 
+    # Depending on the HDF5 string type, h5py may return raw bytes instead of
+    # a Python string, for example b"D" instead of "D". Decode bytes so
+    # downstream metadata always uses str.
     species = h5file["species"][()]
     if isinstance(species, bytes):
         species = species.decode("utf-8")
@@ -51,29 +87,31 @@ def _read_particle_metadata(h5file, filename):
         "charge_state": int(h5file["charge_state"][()]),
         "A": float(h5file["A"][()]),
     }
-    metadata["attributes"] = {
-        dataset_name: dict(h5file[dataset_name].attrs)
-        for dataset_name in PARTICLE_DATASETS
-    }
+    metadata["attributes"] = {}
+    for dataset_name in SPECIES_DATASETS:
+        source_attributes = dict(h5file[dataset_name].attrs)
+        metadata["attributes"][dataset_name] = source_attributes
+
     return metadata
 
 
-def _write_particle_metadata(h5file, particle):
-    """Copy scalar particle metadata into one Stage 2 output file."""
+def _write_species_metadata(h5file, species_metadata):
+    """Copy scalar species metadata into one Stage 2 output file."""
     string_type = h5py.string_dtype(encoding="utf-8")
-    for dataset_name in PARTICLE_DATASETS:
+    for dataset_name in SPECIES_DATASETS:
         if dataset_name == "species":
             output_dataset = h5file.create_dataset(
                 dataset_name,
-                data=particle[dataset_name],
+                data=species_metadata[dataset_name],
                 dtype=string_type,
             )
         else:
             output_dataset = h5file.create_dataset(
                 dataset_name,
-                data=particle[dataset_name],
+                data=species_metadata[dataset_name],
             )
-        for attribute_name, value in particle["attributes"][dataset_name].items():
+        source_attributes = species_metadata["attributes"][dataset_name]
+        for attribute_name, value in source_attributes.items():
             output_dataset.attrs[attribute_name] = value
 
 
@@ -111,40 +149,65 @@ def _discover_reference_files(reference_config):
     return reference_paths
 
 
-def _calculate_output_moments(energy, pitch, f_array, mass_grams):
+def _calculate_output_moments(
+    energy,
+    pitch,
+    f_pitch_energy,
+    mass_grams,
+):
     """Calculate density and relativistic pressure moments on the E-P grid."""
     denergy = energy[1] - energy[0]
     dpitch = pitch[1] - pitch[0]
     cell_area = denergy * dpitch
-    density = float(np.sum(f_array) * cell_area)
+    density = float(np.sum(f_pitch_energy) * cell_area)
 
-    energy_2d = energy[:, np.newaxis]
-    pitch_2d = pitch[np.newaxis, :]
+    energy_2d = energy[np.newaxis, :]
+    pitch_2d = pitch[:, np.newaxis]
     u_squared = 2.0 * ERG_PER_KEV * energy_2d / mass_grams
     speed_of_light = 2.99792458e10
     gamma = np.sqrt(1.0 + u_squared / speed_of_light**2)
     pressure_energy = 2.0 * energy_2d / gamma
 
     parallel_pressure = float(
-        np.sum(pressure_energy * pitch_2d**2 * f_array) * cell_area
+        np.sum(
+            pressure_energy * pitch_2d**2 * f_pitch_energy
+        )
+        * cell_area
     )
     perpendicular_pressure = 0.5 * float(
-        np.sum(pressure_energy * (1.0 - pitch_2d**2) * f_array) * cell_area
+        np.sum(
+            pressure_energy
+            * (1.0 - pitch_2d**2)
+            * f_pitch_energy
+        )
+        * cell_area
     )
     return density, parallel_pressure / density, perpendicular_pressure / density
 
 
-def _write_output(
+def _write_fidasim_distribution(
     output_path,
     reference_path,
-    reference,
-    uniform,
+    distribution_metadata,
+    uniform_distribution,
     moments,
 ):
-    """Write one self-describing distribution using the FIDASIM HDF5 schema."""
-    energy = uniform["energy"]
-    pitch = uniform["pitch"]
-    f_array = uniform["f_array"]
+    """Write one energy-pitch distribution using the FIDASIM HDF5 schema.
+
+    Args:
+        output_path (Path): Destination HDF5 file.
+        reference_path (Path): Stage 1 file from which the distribution came.
+        distribution_metadata (dict): Species parameters and selected spatial
+            location associated with the distribution.
+        uniform_distribution (dict): Distribution sampled on the uniform
+            energy-pitch grid. It contains ``energy``, ``pitch``, and
+            ``f_pitch_energy``.
+        moments (tuple): Density, parallel temperature, and perpendicular
+            temperature calculated from the uniform distribution.
+    """
+    energy = uniform_distribution["energy"]
+    pitch = uniform_distribution["pitch"]
+    f_pitch_energy = uniform_distribution["f_pitch_energy"]
     density, parallel_temperature, perpendicular_temperature = moments
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -155,19 +218,32 @@ def _write_output(
         h5file.create_dataset("nz", data=1)
         h5file.create_dataset("energy", data=energy)
         h5file.create_dataset("pitch", data=pitch)
-        h5file.create_dataset("r", data=np.array([reference["selected_r"]]))
-        h5file.create_dataset("z", data=np.array([reference["selected_z"]]))
+        h5file.create_dataset(
+            "r",
+            data=np.array([distribution_metadata["selected_r"]]),
+        )
+        h5file.create_dataset(
+            "z",
+            data=np.array([distribution_metadata["selected_z"]]),
+        )
         h5file.create_dataset("denf", data=np.array([[density]]))
 
-        # Stage 2 calculates f_array as (energy, pitch). The FIDASIM file
-        # schema exposed by h5py is (z, r, pitch, energy), whose reversed
-        # dimension order is read by the Fortran HDF5 interface as
-        # (energy, pitch, r, z).
-        stored_distribution = f_array.T[np.newaxis, np.newaxis, :, :]
+        # The distribution represents one spatial location. Add singleton z
+        # and r axes to the existing (pitch, energy) array. The stored dataset
+        # therefore has the h5py-visible FIDASIM shape
+        # (z, r, pitch, energy). The Fortran HDF5 interface reverses these
+        # file dimensions when reading them and presents the FIDASIM code with
+        # its logical shape (energy, pitch, r, z).
+        stored_distribution = f_pitch_energy[
+            np.newaxis,
+            np.newaxis,
+            :,
+            :,
+        ]
         h5file.create_dataset("f", data=stored_distribution)
-        _write_particle_metadata(
+        _write_species_metadata(
             h5file=h5file,
-            particle=reference,
+            species_metadata=distribution_metadata,
         )
 
         moments_group = h5file.create_group("moments")
@@ -189,41 +265,86 @@ def _write_output(
         h5file.attrs["source_reference"] = str(reference_path.resolve())
 
 
-def run_conversion(config_path):
-    """Convert every Stage 1 reference file and return generated output paths."""
+def convert_reference_distributions_to_fidasim(config_path):
+    """Convert the complete Stage 1 collection into FIDASIM distributions.
+
+    The Stage 2 configuration points to the Stage 1 configuration that created
+    the indexed single-location CQL3D reference files. This function discovers
+    that collection and, for each reference:
+
+    1. Reads the ``f(u, theta)`` distribution, location, species metadata,
+       and reference moments.
+    2. Transforms the distribution into nonrelativistic energy-pitch
+       coordinates.
+    3. Remaps it onto the configured uniform FIDASIM energy-pitch grid.
+    4. Recalculates the density and directional temperature moments.
+    5. Writes a self-describing HDF5 file using the native FIDASIM
+       distribution schema and optionally creates its diagnostic plot.
+
+    After all cases have been converted, the function writes one collection
+    report comparing the Stage 1 and Stage 2 moments.
+
+    Args:
+        config_path (str or Path): Stage 2 namelist configuration file.
+
+    Raises:
+        ConfigError: If the configuration, reference collection, or required
+            HDF5 data does not satisfy the Stage 2 input contract.
+    """
     config = read_config(config_filename=config_path)
     input_config = config["input"]
     output_base = Path(config["save_data_block"]["output_filename"])
     references = _discover_reference_files(input_config["reference_config"])
 
-    output_paths = []
     report_results = []
     for case_index, reference_path in enumerate(references, start=1):
         with h5py.File(reference_path, mode="r") as h5file:
-            particle = _read_particle_metadata(
+
+            # Read the species parameters associated with this distribution.
+            distribution_metadata = _read_species_metadata(
                 h5file=h5file,
-                filename=reference_path,
+                label=reference_path,
             )
-            species = particle["species"]
-            reference = {
-                **particle,
-                "selected_r": float(h5file["selected_r"][()]),
-                "selected_z": float(h5file["selected_z"][()]),
-            }
+
+            selected_r = float(h5file["selected_r"][()])
+            selected_z = float(h5file["selected_z"][()])
+
+            # Combine the species parameters and spatial location into the
+            # metadata describing this single-location distribution.
+            distribution_metadata["selected_r"] = selected_r
+            distribution_metadata["selected_z"] = selected_z
+
             reference_moments = (
                 float(h5file["moments/density"][()]),
                 float(h5file["moments/parallel_temperature"][()]),
                 float(h5file["moments/perpendicular_temperature"][()]),
             )
-            transformed = transform_to_nonrelativistic_energy_pitch(
-                f_u_theta=h5file["f_u_theta"][:],
-                u_bar=h5file["u_bar"][:],
-                theta=h5file["theta"][:],
-                u_norm=float(h5file["u_norm"][()]),
-                mass_amu=particle["A"],
-            )
 
-        uniform = remap_to_uniform_grid(
+            f_u_theta = h5file["f_u_theta"][:]
+            u_bar = h5file["u_bar"][:]
+            theta = h5file["theta"][:]
+            u_norm = float(h5file["u_norm"][()])
+
+        # u_bar and theta from the CQL3D dataset are uniform grids.
+        # They can be convered into non-uniform E and P grids
+
+        # Convert the CQL3D f(u, theta) distribution into F(E, P) at the
+        # corresponding nonuniform energy-pitch coordinates. The result
+        # retains (pitch, energy) axis order; interpolation onto the
+        # uniform grid occurs next.
+        transformed = transform_to_nonrelativistic_energy_pitch(
+            f_u_theta=f_u_theta,
+            u_bar=u_bar,
+            theta=theta,
+            u_norm=u_norm,
+            mass_amu=distribution_metadata["A"],
+        )
+
+        # Interpolate F(E(u), P(theta)) from the nonuniform energy-pitch
+        # coordinates produced by transforming the source u and theta grids
+        # onto the configured uniform energy and pitch cell centers. The
+        # returned distribution retains (pitch, energy) axis order.
+        uniform_distribution = remap_to_uniform_grid(
             nonuniform_energy=transformed["energy"],
             nonuniform_pitch=transformed["pitch"],
             nonuniform_distribution=transformed["f_energy_pitch"],
@@ -231,23 +352,22 @@ def run_conversion(config_path):
             nenergy=input_config["nenergy"],
             npitch=input_config["npitch"],
         )
-        mass_grams = reference["A"] * ATOMIC_MASS_GRAMS
+        mass_grams = distribution_metadata["A"] * ATOMIC_MASS_GRAMS
         moments = _calculate_output_moments(
-            energy=uniform["energy"],
-            pitch=uniform["pitch"],
-            f_array=uniform["f_array"],
+            energy=uniform_distribution["energy"],
+            pitch=uniform_distribution["pitch"],
+            f_pitch_energy=uniform_distribution["f_pitch_energy"],
             mass_grams=mass_grams,
         )
         output_path = _indexed_path(output_base, case_index)
-        _write_output(
+        _write_fidasim_distribution(
             output_path=output_path,
             reference_path=reference_path,
-            reference=reference,
-            uniform=uniform,
+            distribution_metadata=distribution_metadata,
+            uniform_distribution=uniform_distribution,
             moments=moments,
         )
         print(f"Wrote converted file: {output_path}")
-        output_paths.append(output_path)
 
         if input_config["plot_data"]:
             plot_path = plot_converted_distribution(
@@ -260,8 +380,8 @@ def run_conversion(config_path):
             {
                 "reference_path": reference_path,
                 "output_path": output_path,
-                "selected_r": reference["selected_r"],
-                "selected_z": reference["selected_z"],
+                "selected_r": distribution_metadata["selected_r"],
+                "selected_z": distribution_metadata["selected_z"],
                 "reference_moments": reference_moments,
                 "converted_moments": moments,
             }
@@ -270,4 +390,3 @@ def run_conversion(config_path):
     report_path = output_base.parent / "conversion_moments.txt"
     write_moment_report(results=report_results, output_path=report_path)
     print(f"Wrote report: {report_path}")
-    return output_paths

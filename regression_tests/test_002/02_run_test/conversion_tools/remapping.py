@@ -16,19 +16,43 @@ def remap_to_uniform_grid(
 ):
     """Interpolate transformed values onto uniform cell-centered grids.
 
+    Input array schema::
+
+        nonuniform_energy.shape       == (source_nenergy,)
+        nonuniform_pitch.shape        == (source_npitch,)
+        nonuniform_distribution.shape == (source_npitch, source_nenergy)
+
+    The first distribution axis is pitch and the second is energy.
+
     Args:
-        nonuniform_energy (array-like): Increasing transformed energy values.
-        nonuniform_pitch (array-like): Increasing transformed pitch values.
-        nonuniform_distribution (array-like): Values with shape
-            ``(source_npitch, source_nenergy)``.
+        nonuniform_energy (array-like): Increasing transformed energy values
+            in keV.
+        nonuniform_pitch (array-like): Increasing dimensionless pitch values.
+        nonuniform_distribution (array-like): Distribution values in
+            ions/(cm^3 keV dP).
         energy_upper_edge (float): Energy at the upper edge of the final
             source proper-velocity cell, in keV.
         nenergy (int): Number of uniform FIDASIM energy cells.
         npitch (int): Number of uniform FIDASIM pitch cells.
 
     Returns:
-        dict: Uniform energy and pitch centers, spacings, and ``f_array`` with
-        FIDASIM shape ``(nenergy, npitch)``.
+        dict: Uniform-grid data with the following schema::
+
+            {
+                "energy": ndarray,         # shape (nenergy,), keV
+                "pitch": ndarray,          # shape (npitch,), dimensionless
+                "denergy": float,          # keV
+                "dpitch": float,           # dimensionless
+                "f_pitch_energy": ndarray, # shape (npitch, nenergy)
+            }
+
+        ``f_pitch_energy`` is in ions/(cm^3 keV dP). Its axis order matches
+        the non-spatial dimensions used by h5py when writing the FIDASIM
+        distribution dataset.
+
+    Raises:
+        ConfigError: If the input arrays, dimensions, or grid values do not
+            satisfy the remapping requirements.
     """
     nonuniform_energy = np.asarray(nonuniform_energy, dtype=float)
     nonuniform_pitch = np.asarray(nonuniform_pitch, dtype=float)
@@ -76,20 +100,19 @@ def remap_to_uniform_grid(
     interpolation_points = np.column_stack(
         (pitch_2d.ravel(), energy_2d.ravel())
     )
-    distribution_pitch_energy = interpolator(interpolation_points)
-    distribution_pitch_energy = distribution_pitch_energy.reshape(npitch, nenergy)
+    f_pitch_energy = interpolator(interpolation_points)
+    f_pitch_energy = f_pitch_energy.reshape(npitch, nenergy)
 
     # Linear extrapolation is used only in the final half source cell. Clip any
     # small negative extrapolated values because a distribution cannot be negative.
-    distribution_pitch_energy = np.maximum(distribution_pitch_energy, 0.0)
+    f_pitch_energy = np.maximum(f_pitch_energy, 0.0)
 
-    # The interpolation is assembled as (pitch, energy). Expose the converted
-    # distribution to the rest of Stage 2 in the canonical (energy, pitch)
-    # calculation order.
+    # Keep the (pitch, energy) order produced by the interpolator. This is also
+    # the order required when writing the non-spatial dimensions with h5py.
     return {
         "energy": energy,
         "pitch": pitch,
         "denergy": denergy,
         "dpitch": dpitch,
-        "f_array": distribution_pitch_energy.T,
+        "f_pitch_energy": f_pitch_energy,
     }

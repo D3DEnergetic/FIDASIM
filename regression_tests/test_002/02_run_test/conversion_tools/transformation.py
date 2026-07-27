@@ -45,6 +45,20 @@ def transform_to_nonrelativistic_energy_pitch(
     expression. It does not yet remap the result onto the uniform grids required
     by FIDASIM.
 
+    Here ``epsilon`` is the energy conversion ``ERG_PER_KEV``. For
+    ``E = m*u**2/(2*epsilon)`` and ``P = cos(theta)``, particle-number
+    conservation gives
+
+    ``F(E, P) dE dP = 2*pi*f_v(u, theta)*u**2 du dP``.
+
+    The resulting phase-space Jacobian factor is
+
+    ``2*pi*sqrt(2)*(epsilon/m)**(3/2)*sqrt(E)``.
+
+    The factor includes integration over gyrophase and the velocity-to-energy
+    coordinate Jacobian. It is multiplied by the physical velocity-space
+    distribution at the point where ``f_energy_pitch`` is constructed below.
+
     Args:
         f_u_theta (array-like): CQL3D distribution with shape ``(ntheta, nu)``.
         u_bar (array-like): Normalized proper-velocity coordinates.
@@ -88,16 +102,17 @@ def transform_to_nonrelativistic_energy_pitch(
     # distribution in ions/[cm^3*(cm/s)^3].
     f_velocity = f_u_theta / u_norm**3
 
-    # Apply the conventional sqrt(E) expression derived in the documentation.
-    coefficient = (
+    # Combine the velocity-to-energy Jacobian with the 2*pi gyrophase
+    # integration. Multiplication by this factor converts f_velocity into the
+    # FIDASIM distribution density per unit energy and pitch.
+    phase_space_jacobian = (
         2.0
         * np.pi
         * np.sqrt(2.0)
         * (ERG_PER_KEV / mass_grams) ** 1.5
+        * np.sqrt(energy)
     )
-    f_energy_pitch = (
-        coefficient * np.sqrt(energy)[np.newaxis, :] * f_velocity
-    )
+    f_energy_pitch = phase_space_jacobian[np.newaxis, :] * f_velocity
 
     # Increasing theta produces decreasing pitch. Reverse both pitch and the
     # corresponding distribution axis for the FIDASIM convention.

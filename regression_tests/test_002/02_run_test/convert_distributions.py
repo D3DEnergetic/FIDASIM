@@ -8,7 +8,7 @@ import sys
 regression_tests_directory = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(regression_tests_directory))
 
-from conversion_tools import run_conversion
+from conversion_tools import convert_reference_distributions_to_fidasim
 from regression_test_tools import ConfigError
 
 
@@ -18,7 +18,9 @@ def main():
     parser.add_argument("config_path", help="Path to the Stage 2 namelist")
     arguments = parser.parse_args()
     try:
-        run_conversion(config_path=arguments.config_path)
+        convert_reference_distributions_to_fidasim(
+            config_path=arguments.config_path
+        )
     except ConfigError as error:
         raise SystemExit(f"Configuration error: {error}") from None
 

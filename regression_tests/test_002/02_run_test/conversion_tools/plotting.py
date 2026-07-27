@@ -51,13 +51,12 @@ def plot_converted_distribution(input_path, plot_config):
         pitch = np.asarray(h5file["pitch"][:], dtype=float)
 
         # The Python-written FIDASIM file has h5py order
-        # (z, r, pitch, energy). Select the single spatial cell and transpose
-        # (pitch, energy) into the Stage 2 canonical (energy, pitch) order.
-        stored_distribution = np.asarray(
+        # (z, r, pitch, energy). Select the single spatial cell and retain its
+        # (pitch, energy) order.
+        f_pitch_energy = np.asarray(
             h5file["f"][0, 0, :, :],
             dtype=float,
         )
-        distribution = stored_distribution.T
         selected_r = float(h5file["r"][0])
         selected_z = float(h5file["z"][0])
         density = float(h5file["moments/density"][()])
@@ -68,13 +67,14 @@ def plot_converted_distribution(input_path, plot_config):
             h5file["moments/perpendicular_temperature"][()]
         )
 
-    expected_shape = (energy.size, pitch.size)
-    if distribution.shape != expected_shape:
+    expected_shape = (pitch.size, energy.size)
+    if f_pitch_energy.shape != expected_shape:
         raise ConfigError(
-            f"f has shape {distribution.shape}; expected {expected_shape}."
+            "f at the selected spatial cell has shape "
+            f"{f_pitch_energy.shape}; expected {expected_shape}."
         )
 
-    plot_values = np.array(distribution, dtype=float)
+    plot_values = np.array(f_pitch_energy, dtype=float)
     colorbar_label = r"$F(E,P)$ [ions/(cm$^3$ keV $dP$)]"
     if plot_config["scale"] == "log":
         positive_values = np.where(plot_values > 0.0, plot_values, np.nan)
@@ -94,12 +94,12 @@ def plot_converted_distribution(input_path, plot_config):
 
     figure, axes = plt.subplots(figsize=(7, 5.5))
 
-    # Matplotlib expects contour values as (y=pitch, x=energy), whereas the
-    # Stage 2 calculation contract is (energy, pitch).
+    # Matplotlib expects contour values as (y=pitch, x=energy), matching the
+    # h5py distribution order retained by this workflow.
     contour = axes.contourf(
         energy,
         pitch,
-        plot_values.T,
+        plot_values,
         levels=contour_values,
         cmap=plot_config["colormap"],
         extend="both",

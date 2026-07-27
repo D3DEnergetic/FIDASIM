@@ -14,6 +14,198 @@ result in separate stages.
 | `test_003` | Two-dimensional inverse-transform sampling of fast-ion energy-pitch distributions. | [Test 003 portal](test_003/README.md) |
 | `test_004` | Charge-exchange ion-sink rate and energy-pitch distribution. | [Test 004 portal](test_004/README.md) |
 
+## Python–Fortran workflow and HDF5 array ordering
+
+The regression tests place the compiled FIDASIM calculation between Python
+input and output layers:
+
+```mermaid
+flowchart TD
+    INPUT[/"User inputs and configuration"/]
+
+    subgraph PYINPUT["Python layer: input wrapper"]
+        PREPARE["Validate and normalize input configuration"]
+    end
+
+    NORMALIZED[("Normalized input artifact<br/>native FIDASIM format")]
+
+    subgraph FORTRAN["Fortran layer: FIDASIM calculation"]
+        FIDASIM["Perform the numerical calculation"]
+    end
+
+    HDF5[("Native FIDASIM HDF5 outputs")]
+
+    subgraph PYOUTPUT["Python layer: output wrapper"]
+        POSTPROCESS["Postprocess calculation results"]
+        PRESENT["Generate comparisons, plots, and reports"]
+        POSTPROCESS --> PRESENT
+    end
+
+    OUTPUT[/"Regression-test products"/]
+
+    INPUT --> PREPARE
+    PREPARE --> NORMALIZED
+    NORMALIZED --> FIDASIM
+    FIDASIM --> HDF5
+    HDF5 --> POSTPROCESS
+    PRESENT --> OUTPUT
+
+    classDef external fill:#f3f4f6,stroke:#6b7280,color:#111827
+    classDef python fill:#dcfce7,stroke:#16a34a,color:#111827
+    classDef fortran fill:#dbeafe,stroke:#2563eb,color:#111827
+    classDef hdf5 fill:#fef3c7,stroke:#d97706,color:#111827
+    classDef product fill:#f3e8ff,stroke:#9333ea,color:#111827
+
+    class INPUT,NORMALIZED external
+    class PREPARE,POSTPROCESS,PRESENT python
+    class FIDASIM fortran
+    class HDF5 hdf5
+    class OUTPUT product
+
+    style PYINPUT fill:#f0fdf4,stroke:#16a34a,color:#111827
+    style FORTRAN fill:#eff6ff,stroke:#2563eb,color:#111827
+    style PYOUTPUT fill:#f0fdf4,stroke:#16a34a,color:#111827
+```
+
+The core HDF5 library uses the C array convention, in which the last index
+varies fastest. Fortran uses column-major arrays, in which the first index
+varies fastest. The HDF5 Fortran interface reconciles these conventions by
+reversing the dimension order when a Fortran program writes an array.
+
+The Fortran interface applies the reverse conversion when another Fortran
+program reads the dataset. A Fortran-to-Fortran exchange therefore preserves
+the expected logical array order:
+
+```text
+Fortran array:  A(d1, d2, ..., dN)
+HDF5 file:      A(dN, ..., d2, d1)
+Fortran array:  A(d1, d2, ..., dN)
+```
+
+HDFView and h5py instead expose the dimension order recorded in the HDF5 file.
+They do not apply the Fortran conversion. Consequently,
+
+```text
+Fortran: A(i, j, k)
+HDFView: A(k, j, i)
+h5py:    raw[k, j, i]
+```
+
+The FIDASIM charge-exchange table provides a concrete example. Its Fortran
+writer defines
+
+```fortran
+dim3 = [n_max, m_max, nenergy]
+```
+
+and writes `cx(initial level, final level, relative energy)`. For
+`n_max = 12`, `m_max = 12`, and `nenergy = 200`, HDFView reports the dataset
+shape `(200, 12, 12)`, and h5py exposes
+
+```text
+cx[relative energy, final level, initial level]
+```
+
+The values are not corrupted; only their indexing convention changes. Because
+the two level axes both have length 12, their physical meanings must come from
+the Fortran writer rather than from the dataset shape alone.
+
+### The Fortran–Python–Fortran round-trip rule
+
+When Python sits between a Fortran producer and a Fortran consumer, the array
+passed to the h5py writer must use the HDF5 file order that the Fortran reader
+will convert into the consumer's required logical order:
+
+- If Python keeps the raw h5py axis order, it should write that array back
+  without reordering it.
+- If Python reorders the raw array into a preferred working order, it
+  must apply the inverse mapping before calling the h5py writer.
+
+In the diagram, `M` maps the h5py file order into the preferred Python working
+order `(c1, c2, ..., cN)`. `M inverse` restores the file order. Both are
+identity operations when Python works directly in h5py order.
+
+Rectangles in the diagram represent operations, parallelograms represent
+in-memory arrays, cylinders represent external HDF5 datasets, and labelled
+regions identify the program responsible for each operation. Blue identifies
+Fortran code, green identifies the Python wrapper, and amber identifies
+external HDF5 storage. The nested region inside the Python wrapper separates
+data operations from the h5py input/output interface.
+
+The complete interface is therefore
+
+```mermaid
+flowchart TD
+    subgraph PRODUCER["Fortran producer"]
+        direction TB
+        F1[/"Fortran logical array<br/>(d1, d2, ..., dN)"/]
+        FW["Fortran HDF5 write operation"]
+        F1 --> FW
+    end
+
+    H1[("External input HDF5 dataset<br/>file order: (dN, ..., d2, d1)")]
+
+    subgraph PYTHON["Python wrapper"]
+        direction TB
+        PR["h5py read operation"]
+        PRA[/"Raw Python array<br/>file order: (dN, ..., d2, d1)"/]
+
+        subgraph DATAOPS["Python data operations"]
+            direction TB
+            PM["Optional axis mapping M"]
+            PWA[/"Python working array<br/>preferred order: (c1, c2, ..., cN)"/]
+            PC["Python computation or analysis"]
+            PI["Inverse axis mapping M inverse"]
+
+            PM --> PWA
+            PWA --> PC
+            PC --> PI
+        end
+
+        POA[/"Python output array<br/>file order: (dN, ..., d2, d1)"/]
+        PW["h5py write operation"]
+
+        PR -->|"read without reordering"| PRA
+        PRA --> PM
+        PI --> POA
+        POA --> PW
+    end
+
+    H2[("External output HDF5 dataset<br/>file order: (dN, ..., d2, d1)")]
+
+    subgraph CONSUMER["Fortran consumer"]
+        direction TB
+        FR["Fortran HDF5 read operation"]
+        F2[/"Fortran logical array<br/>(d1, d2, ..., dN)"/]
+        FR -->|"dimensions reversed on read"| F2
+    end
+
+    FW -->|"reverses dimensions"| H1
+    H1 --> PR
+    PW -->|"writes without reordering"| H2
+    H2 --> FR
+
+    classDef fortran fill:#dbeafe,stroke:#2563eb,color:#111827
+    classDef python fill:#dcfce7,stroke:#16a34a,color:#111827
+    classDef hdf5 fill:#fef3c7,stroke:#d97706,color:#111827
+
+    class F1,FW,FR,F2 fortran
+    class PR,PRA,PM,PWA,PC,PI,POA,PW python
+    class H1,H2 hdf5
+
+    style PRODUCER fill:#eff6ff,stroke:#2563eb,color:#111827
+    style PYTHON fill:#f0fdf4,stroke:#16a34a,color:#111827
+    style DATAOPS fill:#ffffff,stroke:#16a34a,stroke-width:2px,color:#111827
+    style CONSUMER fill:#eff6ff,stroke:#2563eb,color:#111827
+```
+
+For each exchanged dataset, document the Fortran logical order, h5py file
+order, and Python working order. Validate the raw rank and dimensions, and
+keep `M` and `M inverse` at the Python input and output boundaries. Use
+explicit operations such as `transpose` or `swapaxes`, with comments naming
+the semantic axes. Python-only outputs may remain in the preferred Python
+order because they are not consumed by a Fortran HDF5 reader.
+
 ## Build
 
 FIDASIM uses a hierarchy of makefiles controlled by the repository-level

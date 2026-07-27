@@ -251,6 +251,11 @@ swaps the two level axes once and presents the calculation with the canonical
 order `(relative energy, initial level, final level)`, matching FIDASIM's
 internal `bb_cx_rates` matrix.
 
+The top-level
+[Python–Fortran HDF5 interface contract](../../README.md#pythonfortran-workflow-and-hdf5-array-ordering)
+explains why this axis conversion is required and defines the convention used
+by regression-test Python readers.
+
 For each $E,p,\phi$, the deterministic calculation follows `bb_cx_rates`: it
 linearly interpolates $\log_{10}\sigma_{m\leftarrow l}$ on the table's
 uniformly spaced $\log_{10}\varepsilon_{\rm rel}$ grid, clamps an out-of-range

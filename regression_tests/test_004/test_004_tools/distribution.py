@@ -72,6 +72,11 @@ def read_distribution(filename):
             f"{filename}: expected f shape (1,1,{pitch.size},{energy.size}), "
             f"got {raw.shape}."
         )
+
+    # Test 002 writes the FIDASIM h5py schema as (z, r, pitch, energy).
+    # Select the single spatial cell and normalize (pitch, energy) into the
+    # Test 004 canonical calculation order (energy, pitch). The source file is
+    # Python-written but deliberately uses the layout expected by Fortran.
     values = raw[0, 0, :, :].T
 
     arrays = [energy, pitch, values]

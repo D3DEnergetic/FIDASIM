@@ -78,6 +78,10 @@ def _validate_distribution(source_path):
             f"Expected one R and one Z location in {source_path}."
         )
 
+    # Test 002 writes the FIDASIM h5py schema as (z, r, pitch, energy).
+    # Select its single spatial cell and normalize (pitch, energy) into the
+    # Test 003 canonical (energy, pitch) order. This transpose reflects the
+    # file schema; the Test 002 file itself was written by Python.
     values = np.transpose(f_array[0, 0, :, :])
     if energy.size < 2 or pitch.size < 2:
         raise ConfigError(f"Energy and pitch grids are too short in {source_path}.")

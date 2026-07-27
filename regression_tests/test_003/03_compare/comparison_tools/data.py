@@ -80,6 +80,10 @@ def read_distribution(filename):
         if sampled_layout:
             energy = np.asarray(h5file["energy_grid"][:], dtype=float)
             pitch = np.asarray(h5file["pitch_grid"][:], dtype=float)
+
+            # The Test 003 Fortran writer pre-transposes its buffer and supplies
+            # reversed HDF5 dimensions. h5py therefore already exposes the
+            # sampled array in canonical (energy, pitch) order.
             values = np.asarray(h5file["f_array"][:], dtype=float)
             selected_r = _read_scalar(h5file["selected_r"])
             selected_z = _read_scalar(h5file["selected_z"])
@@ -94,6 +98,10 @@ def read_distribution(filename):
                     f"{filename}: f shape {raw.shape} does not match "
                     f"{expected_raw_shape}."
                 )
+
+            # Test 002 is Python-written in FIDASIM file order
+            # (z, r, pitch, energy). Normalize the selected spatial slice to
+            # the comparison contract (energy, pitch).
             values = raw[0, 0, :, :].T
             selected_r = _read_scalar(h5file["r"])
             selected_z = _read_scalar(h5file["z"])

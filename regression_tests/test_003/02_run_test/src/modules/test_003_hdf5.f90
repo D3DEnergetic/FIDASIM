@@ -77,12 +77,16 @@ contains
     if (size(distribution%f_array_dimensions) /= 4) then
       error stop 'f must be four-dimensional in '//trim(filename)
     end if
+
+    ! Test 002 writes the h5py-visible order (z, r, pitch, energy). The
+    ! Fortran HDF5 interface presents those dimensions here in reverse order
+    ! as (energy, pitch, r, z).
     if (distribution%f_array_dimensions(1) /= nenergy .or. &
         distribution%f_array_dimensions(2) /= npitch .or. &
         distribution%f_array_dimensions(3) /= 1 .or. &
         distribution%f_array_dimensions(4) /= 1) then
       write(*, '(a)') 'f dimensions do not match the expected Test 002 layout'
-      write(*, '(a,4(1x,i0))') '  HDF5 dimensions:', &
+      write(*, '(a,4(1x,i0))') '  Fortran HDF5 dimensions:', &
         distribution%f_array_dimensions
       write(*, '(a,4(1x,i0))') '  Expected:', nenergy, npitch, 1, 1
       error stop trim(filename)
@@ -112,6 +116,9 @@ contains
     call h5dclose_f(dataset_id, error)
     call check_hdf5(error, 'closing f', filename)
 
+    ! Reuse this array as the Fortran dimension argument for the sampled
+    ! output. Supplying (pitch, energy) makes the HDF5 file visible to h5py as
+    ! the desired (energy, pitch) shape.
     distribution%f_array_dimensions = [int(npitch, HSIZE_T), &
       int(nenergy, HSIZE_T)]
   end subroutine read_f_array
@@ -187,6 +194,10 @@ contains
   end subroutine validate_uniform_spacing
 
   subroutine read_dataset_dimensions(file_id, dataset_name, dimensions, filename)
+    !+ Return an HDF5 dataset's extents in Fortran interface order.
+    !+
+    !+ For multidimensional data, this is the reverse of the raw file order
+    !+ exposed by C-based readers such as h5py.
     integer(HID_T), intent(in) :: file_id
     character(len=*), intent(in) :: dataset_name, filename
     integer(HSIZE_T), allocatable, intent(out) :: dimensions(:)
@@ -285,6 +296,10 @@ contains
     call h5dcreate_f(output_id, 'f_array', H5T_NATIVE_DOUBLE, &
       f_array_space_id, f_array_id, error)
     call check_hdf5(error, 'creating sampled f_array', output_filename)
+
+    ! sampled_f_array is indexed as (energy, pitch). The output dataspace uses
+    ! the reversed Fortran dimensions (pitch, energy), so transpose the buffer
+    ! to preserve f_array[energy,pitch] when h5py reads the resulting file.
     output_f_array = transpose(sampled_f_array)
     call h5dwrite_f(f_array_id, H5T_NATIVE_DOUBLE, output_f_array, &
       f_array_dimensions, error)

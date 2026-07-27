@@ -158,7 +158,13 @@ def _write_output(
         h5file.create_dataset("r", data=np.array([reference["selected_r"]]))
         h5file.create_dataset("z", data=np.array([reference["selected_z"]]))
         h5file.create_dataset("denf", data=np.array([[density]]))
-        h5file.create_dataset("f", data=f_array.T[np.newaxis, np.newaxis, :, :])
+
+        # Stage 2 calculates f_array as (energy, pitch). The FIDASIM file
+        # schema exposed by h5py is (z, r, pitch, energy), whose reversed
+        # dimension order is read by the Fortran HDF5 interface as
+        # (energy, pitch, r, z).
+        stored_distribution = f_array.T[np.newaxis, np.newaxis, :, :]
+        h5file.create_dataset("f", data=stored_distribution)
         _write_particle_metadata(
             h5file=h5file,
             particle=reference,

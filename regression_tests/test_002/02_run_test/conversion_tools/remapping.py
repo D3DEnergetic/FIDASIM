@@ -83,6 +83,9 @@ def remap_to_uniform_grid(
     # small negative extrapolated values because a distribution cannot be negative.
     distribution_pitch_energy = np.maximum(distribution_pitch_energy, 0.0)
 
+    # The interpolation is assembled as (pitch, energy). Expose the converted
+    # distribution to the rest of Stage 2 in the canonical (energy, pitch)
+    # calculation order.
     return {
         "energy": energy,
         "pitch": pitch,

@@ -77,9 +77,9 @@ contains
     real(Float64), allocatable :: stored_distribution(:,:,:,:)
     integer :: error, nenergy, npitch
 
-    ! Test dimensions of the stored distribution array:
-    ! Test 002 stores F(E,p) with two singleton spatial dimensions:
-    ! f(nenergy,npitch,nr=1,nz=1).
+    ! Test 002 writes the h5py-visible order (z, r, pitch, energy). The
+    ! Fortran HDF5 interface presents those dimensions here in reverse order
+    ! as (energy, pitch, r, z).
     nenergy = size(distribution%energy)
     npitch = size(distribution%pitch)
     call read_array_dimensions(file_id, 'f', dimensions, filename)

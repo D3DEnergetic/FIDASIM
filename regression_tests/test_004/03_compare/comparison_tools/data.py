@@ -213,7 +213,9 @@ def read_sink(filename, implementation):
 
     Deterministic artifacts store their comparison datasets at the HDF5 root.
     Production Monte Carlo sink files retain the FIDASIM root schema and store
-    the derived comparison contract under ``/test_004``.
+    the derived comparison contract under ``/test_004``. Both comparison
+    contracts are written by Python in canonical ``(energy, pitch)`` order, so
+    the two-dimensional datasets require no Fortran/HDF5 axis conversion here.
     """
     if implementation not in ("deterministic", "monte_carlo"):
         raise ValueError(f"Unknown implementation: {implementation}")

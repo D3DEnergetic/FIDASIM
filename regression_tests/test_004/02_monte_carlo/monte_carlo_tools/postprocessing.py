@@ -95,6 +95,12 @@ def _read_sink_particles(h5file, filename, expected_markers):
     energy = np.asarray(h5file["energy"][:], dtype=float)
     pitch = np.asarray(h5file["pitch"][:], dtype=float)
     weight = np.asarray(h5file["weight"][:], dtype=float)
+
+    # write_sink_profile uses the Fortran layouts ind(component, particle) and
+    # dens(component, x, y, z). h5py exposes these as (particle, component) and
+    # (z, y, x, component). The particle indices are already in the desired
+    # Python order; density is only reduced over every axis, so no reorder is
+    # required for either dataset.
     indices = np.asarray(h5file["ind"][:], dtype=int)
     density = np.asarray(h5file["dens"][:], dtype=float)
 

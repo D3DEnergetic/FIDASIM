@@ -250,6 +250,10 @@ def plot_sampled_file(filename, plot_config):
     with h5py.File(filename, "r") as h5file:
         energy = np.asarray(h5file["energy_grid"][:], dtype=float)
         pitch = np.asarray(h5file["pitch_grid"][:], dtype=float)
+
+        # The Fortran writer explicitly compensates for the Fortran/HDF5
+        # dimension reversal, so h5py already exposes f_array in the plotting
+        # order (energy, pitch); no Python transpose is required.
         distribution = np.asarray(h5file["f_array"][:], dtype=float)
 
         # Each sampled file represents one selected spatial location.

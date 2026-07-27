@@ -49,7 +49,15 @@ def plot_converted_distribution(input_path, plot_config):
     with h5py.File(input_path, mode="r") as h5file:
         energy = np.asarray(h5file["energy"][:], dtype=float)
         pitch = np.asarray(h5file["pitch"][:], dtype=float)
-        distribution = np.asarray(h5file["f"][0, 0, :, :], dtype=float).T
+
+        # The Python-written FIDASIM file has h5py order
+        # (z, r, pitch, energy). Select the single spatial cell and transpose
+        # (pitch, energy) into the Stage 2 canonical (energy, pitch) order.
+        stored_distribution = np.asarray(
+            h5file["f"][0, 0, :, :],
+            dtype=float,
+        )
+        distribution = stored_distribution.T
         selected_r = float(h5file["r"][0])
         selected_z = float(h5file["z"][0])
         density = float(h5file["moments/density"][()])
@@ -85,6 +93,9 @@ def plot_converted_distribution(input_path, plot_config):
     )
 
     figure, axes = plt.subplots(figsize=(7, 5.5))
+
+    # Matplotlib expects contour values as (y=pitch, x=energy), whereas the
+    # Stage 2 calculation contract is (energy, pitch).
     contour = axes.contourf(
         energy,
         pitch,

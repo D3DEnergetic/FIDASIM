@@ -95,7 +95,10 @@ contains
 
   subroutine read_array_dimensions( &
       file_id, dataset_name, dimensions, filename)
-    !+ Read and return the dimensions of a non-scalar HDF5 dataset.
+    !+ Return a non-scalar HDF5 dataset's extents in Fortran interface order.
+    !+
+    !+ This order is the reverse of the raw file-dataspace order exposed by
+    !+ C-based readers such as h5py.
     integer(HID_T), intent(in) :: file_id
       !+ Identifier of the open HDF5 file.
     character(len=*), intent(in) :: dataset_name, filename

@@ -38,15 +38,17 @@ def load_fidasim_h5_species_parameters(input_path):
 
 
 def load_fidasim_h5_distribution(input_path):
-    """Load a FIDASIM file into the canonical energy-pitch representation.
+    """Load a FIDASIM file in its native h5py-visible array order.
 
     Args:
         input_path (Path): FIDASIM distribution HDF5 file to read.
 
     Returns:
         tuple: ``z, r, pitch, energy, f, denf``, where the one-dimensional
-        arrays define the coordinate grids, ``f`` has shape
-        ``(nz, nr, npitch, nenergy)``, and ``denf`` has shape ``(nz, nr)``.
+        arrays define the coordinate grids, ``f`` retains the FIDASIM file
+        order ``(nz, nr, npitch, nenergy)``, and ``denf`` has shape
+        ``(nz, nr)``. The caller selects the spatial cell and converts its
+        distribution to canonical ``(nenergy, npitch)`` order.
 
     Raises:
         KeyError: If a required dataset, including ``denf``, is absent.

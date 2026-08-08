@@ -41,8 +41,8 @@ The energy-pitch-resolved ion-sink distribution is
 $$
 S(E,p)=
 n_i\ g(E,p)
-\sum_{l,m=1}^{6}n_l
-\left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p),
+\sum_{l=1}^{6}n_l
+\left\langle K_l^{\rm CX}\right\rangle_\phi(E,p),
 $$
 
 and the total volumetric ion-sink reaction rate is
@@ -51,9 +51,9 @@ $$
 R=\int S(E,p)\ dE\ dp.
 $$
 
-Here $n_i$ is the ion density, $g(E,p)$ is the normalized ion distribution,
-and $\left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p)$ is the
-state-resolved, gyrophase-averaged charge-exchange reactivity:
+Here $n_i$ is the ion density and $g(E,p)$ is the normalized ion
+distribution. The state-resolved, gyrophase-averaged charge-exchange
+reactivity is
 
 $$
 \left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p)=
@@ -61,6 +61,22 @@ $$
 \sigma_{m\leftarrow l}(\varepsilon_{\rm rel})v_{\rm rel}
 \right\rangle_{\phi}.
 $$
+
+Summing over every final atomic level $m$ defines the total
+gyrophase-averaged CX reactivity for a neutral initially in level $l$:
+
+$$
+\boxed{
+\left\langle K_l^{\rm CX}\right\rangle_\phi(E,p)
+=
+\sum_{m=1}^{6}
+\left\langle K_{m\leftarrow l}\right\rangle_\phi(E,p)
+}.
+$$
+
+Thus, the sum over $m$ is contained within
+$\left\langle K_l^{\rm CX}\right\rangle_\phi$, while the ion-sink expression
+sums the contributions from the six initial neutral levels $l$.
 
 For any gyrophase-dependent quantity $q(\phi)$, the gyro-averaging operator
 is
@@ -79,6 +95,35 @@ $$
 \mathrm{H}^{+}+\mathrm{H}(l)
 \longrightarrow
 \mathrm{H}(m)+\mathrm{H}^{+}.
+$$
+
+The units of the quantities entering the ion-sink expression are
+
+$$
+[n_i]=[n_l]=\mathrm{cm}^{-3},
+\qquad
+[g]=(\mathrm{keV}\ dp)^{-1},
+\qquad
+\left[
+\left\langle K_{m\leftarrow l}\right\rangle_\phi
+\right]
+=
+\left[
+\left\langle K_l^{\rm CX}\right\rangle_\phi
+\right]
+=\mathrm{cm}^{3}\mathrm{s}^{-1}.
+$$
+
+Consequently,
+
+$$
+[S]
+=\frac{\mathrm{ions}}
+{\mathrm{cm}^{3}\mathrm{s}\ \mathrm{keV}\ dp},
+\qquad
+[R]
+=\frac{\mathrm{ions}}
+{\mathrm{cm}^{3}\mathrm{s}}.
 $$
 
 For ion mass $M_i$ and neutral mass $M_n$, the physical centre-of-mass

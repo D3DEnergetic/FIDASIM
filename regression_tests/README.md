@@ -14,6 +14,13 @@ result in separate stages.
 | `test_003` | Two-dimensional inverse-transform sampling of fast-ion energy-pitch distributions. | [Test 003 portal](test_003/README.md) |
 | `test_004` | Charge-exchange ion-sink rate and energy-pitch distribution. | [Test 004 portal](test_004/README.md) |
 
+## Shared Python tools
+
+[`regression_test_tools`](regression_test_tools/namelist_config_tools/README.md)
+exposes the common namelist configuration utilities used across the
+workflows. The reusable implementation is kept in its nested
+`namelist_config_tools` package, together with a guide and runnable example.
+
 ## Python–Fortran workflow and HDF5 array ordering
 
 The regression tests place the compiled FIDASIM calculation between Python

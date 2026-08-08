@@ -1,11 +1,6 @@
-"""Expose namelist configuration tools to FIDASIM regression workflows.
+"""Public API for reusable Fortran namelist configuration handling."""
 
-The reusable implementation lives in the nested ``namelist_config_tools``
-package. This facade preserves the established ``regression_test_tools`` API
-so FIDASIM code does not depend on that internal package layout.
-"""
-
-from .namelist_config_tools import (
+from .config import (
     ConfigError,
     as_list,
     normalize_path,

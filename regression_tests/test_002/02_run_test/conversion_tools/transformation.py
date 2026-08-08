@@ -9,6 +9,12 @@ SPEED_OF_LIGHT_CM_PER_SECOND = 2.99792458e10
 ERG_PER_KEV = 1.602176634e-9
 ATOMIC_MASS_GRAMS = 1.66053906660e-24
 
+# CQL3D may store the normalized velocity grid as either float32 or float64.
+# For float32 grids, rounding causes small differences between spacings that
+# are mathematically uniform, so the comparison must allow for that precision.
+UNIFORM_SPACING_RELATIVE_TOLERANCE = 2.0e-5
+UNIFORM_SPACING_ABSOLUTE_TOLERANCE = 1.0e-12
+
 
 def _validate_inputs(f_u_theta, u_bar, theta, u_norm, mass_amu):
     """Check the arrays and physical values used by the transformation."""
@@ -22,7 +28,12 @@ def _validate_inputs(f_u_theta, u_bar, theta, u_norm, mass_amu):
     if u_bar.size < 2 or not np.all(np.diff(u_bar) > 0.0):
         raise ConfigError("u_bar must contain at least two increasing values.")
     du_bar = u_bar[1] - u_bar[0]
-    if not np.allclose(np.diff(u_bar), du_bar, rtol=1.0e-10, atol=1.0e-12):
+    if not np.allclose(
+        np.diff(u_bar),
+        du_bar,
+        rtol=UNIFORM_SPACING_RELATIVE_TOLERANCE,
+        atol=UNIFORM_SPACING_ABSOLUTE_TOLERANCE,
+    ):
         raise ConfigError("u_bar must be uniformly spaced.")
     if u_norm <= 0.0:
         raise ConfigError("u_norm must be greater than zero.")

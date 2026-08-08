@@ -1,0 +1,21 @@
+&input
+  comment = 'Dataset D: 25 keV neutral beam at 45 degrees, low density start. More beam-like'
+  reference_config = '../01_reference/input_config_D.nml'
+  nenergy = 120
+  npitch = 60
+  plot_data = .true.
+/
+
+&save_data_block
+  output_filename = 'output_data/dataset_D/fidasim_f4d.h5'
+/
+
+&plot_data_block
+  scale = 'lin'
+  fmin = 'auto'
+  fmax = 'auto'
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  contour_levels = 30
+  emax = 40
+/

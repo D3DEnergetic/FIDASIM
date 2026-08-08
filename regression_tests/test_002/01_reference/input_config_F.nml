@@ -1,0 +1,29 @@
+&input
+  comment = 'Dataset F: 80 keV neutral beam at 45 degrees, low density startup leads to more beam-like f'
+  input_file_type = 'cql3d_f4d'
+  input_filename = '/home/jfcm/Documents/compX/DATA/scratch/kinetic_crm/02_run_nbi_energy_scan_ips_mirror/runs/20260806_scan_extended_tables/NBI_080_keV/work/fp__cql3dm_3/WHAM_001_f4d_001.nc'
+
+  species = 'D'
+  atomic_number = 1
+  mass_number = 2
+  charge_state = 1
+
+  r_locations = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+  z_locations = 0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0
+
+  plot_data = .true.
+  save_data = .true.
+/
+
+&plot_data_block
+  scale = 'log'
+  fmin = 14
+  fmax = 20
+  enable_colorbar = .true.
+  colormap = 'hot_r'
+  contour_levels = 20
+/
+
+&save_data_block
+  output_filename = 'output_data/dataset_F/cql3d_f4d.h5'
+/

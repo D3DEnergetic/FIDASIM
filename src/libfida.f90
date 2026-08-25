@@ -3465,6 +3465,45 @@ subroutine read_vessel_mesh_behavior()
   if(.not.all(matched(1:num_regions))) stop 'mesh behavior: missing artifact region'
 end subroutine read_vessel_mesh_behavior
 
+subroutine reconstruct_vessel_mesh_voxels()
+  !+ Rebuild native voxel candidates from the artifact CSR representation.
+  !+
+  !+ The artifact linearizes cells with X varying fastest. Inactive regions
+  !+ are removed here so every retained candidate is eligible for runtime
+  !+ geometry dispatch; active openings remain candidates and are handled as
+  !+ transparent surfaces during the later detailed-intersection milestone.
+  integer(Int32)::i,j,k,triangle_id,region_id
+  integer(Int64)::ic,first,last,ref,active_references,occupied_voxels
+
+  active_references=0_Int64
+  occupied_voxels=0_Int64
+  do k=1,beam_grid%nz
+    do j=1,beam_grid%ny
+      do i=1,beam_grid%nx
+        ic=int(i,Int64)+int(beam_grid%nx,Int64)*int(j-1,Int64) &
+          +int(beam_grid%nx,Int64)*int(beam_grid%ny,Int64)*int(k-1,Int64)
+        first=vessel%mesh%cell_offsets(ic)+1_Int64
+        last=vessel%mesh%cell_offsets(ic+1_Int64)
+        do ref=first,last
+          triangle_id=vessel%mesh%candidate_triangle_id(ref)
+          region_id=vessel%mesh%triangle_region_id(triangle_id)
+          if(.not.vessel%mesh%region(region_id)%is_active) cycle
+          call append_surface_id(vessel%map(i,j,k)%surface_id,triangle_id)
+          active_references=active_references+1_Int64
+        enddo
+        vessel%map(i,j,k)%has_surfaces=allocated(vessel%map(i,j,k)%surface_id)
+        if(vessel%map(i,j,k)%has_surfaces) occupied_voxels=occupied_voxels+1_Int64
+      enddo
+    enddo
+  enddo
+
+  ! The native map is the runtime representation; release the setup-only CSR
+  ! arrays so a long Monte Carlo run does not retain two copies of the index.
+  deallocate(vessel%mesh%cell_offsets,vessel%mesh%candidate_triangle_id)
+  write(*,'(a,i0)') ' Active mesh references: ',active_references
+  write(*,'(a,i0)') ' Occupied mesh voxels:   ',occupied_voxels
+end subroutine reconstruct_vessel_mesh_voxels
+
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine write_vessel_voxel_map
   !+ Writes the vacuum vessel voxel map to file.
@@ -3553,7 +3592,7 @@ subroutine write_vessel_voxel_map
   call h5fclose_f(h5file_id, error)
 
   ! Release memory:
-  deallocate(has_surfaces)
+  deallocate(has_surfaces,nid)
 
 end subroutine write_vessel_voxel_map
 ! <<< [JFCM, 2025-08-06] <<<
@@ -3580,8 +3619,7 @@ subroutine define_vacuum_vessel()
     case ("mesh")
       call read_vessel_mesh_artifact()
       call read_vessel_mesh_behavior()
-      print *, "Mesh behavior resolved; voxel reconstruction is the next milestone."
-      stop
+      call reconstruct_vessel_mesh_voxels()
     case default
       print *, "Error: Unknown vacuum vessel geometry_type: ", trim(adjustl(vessel%geometry_type))
       stop
@@ -3589,6 +3627,10 @@ subroutine define_vacuum_vessel()
 
   ! WRITE voxel map to disk:
   call write_vessel_voxel_map()
+  if(trim(adjustl(vessel%geometry_type))=='mesh') then
+    print *, 'Mesh voxel map written; triangle intersection is the next milestone.'
+    stop
+  endif
 
 end subroutine define_vacuum_vessel
 ! <<< [JFCM, 2025-07-23] <<<

@@ -262,6 +262,10 @@ type mesh_type
     !+ One mesh-wide physical-region ID for each triangle.
   type(mesh_region_type), dimension(:), allocatable :: region
     !+ Mesh-wide region catalogue with run-specific behavior attached.
+  integer(Int64), dimension(:), allocatable :: cell_offsets
+    !+ Zero-based CSR offsets loaded from the artifact during vessel setup.
+  integer(Int32), dimension(:), allocatable :: candidate_triangle_id
+    !+ Concatenated one-based CSR triangle IDs loaded during vessel setup.
 end type mesh_type
 
 ! >>> [JFCM, 2025_07_30] >>>
@@ -3128,6 +3132,265 @@ subroutine write_nlaunch(papprox,nlaunch,suffix)
 end subroutine write_nlaunch
 ! <<< [JFCM, 2025-08-19] <<<
 
+subroutine read_hdf5_vlen_attribute(file_id, object_name, attribute_name, value)
+  !+ Read one variable-length string attribute written by h5py.
+  !+ The returned HDF5 allocation is copied and released here.
+  integer(HID_T), intent(in) :: file_id
+  character(len=*), intent(in) :: object_name, attribute_name
+  character(len=*), intent(out) :: value
+  integer(HID_T) :: object_id, attribute_id, type_id
+  integer :: error, ii
+  integer(c_int) :: c_error
+  integer(c_size_t) :: text_length
+  type(c_ptr), target :: raw_text
+  character(kind=c_char), pointer :: text(:)
+  interface
+    function c_h5aread(attribute_id, memory_type_id, buffer) bind(C, name='H5Aread') result(status)
+      import c_long, c_ptr, c_int
+      integer(c_long), value :: attribute_id, memory_type_id
+      type(c_ptr), value :: buffer
+      integer(c_int) :: status
+    end function c_h5aread
+    function c_h5free_memory(buffer) bind(C, name='H5free_memory') result(status)
+      import c_ptr, c_int
+      type(c_ptr), value :: buffer
+      integer(c_int) :: status
+    end function c_h5free_memory
+    function c_strlen(buffer) bind(C, name='strlen') result(length)
+      import c_ptr, c_size_t
+      type(c_ptr), value :: buffer
+      integer(c_size_t) :: length
+    end function c_strlen
+  end interface
+
+  value = ''
+  call h5oopen_f(file_id, trim(object_name), object_id, error)
+  if (error < 0) stop 'read_hdf5_vlen_attribute: cannot open object'
+  call h5aopen_f(object_id, trim(attribute_name), attribute_id, error)
+  if (error < 0) stop 'read_hdf5_vlen_attribute: cannot open attribute'
+  call h5aget_type_f(attribute_id, type_id, error)
+  if (error < 0) stop 'read_hdf5_vlen_attribute: cannot inspect type'
+  raw_text = c_null_ptr
+  c_error = c_h5aread(int(attribute_id,c_long), int(type_id,c_long), c_loc(raw_text))
+  if (c_error < 0 .or. .not. c_associated(raw_text)) stop 'read_hdf5_vlen_attribute: read failed'
+  text_length = c_strlen(raw_text)
+  call c_f_pointer(raw_text, text, [int(text_length)])
+  do ii = 1, min(len(value),int(text_length))
+    value(ii:ii) = text(ii)
+  enddo
+  c_error = c_h5free_memory(raw_text)
+  if (c_error < 0) stop 'read_hdf5_vlen_attribute: release failed'
+  call h5tclose_f(type_id,error)
+  call h5aclose_f(attribute_id,error)
+  call h5oclose_f(object_id,error)
+end subroutine read_hdf5_vlen_attribute
+
+subroutine read_vessel_mesh_artifact()
+  !+ Load and validate the version-0 surface-mesh HDF5 artifact.
+  !+ Geometry uses centimetres in the beam-grid-local frame. Connectivity,
+  !+ region IDs, and candidate triangle IDs are one based; CSR offsets are
+  !+ zero based and retained until behavior-aware voxel reconstruction.
+  integer(HID_T) :: file_id, dataset_id, datatype_id
+  integer(HSIZE_T) :: dims1(1), dims2(2)
+  integer(SIZE_T) :: type_size
+  integer :: error, class_id, ii, jj
+  integer :: schema_version(1), triangle_id_base(1), offset_base(1)
+  integer(Int32) :: grid_dims(3)
+  integer(Int32), allocatable :: region_id(:)
+  character(len=64), allocatable :: region_name(:)
+  character(len=64) :: schema_name, length_units, vertex_frame, voxel_order
+  real(Float64) :: bounds(6), angles(3), grid_origin(3)
+  real(Float64) :: basis_raw(3,3), inv_basis_raw(3,3)
+  real(Float64) :: length_scale, length_tolerance
+  integer(Int64) :: n_voxels, n_references
+  logical :: valid
+
+  call h5open_f(error)
+  call h5fopen_f(trim(vessel%geometry_file),H5F_ACC_RDONLY_F,file_id,error)
+  call check_hdf5(error,'open artifact')
+  call require_path('/metadata')
+  call require_path('/mesh/vertices')
+  call require_path('/mesh/triangles')
+  call require_path('/mesh/triangle_region_id')
+  call require_path('/regions/id')
+  call require_path('/regions/name')
+  call require_path('/voxel_index/cell_offsets')
+  call require_path('/voxel_index/triangle_ids')
+
+  call read_hdf5_vlen_attribute(file_id,'/metadata','schema_name',schema_name)
+  call read_hdf5_vlen_attribute(file_id,'/metadata','length_units',length_units)
+  call read_hdf5_vlen_attribute(file_id,'/metadata','vertex_frame',vertex_frame)
+  call read_hdf5_vlen_attribute(file_id,'/metadata','voxel_order',voxel_order)
+  call h5ltget_attribute_int_f(file_id,'/metadata','schema_version',schema_version,error)
+  call check_hdf5(error,'metadata/schema_version')
+  call h5ltget_attribute_int_f(file_id,'/metadata','triangle_id_base',triangle_id_base,error)
+  call check_hdf5(error,'metadata/triangle_id_base')
+  call h5ltget_attribute_int_f(file_id,'/metadata','offset_base',offset_base,error)
+  call check_hdf5(error,'metadata/offset_base')
+  if (trim(schema_name) /= 'fidasim_mesh_artifact') stop 'mesh artifact: unsupported schema_name'
+  if (schema_version(1) /= 0) stop 'mesh artifact: unsupported schema_version'
+  if (trim(length_units) /= 'cm') stop 'mesh artifact: length_units must be cm'
+  if (trim(vertex_frame) /= 'beam_grid_local') stop 'mesh artifact: unsupported vertex_frame'
+  if (trim(voxel_order) /= 'i_fastest_then_j_then_k') stop 'mesh artifact: unsupported voxel_order'
+  if (triangle_id_base(1) /= 1 .or. offset_base(1) /= 0) stop 'mesh artifact: unsupported ID bases'
+
+  call dataset_info('/mesh/vertices',dims2)
+  if (dims2(1) /= 3 .or. dims2(2) < 3) stop 'mesh artifact: invalid vertices shape'
+  allocate(vessel%mesh%vertices(dims2(1),dims2(2)))
+  call h5ltread_dataset_double_f(file_id,'/mesh/vertices',vessel%mesh%vertices,dims2,error)
+  call check_hdf5(error,'mesh/vertices')
+
+  call dataset_info('/mesh/triangles',dims2)
+  if (dims2(1) /= 3 .or. dims2(2) < 1) stop 'mesh artifact: invalid triangles shape'
+  allocate(vessel%mesh%triangles(dims2(1),dims2(2)))
+  call h5ltread_dataset_int_f(file_id,'/mesh/triangles',vessel%mesh%triangles,dims2,error)
+  call check_hdf5(error,'mesh/triangles')
+
+  call dataset_info('/mesh/triangle_region_id',dims1)
+  if (dims1(1) /= size(vessel%mesh%triangles,2)) stop 'mesh artifact: triangle region count mismatch'
+  allocate(vessel%mesh%triangle_region_id(dims1(1)))
+  call h5ltread_dataset_int_f(file_id,'/mesh/triangle_region_id', &
+      vessel%mesh%triangle_region_id,dims1,error)
+  call check_hdf5(error,'mesh/triangle_region_id')
+
+  call dataset_info('/regions/id',dims1)
+  if (dims1(1) < 1) stop 'mesh artifact: empty region catalogue'
+  allocate(region_id(dims1(1)),region_name(dims1(1)),vessel%mesh%region(dims1(1)))
+  call h5ltread_dataset_int_f(file_id,'/regions/id',region_id,dims1,error)
+  call check_hdf5(error,'regions/id')
+  call h5dopen_f(file_id,'/regions/name',dataset_id,error)
+  call check_hdf5(error,'regions/name open')
+  call h5dget_type_f(dataset_id,datatype_id,error)
+  call check_hdf5(error,'regions/name type')
+  call h5dread_f(dataset_id,datatype_id,region_name,dims1,error)
+  call check_hdf5(error,'regions/name read')
+  call h5tclose_f(datatype_id,error)
+  call h5dclose_f(dataset_id,error)
+  do ii=1,size(region_name)
+    do jj=1,len(region_name(ii))
+      if (iachar(region_name(ii)(jj:jj)) == 0) region_name(ii)(jj:jj)=' '
+    enddo
+    if (region_id(ii) /= ii) stop 'mesh artifact: region IDs must be contiguous and one based'
+    if (len_trim(region_name(ii)) == 0) stop 'mesh artifact: empty region name'
+    do jj=1,ii-1
+      if (trim(region_name(ii)) == trim(region_name(jj))) stop 'mesh artifact: duplicate region name'
+    enddo
+    vessel%mesh%region(ii)%id=region_id(ii)
+    vessel%mesh%region(ii)%name=trim(region_name(ii))
+  enddo
+  if (any(vessel%mesh%triangles < 1) .or. &
+      any(vessel%mesh%triangles > size(vessel%mesh%vertices,2))) stop 'mesh artifact: vertex ID out of range'
+  if (any(vessel%mesh%triangle_region_id < 1) .or. &
+      any(vessel%mesh%triangle_region_id > size(vessel%mesh%region))) stop 'mesh artifact: region ID out of range'
+
+  call read_scalar_int('/grid/nx',grid_dims(1))
+  call read_scalar_int('/grid/ny',grid_dims(2))
+  call read_scalar_int('/grid/nz',grid_dims(3))
+  call read_scalar_double('/grid/xmin',bounds(1))
+  call read_scalar_double('/grid/xmax',bounds(2))
+  call read_scalar_double('/grid/ymin',bounds(3))
+  call read_scalar_double('/grid/ymax',bounds(4))
+  call read_scalar_double('/grid/zmin',bounds(5))
+  call read_scalar_double('/grid/zmax',bounds(6))
+  call read_scalar_double('/grid/alpha',angles(1))
+  call read_scalar_double('/grid/beta',angles(2))
+  call read_scalar_double('/grid/gamma',angles(3))
+  dims1=[3_HSIZE_T]
+  call h5ltread_dataset_double_f(file_id,'/grid/origin',grid_origin,dims1,error)
+  call check_hdf5(error,'grid/origin')
+  dims2=[3_HSIZE_T,3_HSIZE_T]
+  call h5ltread_dataset_double_f(file_id,'/grid/basis',basis_raw,dims2,error)
+  call check_hdf5(error,'grid/basis')
+  call h5ltread_dataset_double_f(file_id,'/grid/inv_basis',inv_basis_raw,dims2,error)
+  call check_hdf5(error,'grid/inv_basis')
+  if (any(grid_dims /= beam_grid%dims)) stop 'mesh artifact: beam-grid dimensions differ'
+  length_scale=max(1.d0,maxval(abs(bounds)),maxval(abs(grid_origin)), &
+      abs(bounds(2)-bounds(1)),abs(bounds(4)-bounds(3)),abs(bounds(6)-bounds(5)))
+  length_tolerance=1.d-12*length_scale
+  if (maxval(abs(bounds-[beam_grid%xmin,beam_grid%xmax,beam_grid%ymin, &
+      beam_grid%ymax,beam_grid%zmin,beam_grid%zmax])) > length_tolerance) stop 'mesh artifact: bounds differ'
+  if (maxval(abs(grid_origin-beam_grid%origin)) > length_tolerance) stop 'mesh artifact: origin differs'
+  if (maxval(abs(angles-[beam_grid%alpha,beam_grid%beta,beam_grid%gamma])) > 1.d-12) &
+      stop 'mesh artifact: angles differ'
+  if (maxval(abs(transpose(basis_raw)-beam_grid%basis)) > 1.d-12) stop 'mesh artifact: basis differs'
+  if (maxval(abs(transpose(inv_basis_raw)-beam_grid%inv_basis)) > 1.d-12) stop 'mesh artifact: inv_basis differs'
+
+  n_voxels=int(beam_grid%ngrid,Int64)
+  call dataset_info('/voxel_index/cell_offsets',dims1)
+  if (int(dims1(1),Int64) /= n_voxels+1_Int64) stop 'mesh artifact: cell_offsets length mismatch'
+  allocate(vessel%mesh%cell_offsets(dims1(1)))
+  call h5dopen_f(file_id,'/voxel_index/cell_offsets',dataset_id,error)
+  call check_hdf5(error,'voxel_index/cell_offsets open')
+  call h5dget_type_f(dataset_id,datatype_id,error)
+  call check_hdf5(error,'voxel_index/cell_offsets type')
+  call h5dread_f(dataset_id,datatype_id,vessel%mesh%cell_offsets,dims1,error)
+  call check_hdf5(error,'voxel_index/cell_offsets')
+  call h5tclose_f(datatype_id,error)
+  call h5dclose_f(dataset_id,error)
+  call dataset_info('/voxel_index/triangle_ids',dims1)
+  allocate(vessel%mesh%candidate_triangle_id(dims1(1)))
+  call h5ltread_dataset_int_f(file_id,'/voxel_index/triangle_ids', &
+      vessel%mesh%candidate_triangle_id,dims1,error)
+  call check_hdf5(error,'voxel_index/triangle_ids')
+  n_references=int(size(vessel%mesh%candidate_triangle_id),Int64)
+  if (vessel%mesh%cell_offsets(1) /= 0_Int64) stop 'mesh artifact: first offset must be zero'
+  if (any(vessel%mesh%cell_offsets(2:) < vessel%mesh%cell_offsets(:size(vessel%mesh%cell_offsets)-1))) &
+      stop 'mesh artifact: offsets must be nondecreasing'
+  if (vessel%mesh%cell_offsets(size(vessel%mesh%cell_offsets)) /= n_references) &
+      stop 'mesh artifact: final offset mismatch'
+  if (any(vessel%mesh%candidate_triangle_id < 1) .or. &
+      any(vessel%mesh%candidate_triangle_id > size(vessel%mesh%triangles,2))) &
+      stop 'mesh artifact: candidate triangle ID out of range'
+
+  call h5fclose_f(file_id,error)
+  call h5close_f(error)
+  deallocate(region_id,region_name)
+  if (inputs%verbose >= 1) then
+    write(*,'(a)') '---- Surface mesh artifact ----'
+    write(*,'(T2,"Vertices:   ",i0)') size(vessel%mesh%vertices,2)
+    write(*,'(T2,"Triangles:  ",i0)') size(vessel%mesh%triangles,2)
+    write(*,'(T2,"Regions:    ",i0)') size(vessel%mesh%region)
+    write(*,'(T2,"Voxels:     ",i0)') n_voxels
+    write(*,'(T2,"References: ",i0)') n_references
+    write(*,*) ''
+  endif
+contains
+  subroutine check_hdf5(status,field_name)
+    integer,intent(in)::status
+    character(len=*),intent(in)::field_name
+    if(status < 0) then
+      write(*,'(a,a)') 'read_vessel_mesh_artifact: failed at ',trim(field_name)
+      stop
+    endif
+  end subroutine check_hdf5
+  subroutine require_path(path)
+    character(len=*),intent(in)::path
+    call h5ltpath_valid_f(file_id,trim(path),.true.,valid,error)
+    if(error < 0 .or. .not.valid) then
+      write(*,'(a,a)') 'mesh artifact: missing path ',trim(path)
+      stop
+    endif
+  end subroutine require_path
+  subroutine dataset_info(path,dimensions)
+    character(len=*),intent(in)::path
+    integer(HSIZE_T),intent(out)::dimensions(:)
+    call h5ltget_dataset_info_f(file_id,trim(path),dimensions,class_id,type_size,error)
+    call check_hdf5(error,path)
+  end subroutine dataset_info
+  subroutine read_scalar_int(path,value)
+    character(len=*),intent(in)::path
+    integer(Int32),intent(out)::value
+    call h5ltread_dataset_int_scalar_f(file_id,trim(path),value,error)
+    call check_hdf5(error,path)
+  end subroutine read_scalar_int
+  subroutine read_scalar_double(path,value)
+    character(len=*),intent(in)::path
+    real(Float64),intent(out)::value
+    call h5ltread_dataset_double_scalar_f(file_id,trim(path),value,error)
+    call check_hdf5(error,path)
+  end subroutine read_scalar_double
+end subroutine read_vessel_mesh_artifact
+
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine write_vessel_voxel_map
   !+ Writes the vacuum vessel voxel map to file.
@@ -3241,8 +3504,8 @@ subroutine define_vacuum_vessel()
         call read_vacuum_vessel_namelist()
         call map_vacuum_vessel_to_beam_grid()
     case ("mesh")
-      ! Not yet implemented
-      print *, "Error: Mesh-grid intersection infrastructure not implemented."
+      call read_vessel_mesh_artifact()
+      print *, "Mesh artifact loaded; behavior resolution is the next milestone."
       stop
     case default
       print *, "Error: Unknown vacuum vessel geometry_type: ", trim(adjustl(vessel%geometry_type))

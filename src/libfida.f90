@@ -10720,71 +10720,102 @@ end subroutine track
 
 !! >>> [JFCM, 2025-08-08] >>>
 subroutine find_ray_surface_intersection(ray,ind,collision)
-    !+ Find the closest intersection of a ray with surfaces in a voxel at ind.
+    !+ Dispatch the voxel's candidate IDs to the selected geometry implementation.
     type(ray_type), intent(in) :: ray
-      !+ Ray state: origin [cm] and velocity [cm/s] in beam_grid frame.
     integer, dimension(3), intent(in) :: ind
-      !+ Indices of voxel in beam_grid
     type(ray_collision_type), intent(out) :: collision
-      !+ Closest valid collision event in this voxel.
 
-    ! Local variables:
-    integer(Int32) :: nid
-    integer(Int32), dimension(:), allocatable :: surf_list
-    integer(Int32) :: ss, sid
-    integer :: ee
-    type(ray_collision_type) :: candidate
-    real(Float64) :: s_best
-
-    ! INIT output:
-    collision%n_events = 0
-    s_best = huge(1.0d0)
-
-    !! GET number of surfaces in current voxel:
-    nid = size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
-    if (nid == 0) then
-      stop "(find_ray_surface_intersection) Error: Number of surfaces in voxel should not be zero"
-    end if
-
-    !! LOOP over candidate surfaces:
-    do ss = 1,nid
-
-      !! GET surface id:
-      sid = vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
-
-      ! RESET candidate collision:
-      candidate%n_events = 0
-
-      !! COMPUTE ray-surface collisions:
-      select case (trim(vessel%surface(sid)%primitive_type))
-      case ("plane")
-         call solve_ray_plane_intersection(ray,vessel%surface(sid),candidate)
-      case ("cyl")
-        call solve_ray_cylinder_intersection(ray,vessel%surface(sid),candidate,"first")
-      case DEFAULT
-        stop "find_ray_surface_intersection: incorrect primitive_type selection"
-      end select
-
-      ! SELECT closest event from this surface.
-      do ee = 1, candidate%n_events
-        if (candidate%event(ee)%s_coll < s_best) then
-          s_best = candidate%event(ee)%s_coll
-          collision%n_events = 1
-          collision%event(1) = candidate%event(ee)
-
-          ! The primitive solver knows the active region, but this wrapper
-          ! knows the parent surface id.
-          collision%event(1)%surface_id = sid
-        endif
-      enddo
-
-    end do !! LOOP ss
+    select case(trim(adjustl(vessel%geometry_type)))
+    case('analytic')
+      call find_ray_analytic_surface_intersection(ray,ind,collision)
+    case('mesh')
+      call find_ray_mesh_surface_intersection(ray,ind,collision)
+    case default
+      stop 'find_ray_surface_intersection: unknown geometry type'
+    end select
 
 end subroutine find_ray_surface_intersection
+
+subroutine find_ray_analytic_surface_intersection(ray,ind,collision)
+  !+ Preserve the existing analytic candidate search and nearest-root policy.
+  type(ray_type),intent(in)::ray
+  integer,intent(in)::ind(3)
+  type(ray_collision_type),intent(out)::collision
+  integer(Int32)::nid,ss,sid
+  integer::ee
+  type(ray_collision_type)::candidate
+  real(Float64)::s_best
+
+  collision%n_events=0
+  s_best=huge(1.d0)
+  nid=size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
+  if(nid==0) stop 'find analytic intersection: empty occupied voxel'
+  do ss=1,nid
+    sid=vessel%map(ind(1),ind(2),ind(3))%surface_id(ss)
+    candidate%n_events=0
+    select case(trim(vessel%surface(sid)%primitive_type))
+    case('plane')
+      call solve_ray_plane_intersection(ray,vessel%surface(sid),candidate)
+    case('cyl')
+      call solve_ray_cylinder_intersection(ray,vessel%surface(sid),candidate,'first')
+    case default
+      stop 'find analytic intersection: unknown primitive type'
+    end select
+    do ee=1,candidate%n_events
+      if(candidate%event(ee)%s_coll<s_best) then
+        s_best=candidate%event(ee)%s_coll
+        collision%n_events=1
+        collision%event(1)=candidate%event(ee)
+        collision%event(1)%surface_id=sid
+      endif
+    enddo
+  enddo
+end subroutine find_ray_analytic_surface_intersection
+
+subroutine find_ray_mesh_surface_intersection(ray,ind,collision)
+  !+ Return the nearest forward wall hit among this voxel's mesh candidates.
+  !+
+  !+ Opening triangles stay in the geometric index so the artifact remains
+  !+ reusable across behavior files, but they are transparent and therefore do
+  !+ not compete with physical wall hits during nearest-event selection.
+  type(ray_type),intent(in)::ray
+  integer,intent(in)::ind(3)
+  type(ray_collision_type),intent(out)::collision
+  integer(Int32)::nid,cc,triangle_id,region_id
+  type(ray_collision_type)::candidate
+  real(Float64)::s_best
+
+  collision%n_events=0
+  s_best=huge(1.d0)
+  nid=size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
+  if(nid==0) stop 'find mesh intersection: empty occupied voxel'
+  do cc=1,nid
+    triangle_id=vessel%map(ind(1),ind(2),ind(3))%surface_id(cc)
+    call solve_ray_triangle_intersection(ray,triangle_id,candidate)
+    if(candidate%n_events==0) cycle
+    region_id=candidate%event(1)%region_id
+    select case(trim(vessel%mesh%region(region_id)%behavior_type))
+    case('opening')
+      cycle
+    case('wall')
+      ! Tracking applies a pre-collision padding. Excluding zero-time events
+      ! prevents that operation from repeatedly halving a positive distance
+      ! while trying to make it smaller than zero.
+      if(candidate%event(1)%s_coll<=0.d0) cycle
+      if(candidate%event(1)%s_coll<s_best) then
+        s_best=candidate%event(1)%s_coll
+        collision%n_events=1
+        collision%event(1)=candidate%event(1)
+      endif
+    case default
+      stop 'find mesh intersection: unknown behavior type'
+    end select
+  enddo
+end subroutine find_ray_mesh_surface_intersection
 !! <<< [JFCM, 2025-08-08] <<<
 
 !! >>> [JFCM, 2026-05-16] >>>
-subroutine apply_wall_interaction(vn, event, region, absorbed)
+subroutine apply_wall_interaction(vn, event, wall, absorbed)
     !+ Apply wall interaction model at a collision event.
     !+
     !+ Possible outcomes:
@@ -10796,8 +10827,8 @@ subroutine apply_wall_interaction(vn, event, region, absorbed)
         !+ Particle velocity [cm/s]. Updated if reflected or thermally emitted.
     type(collision_event_type), intent(in) :: event
         !+ Collision event containing surface normal and collision metadata.
-    type(surface_region_type), intent(in) :: region
-        !+ Surface region containing wall properties.
+    type(wall_type), intent(in) :: wall
+        !+ Geometry-neutral wall parameters for the resolved collision region.
     logical, intent(out) :: absorbed
         !+ True if particle is absorbed at the wall.
 
@@ -10816,9 +10847,9 @@ subroutine apply_wall_interaction(vn, event, region, absorbed)
     if (dot_product(nhat, vhat) > 0.d0) nhat = -nhat
 
     !! GET wall properties:
-    T_wall    = region%wall%temp      ! [keV]
-    p_absorb  = region%wall%p_absorb
-    p_specular = region%wall%p_specular
+    T_wall    = wall%temp      ! [keV]
+    p_absorb  = wall%p_absorb
+    p_specular = wall%p_specular
     p_thermal = 1.d0 - (p_absorb + p_specular)
     p_reflect = p_specular + p_thermal
 
@@ -10940,7 +10971,7 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
     real(Float64), dimension(3) :: nhat, vhat
     integer(Int32) :: surface_id, region_id
     character(len=16) :: behavior_type
-    type(surface_region_type) :: region
+    type(wall_type) :: wall
 
     vn = vin; rn = rin; sgn = 0;
 
@@ -11035,37 +11066,28 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
           surface_id = event%surface_id
           region_id  = event%region_id
 
-          !! CHECK surface id:
-          if (surface_id < 1 .or. surface_id > size(vessel%surface)) then
-              write(*,*) "ERROR(track_to_wall): invalid surface_id = ", surface_id
-              write(*,*) "Number of surfaces = ", size(vessel%surface)
-              stop
-          endif
-
-          !! CHECK region allocation:
-          if (.not. allocated(vessel%surface(surface_id)%region)) then
-              write(*,*) "ERROR(track_to_wall): region array not allocated"
-              write(*,*) "surface_id = ", surface_id
-              stop
-          endif
-
-          !! CHECK region id:
-          if (region_id < 1 .or. &
-              region_id > size(vessel%surface(surface_id)%region)) then
-
-              write(*,*) "ERROR(track_to_wall): invalid region_id = ", region_id
-              write(*,*) "surface_id = ", surface_id
-              write(*,*) "Number of regions = ", &
-                  size(vessel%surface(surface_id)%region)
-
-              stop
-          endif
-
-          !! GET region object:
-          region = vessel%surface(surface_id)%region(region_id)
-
-          ! CHECK wall behavoir:
-          behavior_type = trim(adjustl(region%behavior_type))
+          ! Resolve behavior through the geometry-specific region table, then
+          ! hand only the shared wall parameters to downstream physics.
+          select case(trim(adjustl(vessel%geometry_type)))
+          case('analytic')
+            if(surface_id<1 .or. surface_id>size(vessel%surface)) &
+              stop 'track_to_wall: invalid analytic surface ID'
+            if(.not.allocated(vessel%surface(surface_id)%region)) &
+              stop 'track_to_wall: analytic region array not allocated'
+            if(region_id<1 .or. region_id>size(vessel%surface(surface_id)%region)) &
+              stop 'track_to_wall: invalid analytic region ID'
+            behavior_type=trim(adjustl(vessel%surface(surface_id)%region(region_id)%behavior_type))
+            wall=vessel%surface(surface_id)%region(region_id)%wall
+          case('mesh')
+            if(surface_id<1 .or. surface_id>size(vessel%mesh%triangles,2)) &
+              stop 'track_to_wall: invalid mesh triangle ID'
+            if(region_id<1 .or. region_id>size(vessel%mesh%region)) &
+              stop 'track_to_wall: invalid mesh region ID'
+            behavior_type=trim(adjustl(vessel%mesh%region(region_id)%behavior_type))
+            wall=vessel%mesh%region(region_id)%wall
+          case default
+            stop 'track_to_wall: unknown vessel geometry type'
+          end select
 
           if (behavior_type == "opening") then
             dT_coll = huge(1.d0)
@@ -11131,7 +11153,7 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
           !! STORE event in surface's reservoir or bucket:
 
           !! COMPPUTE new vn based on wall interaction:
-          call apply_wall_interaction(vn, event, region, absorbed)
+          call apply_wall_interaction(vn, event, wall, absorbed)
           if (absorbed) exit !! If particle absorbed, exit while loop:
 
         case DEFAULT

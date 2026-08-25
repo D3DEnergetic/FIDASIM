@@ -192,18 +192,6 @@ type voxel_type
 end type voxel_type
 ! <<< [JFCM, 2025_07_22] <<<
 
-! >>> [JFCM, 2025_07_22] >>>
-type mesh_type
-  !+ Holds all data relating to a surface mesh describing a boundary
-  ! character(len=charlim) :: filename
-  !   !+ Full path to .msh file
-  real(Float64), dimension(:,:), allocatable :: vertices
-    !+ Store triangle vertices. dimensions are N_vert x 3
-  Integer(Int32), dimension(:,:), allocatable :: triangles
-    !+ Define triangles as triplets of vertex indices. dimensions are N_tri x 3
-end type mesh_type
-! <<< [JFCM, 2025_07_22] <<<
-
 ! >>> [JFCM, 2025_09_02] >>>
 type source_type
   ! NOTE:
@@ -239,6 +227,42 @@ type wall_type
     !+ Thermal emission probability of region
 end type wall_type
 ! <<< [JFCM, 2026_05_11] <<<
+
+type mesh_region_type
+  !+ Defines one named physical region in a triangular surface mesh.
+  integer(Int32) :: id
+    !+ Positive, contiguous, one-based region ID from the mesh artifact.
+  character(len=64) :: name
+    !+ Unique physical-region name from the mesh artifact.
+  logical :: is_active
+    !+ Enables this region in runtime collision and source calculations.
+  character(len=16) :: behavior_type
+    !+ Run-specific interaction behavior: "wall" or "opening".
+  logical :: enable_source
+    !+ Enables optional neutral emission from this region.
+  type(wall_type) :: wall
+    !+ Run-specific wall-interaction parameters.
+  type(source_type) :: source
+    !+ Run-specific neutral-source parameters.
+  integer(Int32), dimension(:), allocatable :: triangle_id
+    !+ Triangle IDs belonging to this region, derived during setup.
+  real(Float64) :: total_area
+    !+ Total physical area of the region in square centimetres.
+  real(Float64), dimension(:), allocatable :: area_cdf
+    !+ Area-weighted cumulative distribution for source sampling.
+end type mesh_region_type
+
+type mesh_type
+  !+ Holds the triangular geometry and physical regions of a mesh boundary.
+  real(Float64), dimension(:,:), allocatable :: vertices
+    !+ Vertex coordinates in beam-grid-local centimetres, shaped (3, n_vertices).
+  integer(Int32), dimension(:,:), allocatable :: triangles
+    !+ One-based vertex IDs for each triangle, shaped (3, n_triangles).
+  integer(Int32), dimension(:), allocatable :: triangle_region_id
+    !+ One mesh-wide physical-region ID for each triangle.
+  type(mesh_region_type), dimension(:), allocatable :: region
+    !+ Mesh-wide region catalogue with run-specific behavior attached.
+end type mesh_type
 
 ! >>> [JFCM, 2025_07_30] >>>
 type surface_region_type
@@ -371,7 +395,9 @@ type vacuum_vessel_type
     character(len=16) :: geometry_type
       !+ Determines how the vacuum vessel is described: "mesh" or "analytic" surfaces
     character(charlim) :: geometry_file
-      !+ Full path to file with the vacuum vessel description for mesh (.msh) or analytic surfaces (.nml)
+      !+ File containing the mesh artifact or analytic vessel description.
+    character(charlim) :: behavior_file
+      !+ Run-specific mesh behavior file; unused for analytic geometry.
     type(mesh_type) :: mesh
       !+ Store surface triangular mesh which describes the vacuum vessel
       !+ Only used when geometry_type == "mesh"
@@ -1398,8 +1424,10 @@ type SimulationInputs
         !+ Enable the use of externally defined neutral gas sources on surface regions
     character(charlim) :: vessel_geometry_type
         !+ Define how the vacuum vessel is to be described: analytic surfaces or mesh
-    character(charlim) ::vessel_geometry_file
+    character(charlim) :: vessel_geometry_file
         !+ Define the name of file with vessel representation
+    character(charlim) :: vessel_behavior_file
+        !+ Define the name of the run-specific mesh behavior file
     !! <<< [JFCM, 2025_10_30] <<<
 
     !! Distribution settings
@@ -2339,6 +2367,7 @@ subroutine read_inputs
     integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
     logical :: vessel_enabled, enable_wall_interactions, enable_external_sources
     character(charlim) :: vessel_geometry_type, vessel_geometry_file
+    character(charlim) :: vessel_behavior_file
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -2357,7 +2386,7 @@ subroutine read_inputs
         calc_sink, enable_halo, reservoir_size, &
         non_thermal_beam_stopping, non_thermal_cx_sampling, full_f, &
         vessel_enabled, enable_wall_interactions, enable_external_sources, &
-        vessel_geometry_type, vessel_geometry_file
+        vessel_geometry_type, vessel_geometry_file, vessel_behavior_file
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -2449,6 +2478,7 @@ subroutine read_inputs
     enable_external_sources = .FALSE.
     vessel_geometry_type = "analytic"
     vessel_geometry_file = "vacuum_vessel.nml"
+    vessel_behavior_file = ""
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -2563,6 +2593,7 @@ subroutine read_inputs
     inputs%vessel_enabled = vessel_enabled
     inputs%vessel_geometry_type = vessel_geometry_type
     inputs%vessel_geometry_file = vessel_geometry_file
+    inputs%vessel_behavior_file = vessel_behavior_file
     inputs%enable_wall_interactions = enable_wall_interactions
     inputs%enable_external_sources = enable_external_sources
         !! <<< [JFCM, 2025-10-27] <<<
@@ -2646,6 +2677,75 @@ subroutine read_inputs
     endif
 
     error = .False.
+
+    if (inputs%vessel_enabled) then
+        select case (trim(adjustl(inputs%vessel_geometry_type)))
+        case ("analytic")
+            if (len_trim(inputs%vessel_geometry_file) == 0) then
+                if (inputs%verbose.ge.0) then
+                    write(*,'(a)') 'READ_INPUTS: vessel_geometry_file is required for analytic vessel geometry.'
+                endif
+                error = .True.
+            else
+                inquire(file=inputs%vessel_geometry_file, exist=exis)
+                if (.not.exis) then
+                    if (inputs%verbose.ge.0) then
+                        write(*,'(a,a)') 'READ_INPUTS: Vessel geometry file does not exist: ', &
+                                         trim(inputs%vessel_geometry_file)
+                    endif
+                    error = .True.
+                endif
+            endif
+
+            if (len_trim(inputs%vessel_behavior_file) /= 0) then
+                if (inputs%verbose.ge.0) then
+                    write(*,'(a)') &
+                        'READ_INPUTS: vessel_behavior_file is not supported for analytic vessel geometry.'
+                endif
+                error = .True.
+            endif
+
+        case ("mesh")
+            if (len_trim(inputs%vessel_geometry_file) == 0) then
+                if (inputs%verbose.ge.0) then
+                    write(*,'(a)') 'READ_INPUTS: vessel_geometry_file is required for mesh vessel geometry.'
+                endif
+                error = .True.
+            else
+                inquire(file=inputs%vessel_geometry_file, exist=exis)
+                if (.not.exis) then
+                    if (inputs%verbose.ge.0) then
+                        write(*,'(a,a)') 'READ_INPUTS: Vessel geometry file does not exist: ', &
+                                         trim(inputs%vessel_geometry_file)
+                    endif
+                    error = .True.
+                endif
+            endif
+
+            if (len_trim(inputs%vessel_behavior_file) == 0) then
+                if (inputs%verbose.ge.0) then
+                    write(*,'(a)') 'READ_INPUTS: vessel_behavior_file is required for mesh vessel geometry.'
+                endif
+                error = .True.
+            else
+                inquire(file=inputs%vessel_behavior_file, exist=exis)
+                if (.not.exis) then
+                    if (inputs%verbose.ge.0) then
+                        write(*,'(a,a)') 'READ_INPUTS: Vessel behavior file does not exist: ', &
+                                         trim(inputs%vessel_behavior_file)
+                    endif
+                    error = .True.
+                endif
+            endif
+
+        case default
+            if (inputs%verbose.ge.0) then
+                write(*,'(a,a)') 'READ_INPUTS: Unknown vessel_geometry_type: ', &
+                                 trim(adjustl(inputs%vessel_geometry_type))
+            endif
+            error = .True.
+        end select
+    endif
 
     inquire(file=inputs%tables_file,exist=exis)
     if(exis) then
@@ -3130,6 +3230,7 @@ subroutine define_vacuum_vessel()
   ! GET geometry type (mesh or analytic) and associated file:
   vessel%geometry_type = inputs%vessel_geometry_type
   vessel%geometry_file = inputs%vessel_geometry_file
+  vessel%behavior_file = inputs%vessel_behavior_file
 
   ! ALLOCATE the voxel map
   allocate(vessel%map(beam_grid%nx, beam_grid%ny, beam_grid%nz))

@@ -3627,10 +3627,6 @@ subroutine define_vacuum_vessel()
 
   ! WRITE voxel map to disk:
   call write_vessel_voxel_map()
-  if(trim(adjustl(vessel%geometry_type))=='mesh') then
-    print *, 'Mesh voxel map written; triangle intersection is the next milestone.'
-    stop
-  endif
 
 end subroutine define_vacuum_vessel
 ! <<< [JFCM, 2025-07-23] <<<

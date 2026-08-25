@@ -3391,6 +3391,80 @@ contains
   end subroutine read_scalar_double
 end subroutine read_vessel_mesh_artifact
 
+subroutine read_vessel_mesh_behavior()
+  !+ Read run-specific behavior and resolve each block by artifact region name.
+  integer::schema_version,num_regions,unit,ios,rr,mesh_id
+  real(Float64)::surface_padding_epsilon,wall_temp,wall_p_absorb,wall_p_specular
+  character(len=64)::name
+  character(len=16)::behavior_type
+  logical::is_active,enable_source
+  logical,allocatable::matched(:)
+  character(len=512)::iomsg
+  namelist /config/ schema_version,num_regions,surface_padding_epsilon
+  namelist /region/ name,is_active,behavior_type,enable_source,wall_temp,wall_p_absorb,wall_p_specular
+
+  ! Sentinels make omitted required config fields fail deterministically instead
+  ! of inheriting whatever happened to be in uninitialized local storage.
+  schema_version=-1; num_regions=-1; surface_padding_epsilon=-1.d0
+  open(newunit=unit,file=trim(vessel%behavior_file),status='old',action='read',iostat=ios)
+  if(ios/=0) stop 'mesh behavior: cannot open file'
+  read(unit,nml=config,iostat=ios,iomsg=iomsg)
+  if(ios/=0) then
+    write(*,'(a,a)') 'mesh behavior: cannot read config: ',trim(iomsg)
+    stop
+  endif
+  close(unit)
+  if(schema_version/=0) stop 'mesh behavior: unsupported schema_version'
+  if(num_regions/=size(vessel%mesh%region)) stop 'mesh behavior: region count mismatch'
+  if(surface_padding_epsilon<=0.d0) stop 'mesh behavior: padding must be positive'
+  vessel%surface_padding_epsilon=surface_padding_epsilon
+  allocate(matched(num_regions),source=.false.)
+
+  open(newunit=unit,file=trim(vessel%behavior_file),status='old',action='read',iostat=ios)
+  if(ios/=0) stop 'mesh behavior: cannot reopen file'
+  do rr=1,num_regions
+    name=''; behavior_type=''; is_active=.true.; enable_source=.false.
+    wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
+    read(unit,nml=region,iostat=ios,iomsg=iomsg)
+    if(ios/=0) then
+      write(*,'(a,a)') 'mesh behavior: cannot read region: ',trim(iomsg)
+      stop
+    endif
+    mesh_id=0
+    do while(mesh_id<size(vessel%mesh%region))
+      mesh_id=mesh_id+1
+      if(trim(name)==trim(vessel%mesh%region(mesh_id)%name)) exit
+    enddo
+    if(mesh_id>size(vessel%mesh%region) .or. trim(name)/=trim(vessel%mesh%region(mesh_id)%name)) &
+      stop 'mesh behavior: unknown region name'
+    if(matched(mesh_id)) stop 'mesh behavior: duplicate region name'
+    matched(mesh_id)=.true.
+    if(behavior_type/='wall' .and. behavior_type/='opening') stop 'mesh behavior: invalid behavior_type'
+    if(enable_source) stop 'mesh behavior: surface sources are deferred and must be disabled'
+    if(behavior_type=='wall') then
+      if(wall_temp<=0.d0) stop 'mesh behavior: wall temperature must be positive'
+      if(wall_p_absorb<0.d0 .or. wall_p_absorb>1.d0 .or. wall_p_specular<0.d0 .or. &
+         wall_p_specular>1.d0 .or. wall_p_absorb+wall_p_specular>1.d0) &
+         stop 'mesh behavior: invalid wall probabilities'
+    endif
+    vessel%mesh%region(mesh_id)%is_active=is_active
+    vessel%mesh%region(mesh_id)%behavior_type=behavior_type
+    vessel%mesh%region(mesh_id)%enable_source=.false.
+    vessel%mesh%region(mesh_id)%wall%temp=wall_temp
+    vessel%mesh%region(mesh_id)%wall%p_absorb=wall_p_absorb
+    vessel%mesh%region(mesh_id)%wall%p_specular=wall_p_specular
+    vessel%mesh%region(mesh_id)%wall%p_thermal=1.d0-wall_p_absorb-wall_p_specular
+  enddo
+  ! An extra block is just as likely to indicate a misspelled or stale region as
+  ! a missing block, so reject it rather than silently ignoring configuration.
+  name=''; behavior_type=''; is_active=.true.; enable_source=.false.
+  wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
+  read(unit,nml=region,iostat=ios)
+  if(ios==0) stop 'mesh behavior: more region blocks than declared'
+  close(unit)
+  if(.not.all(matched(1:num_regions))) stop 'mesh behavior: missing artifact region'
+end subroutine read_vessel_mesh_behavior
+
 ! >>> [JFCM, 2025-08-06] >>>
 subroutine write_vessel_voxel_map
   !+ Writes the vacuum vessel voxel map to file.
@@ -3505,7 +3579,8 @@ subroutine define_vacuum_vessel()
         call map_vacuum_vessel_to_beam_grid()
     case ("mesh")
       call read_vessel_mesh_artifact()
-      print *, "Mesh artifact loaded; behavior resolution is the next milestone."
+      call read_vessel_mesh_behavior()
+      print *, "Mesh behavior resolved; voxel reconstruction is the next milestone."
       stop
     case default
       print *, "Error: Unknown vacuum vessel geometry_type: ", trim(adjustl(vessel%geometry_type))

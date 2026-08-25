@@ -4403,6 +4403,66 @@ subroutine solve_ray_plane_intersection(ray, surface, collision)
 end subroutine solve_ray_plane_intersection
 ! <<< [JFCM, 2025-08-06] <<<
 
+subroutine solve_ray_triangle_intersection(ray,triangle_id,collision)
+  !+ Calculate the two-sided Moller-Trumbore intersection with one mesh triangle.
+  !+
+  !+ ``ray%v`` is a physical velocity rather than a unit direction, so the
+  !+ returned parameter is flight time in seconds, matching the existing
+  !+ collision-event contract. The determinant tolerance includes velocity
+  !+ magnitude to preserve the reference algorithm's scale-independent angular
+  !+ parallel test.
+  type(ray_type),intent(in)::ray
+  integer(Int32),intent(in)::triangle_id
+  type(ray_collision_type),intent(out)::collision
+  real(Float64)::p0(3),p1(3),p2(3),edge1(3),edge2(3),hvec(3),qvec(3)
+  real(Float64)::origin_offset(3),normal(3),determinant,inverse_determinant
+  real(Float64)::area_twice,velocity_magnitude,determinant_tolerance
+  real(Float64)::barycentric_u,barycentric_v,s_coll
+  real(Float64),parameter::relative_parallel_tolerance=1.d-12
+  real(Float64),parameter::barycentric_tolerance=1.d-12
+
+  collision%n_events=0
+  if(triangle_id<1 .or. triangle_id>size(vessel%mesh%triangles,2)) &
+    stop 'solve_ray_triangle_intersection: triangle ID out of range'
+
+  p0=vessel%mesh%vertices(:,vessel%mesh%triangles(1,triangle_id))
+  p1=vessel%mesh%vertices(:,vessel%mesh%triangles(2,triangle_id))
+  p2=vessel%mesh%vertices(:,vessel%mesh%triangles(3,triangle_id))
+  edge1=p1-p0
+  edge2=p2-p0
+  normal=cross_product(edge1,edge2)
+  area_twice=norm2(normal)
+  if(area_twice<=0.d0) stop 'solve_ray_triangle_intersection: degenerate triangle'
+
+  velocity_magnitude=norm2(ray%v)
+  if(velocity_magnitude<=0.d0) stop 'solve_ray_triangle_intersection: zero velocity'
+  hvec=cross_product(ray%v,edge2)
+  determinant=dot_product(edge1,hvec)
+  determinant_tolerance=relative_parallel_tolerance*area_twice*velocity_magnitude
+  if(abs(determinant)<=determinant_tolerance) return
+
+  inverse_determinant=1.d0/determinant
+  origin_offset=ray%origin-p0
+  barycentric_u=inverse_determinant*dot_product(origin_offset,hvec)
+  if(barycentric_u < -barycentric_tolerance .or. &
+     barycentric_u > 1.d0+barycentric_tolerance) return
+
+  qvec=cross_product(origin_offset,edge1)
+  barycentric_v=inverse_determinant*dot_product(ray%v,qvec)
+  if(barycentric_v < -barycentric_tolerance .or. &
+     barycentric_u+barycentric_v > 1.d0+barycentric_tolerance) return
+
+  s_coll=inverse_determinant*dot_product(edge2,qvec)
+  if(s_coll<0.d0) return
+
+  collision%n_events=1
+  collision%event(1)%s_coll=s_coll
+  collision%event(1)%p_coll=ray%origin+s_coll*ray%v
+  collision%event(1)%normal=normal/area_twice
+  collision%event(1)%surface_id=triangle_id
+  collision%event(1)%region_id=vessel%mesh%triangle_region_id(triangle_id)
+end subroutine solve_ray_triangle_intersection
+
 ! >>> [JFCM, 2026-05-12] >>>
 function signed_angle_difference(phi, phi0) result(dphi)
   real(Float64), intent(in) :: phi

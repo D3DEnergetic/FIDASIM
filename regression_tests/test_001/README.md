@@ -10,20 +10,20 @@
 Test 001 checks the neutral-beam stopping mean free path produced by
 `libfida::colrad` against an independent ADAS ADF21 stopping-coefficient
 reference. The Python implementation ports the legacy MATLAB reference,
-post-processing, and comparison workflow so MATLAB can eventually be removed
-from the high-level regression code.
+post-processing, and comparison workflow and is the canonical high-level
+implementation of the regression.
 
-## Migration status
+## Implementation status
 
-- **MATLAB workflow:** Implemented and retained as the migration reference.
-- **Python workflow:** Implemented in parallel and treated as experimental
-  until the project accepts it as the replacement workflow.
+- **Python workflow:** Canonical implementation for reference generation,
+  FIDASIM post-processing, scientific comparison, and reporting.
+- **MATLAB workflow:** Legacy migration reference retained temporarily for
+  independent review; it is not invoked by the operational workflow.
 - **FIDASIM calculation:** The top-level runner executes the compiled Test 001,
   then passes the newly generated `test_001.h5` through the Python workflow.
 
-The port preserves the existing scientific definition and acceptance
-criterion. MATLAB and Fortran sources remain unchanged and available for
-independent review.
+The canonical workflow preserves the established scientific definition and
+acceptance criterion. The Fortran calculation remains unchanged.
 
 ## Objective, scope, and test boundary
 
@@ -31,8 +31,8 @@ The regression answers two different questions:
 
 1. **Scientific regression:** Does the FIDASIM attenuation result agree with
    the ADF21-derived reference to within the established 12% tolerance?
-2. **Temporary port parity:** Do Python and MATLAB produce the same reference
-   and post-processed numerical arrays?
+2. **Historical port validation:** Does the canonical Python implementation
+   reproduce the retained MATLAB reference and post-processed arrays?
 
 The FIDASIM procedure under test is:
 
@@ -520,12 +520,13 @@ python3 -c "import f90nml, h5py, matplotlib, numpy, scipy"
 If an import fails, recreate or update `FIDASIM_env` from
 [`regression_tests/environment.yml`](../environment.yml).
 
-### Missing input on a fresh clone
+### Missing executable or optional parity input
 
-Check the two preserved artifacts listed under
-[fresh-clone setup](#required-preserved-artifacts). A missing raw file is an
-input-data problem, not permission to regenerate FIDASIM output inside the
-Python workflow.
+If `02_run_test/test_001` is missing, build FIDASIM and its regression targets
+before running the workflow. The normal runner generates `test_001.h5`; it
+does not require a preserved raw result. Missing MATLAB witnesses affect only
+the optional parity check described under
+[generated and preserved artifacts](#generated-and-preserved-artifacts).
 
 ### Configuration path failure
 

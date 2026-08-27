@@ -57,8 +57,8 @@ def read_reference(path: Path) -> dict[str, FloatArray]:
         beam_mass = read_dataset(source, "/ab").reshape(-1)
         raw_mfp = read_dataset(source, "/mfp")
 
-    # MATLAB writes its logical (density, energy, temperature) array so h5py
-    # observes the reversed on-disk order (temperature, energy, density).
+    # The established file layout stores the semantic (density, energy,
+    # temperature) array in raw (temperature, energy, density) order.
     expected_raw_shape = (temperature.size, energy.size, density.size)
     if raw_mfp.shape != expected_raw_shape:
         raise ValueError(
@@ -93,8 +93,8 @@ def read_postprocessed(path: Path) -> dict[str, FloatArray]:
         beam_mass = read_dataset(source, "/beam_mass").reshape(-1)
         raw_mfp = read_dataset(source, "/mfp")
 
-    # Stage 2 deliberately preserves MATLAB's HDF5 axis order. Make the
-    # conversion to semantic order visible rather than relying on shape alone.
+    # Stage 2 preserves the established HDF5 axis order. Make the conversion
+    # to semantic order visible rather than relying on shape alone.
     expected_raw_shape = (temperature.size, energy.size, density.size)
     if raw_mfp.shape != expected_raw_shape:
         raise ValueError(
@@ -140,7 +140,7 @@ def read_raw_profiles(path: Path) -> dict[str, FloatArray]:
 
     # In h5py, /x is [density, x] and /denn is
     # [temperature, energy, density, x]. These are the reversals of the
-    # logical MATLAB arrays [x, density] and [x, density, energy, temperature].
+    # semantic arrays [x, density] and [x, density, energy, temperature].
     expected_raw_x_shape = (electron_density.size, raw_x.shape[1])
     if raw_x.shape != expected_raw_x_shape:
         raise ValueError(
@@ -324,7 +324,7 @@ def calculate_statistics(
     if not np.all(np.isfinite(relative_error)):
         raise ValueError("Mean-free-path relative error contains nonfinite values")
 
-    # MATLAB linear indexing uses column-major order. Preserve it explicitly.
+    # Preserve the established column-major tie-breaking order explicitly.
     maximum_flat_index = int(np.argmax(relative_error.ravel(order="F")))
     maximum_index = np.unravel_index(
         maximum_flat_index,
@@ -341,14 +341,14 @@ def calculate_statistics(
 
 
 def format_report(statistics: dict[str, object], tolerance: float) -> str:
-    """Format the persistent report using the legacy MATLAB text contract.
+    """Format the persistent report using the established text contract.
 
     Args:
         statistics: Output from :func:`calculate_statistics`.
         tolerance: Maximum accepted absolute relative error.
 
     Returns:
-        Legacy-formatted text report ending with a blank line.
+        Formatted text report ending with a blank line.
     """
 
     maximum_percent = statistics["maximum"] * 100.0

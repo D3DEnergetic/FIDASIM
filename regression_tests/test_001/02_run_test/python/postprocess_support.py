@@ -2,9 +2,9 @@
 
 The source HDF5 file was written through the Fortran HDF5 interface.  h5py
 therefore exposes its multidimensional arrays with the reverse of the logical
-Fortran/MATLAB dimension order.  This module converts those arrays immediately
-after reading them, validates the logical arrays, and reproduces the legacy
-MATLAB mean-free-path estimator without introducing a fitted estimator.
+Fortran dimension order.  This module converts those arrays immediately after
+reading them, validates the logical arrays, and applies the established
+mean-free-path estimator without introducing a fitted estimator.
 """
 
 from __future__ import annotations
@@ -168,7 +168,7 @@ def read_source_h5(source_path: Path) -> dict[str, FloatArray]:
         source_path: Existing ``test_001.h5`` path.
 
     Returns:
-        Raw h5py-visible arrays required to reproduce the MATLAB calculation.
+        Raw h5py-visible arrays required for the mean-free-path calculation.
 
     Raises:
         OSError: If HDF5 cannot open or read the source.
@@ -365,7 +365,7 @@ def validate_logical_data(logical_data: dict[str, FloatArray]) -> float:
 
 
 def compute_legacy_mfp(x: FloatArray, denn: FloatArray) -> FloatArray:
-    """Reproduce the legacy MATLAB mean-free-path estimator exactly.
+    """Apply the established Test 001 mean-free-path estimator exactly.
 
     For each density, energy, and temperature profile, the procedure divides
     by that profile's maximum, takes the natural logarithm, forms ``nx - 1``
@@ -468,8 +468,8 @@ def write_postprocessed_h5(
     created_utc = datetime.now(timezone.utc).isoformat(timespec="seconds")
     local_slope_count = logical_data["x"].shape[0] - 1
 
-    # A Python-written HDF5 dataset must use (nt, neb, nden) so MATLAB h5read
-    # exposes the legacy logical (nden, neb, nt) dimension order.
+    # Store the array in (nt, neb, nden) order while numerical work uses the
+    # documented semantic (nden, neb, nt) order.
     mfp_h5py_order = computed_mfp.transpose(2, 1, 0).copy()
 
     with h5py.File(output_path, mode="w") as h5file:

@@ -9,16 +9,14 @@
 
 Test 001 checks the neutral-beam stopping mean free path produced by
 `libfida::colrad` against an independent ADAS ADF21 stopping-coefficient
-reference. The Python implementation ports the legacy MATLAB reference,
-post-processing, and comparison workflow and is the canonical high-level
-implementation of the regression.
+reference. The Python implementation provides the reference, post-processing,
+and comparison functionality and is the canonical high-level implementation
+of the regression.
 
 ## Implementation status
 
 - **Python workflow:** Canonical implementation for reference generation,
   FIDASIM post-processing, scientific comparison, and reporting.
-- **MATLAB workflow:** Legacy migration reference retained temporarily for
-  independent review; it is not invoked by the operational workflow.
 - **FIDASIM calculation:** The top-level runner executes the compiled Test 001,
   then passes the newly generated `test_001.h5` through the Python workflow.
 
@@ -27,12 +25,8 @@ acceptance criterion. The Fortran calculation remains unchanged.
 
 ## Objective, scope, and test boundary
 
-The regression answers two different questions:
-
-1. **Scientific regression:** Does the FIDASIM attenuation result agree with
-   the ADF21-derived reference to within the established 12% tolerance?
-2. **Historical port validation:** Does the canonical Python implementation
-   reproduce the retained MATLAB reference and post-processed arrays?
+The regression asks whether the FIDASIM attenuation result agrees with the
+ADF21-derived reference to within the established 12% tolerance.
 
 The FIDASIM procedure under test is:
 
@@ -46,9 +40,8 @@ construction of the `LocalProfiles` state, grid generation, HDF5 writing, and
 procedures called internally by `colrad` support the test; they are not
 independent regression targets.
 
-The complete workflow starts with the compiled Test 001 calculation. The
-temporary parity check can still use an older MATLAB-produced result when an
-exact translation comparison is needed.
+The complete workflow starts with the compiled Test 001 calculation and uses
+Python for all reference generation, post-processing, comparison, and reports.
 
 ## Scientific definition
 
@@ -80,7 +73,7 @@ where $k_T$ is linearly interpolated on the temperature table and $k_{EN}$ is
 linearly interpolated on the energy-density table. Requested grid points must
 remain inside the ADF21 table bounds.
 
-The legacy implementation obtains the beam mass $A_b$ from the ADF21 filename,
+The reference obtains the beam mass $A_b$ from the ADF21 filename,
 sets $M_b=m_p A_b$, and evaluates
 
 $$
@@ -99,11 +92,10 @@ $$
 \frac{v_b}{n_e k_s}.
 $$
 
-The Python reference stage deliberately reproduces these constants,
-interpolations, and operations rather than revising the physics during the
-language port.
+The Python reference stage uses these established constants, interpolations,
+and operations without revising the physics definition.
 
-### Legacy FIDASIM profile estimator
+### FIDASIM profile estimator
 
 For one positive neutral-density profile $n_n(x_i)$ on a uniform grid, first
 normalize the profile:
@@ -149,7 +141,7 @@ Before applying the estimator, the Python postprocessor requires:
 - `sum(denn_n, axis=level)` to reproduce `denn` within relative tolerance
   `1e-12`.
 
-### Scientific comparison and migration tolerance
+### Scientific comparison and acceptance tolerance
 
 For every density, energy, and temperature point, Stage 3 calculates
 
@@ -183,21 +175,8 @@ s_{\epsilon}
 }.
 $$
 
-These tolerances have distinct meanings:
-
-| Tolerance | Check | Meaning |
-| --- | --- | --- |
-| `0.12` (12%) | $\epsilon_{\max}\leq0.12$ | Scientific agreement between FIDASIM and the independent ADF21 reference. |
-| `rtol=1e-12`, `atol=1e-12` | MATLAB arrays versus Python arrays | Translation parity between two implementations of the same calculation. |
-
-The `1e-12` parity tolerance is used only while reviewing the language port;
-it is not part of the operational scientific regression. The 12% threshold
-must not be replaced by the parity tolerance. A result can have excellent
-MATLAB/Python parity and still fail the scientific regression, or pass the
-scientific regression while exposing a porting error.
-The committed [legacy report](03_compare/mfp_regression_report_2026_01_13.txt)
-records a 10.01% maximum error against the 12% criterion for the preserved
-baseline.
+The test passes when $\epsilon_{\max}\leq0.12$. This 12% criterion measures
+scientific agreement between FIDASIM and the independent ADF21 reference.
 
 ## Canonical test conditions
 
@@ -222,38 +201,28 @@ describes hydrogen on hydrogen.
 
 ## Python workflow
 
-The MATLAB and Python paths share scientific inputs and can analyze the same
-raw FIDASIM result, but write separate derived artifacts.
-
 ```text
-input.nml + bms93#h_h1.dat
-          |
-          +----------------------+----------------------+
-          |                                             |
-          v                                             v
- MATLAB Stage 1                                 Python Stage 1
-  reference.h5                          python/output_data/reference.h5
-          |                                             |
-          +----------------------+----------------------+
-                                 |
-                 freshly generated test_001.h5
-                                 |
-          +----------------------+----------------------+
-          |                                             |
-          v                                             v
- MATLAB post-processing                         Python Stage 2
- legacy /mfp witness               python/output_data/postprocessed.h5
-          |                                             |
-          v                                             v
- MATLAB comparison                              Python Stage 3
- figures / report                     figures / persistent report
+input.nml + bms93#h_h1.dat       compiled Test 001
+              |                         |
+              v                         v
+      Python Stage 1               test_001.h5
+        reference.h5                    |
+              |                         v
+              |                  Python Stage 2
+              |                  postprocessed.h5
+              |                         |
+              +------------+------------+
+                           |
+                           v
+                    Python Stage 3
+                  figures and report
 ```
 
-| Stage | MATLAB or shared implementation | Python implementation | Python-owned output |
-| --- | --- | --- | --- |
-| 1. ADF21 reference | [`produce_reference.m`](01_reference/produce_reference.m) | [`produce_reference.py`](01_reference/python/produce_reference.py) and support modules | `01_reference/python/output_data/reference.h5` and three figure pairs |
-| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`test_001_postprocess.m`](02_run_test/test_001_postprocess.m) is the estimator witness | [`postprocess.py`](02_run_test/python/postprocess.py) reads the newly generated raw file | `02_run_test/python/output_data/postprocessed.h5` and four figure pairs |
-| 3. Scientific comparison | [`test_001_compare.m`](03_compare/test_001_compare.m) | [`compare_mean_free_paths.py`](03_compare/python/compare_mean_free_paths.py) | `03_compare/python/output_data/mfp_regression_report.txt` and seven figure pairs |
+| Stage | Implementation | Output |
+| --- | --- | --- |
+| 1. ADF21 reference | [`produce_reference.py`](01_reference/python/produce_reference.py) and support modules | `01_reference/python/output_data/reference.h5` and three figure pairs |
+| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`postprocess.py`](02_run_test/python/postprocess.py) derives mean free paths | `02_run_test/python/output_data/postprocessed.h5` and four figure pairs |
+| 3. Scientific comparison | [`compare_mean_free_paths.py`](03_compare/python/compare_mean_free_paths.py) | `03_compare/python/output_data/mfp_regression_report.txt` and seven figure pairs |
 
 All Python-stage paths are configured independently. Relative paths are
 resolved from the directory containing the corresponding namelist, not from
@@ -285,33 +254,11 @@ The run scripts call `python3` directly and therefore require
 - `matplotlib`
 - `f90nml`
 
-### Generated and preserved artifacts
+### Generated artifacts
 
-HDF5 and generated-output files are intentionally ignored by Git. The normal
-workflow creates its own raw FIDASIM result. Separate legacy MATLAB witnesses
-are needed only for the temporary parity check.
-
-| Required local file | Used by | Contract |
-| --- | --- | --- |
-| `01_reference/reference.h5` | Optional parity check | MATLAB reference witness containing `/ne`, `/eb`, `/T`, `/ab`, and `/mfp`. |
-| `04_validate_port/matlab_test_001.h5` | Optional parity check | Preserved MATLAB-postprocessed test witness containing `/mfp`. |
-
-Obtain the MATLAB witnesses from the trusted Test 001 baseline only when
-running the optional parity check. Confirm their presence with:
-
-```bash
-cd "$FIDASIM_DIR/regression_tests/test_001"
-test -f 01_reference/reference.h5
-test -f 04_validate_port/matlab_test_001.h5
-```
-
-Stage 2 does not read the legacy MATLAB `/mfp` dataset. The temporary parity
-script requires it only because that array is the MATLAB post-processing
-witness.
-
-The complete runner overwrites `02_run_test/test_001.h5` with the output of the
-current compiled Test 001 calculation. The separately named parity witness is
-not modified. The shared build procedure is documented in the
+HDF5 and generated-output files are intentionally ignored by Git. The complete
+runner overwrites `02_run_test/test_001.h5` with the output of the current
+compiled Test 001 calculation. The shared build procedure is documented in the
 [regression-test build guide](../docs/build_system.md).
 
 ## Run the complete workflow
@@ -345,20 +292,6 @@ Each stage directory also contains a minimal `run.sh` for use after changing
 into that directory.
 
 Stages 1–3 may be rerun independently once their input artifacts exist.
-
-### Optional MATLAB/Python parity check
-
-During migration review, run the small numerical parity check after Stages 1
-and 2:
-
-```bash
-cd "$FIDASIM_DIR/regression_tests/test_001/04_validate_port"
-./run.sh
-```
-
-This compares only the reference and post-processing arrays. It is not called
-by the top-level `run.sh`, does not write an audit report, and can be removed
-when the Python implementation replaces MATLAB.
 
 ## Configuration interface
 
@@ -415,26 +348,10 @@ Density, energy, and beam-mass grids must match exactly. Temperature grids
 must agree within relative tolerance `1e-7`, and both mean-free-path arrays
 must have semantic shape `(nden, neb, nt)`.
 
-### Temporary parity check: `&parity`
-
-Configuration:
-[`04_validate_port/input_config.nml`](04_validate_port/input_config.nml)
-
-| Field | Type | Required | Meaning and validation |
-| --- | --- | --- | --- |
-| `matlab_reference_file` | Path string | Yes | Existing MATLAB Stage 1 witness. |
-| `python_reference_file` | Path string | Yes | Existing Python Stage 1 artifact. |
-| `matlab_test_file` | Path string | Yes | Preserved file containing the MATLAB `/mfp` witness. |
-| `python_postprocessed_file` | Path string | Yes | Existing Python Stage 2 artifact. |
-| `relative_tolerance` | Non-negative real | Yes | `numpy.allclose` relative tolerance; checked in as `1e-12`. |
-| `absolute_tolerance` | Non-negative real | Yes | `numpy.allclose` absolute tolerance; checked in as `1e-12`. |
-
-The namelist must contain only the `&parity` block and its documented fields.
-
 ## HDF5 and array-order contract
 
-Fortran and MATLAB expose logical array dimensions in the opposite order from
-the HDF5 file order visible through h5py. Python transposes immediately after
+The Fortran-written logical array dimensions appear in the opposite order in
+the HDF5 file as viewed through h5py. Python transposes immediately after
 reading so all numerical work uses semantic axes. See the shared
 [HDF5 array-ordering guide](../docs/hdf5_array_ordering.md) for the general
 rule.
@@ -455,14 +372,14 @@ denn_n = raw_denn_n.transpose(4, 3, 2, 1, 0)
 mfp = raw_mfp.transpose(2, 1, 0)
 ```
 
-Python writes `/mfp` in raw `(nt, neb, nden)` order. MATLAB `h5read` therefore
-continues to expose it in logical `(nden, neb, nt)` order.
+Python writes `/mfp` in raw `(nt, neb, nden)` order and records the semantic
+axis order `(nden, neb, nt)` in the dataset metadata.
 
 ### Python HDF5 artifacts
 
 | Artifact | Required datasets | Contract |
 | --- | --- | --- |
-| Stage 1 `reference.h5` | `/ne`, `/eb`, `/T`, `/ab`, `/mfp` | MATLAB-compatible ADF21 reference. Vectors retain the legacy row-vector file layout; `/mfp` has raw shape `(nt, neb, nden)`. |
+| Stage 1 `reference.h5` | `/ne`, `/eb`, `/T`, `/ab`, `/mfp` | ADF21 reference. Vectors retain the established row-vector file layout; `/mfp` has raw shape `(nt, neb, nden)`. |
 | Stage 2 `postprocessed.h5` | `/dene`, `/eb`, `/temperature`, `/beam_mass`, `/mfp` | Self-contained derived mean-free-path result. `/mfp` has raw shape `(nt, neb, nden)` and records both semantic and h5py axis metadata. |
 
 Stage 2 also records its estimator, slope count, creation time, configured
@@ -499,8 +416,6 @@ Each scientific figure is written as a 600-DPI PNG and a vector PDF.
   figures before returning its scientific PASS/FAIL status.
 - Stage 3 returns 0 when the finite maximum relative error is no greater than
   the configured tolerance and 1 otherwise.
-- The optional parity script returns 0 when MATLAB and Python reference and
-  post-processing arrays agree within its migration tolerance.
 
 Do not infer success only from the presence of figures. Review the Stage 3
 report for scientific status.
@@ -520,13 +435,11 @@ python3 -c "import f90nml, h5py, matplotlib, numpy, scipy"
 If an import fails, recreate or update `FIDASIM_env` from
 [`regression_tests/environment.yml`](../environment.yml).
 
-### Missing executable or optional parity input
+### Missing executable
 
 If `02_run_test/test_001` is missing, build FIDASIM and its regression targets
 before running the workflow. The normal runner generates `test_001.h5`; it
-does not require a preserved raw result. Missing MATLAB witnesses affect only
-the optional parity check described under
-[generated and preserved artifacts](#generated-and-preserved-artifacts).
+does not require a preserved raw result.
 
 ### Configuration path failure
 
@@ -548,12 +461,6 @@ Open `mfp_regression_report.txt`, then inspect the relative-error figures and
 stage returns nonzero. Do not relax the 12% threshold merely to make the test
 pass.
 
-### Temporary parity-check failure
-
-Read the per-dataset terminal output to identify the failing reference or
-post-processing array. Do not relax `1e-12` to hide an unexplained translation
-difference.
-
 ## Limitations and deferred work
 
 - The regression covers the canonical hydrogen-on-hydrogen grid produced by
@@ -563,13 +470,10 @@ difference.
 - The legacy profile estimator averages local reciprocal slopes directly. It
   does not identify an entrance transient, reject noisy tail points, or fit an
   asymptotic attenuation interval.
-- The temporary parity script compares numerical arrays only. It is migration
-  support, not part of the final Python regression workflow.
-
 An improved transient detector and asymptotic attenuation fit are explicitly
 deferred to a separate scientific-method milestone. That change requires its
 own theory, configuration, validation cases, tolerance review, and reference
-baseline; it must not be folded into the MATLAB-to-Python parity port.
+baseline and must remain separate from the language port.
 
 ## Directory map
 
@@ -581,8 +485,6 @@ test_001/
 ├── 01_reference/
 │   ├── input.nml
 │   ├── adas/
-│   ├── produce_reference.m
-│   ├── reference.h5                 # ignored MATLAB witness
 │   └── python/
 │       ├── input_config.nml
 │       ├── produce_reference.py
@@ -591,25 +493,19 @@ test_001/
 │       └── output_data/              # ignored Python outputs
 ├── 02_run_test/
 │   ├── test_001.f90
-│   ├── test_001_postprocess.m
 │   ├── test_001.h5                   # ignored generated raw result
 │   └── python/
 │       ├── input_config.nml
 │       ├── postprocess.py
 │       ├── postprocess_support.py
 │       └── output_data/              # ignored Python outputs
-├── 03_compare/
-│   ├── test_001_compare.m
-│   └── python/
-│       ├── input_config.nml
-│       ├── compare_mean_free_paths.py
-│       ├── comparison_config.py
-│       ├── comparison_workflow.py
-│       └── output_data/              # ignored report and figures
-└── 04_validate_port/                 # temporary migration check
-    ├── input_config.nml
-    ├── matlab_test_001.h5            # ignored MATLAB witness
-    └── validate_python_port.py
+└── 03_compare/
+    └── python/
+        ├── input_config.nml
+        ├── compare_mean_free_paths.py
+        ├── comparison_config.py
+        ├── comparison_workflow.py
+        └── output_data/              # ignored report and figures
 ```
 
 ---

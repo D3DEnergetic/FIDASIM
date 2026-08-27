@@ -79,7 +79,7 @@ def read_reference_config(config_path: Path) -> ReferenceConfig:
 
 
 def read_reference_grid(grid_input_file: Path) -> ReferenceGrid:
-    """Read the legacy MATLAB grid definition from its shared namelist.
+    """Read the shared Test 001 grid definition from its namelist.
 
     Args:
         grid_input_file: Existing Test 001 ``input.nml`` path.
@@ -192,7 +192,7 @@ def calculate_mean_free_path(
     grid: ReferenceGrid,
     data: ADF21Data,
 ) -> np.ndarray:
-    """Calculate the MATLAB-equivalent logical mean-free-path array.
+    """Calculate the logical ADF21 mean-free-path array.
 
     Args:
         grid: Density, energy, and temperature values for the reference table.
@@ -233,12 +233,12 @@ def calculate_mean_free_path(
     return mean_free_path
 
 
-def _write_matlab_text_attribute(
+def _write_text_attribute(
     target: h5py.AttributeManager,
     name: str,
     value: str,
 ) -> None:
-    """Write a one-element string attribute like MATLAB string metadata.
+    """Write a one-element UTF-8 string attribute.
 
     Args:
         target: HDF5 attribute manager receiving the value.
@@ -259,21 +259,21 @@ def _create_numeric_dataset(
     description: str,
     units: str,
 ) -> h5py.Dataset:
-    """Create one numeric dataset with legacy description and units metadata.
+    """Create one numeric dataset with description and units metadata.
 
     Args:
         output_file: Open output HDF5 file.
         name: Root dataset name.
         values: Numeric data in h5py-visible file order.
-        description: Legacy MATLAB dataset description.
-        units: Legacy MATLAB units string.
+        description: Human-readable dataset description.
+        units: Physical units string.
 
     Returns:
         The created HDF5 dataset.
     """
     dataset = output_file.create_dataset(name, data=values, dtype=np.float64)
-    _write_matlab_text_attribute(dataset.attrs, "description", description)
-    _write_matlab_text_attribute(dataset.attrs, "units", units)
+    _write_text_attribute(dataset.attrs, "description", description)
+    _write_text_attribute(dataset.attrs, "units", units)
     return dataset
 
 
@@ -283,7 +283,7 @@ def write_reference_h5(
     grid: ReferenceGrid,
     mean_free_path: np.ndarray,
 ) -> None:
-    """Write the MATLAB-compatible reference HDF5 schema with h5py.
+    """Write the established reference HDF5 schema with h5py.
 
     Args:
         output_path: Destination for the Python-owned reference artifact.
@@ -298,9 +298,8 @@ def write_reference_h5(
     energy = np.asarray(grid["energy"], dtype=np.float64)
     temperature = np.asarray(grid["temperature"], dtype=np.float64)
 
-    # MATLAB's HDF5 interface reverses array dimensions at the file boundary.
-    # h5py must therefore receive (T, eb, ne) to reproduce the existing raw
-    # file shape while the documented logical order remains (ne, eb, T).
+    # Store (T, eb, ne) so the file retains its established raw shape while
+    # the documented semantic order remains (ne, eb, T).
     raw_mean_free_path = np.transpose(mean_free_path, axes=(2, 1, 0))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -340,13 +339,13 @@ def write_reference_h5(
             "mean free path",
             "[cm]",
         )
-        _write_matlab_text_attribute(
+        _write_text_attribute(
             mean_free_path_dataset.attrs,
             "dimension_order",
             "(ne, eb, T) = (nden, neb, nt)",
         )
 
-        _write_matlab_text_attribute(
+        _write_text_attribute(
             output_file.attrs,
             "description",
             "Contains mean free paths derived from an ADF21 dataset.",
@@ -363,7 +362,7 @@ def save_reference_figures(
     grid: ReferenceGrid,
     mean_free_path: np.ndarray,
 ) -> list[Path]:
-    """Save MATLAB-equivalent temperature scans as PNG and PDF figures.
+    """Save reference temperature scans as PNG and PDF figures.
 
     Args:
         figure_directory: Directory receiving all generated figures.

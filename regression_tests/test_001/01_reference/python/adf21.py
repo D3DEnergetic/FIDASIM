@@ -2,7 +2,7 @@
 
 ADF21 stores an energy-density scan at a reference temperature and a separate
 temperature scan at a reference energy and density.  Test 001 combines those
-two scans using the factorization employed by the legacy MATLAB workflow.
+two scans using the established Test 001 factorization.
 
 This module intentionally implements only the small ADF21 interface needed by
 the regression test.  It has no dependency on the compiled ADAS Python
@@ -121,7 +121,7 @@ def read_adf21(adf21_path: Path) -> ADF21Data:
 
     The returned arrays use semantic Python ordering.  In particular,
     ``energy_density_coefficient`` has shape ``(n_energy, n_density)`` to
-    match the MATLAB reader and the physical description of the table.
+    match the physical description of the table.
 
     Args:
         adf21_path: Existing ADF21 data file.

@@ -10,8 +10,19 @@ program test_005
   use libfida,only:ray_type,ray_collision_type,vessel, &
     solve_ray_triangle_intersection,find_ray_surface_intersection
   implicit none
+  integer,parameter::max_results=32
+  character(len=*),parameter::report_path= &
+    'output_data/comparison_report.txt'
+  type::test_result_type
+    character(len=64)::label=''
+    logical::passed=.false.
+    character(len=256)::detail=''
+  end type test_result_type
   type(ray_type)::ray
   type(ray_collision_type)::collision
+  type(test_result_type)::results(max_results)
+  integer::number_of_results=0
+  logical::all_passed
 
   ! Build one reusable triangle fixture. set_triangle reconfigures the same
   ! three vertices for the unit, small, and large scale test phases below.
@@ -73,6 +84,10 @@ program test_005
   ! behavior filtering and nearest-hit selection within a synthetic voxel.
   call test_mesh_dispatch()
 
+  ! Persist every result before returning a failing process status. This keeps
+  ! the diagnostic evidence available to both people and automated runners.
+  call write_comparison_report(report_path,all_passed)
+  if(.not.all_passed) error stop 'test_005: one or more checks failed'
   print *,'test_005: all ray-triangle and mesh-dispatch checks passed'
 
 contains
@@ -89,7 +104,7 @@ contains
   end subroutine set_triangle
 
   subroutine expect_hit(origin,velocity,expected_time,expected_point,label)
-    !+ Assert one ray-triangle hit and validate its complete collision record.
+    !+ Evaluate one ray-triangle hit and record its complete collision result.
     !+
     !+ origin: Ray origin [cm].
     !+ velocity: Physical ray velocity [cm/s].
@@ -102,32 +117,70 @@ contains
     real(real64),intent(in)::origin(3),velocity(3),expected_time,expected_point(3)
     character(len=*),intent(in)::label
     real(real64),parameter::tol=1.d-11
+    character(len=256)::detail
+
     ray%origin=origin
     ray%v=velocity
     call solve_ray_triangle_intersection(ray,1,collision)
-    if(collision%n_events/=1) error stop label//': expected a hit'
-    if(abs(collision%event(1)%s_coll-expected_time)>tol) &
-      error stop label//': incorrect time'
-    if(maxval(abs(collision%event(1)%p_coll-expected_point))>tol) &
-      error stop label//': incorrect point'
-    if(maxval(abs(collision%event(1)%normal-[0.d0,0.d0,1.d0]))>tol) &
-      error stop label//': incorrect normal'
+
+    if(collision%n_events/=1) then
+      write(detail,'(a,i0)') 'expected one collision event; actual events: ', &
+        collision%n_events
+      call record_result(label,.false.,detail)
+      return
+    endif
+    if(abs(collision%event(1)%s_coll-expected_time)>tol) then
+      write(detail,'(a,es12.4,a,es12.4)') 'expected time: ',expected_time, &
+        '; actual time: ',collision%event(1)%s_coll
+      call record_result(label,.false.,detail)
+      return
+    endif
+    if(maxval(abs(collision%event(1)%p_coll-expected_point))>tol) then
+      write(detail,'(a,3(es12.4,1x),a,3(es12.4,1x))') &
+        'expected point: ',expected_point,'; actual point: ', &
+        collision%event(1)%p_coll
+      call record_result(label,.false.,detail)
+      return
+    endif
+    if(maxval(abs(collision%event(1)%normal-[0.d0,0.d0,1.d0]))>tol) then
+      write(detail,'(a,3(es12.4,1x),a,3(es12.4,1x))') &
+        'expected normal: ',[0.d0,0.d0,1.d0],'; actual normal: ', &
+        collision%event(1)%normal
+      call record_result(label,.false.,detail)
+      return
+    endif
     if(collision%event(1)%surface_id/=1 .or. &
-       collision%event(1)%region_id/=1) error stop label//': incorrect IDs'
+       collision%event(1)%region_id/=1) then
+      write(detail,'(a,i0,a,i0,a,i0,a,i0)') &
+        'expected surface/region IDs: ',1,'/',1,'; actual IDs: ', &
+        collision%event(1)%surface_id,'/',collision%event(1)%region_id
+      call record_result(label,.false.,detail)
+      return
+    endif
+    call record_result(label,.true., &
+      'event count, time, point, normal, and IDs match')
   end subroutine expect_hit
 
   subroutine expect_miss(origin,velocity,label)
-    !+ Assert that a ray produces no intersection with the fixture triangle.
+    !+ Evaluate one expected miss and record whether no collision was returned.
     !+
     !+ origin: Ray origin [cm].
     !+ velocity: Physical ray velocity [cm/s].
     !+ label: Human-readable test-case name included in failure messages.
     real(real64),intent(in)::origin(3),velocity(3)
     character(len=*),intent(in)::label
+    character(len=256)::detail
+
     ray%origin=origin
     ray%v=velocity
     call solve_ray_triangle_intersection(ray,1,collision)
-    if(collision%n_events/=0) error stop label//': expected a miss'
+    if(collision%n_events==0) then
+      call record_result(label,.true.,'no collision event returned')
+    else
+      write(detail,'(a,i0)') 'expected zero collision events; actual events: ', &
+        collision%n_events
+      call record_result(label,.false.,detail)
+    endif
   end subroutine expect_miss
 
   subroutine test_mesh_dispatch()
@@ -169,23 +222,146 @@ contains
     ! Case 1: triangle 1 is an opening, so the ray passes through it and hits
     ! triangle 2, the farther wall, at two seconds.
     call find_ray_surface_intersection(ray,[1,1,1],collision)
-    if(collision%n_events/=1 .or. collision%event(1)%surface_id/=2 .or. &
-       abs(collision%event(1)%s_coll-2.d0)>1.d-12) &
-      error stop 'mesh dispatch: opening did not expose farther wall'
+    call expect_dispatch_hit( &
+      label='opening exposes farther wall', &
+      expected_surface_id=2,expected_time=2.d0)
 
     ! Case 2: both triangles are walls. Triangle 1 must win at one second even
     ! though triangle 2 appears first in the candidate list.
     vessel%mesh%region(1)%behavior_type='wall'
     call find_ray_surface_intersection(ray,[1,1,1],collision)
-    if(collision%n_events/=1 .or. collision%event(1)%surface_id/=1 .or. &
-       abs(collision%event(1)%s_coll-1.d0)>1.d-12) &
-      error stop 'mesh dispatch: did not select nearest wall'
+    call expect_dispatch_hit( &
+      label='candidate order preserves nearest wall', &
+      expected_surface_id=1,expected_time=1.d0)
 
     ! Case 3: both triangles are openings, so no wall collision is returned.
     vessel%mesh%region(1)%behavior_type='opening'
     vessel%mesh%region(2)%behavior_type='opening'
     call find_ray_surface_intersection(ray,[1,1,1],collision)
-    if(collision%n_events/=0) error stop 'mesh dispatch: opening was not transparent'
+    call expect_no_dispatch_hit(label='all openings are transparent')
   end subroutine test_mesh_dispatch
+
+  subroutine expect_dispatch_hit(label,expected_surface_id,expected_time)
+    !+ Record whether the current dispatch result is the expected nearest hit.
+    character(len=*),intent(in)::label
+    integer,intent(in)::expected_surface_id
+    real(real64),intent(in)::expected_time
+    real(real64),parameter::tol=1.d-12
+    character(len=256)::detail
+
+    if(collision%n_events/=1) then
+      write(detail,'(a,i0)') 'expected one collision event; actual events: ', &
+        collision%n_events
+      call record_result(label,.false.,detail)
+      return
+    endif
+    if(collision%event(1)%surface_id/=expected_surface_id) then
+      write(detail,'(a,i0,a,i0)') 'expected surface ID: ',expected_surface_id, &
+        '; actual surface ID: ',collision%event(1)%surface_id
+      call record_result(label,.false.,detail)
+      return
+    endif
+    if(abs(collision%event(1)%s_coll-expected_time)>tol) then
+      write(detail,'(a,es12.4,a,es12.4)') 'expected time: ',expected_time, &
+        '; actual time: ',collision%event(1)%s_coll
+      call record_result(label,.false.,detail)
+      return
+    endif
+    call record_result(label,.true., &
+      'nearest accepted wall has the expected surface ID and time')
+  end subroutine expect_dispatch_hit
+
+  subroutine expect_no_dispatch_hit(label)
+    !+ Record whether the current dispatch result contains no wall collision.
+    character(len=*),intent(in)::label
+    character(len=256)::detail
+
+    if(collision%n_events==0) then
+      call record_result(label,.true.,'no wall collision returned')
+    else
+      write(detail,'(a,i0)') 'expected zero collision events; actual events: ', &
+        collision%n_events
+      call record_result(label,.false.,detail)
+    endif
+  end subroutine expect_no_dispatch_hit
+
+  subroutine record_result(label,passed,detail)
+    !+ Append one complete named result to the bounded result collection.
+    character(len=*),intent(in)::label,detail
+    logical,intent(in)::passed
+    character(len=4)::status
+
+    if(number_of_results>=max_results) &
+      error stop 'test_005: result capacity exceeded'
+    number_of_results=number_of_results+1
+    results(number_of_results)%label=label
+    results(number_of_results)%passed=passed
+    results(number_of_results)%detail=detail
+    if(passed) then
+      status='PASS'
+    else
+      status='FAIL'
+    endif
+    write(*,'(2x,a,2x,a)') status,trim(label)
+  end subroutine record_result
+
+  subroutine write_comparison_report(path,passed)
+    !+ Write all case results, summary counts, and the overall test status.
+    !+
+    !+ path: Destination report filename. Its parent directory must exist.
+    !+ passed: True only when every recorded case passed.
+    character(len=*),intent(in)::path
+    logical,intent(out)::passed
+    integer::report_unit,ios,ii,number_passed,number_failed
+    character(len=4)::status
+
+    number_passed=count(results(1:number_of_results)%passed)
+    number_failed=number_of_results-number_passed
+    passed=number_failed==0
+    if(passed) then
+      status='PASS'
+    else
+      status='FAIL'
+    endif
+
+    open(newunit=report_unit,file=path,status='replace',action='write',iostat=ios)
+    if(ios/=0) error stop 'test_005: could not open comparison report'
+    write(report_unit,'(a)') '=============================================='
+    write(report_unit,'(a,a)') 'OVERALL REGRESSION STATUS: ',status
+    write(report_unit,'(a)') '=============================================='
+    write(report_unit,'(a)') ''
+    write(report_unit,'(a)') 'Test 005 ray-triangle and mesh-dispatch report'
+    write(report_unit,'(a)') '=============================================='
+    write(report_unit,'(a,i0)') 'Named checks: ',number_of_results
+    write(report_unit,'(a,i0)') 'Passed:       ',number_passed
+    write(report_unit,'(a,i0)') 'Failed:       ',number_failed
+    write(report_unit,'(a)') ''
+
+    do ii=1,number_of_results
+      if(results(ii)%passed) then
+        status='PASS'
+      else
+        status='FAIL'
+      endif
+      write(report_unit,'(a,i0,a,a)') 'Case ',ii,': ',trim(results(ii)%label)
+      write(report_unit,'(a,a)') '  Status: ',status
+      write(report_unit,'(a,a)') '  Detail: ',trim(results(ii)%detail)
+      write(report_unit,'(a)') ''
+    enddo
+
+    if(passed) then
+      status='PASS'
+    else
+      status='FAIL'
+    endif
+    write(report_unit,'(a)') 'Overall summary'
+    write(report_unit,'(a)') '---------------'
+    write(report_unit,'(a,a)') 'Status: ',status
+    write(report_unit,'(a,i0)') 'Named checks: ',number_of_results
+    write(report_unit,'(a,i0)') 'Passed:       ',number_passed
+    write(report_unit,'(a,i0)') 'Failed:       ',number_failed
+    close(report_unit)
+    write(*,'(a,a)') 'Wrote report: ',trim(path)
+  end subroutine write_comparison_report
 
 end program test_005

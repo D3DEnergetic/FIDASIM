@@ -222,9 +222,9 @@ input.nml + bms93#h_h1.dat       compiled Test 001
 
 | Stage | Implementation | Output |
 | --- | --- | --- |
-| 1. ADF21 reference | [`produce_reference.py`](01_reference/python/produce_reference.py) and support modules | `01_reference/python/output_data/reference.h5` and three figure pairs |
-| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`postprocess.py`](02_run_test/python/postprocess.py) derives mean free paths | `02_run_test/python/output_data/postprocessed.h5` and four figure pairs |
-| 3. Scientific comparison | [`compare_mean_free_paths.py`](03_compare/python/compare_mean_free_paths.py) | `03_compare/python/output_data/mfp_regression_report.txt` and seven figure pairs |
+| 1. ADF21 reference | [`produce_reference.py`](01_reference/produce_reference.py) and support modules | `01_reference/output_data/reference.h5` and three figure pairs |
+| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`postprocess.py`](02_run_test/postprocess.py) derives mean free paths | `02_run_test/output_data/postprocessed.h5` and four figure pairs |
+| 3. Scientific comparison | [`compare_mean_free_paths.py`](03_compare/compare_mean_free_paths.py) | `03_compare/output_data/mfp_regression_report.txt` and seven figure pairs |
 
 All Python-stage paths are configured independently. Relative paths are
 resolved from the directory containing the corresponding namelist, not from
@@ -285,13 +285,10 @@ From `regression_tests/test_001`, run an individual Python entry point with its
 configuration:
 
 ```bash
-python3 01_reference/python/produce_reference.py 01_reference/python/input_config.nml
-python3 02_run_test/python/postprocess.py 02_run_test/python/input_config.nml
-python3 03_compare/python/compare_mean_free_paths.py 03_compare/python/input_config.nml
+python3 01_reference/produce_reference.py 01_reference/input_config.nml
+python3 02_run_test/postprocess.py 02_run_test/input_config.nml
+python3 03_compare/compare_mean_free_paths.py 03_compare/input_config.nml
 ```
-
-Each stage directory also contains a minimal `run.sh` for use after changing
-into that directory.
 
 Stages 1–3 may be rerun independently once their input artifacts exist.
 
@@ -311,7 +308,7 @@ resolved from the configuration file that contains it.
 ### Stage 1: `&reference`
 
 Configuration:
-[`01_reference/python/input_config.nml`](01_reference/python/input_config.nml)
+[`01_reference/input_config.nml`](01_reference/input_config.nml)
 
 | Field | Type | Required | Meaning and validation |
 | --- | --- | --- | --- |
@@ -327,7 +324,7 @@ the ADF21 table.
 ### Stage 2: `&postprocess`
 
 Configuration:
-[`02_run_test/python/input_config.nml`](02_run_test/python/input_config.nml)
+[`02_run_test/input_config.nml`](02_run_test/input_config.nml)
 
 | Field | Type | Required | Meaning and validation |
 | --- | --- | --- | --- |
@@ -342,7 +339,7 @@ different path.
 ### Stage 3: `&compare`
 
 Configuration:
-[`03_compare/python/input_config.nml`](03_compare/python/input_config.nml)
+[`03_compare/input_config.nml`](03_compare/input_config.nml)
 
 | Field | Type | Required | Meaning and validation |
 | --- | --- | --- | --- |
@@ -403,15 +400,15 @@ stage.
 
 | Stage | Output | Contents |
 | --- | --- | --- |
-| 1 | `01_reference/python/output_data/reference.h5` | ADF21 grids, beam mass, and reference MFP. |
-| 1 | `01_reference/python/output_data/figures/bms93_h_h1_MFP_{1..3}.{png,pdf}` | Reference MFP versus temperature, one density per figure. |
-| 2 | `02_run_test/python/output_data/postprocessed.h5` | FIDASIM grids, beam mass, and derived MFP. |
-| 2 | `02_run_test/python/output_data/figures/FIDASIM_MFP_{1..3}.{png,pdf}` | FIDASIM MFP versus temperature, one density per figure. |
-| 2 | `02_run_test/python/output_data/figures/Example_neutral_density_profile.{png,pdf}` | `log10` of the first normalized FIDASIM neutral-density profile. |
-| 3 | `03_compare/python/output_data/mfp_regression_report.txt` | PASS/FAIL, maximum, mean, sample standard deviation, and 12% acceptance check. |
-| 3 | `03_compare/python/output_data/figures/comparison__MFP_{1..3}.{png,pdf}` | Solid ADF21 reference and dashed FIDASIM MFP curves. |
-| 3 | `03_compare/python/output_data/figures/comparison__relative_error_{1..3}.{png,pdf}` | Relative error versus temperature with the vertical range fixed to the tolerance. |
-| 3 | `03_compare/python/output_data/figures/max_relative_error_profiles.{png,pdf}` | ADF21 exponential and normalized raw FIDASIM profile at the maximum-error condition. |
+| 1 | `01_reference/output_data/reference.h5` | ADF21 grids, beam mass, and reference MFP. |
+| 1 | `01_reference/output_data/figures/bms93_h_h1_MFP_{1..3}.{png,pdf}` | Reference MFP versus temperature, one density per figure. |
+| 2 | `02_run_test/output_data/postprocessed.h5` | FIDASIM grids, beam mass, and derived MFP. |
+| 2 | `02_run_test/output_data/figures/FIDASIM_MFP_{1..3}.{png,pdf}` | FIDASIM MFP versus temperature, one density per figure. |
+| 2 | `02_run_test/output_data/figures/Example_neutral_density_profile.{png,pdf}` | `log10` of the first normalized FIDASIM neutral-density profile. |
+| 3 | `03_compare/output_data/mfp_regression_report.txt` | PASS/FAIL, maximum, mean, sample standard deviation, and 12% acceptance check. |
+| 3 | `03_compare/output_data/figures/comparison__MFP_{1..3}.{png,pdf}` | Solid ADF21 reference and dashed FIDASIM MFP curves. |
+| 3 | `03_compare/output_data/figures/comparison__relative_error_{1..3}.{png,pdf}` | Relative error versus temperature with the vertical range fixed to the tolerance. |
+| 3 | `03_compare/output_data/figures/max_relative_error_profiles.{png,pdf}` | ADF21 exponential and normalized raw FIDASIM profile at the maximum-error condition. |
 
 Each scientific figure is written as a 600-DPI PNG and a vector PDF.
 
@@ -493,31 +490,28 @@ test_001/
 ├── run.sh
 ├── 01_reference/
 │   ├── input.nml
+│   ├── input_config.nml
 │   ├── adas/
 │   ├── legacy/                       # archived MATLAB sources
-│   └── python/
-│       ├── input_config.nml
-│       ├── produce_reference.py
-│       ├── adf21.py
-│       ├── reference_workflow.py
-│       └── output_data/              # ignored Python outputs
+│   ├── produce_reference.py
+│   ├── adf21.py
+│   ├── reference_workflow.py
+│   └── output_data/                  # ignored generated outputs
 ├── 02_run_test/
 │   ├── test_001.f90
 │   ├── test_001.h5                   # ignored generated raw result
 │   ├── legacy/                       # archived MATLAB source
-│   └── python/
-│       ├── input_config.nml
-│       ├── postprocess.py
-│       ├── postprocess_support.py
-│       └── output_data/              # ignored Python outputs
+│   ├── input_config.nml
+│   ├── postprocess.py
+│   ├── postprocess_support.py
+│   └── output_data/                  # ignored generated outputs
 └── 03_compare/
     ├── legacy/                       # archived MATLAB source
-    └── python/
-        ├── input_config.nml
-        ├── compare_mean_free_paths.py
-        ├── comparison_config.py
-        ├── comparison_workflow.py
-        └── output_data/              # ignored report and figures
+    ├── input_config.nml
+    ├── compare_mean_free_paths.py
+    ├── comparison_config.py
+    ├── comparison_workflow.py
+    └── output_data/                  # ignored report and figures
 ```
 
 ---

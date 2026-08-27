@@ -475,7 +475,7 @@ def write_postprocessed_h5(
     with h5py.File(output_path, mode="w") as h5file:
         h5file.attrs["artifact_kind"] = "FIDASIM test_001 derived mean free path"
         h5file.attrs["created_by"] = (
-            "regression_tests/test_001/02_run_test/python/postprocess.py"
+            "regression_tests/test_001/02_run_test/postprocess.py"
         )
         h5file.attrs["created_utc"] = created_utc
         h5file.attrs["configuration_file"] = relative_config

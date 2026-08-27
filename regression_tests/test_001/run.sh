@@ -8,7 +8,6 @@ cd 02_run_test
 ./test_001
 cd ..
 
-python3 01_reference/python/produce_reference.py 01_reference/python/input_config.nml
-python3 02_run_test/python/postprocess.py 02_run_test/python/input_config.nml
-python3 03_compare/python/compare_mean_free_paths.py \
-    03_compare/python/input_config.nml
+python3 01_reference/produce_reference.py 01_reference/input_config.nml
+python3 02_run_test/postprocess.py 02_run_test/input_config.nml
+python3 03_compare/compare_mean_free_paths.py 03_compare/input_config.nml

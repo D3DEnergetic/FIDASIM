@@ -13,10 +13,10 @@ import sys
 from pathlib import Path
 
 
-# The shared regression configuration helpers live three directories above
+# The shared regression configuration helpers live two directories above
 # this stage entry point. Add that stable repository location before importing
 # the local configuration and workflow modules.
-REGRESSION_TESTS_DIRECTORY = Path(__file__).resolve().parents[3]
+REGRESSION_TESTS_DIRECTORY = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REGRESSION_TESTS_DIRECTORY))
 
 # Keep Matplotlib's writable cache with the ignored Python artifacts. This is

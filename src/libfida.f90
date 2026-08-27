@@ -262,10 +262,6 @@ type mesh_type
     !+ One mesh-wide physical-region ID for each triangle.
   type(mesh_region_type), dimension(:), allocatable :: region
     !+ Mesh-wide region catalogue with run-specific behavior attached.
-  integer(Int64), dimension(:), allocatable :: cell_offsets
-    !+ Zero-based CSR offsets loaded from the artifact during vessel setup.
-  integer(Int32), dimension(:), allocatable :: candidate_triangle_id
-    !+ Concatenated one-based CSR triangle IDs loaded during vessel setup.
 end type mesh_type
 
 ! >>> [JFCM, 2025_07_30] >>>
@@ -3181,11 +3177,32 @@ subroutine read_hdf5_vlen_attribute(file_id, object_name, attribute_name, value)
   call h5oclose_f(object_id,error)
 end subroutine read_hdf5_vlen_attribute
 
-subroutine read_vessel_mesh_artifact()
+subroutine setup_vessel_mesh()
+  !+ Coordinate mesh-vessel setup and own its temporary compressed sparse row
+  !+ (CSR) voxel-candidate data.
+  !+
+  !+ ``cell_offsets`` identifies the slice belonging to each voxel in the flat
+  !+ ``candidate_triangle_id`` array. The artifact reader allocates both CSR
+  !+ arrays, and voxel reconstruction consumes them after region behavior has
+  !+ been resolved. Because the arrays are local to this coordinator, Fortran
+  !+ releases them automatically when setup completes; only runtime mesh
+  !+ geometry and the native voxel map remain stored on vessel.
+  integer(Int64),allocatable::cell_offsets(:)
+  integer(Int32),allocatable::candidate_triangle_id(:)
+
+  call read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
+  call read_vessel_mesh_behavior()
+  call reconstruct_vessel_mesh_voxels(cell_offsets,candidate_triangle_id)
+end subroutine setup_vessel_mesh
+
+subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   !+ Load and validate the version-0 surface-mesh HDF5 artifact.
   !+ Geometry uses centimetres in the beam-grid-local frame. Connectivity,
   !+ region IDs, and candidate triangle IDs are one based; CSR offsets are
-  !+ zero based and retained until behavior-aware voxel reconstruction.
+  !+ zero based. The setup-only CSR arrays are allocated here and returned to
+  !+ the mesh-setup coordinator for behavior-aware voxel reconstruction.
+  integer(Int64),allocatable,intent(out)::cell_offsets(:)
+  integer(Int32),allocatable,intent(out)::candidate_triangle_id(:)
   integer(HID_T) :: file_id, dataset_id, datatype_id
   integer(HSIZE_T) :: dims1(1), dims2(2)
   integer(SIZE_T) :: type_size
@@ -3201,6 +3218,7 @@ subroutine read_vessel_mesh_artifact()
   integer(Int64) :: n_voxels, n_references
   logical :: valid
 
+  ! Open the artifact and confirm that every required group or dataset exists.
   call h5open_f(error)
   call h5fopen_f(trim(vessel%geometry_file),H5F_ACC_RDONLY_F,file_id,error)
   call check_hdf5(error,'open artifact')
@@ -3213,6 +3231,7 @@ subroutine read_vessel_mesh_artifact()
   call require_path('/voxel_index/cell_offsets')
   call require_path('/voxel_index/triangle_ids')
 
+  ! Read and validate the artifact metadata contract.
   call read_hdf5_vlen_attribute(file_id,'/metadata','schema_name',schema_name)
   call read_hdf5_vlen_attribute(file_id,'/metadata','length_units',length_units)
   call read_hdf5_vlen_attribute(file_id,'/metadata','vertex_frame',vertex_frame)
@@ -3230,6 +3249,7 @@ subroutine read_vessel_mesh_artifact()
   if (trim(voxel_order) /= 'i_fastest_then_j_then_k') stop 'mesh artifact: unsupported voxel_order'
   if (triangle_id_base(1) /= 1 .or. offset_base(1) /= 0) stop 'mesh artifact: unsupported ID bases'
 
+  ! Load mesh geometry, topology, and the named physical-region catalogue.
   call dataset_info('/mesh/vertices',dims2)
   if (dims2(1) /= 3 .or. dims2(2) < 3) stop 'mesh artifact: invalid vertices shape'
   allocate(vessel%mesh%vertices(dims2(1),dims2(2)))
@@ -3251,17 +3271,11 @@ subroutine read_vessel_mesh_artifact()
 
   call dataset_info('/regions/id',dims1)
   if (dims1(1) < 1) stop 'mesh artifact: empty region catalogue'
-  allocate(region_id(dims1(1)),region_name(dims1(1)),vessel%mesh%region(dims1(1)))
+  allocate(region_id(dims1(1)),vessel%mesh%region(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/regions/id',region_id,dims1,error)
   call check_hdf5(error,'regions/id')
-  call h5dopen_f(file_id,'/regions/name',dataset_id,error)
-  call check_hdf5(error,'regions/name open')
-  call h5dget_type_f(dataset_id,datatype_id,error)
-  call check_hdf5(error,'regions/name type')
-  call h5dread_f(dataset_id,datatype_id,region_name,dims1,error)
-  call check_hdf5(error,'regions/name read')
-  call h5tclose_f(datatype_id,error)
-  call h5dclose_f(dataset_id,error)
+  call read_fixed_string_array('/regions/name',region_name)
+  if (size(region_name) /= size(region_id)) stop 'mesh artifact: region ID/name count mismatch'
   do ii=1,size(region_name)
     do jj=1,len(region_name(ii))
       if (iachar(region_name(ii)(jj:jj)) == 0) region_name(ii)(jj:jj)=' '
@@ -3279,6 +3293,7 @@ subroutine read_vessel_mesh_artifact()
   if (any(vessel%mesh%triangle_region_id < 1) .or. &
       any(vessel%mesh%triangle_region_id > size(vessel%mesh%region))) stop 'mesh artifact: region ID out of range'
 
+  ! Verify that the artifact voxel grid exactly matches the active beam grid.
   call read_scalar_int('/grid/nx',grid_dims(1))
   call read_scalar_int('/grid/ny',grid_dims(2))
   call read_scalar_int('/grid/nz',grid_dims(3))
@@ -3311,33 +3326,35 @@ subroutine read_vessel_mesh_artifact()
   if (maxval(abs(transpose(basis_raw)-beam_grid%basis)) > 1.d-12) stop 'mesh artifact: basis differs'
   if (maxval(abs(transpose(inv_basis_raw)-beam_grid%inv_basis)) > 1.d-12) stop 'mesh artifact: inv_basis differs'
 
+  ! Load and validate the setup-only CSR voxel-candidate index.
   n_voxels=int(beam_grid%ngrid,Int64)
   call dataset_info('/voxel_index/cell_offsets',dims1)
   if (int(dims1(1),Int64) /= n_voxels+1_Int64) stop 'mesh artifact: cell_offsets length mismatch'
-  allocate(vessel%mesh%cell_offsets(dims1(1)))
+  allocate(cell_offsets(dims1(1)))
   call h5dopen_f(file_id,'/voxel_index/cell_offsets',dataset_id,error)
   call check_hdf5(error,'voxel_index/cell_offsets open')
   call h5dget_type_f(dataset_id,datatype_id,error)
   call check_hdf5(error,'voxel_index/cell_offsets type')
-  call h5dread_f(dataset_id,datatype_id,vessel%mesh%cell_offsets,dims1,error)
+  call h5dread_f(dataset_id,datatype_id,cell_offsets,dims1,error)
   call check_hdf5(error,'voxel_index/cell_offsets')
   call h5tclose_f(datatype_id,error)
   call h5dclose_f(dataset_id,error)
   call dataset_info('/voxel_index/triangle_ids',dims1)
-  allocate(vessel%mesh%candidate_triangle_id(dims1(1)))
+  allocate(candidate_triangle_id(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/voxel_index/triangle_ids', &
-      vessel%mesh%candidate_triangle_id,dims1,error)
+      candidate_triangle_id,dims1,error)
   call check_hdf5(error,'voxel_index/triangle_ids')
-  n_references=int(size(vessel%mesh%candidate_triangle_id),Int64)
-  if (vessel%mesh%cell_offsets(1) /= 0_Int64) stop 'mesh artifact: first offset must be zero'
-  if (any(vessel%mesh%cell_offsets(2:) < vessel%mesh%cell_offsets(:size(vessel%mesh%cell_offsets)-1))) &
+  n_references=int(size(candidate_triangle_id),Int64)
+  if (cell_offsets(1) /= 0_Int64) stop 'mesh artifact: first offset must be zero'
+  if (any(cell_offsets(2:) < cell_offsets(:size(cell_offsets)-1))) &
       stop 'mesh artifact: offsets must be nondecreasing'
-  if (vessel%mesh%cell_offsets(size(vessel%mesh%cell_offsets)) /= n_references) &
+  if (cell_offsets(size(cell_offsets)) /= n_references) &
       stop 'mesh artifact: final offset mismatch'
-  if (any(vessel%mesh%candidate_triangle_id < 1) .or. &
-      any(vessel%mesh%candidate_triangle_id > size(vessel%mesh%triangles,2))) &
+  if (any(candidate_triangle_id < 1) .or. &
+      any(candidate_triangle_id > size(vessel%mesh%triangles,2))) &
       stop 'mesh artifact: candidate triangle ID out of range'
 
+  ! Close the artifact and report the validated mesh when verbose output is on.
   call h5fclose_f(file_id,error)
   call h5close_f(error)
   deallocate(region_id,region_name)
@@ -3352,6 +3369,11 @@ subroutine read_vessel_mesh_artifact()
   endif
 contains
   subroutine check_hdf5(status,field_name)
+    !+ Stop when an HDF5 operation fails and identify the failed field.
+    !+
+    !+ status: HDF5 status returned by the preceding operation.
+    !+ field_name: Dataset, attribute, or operation label used in the error
+    !+ message.
     integer,intent(in)::status
     character(len=*),intent(in)::field_name
     if(status < 0) then
@@ -3360,6 +3382,9 @@ contains
     endif
   end subroutine check_hdf5
   subroutine require_path(path)
+    !+ Require one group or dataset path to exist in the open artifact.
+    !+
+    !+ path: Absolute HDF5 object path checked before payload reading begins.
     character(len=*),intent(in)::path
     call h5ltpath_valid_f(file_id,trim(path),.true.,valid,error)
     if(error < 0 .or. .not.valid) then
@@ -3368,18 +3393,54 @@ contains
     endif
   end subroutine require_path
   subroutine dataset_info(path,dimensions)
+    !+ Return a dataset's extents without reading its payload.
+    !+
+    !+ path: Absolute HDF5 dataset path to inspect.
+    !+ dimensions: Dataset extents. The caller supplies an array whose size
+    !+ matches the expected dataset rank.
     character(len=*),intent(in)::path
     integer(HSIZE_T),intent(out)::dimensions(:)
     call h5ltget_dataset_info_f(file_id,trim(path),dimensions,class_id,type_size,error)
     call check_hdf5(error,path)
   end subroutine dataset_info
+  subroutine read_fixed_string_array(path,values)
+    !+ Read a one-dimensional dataset of fixed-length 64-character strings.
+    !+
+    !+ path: Absolute HDF5 dataset path.
+    !+ values: Allocated output array populated with the dataset strings.
+    character(len=*),intent(in)::path
+    character(len=64),allocatable,intent(out)::values(:)
+    integer(HID_T)::string_dataset_id,string_datatype_id
+    integer(HSIZE_T)::string_dims(1)
+
+    call dataset_info(path,string_dims)
+    allocate(values(string_dims(1)))
+    call h5dopen_f(file_id,trim(path),string_dataset_id,error)
+    call check_hdf5(error,trim(path)//' open')
+    call h5dget_type_f(string_dataset_id,string_datatype_id,error)
+    call check_hdf5(error,trim(path)//' type')
+    call h5dread_f(string_dataset_id,string_datatype_id,values,string_dims,error)
+    call check_hdf5(error,trim(path)//' read')
+    call h5tclose_f(string_datatype_id,error)
+    call check_hdf5(error,trim(path)//' type close')
+    call h5dclose_f(string_dataset_id,error)
+    call check_hdf5(error,trim(path)//' close')
+  end subroutine read_fixed_string_array
   subroutine read_scalar_int(path,value)
+    !+ Read one scalar Int32 dataset from the open artifact.
+    !+
+    !+ path: Absolute HDF5 dataset path.
+    !+ value: Integer value returned to the caller.
     character(len=*),intent(in)::path
     integer(Int32),intent(out)::value
     call h5ltread_dataset_int_scalar_f(file_id,trim(path),value,error)
     call check_hdf5(error,path)
   end subroutine read_scalar_int
   subroutine read_scalar_double(path,value)
+    !+ Read one scalar Float64 dataset from the open artifact.
+    !+
+    !+ path: Absolute HDF5 dataset path.
+    !+ value: Floating-point value returned to the caller.
     character(len=*),intent(in)::path
     real(Float64),intent(out)::value
     call h5ltread_dataset_double_scalar_f(file_id,trim(path),value,error)
@@ -3482,13 +3543,15 @@ subroutine read_vessel_mesh_behavior()
   if(.not.all(matched(1:num_regions))) stop 'mesh behavior: missing artifact region'
 end subroutine read_vessel_mesh_behavior
 
-subroutine reconstruct_vessel_mesh_voxels()
+subroutine reconstruct_vessel_mesh_voxels(cell_offsets,candidate_triangle_id)
   !+ Rebuild native voxel candidates from the artifact CSR representation.
   !+
   !+ The artifact linearizes cells with X varying fastest. Inactive regions
   !+ are removed here so every retained candidate is eligible for runtime
   !+ geometry dispatch; active openings remain candidates and are handled as
   !+ transparent surfaces during the later detailed-intersection milestone.
+  integer(Int64),intent(in)::cell_offsets(:)
+  integer(Int32),intent(in)::candidate_triangle_id(:)
   integer(Int32)::i,j,k,triangle_id,region_id
   integer(Int64)::ic,first,last,ref,active_references,occupied_voxels
 
@@ -3499,10 +3562,10 @@ subroutine reconstruct_vessel_mesh_voxels()
       do i=1,beam_grid%nx
         ic=int(i,Int64)+int(beam_grid%nx,Int64)*int(j-1,Int64) &
           +int(beam_grid%nx,Int64)*int(beam_grid%ny,Int64)*int(k-1,Int64)
-        first=vessel%mesh%cell_offsets(ic)+1_Int64
-        last=vessel%mesh%cell_offsets(ic+1_Int64)
+        first=cell_offsets(ic)+1_Int64
+        last=cell_offsets(ic+1_Int64)
         do ref=first,last
-          triangle_id=vessel%mesh%candidate_triangle_id(ref)
+          triangle_id=candidate_triangle_id(ref)
           region_id=vessel%mesh%triangle_region_id(triangle_id)
           if(.not.vessel%mesh%region(region_id)%is_active) cycle
           call append_surface_id(vessel%map(i,j,k)%surface_id,triangle_id)
@@ -3514,9 +3577,6 @@ subroutine reconstruct_vessel_mesh_voxels()
     enddo
   enddo
 
-  ! The native map is the runtime representation; release the setup-only CSR
-  ! arrays so a long Monte Carlo run does not retain two copies of the index.
-  deallocate(vessel%mesh%cell_offsets,vessel%mesh%candidate_triangle_id)
   write(*,'(a,i0)') ' Active mesh references: ',active_references
   write(*,'(a,i0)') ' Occupied mesh voxels:   ',occupied_voxels
 end subroutine reconstruct_vessel_mesh_voxels
@@ -3608,9 +3668,6 @@ subroutine write_vessel_voxel_map
   ! Close file:
   call h5fclose_f(h5file_id, error)
 
-  ! Release memory:
-  deallocate(has_surfaces,nid)
-
 end subroutine write_vessel_voxel_map
 ! <<< [JFCM, 2025-08-06] <<<
 
@@ -3634,9 +3691,7 @@ subroutine define_vacuum_vessel()
         call read_vacuum_vessel_namelist()
         call map_vacuum_vessel_to_beam_grid()
     case ("mesh")
-      call read_vessel_mesh_artifact()
-      call read_vessel_mesh_behavior()
-      call reconstruct_vessel_mesh_voxels()
+      call setup_vessel_mesh()
     case default
       print *, "Error: Unknown vacuum vessel geometry_type: ", trim(adjustl(vessel%geometry_type))
       stop

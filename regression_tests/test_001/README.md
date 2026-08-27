@@ -19,6 +19,8 @@ of the regression.
   FIDASIM post-processing, scientific comparison, and reporting.
 - **FIDASIM calculation:** The top-level runner executes the compiled Test 001,
   then passes the newly generated `test_001.h5` through the Python workflow.
+- **Legacy MATLAB sources:** Archived under each stage's `legacy/` directory;
+  they are retained for historical comparison and are not run by `run.sh`.
 
 The canonical workflow preserves the established scientific definition and
 acceptance criterion. The Fortran calculation remains unchanged.
@@ -293,6 +295,13 @@ into that directory.
 
 Stages 1–3 may be rerun independently once their input artifacts exist.
 
+### Legacy MATLAB sources
+
+The former MATLAB scripts are preserved under `01_reference/legacy/`,
+`02_run_test/legacy/`, and `03_compare/legacy/`. They retain the source as it
+existed at the point of migration and are not maintained as runnable parallel
+workflows. The Python stages and top-level `run.sh` are authoritative.
+
 ## Configuration interface
 
 The checked-in namelists are complete, valid examples. Each stage validates
@@ -485,6 +494,7 @@ test_001/
 ├── 01_reference/
 │   ├── input.nml
 │   ├── adas/
+│   ├── legacy/                       # archived MATLAB sources
 │   └── python/
 │       ├── input_config.nml
 │       ├── produce_reference.py
@@ -494,12 +504,14 @@ test_001/
 ├── 02_run_test/
 │   ├── test_001.f90
 │   ├── test_001.h5                   # ignored generated raw result
+│   ├── legacy/                       # archived MATLAB source
 │   └── python/
 │       ├── input_config.nml
 │       ├── postprocess.py
 │       ├── postprocess_support.py
 │       └── output_data/              # ignored Python outputs
 └── 03_compare/
+    ├── legacy/                       # archived MATLAB source
     └── python/
         ├── input_config.nml
         ├── compare_mean_free_paths.py

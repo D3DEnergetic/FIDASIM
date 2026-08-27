@@ -18,8 +18,8 @@ from the high-level regression code.
 - **MATLAB workflow:** Implemented and retained as the migration reference.
 - **Python workflow:** Implemented in parallel and treated as experimental
   until the project accepts it as the replacement workflow.
-- **FIDASIM calculation:** Shared by both workflows. The Python runner consumes
-  an existing raw `test_001.h5`; it does not build or run FIDASIM.
+- **FIDASIM calculation:** The top-level runner executes the compiled Test 001,
+  then passes the newly generated `test_001.h5` through the Python workflow.
 
 The port preserves the existing scientific definition and acceptance
 criterion. MATLAB and Fortran sources remain unchanged and available for
@@ -46,8 +46,9 @@ construction of the `LocalProfiles` state, grid generation, HDF5 writing, and
 procedures called internally by `colrad` support the test; they are not
 independent regression targets.
 
-The Python workflow begins from a preserved raw FIDASIM result. It is not a
-general FIDASIM execution wrapper and does not validate a new FIDASIM build.
+The complete workflow starts with the compiled Test 001 calculation. The
+temporary parity check can still use an older MATLAB-produced result when an
+exact translation comparison is needed.
 
 ## Scientific definition
 
@@ -221,8 +222,8 @@ describes hydrogen on hydrogen.
 
 ## Python workflow
 
-The MATLAB and Python paths share scientific inputs and the preserved raw
-FIDASIM result but write separate derived artifacts.
+The MATLAB and Python paths share scientific inputs and can analyze the same
+raw FIDASIM result, but write separate derived artifacts.
 
 ```text
 input.nml + bms93#h_h1.dat
@@ -235,7 +236,7 @@ input.nml + bms93#h_h1.dat
           |                                             |
           +----------------------+----------------------+
                                  |
-                    existing raw test_001.h5
+                 freshly generated test_001.h5
                                  |
           +----------------------+----------------------+
           |                                             |
@@ -251,7 +252,7 @@ input.nml + bms93#h_h1.dat
 | Stage | MATLAB or shared implementation | Python implementation | Python-owned output |
 | --- | --- | --- | --- |
 | 1. ADF21 reference | [`produce_reference.m`](01_reference/produce_reference.m) | [`produce_reference.py`](01_reference/python/produce_reference.py) and support modules | `01_reference/python/output_data/reference.h5` and three figure pairs |
-| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`test_001_postprocess.m`](02_run_test/test_001_postprocess.m) is the estimator witness | [`postprocess.py`](02_run_test/python/postprocess.py) reads the existing raw file | `02_run_test/python/output_data/postprocessed.h5` and four figure pairs |
+| 2. FIDASIM result and post-processing | [`test_001.f90`](02_run_test/test_001.f90) produces raw profiles; [`test_001_postprocess.m`](02_run_test/test_001_postprocess.m) is the estimator witness | [`postprocess.py`](02_run_test/python/postprocess.py) reads the newly generated raw file | `02_run_test/python/output_data/postprocessed.h5` and four figure pairs |
 | 3. Scientific comparison | [`test_001_compare.m`](03_compare/test_001_compare.m) | [`compare_mean_free_paths.py`](03_compare/python/compare_mean_free_paths.py) | `03_compare/python/output_data/mfp_regression_report.txt` and seven figure pairs |
 
 All Python-stage paths are configured independently. Relative paths are
@@ -284,55 +285,50 @@ The run scripts call `python3` directly and therefore require
 - `matplotlib`
 - `f90nml`
 
-### Required preserved artifacts
+### Generated and preserved artifacts
 
 HDF5 and generated-output files are intentionally ignored by Git. The normal
-Python workflow requires the preserved raw FIDASIM result. The legacy MATLAB
-reference is needed only for the temporary parity check.
+workflow creates its own raw FIDASIM result. Separate legacy MATLAB witnesses
+are needed only for the temporary parity check.
 
 | Required local file | Used by | Contract |
 | --- | --- | --- |
-| `02_run_test/test_001.h5` | Stages 2–3 | Preserved raw FIDASIM grids and profiles. |
 | `01_reference/reference.h5` | Optional parity check | MATLAB reference witness containing `/ne`, `/eb`, `/T`, `/ab`, and `/mfp`. |
+| `04_validate_port/matlab_test_001.h5` | Optional parity check | Preserved MATLAB-postprocessed test witness containing `/mfp`. |
 
-Obtain these files from the trusted Test 001 baseline and place them at the
-paths above before running the complete workflow. Confirm their presence with:
+Obtain the MATLAB witnesses from the trusted Test 001 baseline only when
+running the optional parity check. Confirm their presence with:
 
 ```bash
 cd "$FIDASIM_DIR/regression_tests/test_001"
 test -f 01_reference/reference.h5
-test -f 02_run_test/test_001.h5
+test -f 04_validate_port/matlab_test_001.h5
 ```
 
 Stage 2 does not read the legacy MATLAB `/mfp` dataset. The temporary parity
 script requires it only because that array is the MATLAB post-processing
 witness.
 
-> **No FIDASIM rerun:** `run_python.sh` must use the existing
-> `02_run_test/test_001.h5`. It does not invoke `make`, `test_001`, or any
-> FIDASIM executable, and it must not silently regenerate a missing raw file.
-> Refreshing the raw baseline is a separate, controlled regression-data task.
+The complete runner overwrites `02_run_test/test_001.h5` with the output of the
+current compiled Test 001 calculation. The separately named parity witness is
+not modified. The shared build procedure is documented in the
+[regression-test build guide](../docs/build_system.md).
 
-The shared build procedure is documented in the
-[regression-test build guide](../docs/build_system.md). It is relevant only
-when intentionally rebuilding the compiled test, not when reviewing the
-Python post-processing port.
+## Run the complete workflow
 
-## Run the Python workflow
-
-After activating the environment and supplying the preserved raw FIDASIM
-artifact, run all three Python stages from the Test 001 directory:
+After building FIDASIM and activating the Python environment, run the compiled
+Test 001 calculation and all three Python stages from the Test 001 directory:
 
 ```bash
 conda activate FIDASIM_env
 cd "$FIDASIM_DIR/regression_tests/test_001"
-./run_python.sh
+./run.sh
 ```
 
-[`run_python.sh`](run_python.sh) uses simple paths relative to the Test 001
-directory and runs the bundled configurations in dependency order. It returns
-the Stage 3 scientific regression status. Setup, reference, or post-processing
-errors are immediate failures.
+[`run.sh`](run.sh) uses simple paths relative to the Test 001 directory. It
+runs the regression executable from `02_run_test`, and then runs the three
+Python stages in dependency order. It returns the Stage 3 scientific regression
+status. Execution, reference, or post-processing errors are immediate failures.
 
 ### Run or debug one stage
 
@@ -361,8 +357,8 @@ cd "$FIDASIM_DIR/regression_tests/test_001/04_validate_port"
 ```
 
 This compares only the reference and post-processing arrays. It is not called
-by `run_python.sh`, does not write an audit report, and can be removed when the
-Python implementation replaces MATLAB.
+by the top-level `run.sh`, does not write an audit report, and can be removed
+when the Python implementation replaces MATLAB.
 
 ## Configuration interface
 
@@ -428,7 +424,7 @@ Configuration:
 | --- | --- | --- | --- |
 | `matlab_reference_file` | Path string | Yes | Existing MATLAB Stage 1 witness. |
 | `python_reference_file` | Path string | Yes | Existing Python Stage 1 artifact. |
-| `matlab_test_file` | Path string | Yes | Existing raw file containing the MATLAB `/mfp` witness. |
+| `matlab_test_file` | Path string | Yes | Preserved file containing the MATLAB `/mfp` witness. |
 | `python_postprocessed_file` | Path string | Yes | Existing Python Stage 2 artifact. |
 | `relative_tolerance` | Non-negative real | Yes | `numpy.allclose` relative tolerance; checked in as `1e-12`. |
 | `absolute_tolerance` | Non-negative real | Yes | `numpy.allclose` absolute tolerance; checked in as `1e-12`. |
@@ -559,8 +555,8 @@ difference.
 
 ## Limitations and deferred work
 
-- The regression covers the canonical hydrogen-on-hydrogen grid and one
-  preserved raw FIDASIM calculation; it is not a parameter-space survey.
+- The regression covers the canonical hydrogen-on-hydrogen grid produced by
+  the current Test 001 calculation; it is not a parameter-space survey.
 - The ADF21 reference assumes $T_e=T_i$ and linear interpolation inside the
   table domain.
 - The legacy profile estimator averages local reciprocal slopes directly. It
@@ -568,7 +564,6 @@ difference.
   asymptotic attenuation interval.
 - The temporary parity script compares numerical arrays only. It is migration
   support, not part of the final Python regression workflow.
-- The Python runner does not build, execute, or refresh the FIDASIM result.
 
 An improved transient detector and asymptotic attenuation fit are explicitly
 deferred to a separate scientific-method milestone. That change requires its
@@ -581,7 +576,7 @@ baseline; it must not be folded into the MATLAB-to-Python parity port.
 test_001/
 ├── README.md
 ├── makefile
-├── run_python.sh
+├── run.sh
 ├── 01_reference/
 │   ├── input.nml
 │   ├── adas/
@@ -596,7 +591,7 @@ test_001/
 ├── 02_run_test/
 │   ├── test_001.f90
 │   ├── test_001_postprocess.m
-│   ├── test_001.h5                   # ignored preserved raw/witness file
+│   ├── test_001.h5                   # ignored generated raw result
 │   └── python/
 │       ├── input_config.nml
 │       ├── postprocess.py
@@ -612,6 +607,7 @@ test_001/
 │       └── output_data/              # ignored report and figures
 └── 04_validate_port/                 # temporary migration check
     ├── input_config.nml
+    ├── matlab_test_001.h5            # ignored MATLAB witness
     └── validate_python_port.py
 ```
 

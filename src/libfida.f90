@@ -2701,13 +2701,9 @@ subroutine read_inputs
                 endif
             endif
 
-            if (len_trim(inputs%vessel_behavior_file) /= 0) then
-                if (inputs%verbose.ge.0) then
-                    write(*,'(a)') &
-                        'READ_INPUTS: vessel_behavior_file is not supported for analytic vessel geometry.'
-                endif
-                error = .True.
-            endif
+            ! vessel_behavior_file applies only to mesh geometry. Ignore any
+            ! configured value here so one input file can switch geometry mode
+            ! without requiring unrelated entries to be removed.
 
         case ("mesh")
             if (len_trim(inputs%vessel_geometry_file) == 0) then
@@ -3393,7 +3389,7 @@ end subroutine read_vessel_mesh_artifact
 
 subroutine read_vessel_mesh_behavior()
   !+ Read run-specific behavior and resolve each block by artifact region name.
-  integer::schema_version,num_regions,unit,ios,rr,mesh_id
+  integer::schema_version,num_regions,unit,ios,rr,artifact_region_id,candidate_region_id
   real(Float64)::surface_padding_epsilon,wall_temp,wall_p_absorb,wall_p_specular
   character(len=64)::name
   character(len=16)::behavior_type
@@ -3403,9 +3399,12 @@ subroutine read_vessel_mesh_behavior()
   namelist /config/ schema_version,num_regions,surface_padding_epsilon
   namelist /region/ name,is_active,behavior_type,enable_source,wall_temp,wall_p_absorb,wall_p_specular
 
-  ! Sentinels make omitted required config fields fail deterministically instead
-  ! of inheriting whatever happened to be in uninitialized local storage.
+  ! Initialize required config fields to invalid values. If a field is omitted
+  ! from the namelist, the validation below rejects it explicitly.
   schema_version=-1; num_regions=-1; surface_padding_epsilon=-1.d0
+
+  ! Open the behavior file and read its global configuration. Keep the file
+  ! open so the following region blocks are read sequentially.
   open(newunit=unit,file=trim(vessel%behavior_file),status='old',action='read',iostat=ios)
   if(ios/=0) stop 'mesh behavior: cannot open file'
   read(unit,nml=config,iostat=ios,iomsg=iomsg)
@@ -3413,16 +3412,18 @@ subroutine read_vessel_mesh_behavior()
     write(*,'(a,a)') 'mesh behavior: cannot read config: ',trim(iomsg)
     stop
   endif
-  close(unit)
+
+  ! Validate the global configuration before allocating matching state.
   if(schema_version/=0) stop 'mesh behavior: unsupported schema_version'
   if(num_regions/=size(vessel%mesh%region)) stop 'mesh behavior: region count mismatch'
   if(surface_padding_epsilon<=0.d0) stop 'mesh behavior: padding must be positive'
   vessel%surface_padding_epsilon=surface_padding_epsilon
   allocate(matched(num_regions),source=.false.)
 
-  open(newunit=unit,file=trim(vessel%behavior_file),status='old',action='read',iostat=ios)
-  if(ios/=0) stop 'mesh behavior: cannot reopen file'
+  ! Read exactly one behavior block for each artifact region. Blocks are
+  ! matched by name, so their order does not need to match the artifact.
   do rr=1,num_regions
+    ! Invalid defaults make omitted required region fields fail validation.
     name=''; behavior_type=''; is_active=.true.; enable_source=.false.
     wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
     read(unit,nml=region,iostat=ios,iomsg=iomsg)
@@ -3430,15 +3431,21 @@ subroutine read_vessel_mesh_behavior()
       write(*,'(a,a)') 'mesh behavior: cannot read region: ',trim(iomsg)
       stop
     endif
-    mesh_id=0
-    do while(mesh_id<size(vessel%mesh%region))
-      mesh_id=mesh_id+1
-      if(trim(name)==trim(vessel%mesh%region(mesh_id)%name)) exit
+
+    ! Resolve the behavior block to its artifact region and reject unknown or
+    ! duplicate names so every region receives exactly one definition.
+    artifact_region_id=0
+    do candidate_region_id=1,size(vessel%mesh%region)
+      if(trim(name)==trim(vessel%mesh%region(candidate_region_id)%name)) then
+        artifact_region_id=candidate_region_id
+        exit
+      endif
     enddo
-    if(mesh_id>size(vessel%mesh%region) .or. trim(name)/=trim(vessel%mesh%region(mesh_id)%name)) &
-      stop 'mesh behavior: unknown region name'
-    if(matched(mesh_id)) stop 'mesh behavior: duplicate region name'
-    matched(mesh_id)=.true.
+    if(artifact_region_id==0) stop 'mesh behavior: unknown region name'
+    if(matched(artifact_region_id)) stop 'mesh behavior: duplicate region name'
+    matched(artifact_region_id)=.true.
+
+    ! Validate behavior-specific fields before storing the resolved values.
     if(behavior_type/='wall' .and. behavior_type/='opening') stop 'mesh behavior: invalid behavior_type'
     if(enable_source) stop 'mesh behavior: surface sources are deferred and must be disabled'
     if(behavior_type=='wall') then
@@ -3447,21 +3454,31 @@ subroutine read_vessel_mesh_behavior()
          wall_p_specular>1.d0 .or. wall_p_absorb+wall_p_specular>1.d0) &
          stop 'mesh behavior: invalid wall probabilities'
     endif
-    vessel%mesh%region(mesh_id)%is_active=is_active
-    vessel%mesh%region(mesh_id)%behavior_type=behavior_type
-    vessel%mesh%region(mesh_id)%enable_source=.false.
-    vessel%mesh%region(mesh_id)%wall%temp=wall_temp
-    vessel%mesh%region(mesh_id)%wall%p_absorb=wall_p_absorb
-    vessel%mesh%region(mesh_id)%wall%p_specular=wall_p_specular
-    vessel%mesh%region(mesh_id)%wall%p_thermal=1.d0-wall_p_absorb-wall_p_specular
+    vessel%mesh%region(artifact_region_id)%is_active=is_active
+    vessel%mesh%region(artifact_region_id)%behavior_type=behavior_type
+    vessel%mesh%region(artifact_region_id)%enable_source=.false.
+    vessel%mesh%region(artifact_region_id)%wall%temp=wall_temp
+    vessel%mesh%region(artifact_region_id)%wall%p_absorb=wall_p_absorb
+    vessel%mesh%region(artifact_region_id)%wall%p_specular=wall_p_specular
+    vessel%mesh%region(artifact_region_id)%wall%p_thermal= &
+      1.d0-wall_p_absorb-wall_p_specular
   enddo
-  ! An extra block is just as likely to indicate a misspelled or stale region as
-  ! a missing block, so reject it rather than silently ignoring configuration.
+
+  ! Confirm that the expected region blocks are followed by a clean end of
+  ! file. An additional block usually indicates a stale or misspelled region;
+  ! malformed trailing input must not be mistaken for normal end of file.
   name=''; behavior_type=''; is_active=.true.; enable_source=.false.
   wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
-  read(unit,nml=region,iostat=ios)
+  read(unit,nml=region,iostat=ios,iomsg=iomsg)
   if(ios==0) stop 'mesh behavior: more region blocks than declared'
+  if(.not.is_iostat_end(ios)) then
+    write(*,'(a,a)') 'mesh behavior: malformed trailing input: ',trim(iomsg)
+    stop
+  endif
   close(unit)
+
+  ! The count check catches too few blocks; this check confirms that every
+  ! artifact region name was actually matched.
   if(.not.all(matched(1:num_regions))) stop 'mesh behavior: missing artifact region'
 end subroutine read_vessel_mesh_behavior
 
@@ -4417,10 +4434,14 @@ subroutine solve_ray_triangle_intersection(ray,triangle_id,collision)
   real(Float64),parameter::relative_parallel_tolerance=1.d-12
   real(Float64),parameter::barycentric_tolerance=1.d-12
 
+  ! Initialize the no-hit result and validate the requested triangle.
   collision%n_events=0
   if(triangle_id<1 .or. triangle_id>size(vessel%mesh%triangles,2)) &
     stop 'solve_ray_triangle_intersection: triangle ID out of range'
 
+  ! Load the vertices and construct two oriented triangle edges. The cross
+  ! product magnitude is twice the triangle area; exact zero identifies
+  ! coincident or collinear vertices.
   p0=vessel%mesh%vertices(:,vessel%mesh%triangles(1,triangle_id))
   p1=vessel%mesh%vertices(:,vessel%mesh%triangles(2,triangle_id))
   p2=vessel%mesh%vertices(:,vessel%mesh%triangles(3,triangle_id))
@@ -4428,8 +4449,10 @@ subroutine solve_ray_triangle_intersection(ray,triangle_id,collision)
   edge2=p2-p0
   normal=cross_product(edge1,edge2)
   area_twice=norm2(normal)
-  if(area_twice<=0.d0) stop 'solve_ray_triangle_intersection: degenerate triangle'
+  if(area_twice==0.d0) stop 'solve_ray_triangle_intersection: degenerate triangle'
 
+  ! Form the Moller-Trumbore determinant. Its scale-aware tolerance treats
+  ! numerically grazing rays as parallel to the triangle plane.
   velocity_magnitude=norm2(ray%v)
   if(velocity_magnitude<=0.d0) stop 'solve_ray_triangle_intersection: zero velocity'
   hvec=cross_product(ray%v,edge2)
@@ -4437,20 +4460,27 @@ subroutine solve_ray_triangle_intersection(ray,triangle_id,collision)
   determinant_tolerance=relative_parallel_tolerance*area_twice*velocity_magnitude
   if(abs(determinant)<=determinant_tolerance) return
 
+  ! Compute the first barycentric coordinate and reject points beyond either
+  ! of the corresponding triangle edges, allowing only round-off tolerance.
   inverse_determinant=1.d0/determinant
   origin_offset=ray%origin-p0
   barycentric_u=inverse_determinant*dot_product(origin_offset,hvec)
   if(barycentric_u < -barycentric_tolerance .or. &
      barycentric_u > 1.d0+barycentric_tolerance) return
 
+  ! Compute the second barycentric coordinate. A point is inside when both
+  ! coordinates are nonnegative and their sum does not exceed one.
   qvec=cross_product(origin_offset,edge1)
   barycentric_v=inverse_determinant*dot_product(ray%v,qvec)
   if(barycentric_v < -barycentric_tolerance .or. &
      barycentric_u+barycentric_v > 1.d0+barycentric_tolerance) return
 
+  ! Compute flight time and reject intersections behind the ray origin. A
+  ! zero-time geometric hit is retained for the caller to handle by policy.
   s_coll=inverse_determinant*dot_product(edge2,qvec)
   if(s_coll<0.d0) return
 
+  ! Populate the single collision event for this triangle.
   collision%n_events=1
   collision%event(1)%s_coll=s_coll
   collision%event(1)%p_coll=ray%origin+s_coll*ray%v
@@ -10740,10 +10770,11 @@ subroutine find_ray_analytic_surface_intersection(ray,ind,collision)
   integer(Int32)::nid,ss,sid
   integer::ee
   type(ray_collision_type)::candidate
-  real(Float64)::s_best
+  real(Float64)::nearest_collision_time
 
   collision%n_events=0
-  s_best=huge(1.d0)
+  ! Track the smallest accepted collision time among this voxel's candidates.
+  nearest_collision_time=huge(1.d0)
   nid=size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
   if(nid==0) stop 'find analytic intersection: empty occupied voxel'
   do ss=1,nid
@@ -10758,8 +10789,8 @@ subroutine find_ray_analytic_surface_intersection(ray,ind,collision)
       stop 'find analytic intersection: unknown primitive type'
     end select
     do ee=1,candidate%n_events
-      if(candidate%event(ee)%s_coll<s_best) then
-        s_best=candidate%event(ee)%s_coll
+      if(candidate%event(ee)%s_coll<nearest_collision_time) then
+        nearest_collision_time=candidate%event(ee)%s_coll
         collision%n_events=1
         collision%event(1)=candidate%event(ee)
         collision%event(1)%surface_id=sid
@@ -10779,10 +10810,11 @@ subroutine find_ray_mesh_surface_intersection(ray,ind,collision)
   type(ray_collision_type),intent(out)::collision
   integer(Int32)::nid,cc,triangle_id,region_id
   type(ray_collision_type)::candidate
-  real(Float64)::s_best
+  real(Float64)::nearest_collision_time
 
   collision%n_events=0
-  s_best=huge(1.d0)
+  ! Track the smallest accepted collision time among this voxel's candidates.
+  nearest_collision_time=huge(1.d0)
   nid=size(vessel%map(ind(1),ind(2),ind(3))%surface_id)
   if(nid==0) stop 'find mesh intersection: empty occupied voxel'
   do cc=1,nid
@@ -10798,8 +10830,8 @@ subroutine find_ray_mesh_surface_intersection(ray,ind,collision)
       ! prevents that operation from repeatedly halving a positive distance
       ! while trying to make it smaller than zero.
       if(candidate%event(1)%s_coll<=0.d0) cycle
-      if(candidate%event(1)%s_coll<s_best) then
-        s_best=candidate%event(1)%s_coll
+      if(candidate%event(1)%s_coll<nearest_collision_time) then
+        nearest_collision_time=candidate%event(1)%s_coll
         collision%n_events=1
         collision%event(1)=candidate%event(1)
       endif

@@ -3,6 +3,7 @@ module libfida
 !+ Main FIDASIM library
 
 USE ISO_C_BINDING
+USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY: ieee_is_finite
 USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
@@ -18380,6 +18381,7 @@ subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)
     real(Float64), dimension(3) :: ri, r_gyro, vi, pos
     real(Float64) :: pitch, dT, energy
     integer(Int32), dimension(3) :: ind
+    logical :: valid_gyro_fields
 
     !! Define random numbers:
     if (weight .gt. 0.d0) then
@@ -18408,9 +18410,29 @@ subroutine store_birth_particle(tracks,ntrack,mass,weight,neut_type)
       if (.not.fields%in_plasma) then
         call get_fields(fields,pos=pos)
       endif
-      ! COMPUTE pitch and gyro_step (points from ri to GC):
-      pitch = dot_product(fields%b_norm,vi/norm2(vi))
-      call gyro_step(vi,fields,mass,r_gyro)
+
+      ! Only apply the gyro displacement where the magnetic field is valid.
+      valid_gyro_fields = fields%in_plasma .and. &
+                          ieee_is_finite(fields%b_abs) .and. &
+                          fields%b_abs .gt. 0.d0 .and. &
+                          all(ieee_is_finite(fields%b_norm))
+
+      if (valid_gyro_fields) then
+        ! COMPUTE pitch and gyro_step (points from ri to GC):
+        pitch = dot_product(fields%b_norm,vi/norm2(vi))
+        call gyro_step(vi,fields,mass,r_gyro)
+
+        if (.not.all(ieee_is_finite(r_gyro))) then
+          write(*,*) "WARNING: Non-finite gyro displacement. Using particle position as guiding center."
+          write(*,*) "ri, weight: ", ri, weight
+          r_gyro = 0.d0
+        endif
+      else
+        write(*,*) "WARNING: Invalid magnetic field. Using particle position as guiding center."
+        write(*,*) "ri, weight, in_plasma, B: ", ri, weight, fields%in_plasma, fields%b_abs
+        pitch = 0.d0
+        r_gyro = 0.d0
+      endif
     else
       pitch = 0.d0
       r_gyro = 0.d0

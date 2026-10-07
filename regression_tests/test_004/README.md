@@ -24,6 +24,20 @@ neutral and ion-birth storage are outside its scope.
 | [`02_monte_carlo`](02_monte_carlo/README.md) | Run the stripped-down Monte Carlo ion-sink calculation using FIDASIM procedures. |
 | [`03_compare`](03_compare/README.md) | Compare the deterministic and Monte Carlo distributions, marginals, and total rates. |
 
+## Run the complete test
+
+Build the regression executables from the FIDASIM repository root, then run
+Test 004 separately:
+
+```bash
+make regression_tests
+cd regression_tests/test_004
+./run.sh
+```
+
+The runner performs the deterministic calculation, Monte Carlo calculation,
+and final comparison in that order. It stops immediately if a stage fails.
+
 ## FIDASIM code under test
 
 | Module | Procedure | Role |

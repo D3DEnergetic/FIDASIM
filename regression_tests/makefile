@@ -1,30 +1,32 @@
-.PHONY: all test_001 test_003 test_004 test_005 summary clean
+.PHONY: all test_001 test_003 test_004 test_005 test_006 summary clean
 
-all: test_001 test_003 test_004 test_005 summary
+all: test_001 test_003 test_004 test_005 test_006 summary
 
 test_001:
-	@cd test_001; make
+	@$(MAKE) -C test_001
 
 test_003:
-	@cd test_003; make
+	@$(MAKE) -C test_003
 
 test_004:
-	@cd test_004; make
+	@$(MAKE) -C test_004
 
 test_005:
-	@cd test_005; make check
+	@$(MAKE) -C test_005
+
+test_006:
+	@$(MAKE) -C test_006
 
 summary:
 	@echo ""
-	@echo "Regression verification summary"
-	@echo "  Test 001: BUILD PASS - scientific comparison not run"
-	@echo "  Test 003: BUILD PASS - scientific comparison not run"
-	@echo "  Test 004: BUILD PASS - scientific comparison not run"
-	@echo "  Test 005: PASS - self-check executed and report verified"
-	@echo "  Overall:  PASS for the verification stages listed above"
+	@echo "Regression build summary"
+	@echo "  Tests 001, 003, 004, 005, and 006 compiled successfully."
+	@echo "  No regression tests were executed."
+	@echo "  Run ./regression_tests/run.sh from the repository root."
 
 clean:
-	@cd test_001; make clean
-	@cd test_003; make clean
-	@cd test_004; make clean
-	@cd test_005; make clean
+	@$(MAKE) -C test_001 clean
+	@$(MAKE) -C test_003 clean
+	@$(MAKE) -C test_004 clean
+	@$(MAKE) -C test_005 clean
+	@$(MAKE) -C test_006 clean

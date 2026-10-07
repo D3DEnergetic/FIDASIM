@@ -9,11 +9,12 @@ fi
 config_file="$1"
 normalized_config="build/normalized_input_config.nml"
 
+if [ ! -x ./test_004 ]; then
+  echo "Test 004 executable not found. Run 'make regression_tests' from the FIDASIM repository root first." >&2
+  exit 2
+fi
+
 python3 normalize_config.py "${config_file}" "${normalized_config}"
-
-# The Test 004 makefile is in the parent directory.
-make -C ..
-
 ./test_004 "${normalized_config}"
 
 python3 postprocess_monte_carlo.py "${config_file}"

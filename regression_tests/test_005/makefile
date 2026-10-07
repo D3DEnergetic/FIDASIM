@@ -14,7 +14,7 @@ TEST_EXE := $(BUILD_DIR)/$(TEST_NAME)$(EXEEXT)
 FIDA_OBJS := $(FIDA_SRC)/libfida.o $(FIDA_SRC)/eigensystem.o \
 	$(FIDA_SRC)/utilities.o $(FIDA_SRC)/hdf5_utils.o
 
-.PHONY: all run check clean
+.PHONY: all clean
 all: $(TEST_EXE)
 
 $(TEST_EXE): $(TEST_OBJ) $(FIDA_OBJS)
@@ -24,16 +24,6 @@ $(TEST_OBJ): $(TEST_F90) | $(BUILD_DIR)
 	$(MPI_FC) $(C_FLAGS) -c -I$(FIDA_SRC) $(I_FLAGS) $< -o $@
 
 $(BUILD_DIR):
-	mkdir -p $@
-
-run: $(TEST_EXE) | $(REPORT_DIR)
-	./$(TEST_EXE)
-
-check: run
-	@grep -q '^OVERALL REGRESSION STATUS: PASS$$' $(REPORT_FILE)
-	@echo "Test 005 report verification: PASS"
-
-$(REPORT_DIR):
 	mkdir -p $@
 
 clean:

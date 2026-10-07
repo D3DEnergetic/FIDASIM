@@ -79,7 +79,8 @@ repository target: fidasim
     ├── test_001
     ├── test_003
     ├── test_004
-    └── test_005                  [built, executed, and report verified]
+    ├── test_005
+    └── test_006
 ```
 
 The branches are sibling targets requested by the repository-level Makefile;
@@ -104,10 +105,17 @@ This target invokes the `src` submake first, so changed FIDASIM sources are
 rebuilt before the regression programs. It does not invoke `deps`, and
 therefore assumes that the selected HDF5 installation is already available.
 
-The target compiles Tests 001, 003, and 004 without running their separate
-scientific comparison workflows. Test 005 is self-checking, so the same target
-executes it, verifies its persistent report, and prints a summary that
-distinguishes these verification levels.
+The target compiles Tests 001, 003, 004, 005, and 006. It does not execute any
+regression test. Activate the Python environment required by the workflows,
+then run the complete suite separately with:
+
+```bash
+conda activate FIDASIM_env
+./regression_tests/run.sh
+```
+
+The execution runner includes the Python-only Test 002 and orders the tests so
+that its generated distributions are available to Tests 003 and 004.
 
 ## Known limitations
 
@@ -115,10 +123,6 @@ distinguishes these verification levels.
   top-level target; `src` does not explicitly depend on `deps`. A parallel
   clean build can therefore start compiling FIDASIM before the bundled HDF5
   module files and libraries have been created.
-- Recursive recipes currently invoke `make` after changing directories. Using
-  `$(MAKE) -C <directory>` would preserve GNU Make's recursive-build and
-  parallel-job coordination more reliably.
-
 Until the bundled dependency ordering is corrected, use the full non-parallel
 repository build when creating the bundled HDF5 installation from a clean
 checkout.

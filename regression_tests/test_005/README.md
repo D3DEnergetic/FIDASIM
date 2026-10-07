@@ -124,7 +124,7 @@ evidence while still allowing an automated runner to detect failure.
 ```text
 test_005/
 ├── README.md                    # this portal
-├── makefile                     # build, run, report verification, and cleanup
+├── makefile                     # compilation and cleanup
 ├── run.sh                       # execute the prebuilt self-checking test
 ├── src/
 │   └── test_005.f90             # fixtures, assertions, and report writer
@@ -145,8 +145,7 @@ source env/<platform>.sh
 make regression_tests
 ```
 
-The regression target builds Tests 001, 003, and 004. Test 005 is built,
-executed, and its report is verified because it is a self-contained check.
+The regression target compiles Test 005 but does not execute it.
 
 To rerun only the already-built Test 005 executable:
 
@@ -176,10 +175,9 @@ The persistent report is written to
 - one status and diagnostic detail for each named check; and
 - a repeated overall summary at the end.
 
-The Test 005 Makefile's `check` target verifies that the report begins with
-`OVERALL REGRESSION STATUS: PASS`. The centralized regression summary labels
-Test 005 as an executed self-check; it does not claim that the separate
-scientific comparisons for the build-only tests were executed.
+The executable writes the report before returning. It returns a nonzero status
+when any named check fails, so `run.sh` directly provides the regression
+verdict to both users and the complete-suite runner.
 
 ## Debugging one failed check
 

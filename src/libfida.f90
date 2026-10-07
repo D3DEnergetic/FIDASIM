@@ -3126,29 +3126,29 @@ end subroutine write_nlaunch
 ! <<< [JFCM, 2025-08-19] <<<
 
 subroutine setup_vessel_mesh()
-  !+ Coordinate mesh-vessel setup and own its temporary compressed sparse row
-  !+ (CSR) voxel-candidate data.
+  !+ Prepare a surface-mesh vessel for particle tracking.
   !+
-  !+ ``cell_offsets`` identifies the slice belonging to each voxel in the flat
-  !+ ``candidate_triangle_id`` array. The artifact reader allocates both CSR
-  !+ arrays, and voxel reconstruction consumes them after region behavior has
-  !+ been resolved. Because the arrays are local to this coordinator, Fortran
-  !+ releases them automatically when setup completes; only runtime mesh
-  !+ geometry and the native voxel map remain stored on vessel.
+  !+ The mesh artifact stores the candidate triangle IDs for all structured-grid
+  !+ cells in one flat array. ``cell_offsets`` identifies the part of that array
+  !+ belonging to each cell. After loading the artifact and resolving the
+  !+ behavior of each named mesh region, this routine rebuilds FIDASIM's native
+  !+ per-cell triangle lists. The two temporary index arrays are released when
+  !+ setup finishes; the mesh geometry and native voxel map remain on vessel.
   integer(Int32),allocatable::cell_offsets(:)
   integer(Int32),allocatable::candidate_triangle_id(:)
 
   call read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
-  call read_vessel_mesh_behavior()
+  call read_vessel_mesh_behavior_config()
   call reconstruct_vessel_mesh_voxels(cell_offsets,candidate_triangle_id)
 end subroutine setup_vessel_mesh
 
 subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   !+ Load and validate the version-0 surface-mesh HDF5 artifact.
   !+ Geometry uses centimetres in the beam-grid-local frame. Connectivity,
-  !+ region IDs, and candidate triangle IDs are one based; CSR offsets are
-  !+ zero based. The setup-only CSR arrays are allocated here and returned to
-  !+ the mesh-setup coordinator for behavior-aware voxel reconstruction.
+  !+ region IDs, and candidate triangle IDs are one based; cell offsets are
+  !+ zero based. The two-array voxel-to-triangle index is allocated here and
+  !+ returned to the mesh-setup coordinator for behavior-aware reconstruction
+  !+ of FIDASIM's native per-cell triangle lists.
   integer(Int32),allocatable,intent(out)::cell_offsets(:)
   integer(Int32),allocatable,intent(out)::candidate_triangle_id(:)
   integer(HID_T) :: file_id
@@ -3169,15 +3169,15 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   ! Open the artifact and confirm that every required group or dataset exists.
   call h5open_f(error)
   call h5fopen_f(trim(vessel%geometry_file),H5F_ACC_RDONLY_F,file_id,error)
-  call check_hdf5(error,'open artifact')
-  call require_path('/metadata')
-  call require_path('/mesh/vertices')
-  call require_path('/mesh/triangles')
-  call require_path('/mesh/triangle_region_id')
-  call require_path('/regions/id')
-  call require_path('/regions/name')
-  call require_path('/voxel_index/cell_offsets')
-  call require_path('/voxel_index/triangle_ids')
+  call check_hdf5_status(error,'open artifact')
+  call require_hdf5_path('/metadata')
+  call require_hdf5_path('/mesh/vertices')
+  call require_hdf5_path('/mesh/triangles')
+  call require_hdf5_path('/mesh/triangle_region_id')
+  call require_hdf5_path('/regions/id')
+  call require_hdf5_path('/regions/name')
+  call require_hdf5_path('/voxel_index/cell_offsets')
+  call require_hdf5_path('/voxel_index/triangle_ids')
 
   ! Read and validate the artifact metadata contract.
   call read_fixed_string_attribute('/metadata','schema_name',schema_name)
@@ -3185,11 +3185,11 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   call read_fixed_string_attribute('/metadata','vertex_frame',vertex_frame)
   call read_fixed_string_attribute('/metadata','voxel_order',voxel_order)
   call h5ltget_attribute_int_f(file_id,'/metadata','schema_version',schema_version,error)
-  call check_hdf5(error,'metadata/schema_version')
+  call check_hdf5_status(error,'metadata/schema_version')
   call h5ltget_attribute_int_f(file_id,'/metadata','triangle_id_base',triangle_id_base,error)
-  call check_hdf5(error,'metadata/triangle_id_base')
+  call check_hdf5_status(error,'metadata/triangle_id_base')
   call h5ltget_attribute_int_f(file_id,'/metadata','offset_base',offset_base,error)
-  call check_hdf5(error,'metadata/offset_base')
+  call check_hdf5_status(error,'metadata/offset_base')
   if (trim(schema_name) /= 'fidasim_mesh_artifact') stop 'mesh artifact: unsupported schema_name'
   if (schema_version(1) /= 0) stop 'mesh artifact: unsupported schema_version'
   if (trim(length_units) /= 'cm') stop 'mesh artifact: length_units must be cm'
@@ -3198,31 +3198,31 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   if (triangle_id_base(1) /= 1 .or. offset_base(1) /= 0) stop 'mesh artifact: unsupported ID bases'
 
   ! Load mesh geometry, topology, and the named physical-region catalogue.
-  call dataset_info('/mesh/vertices',dims2)
+  call get_hdf5_dataset_shape('/mesh/vertices',dims2)
   if (dims2(1) /= 3 .or. dims2(2) < 3) stop 'mesh artifact: invalid vertices shape'
   allocate(vessel%mesh%vertices(dims2(1),dims2(2)))
   call h5ltread_dataset_double_f(file_id,'/mesh/vertices',vessel%mesh%vertices,dims2,error)
-  call check_hdf5(error,'mesh/vertices')
+  call check_hdf5_status(error,'mesh/vertices')
 
-  call dataset_info('/mesh/triangles',dims2)
+  call get_hdf5_dataset_shape('/mesh/triangles',dims2)
   if (dims2(1) /= 3 .or. dims2(2) < 1) stop 'mesh artifact: invalid triangles shape'
   allocate(vessel%mesh%triangles(dims2(1),dims2(2)))
   call h5ltread_dataset_int_f(file_id,'/mesh/triangles',vessel%mesh%triangles,dims2,error)
-  call check_hdf5(error,'mesh/triangles')
+  call check_hdf5_status(error,'mesh/triangles')
 
-  call dataset_info('/mesh/triangle_region_id',dims1)
+  call get_hdf5_dataset_shape('/mesh/triangle_region_id',dims1)
   if (dims1(1) /= size(vessel%mesh%triangles,2)) stop 'mesh artifact: triangle region count mismatch'
   allocate(vessel%mesh%triangle_region_id(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/mesh/triangle_region_id', &
       vessel%mesh%triangle_region_id,dims1,error)
-  call check_hdf5(error,'mesh/triangle_region_id')
+  call check_hdf5_status(error,'mesh/triangle_region_id')
 
-  call dataset_info('/regions/id',dims1)
+  call get_hdf5_dataset_shape('/regions/id',dims1)
   if (dims1(1) < 1) stop 'mesh artifact: empty region catalogue'
   allocate(region_id(dims1(1)),vessel%mesh%region(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/regions/id',region_id,dims1,error)
-  call check_hdf5(error,'regions/id')
-  call read_fixed_string_array('/regions/name',region_name)
+  call check_hdf5_status(error,'regions/id')
+  call read_fixed_string_dataset('/regions/name',region_name)
   if (size(region_name) /= size(region_id)) stop 'mesh artifact: region ID/name count mismatch'
   do ii=1,size(region_name)
     do jj=1,len(region_name(ii))
@@ -3242,26 +3242,26 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
       any(vessel%mesh%triangle_region_id > size(vessel%mesh%region))) stop 'mesh artifact: region ID out of range'
 
   ! Verify that the artifact voxel grid exactly matches the active beam grid.
-  call read_scalar_int('/grid/nx',grid_dims(1))
-  call read_scalar_int('/grid/ny',grid_dims(2))
-  call read_scalar_int('/grid/nz',grid_dims(3))
-  call read_scalar_double('/grid/xmin',bounds(1))
-  call read_scalar_double('/grid/xmax',bounds(2))
-  call read_scalar_double('/grid/ymin',bounds(3))
-  call read_scalar_double('/grid/ymax',bounds(4))
-  call read_scalar_double('/grid/zmin',bounds(5))
-  call read_scalar_double('/grid/zmax',bounds(6))
-  call read_scalar_double('/grid/alpha',angles(1))
-  call read_scalar_double('/grid/beta',angles(2))
-  call read_scalar_double('/grid/gamma',angles(3))
+  call read_int32_scalar_dataset('/grid/nx',grid_dims(1))
+  call read_int32_scalar_dataset('/grid/ny',grid_dims(2))
+  call read_int32_scalar_dataset('/grid/nz',grid_dims(3))
+  call read_float64_scalar_dataset('/grid/xmin',bounds(1))
+  call read_float64_scalar_dataset('/grid/xmax',bounds(2))
+  call read_float64_scalar_dataset('/grid/ymin',bounds(3))
+  call read_float64_scalar_dataset('/grid/ymax',bounds(4))
+  call read_float64_scalar_dataset('/grid/zmin',bounds(5))
+  call read_float64_scalar_dataset('/grid/zmax',bounds(6))
+  call read_float64_scalar_dataset('/grid/alpha',angles(1))
+  call read_float64_scalar_dataset('/grid/beta',angles(2))
+  call read_float64_scalar_dataset('/grid/gamma',angles(3))
   dims1=[3_HSIZE_T]
   call h5ltread_dataset_double_f(file_id,'/grid/origin',grid_origin,dims1,error)
-  call check_hdf5(error,'grid/origin')
+  call check_hdf5_status(error,'grid/origin')
   dims2=[3_HSIZE_T,3_HSIZE_T]
   call h5ltread_dataset_double_f(file_id,'/grid/basis',basis_raw,dims2,error)
-  call check_hdf5(error,'grid/basis')
+  call check_hdf5_status(error,'grid/basis')
   call h5ltread_dataset_double_f(file_id,'/grid/inv_basis',inv_basis_raw,dims2,error)
-  call check_hdf5(error,'grid/inv_basis')
+  call check_hdf5_status(error,'grid/inv_basis')
   if (any(grid_dims /= beam_grid%dims)) stop 'mesh artifact: beam-grid dimensions differ'
   length_scale=max(1.d0,maxval(abs(bounds)),maxval(abs(grid_origin)), &
       abs(bounds(2)-bounds(1)),abs(bounds(4)-bounds(3)),abs(bounds(6)-bounds(5)))
@@ -3274,18 +3274,18 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
   if (maxval(abs(transpose(basis_raw)-beam_grid%basis)) > 1.d-12) stop 'mesh artifact: basis differs'
   if (maxval(abs(transpose(inv_basis_raw)-beam_grid%inv_basis)) > 1.d-12) stop 'mesh artifact: inv_basis differs'
 
-  ! Load and validate the setup-only CSR voxel-candidate index.
+  ! Load and validate the compact voxel-to-triangle index used during setup.
   n_voxels=beam_grid%ngrid
-  call dataset_info('/voxel_index/cell_offsets',dims1)
+  call get_hdf5_dataset_shape('/voxel_index/cell_offsets',dims1)
   if (dims1(1) /= int(n_voxels+1,HSIZE_T)) stop 'mesh artifact: cell_offsets length mismatch'
   allocate(cell_offsets(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/voxel_index/cell_offsets',cell_offsets,dims1,error)
-  call check_hdf5(error,'voxel_index/cell_offsets')
-  call dataset_info('/voxel_index/triangle_ids',dims1)
+  call check_hdf5_status(error,'voxel_index/cell_offsets')
+  call get_hdf5_dataset_shape('/voxel_index/triangle_ids',dims1)
   allocate(candidate_triangle_id(dims1(1)))
   call h5ltread_dataset_int_f(file_id,'/voxel_index/triangle_ids', &
       candidate_triangle_id,dims1,error)
-  call check_hdf5(error,'voxel_index/triangle_ids')
+  call check_hdf5_status(error,'voxel_index/triangle_ids')
   n_references=size(candidate_triangle_id)
   if (cell_offsets(1) /= 0) stop 'mesh artifact: first offset must be zero'
   if (any(cell_offsets(2:) < cell_offsets(:size(cell_offsets)-1))) &
@@ -3310,7 +3310,7 @@ subroutine read_vessel_mesh_artifact(cell_offsets,candidate_triangle_id)
     write(*,*) ''
   endif
 contains
-  subroutine check_hdf5(status,field_name)
+  subroutine check_hdf5_status(status,field_name)
     !+ Stop when an HDF5 operation fails and identify the failed field.
     !+
     !+ status: HDF5 status returned by the preceding operation.
@@ -3322,8 +3322,8 @@ contains
       write(*,'(a,a)') 'read_vessel_mesh_artifact: failed at ',trim(field_name)
       stop
     endif
-  end subroutine check_hdf5
-  subroutine require_path(path)
+  end subroutine check_hdf5_status
+  subroutine require_hdf5_path(path)
     !+ Require one group or dataset path to exist in the open artifact.
     !+
     !+ path: Absolute HDF5 object path checked before payload reading begins.
@@ -3333,8 +3333,8 @@ contains
       write(*,'(a,a)') 'mesh artifact: missing path ',trim(path)
       stop
     endif
-  end subroutine require_path
-  subroutine dataset_info(path,dimensions)
+  end subroutine require_hdf5_path
+  subroutine get_hdf5_dataset_shape(path,dimensions)
     !+ Return a dataset's extents without reading its payload.
     !+
     !+ path: Absolute HDF5 dataset path to inspect.
@@ -3343,8 +3343,8 @@ contains
     character(len=*),intent(in)::path
     integer(HSIZE_T),intent(out)::dimensions(:)
     call h5ltget_dataset_info_f(file_id,trim(path),dimensions,class_id,type_size,error)
-    call check_hdf5(error,path)
-  end subroutine dataset_info
+    call check_hdf5_status(error,path)
+  end subroutine get_hdf5_dataset_shape
   subroutine read_fixed_string_attribute(object_path,attribute_name,value)
     !+ Read one controlled fixed-length ASCII metadata attribute.
     character(len=*),intent(in)::object_path,attribute_name
@@ -3353,9 +3353,9 @@ contains
     value=''
     call h5ltget_attribute_string_f(file_id,trim(object_path), &
         trim(attribute_name),value,error)
-    call check_hdf5(error,trim(object_path)//'/'//trim(attribute_name))
+    call check_hdf5_status(error,trim(object_path)//'/'//trim(attribute_name))
   end subroutine read_fixed_string_attribute
-  subroutine read_fixed_string_array(path,values)
+  subroutine read_fixed_string_dataset(path,values)
     !+ Read a one-dimensional dataset of fixed-length 64-character strings.
     !+
     !+ path: Absolute HDF5 dataset path.
@@ -3365,20 +3365,20 @@ contains
     integer(HID_T)::string_dataset_id,string_datatype_id
     integer(HSIZE_T)::string_dims(1)
 
-    call dataset_info(path,string_dims)
+    call get_hdf5_dataset_shape(path,string_dims)
     allocate(values(string_dims(1)))
     call h5dopen_f(file_id,trim(path),string_dataset_id,error)
-    call check_hdf5(error,trim(path)//' open')
+    call check_hdf5_status(error,trim(path)//' open')
     call h5dget_type_f(string_dataset_id,string_datatype_id,error)
-    call check_hdf5(error,trim(path)//' type')
+    call check_hdf5_status(error,trim(path)//' type')
     call h5dread_f(string_dataset_id,string_datatype_id,values,string_dims,error)
-    call check_hdf5(error,trim(path)//' read')
+    call check_hdf5_status(error,trim(path)//' read')
     call h5tclose_f(string_datatype_id,error)
-    call check_hdf5(error,trim(path)//' type close')
+    call check_hdf5_status(error,trim(path)//' type close')
     call h5dclose_f(string_dataset_id,error)
-    call check_hdf5(error,trim(path)//' close')
-  end subroutine read_fixed_string_array
-  subroutine read_scalar_int(path,value)
+    call check_hdf5_status(error,trim(path)//' close')
+  end subroutine read_fixed_string_dataset
+  subroutine read_int32_scalar_dataset(path,value)
     !+ Read one scalar Int32 dataset from the open artifact.
     !+
     !+ path: Absolute HDF5 dataset path.
@@ -3386,9 +3386,9 @@ contains
     character(len=*),intent(in)::path
     integer(Int32),intent(out)::value
     call h5ltread_dataset_int_scalar_f(file_id,trim(path),value,error)
-    call check_hdf5(error,path)
-  end subroutine read_scalar_int
-  subroutine read_scalar_double(path,value)
+    call check_hdf5_status(error,path)
+  end subroutine read_int32_scalar_dataset
+  subroutine read_float64_scalar_dataset(path,value)
     !+ Read one scalar Float64 dataset from the open artifact.
     !+
     !+ path: Absolute HDF5 dataset path.
@@ -3396,11 +3396,11 @@ contains
     character(len=*),intent(in)::path
     real(Float64),intent(out)::value
     call h5ltread_dataset_double_scalar_f(file_id,trim(path),value,error)
-    call check_hdf5(error,path)
-  end subroutine read_scalar_double
+    call check_hdf5_status(error,path)
+  end subroutine read_float64_scalar_dataset
 end subroutine read_vessel_mesh_artifact
 
-subroutine read_vessel_mesh_behavior()
+subroutine read_vessel_mesh_behavior_config()
   !+ Read run-specific behavior and resolve each block by artifact region name.
   integer::schema_version,num_regions,unit,ios,rr,artifact_region_id,candidate_region_id
   real(Float64)::surface_padding_epsilon,wall_temp,wall_p_absorb,wall_p_specular
@@ -3493,10 +3493,15 @@ subroutine read_vessel_mesh_behavior()
   ! The count check catches too few blocks; this check confirms that every
   ! artifact region name was actually matched.
   if(.not.all(matched(1:num_regions))) stop 'mesh behavior: missing artifact region'
-end subroutine read_vessel_mesh_behavior
+end subroutine read_vessel_mesh_behavior_config
 
 subroutine reconstruct_vessel_mesh_voxels(cell_offsets,candidate_triangle_id)
-  !+ Rebuild native voxel candidates from the artifact CSR representation.
+  !+ Rebuild native voxel candidates from the artifact's compact index.
+  !+
+  !+ ``candidate_triangle_id`` contains all candidate triangle IDs in one flat
+  !+ array. For cell ``ic``, ``cell_offsets(ic)`` and
+  !+ ``cell_offsets(ic+1)`` delimit that cell's part of the array. Empty cells
+  !+ have equal consecutive offsets.
   !+
   !+ The artifact linearizes cells with X varying fastest. Inactive regions
   !+ are removed here so every retained candidate is eligible for runtime

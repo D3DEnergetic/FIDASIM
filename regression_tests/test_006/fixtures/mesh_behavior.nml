@@ -1,0 +1,22 @@
+&config
+  schema_version          = 0
+  num_regions             = 2
+  surface_padding_epsilon = 1.0e-9
+/
+
+&region
+  name          = "opening"
+  is_active     = .false.
+  behavior_type = "opening"
+  enable_source = .false.
+/
+
+&region
+  name            = "wall"
+  is_active       = .true.
+  behavior_type   = "wall"
+  enable_source   = .false.
+  wall_temp       = 2.0e-3
+  wall_p_absorb   = 1.0
+  wall_p_specular = 0.0
+/

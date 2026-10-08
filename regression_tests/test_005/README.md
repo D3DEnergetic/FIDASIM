@@ -4,12 +4,13 @@
 
 ---
 
-# Test 005: ray-triangle intersection and mesh collision dispatch
+# Test 005: surface geometry and mesh collision dispatch
 
-`test_005` is a deterministic, self-checking regression test for the surface
-mesh collision capability. It first isolates the ray-triangle intersection
-primitive, then checks the policy that selects a physical wall collision from
-the candidate triangles in one mesh voxel.
+`test_005` is a deterministic, self-checking regression test for surface
+geometry helpers and the mesh collision capability. It checks analytic
+wall-source angle sampling, isolates the ray-triangle intersection primitive,
+and verifies the policy that selects a physical wall collision from candidate
+triangles in one mesh voxel.
 
 The expected answers are embedded in the Fortran test program. The test does
 not require an external reference dataset or a separate scientific comparison
@@ -31,8 +32,9 @@ The test uses the following terms deliberately:
   dispatcher** evaluates candidates, applies region behavior, and retains the
   nearest accepted wall.
 
-Implemented coverage includes ray-triangle geometry, boundary and tolerance
-behavior, scale robustness, opening transparency, and nearest-wall selection.
+Implemented coverage includes full-circle and directed-angle sampling,
+ray-triangle geometry, boundary and tolerance behavior, scale robustness,
+opening transparency, and nearest-wall selection.
 The test does not cover artifact loading, voxel traversal, full particle
 tracking, or validation that a vessel mesh is watertight and consistently
 oriented.
@@ -41,6 +43,7 @@ oriented.
 
 | Module | Procedure | Responsibility |
 | --- | --- | --- |
+| `libfida` | `sample_angle_between_dir` | Maps a unit random coordinate onto a full, clockwise, or counter-clockwise angular interval. |
 | `libfida` | `solve_ray_triangle_intersection` | Computes the geometric intersection between one directed ray and one triangle. |
 | `libfida` | `find_ray_surface_intersection` | Dispatches mesh candidates, rejects openings, and returns the nearest accepted wall collision. |
 
@@ -85,6 +88,7 @@ by collision time rather than accepting the first candidate in the list.
 
 | Group | Named checks | Purpose |
 | --- | --- | --- |
+| Angular sampling | `full-circle angle sampling`, `full-circle capitalization`, `directed angle sampling unchanged` | Confirm uniform full-circle quantiles, accepted capitalization, and preservation of the clockwise and counter-clockwise paths. |
 | Ordinary hits | `interior hit`, `back-side hit` | Confirm interior intersections from both triangle faces. |
 | Boundaries and tolerance | `edge hit`, `barycentric-tolerance hit`, `vertex hit`, `zero-time hit` | Exercise exact boundaries, the accepted near-edge tolerance, and a ray beginning on the triangle. |
 | Time scaling | `velocity-scaled hit` | Confirm that doubling ray speed halves collision time while preserving the collision point. |

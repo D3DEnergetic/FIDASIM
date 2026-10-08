@@ -17526,6 +17526,19 @@ end subroutine mc_ion_velocity_f4d
 
 !! >>> [JFCM,2026_05_12] >>>
 function sample_angle_between_dir(tmin, tmax, direction, u) result(t)
+  !+ Sample an angle from a directed angular interval.
+  !+
+  !+ Inputs:
+  !+   tmin, tmax : Interval bounds [rad]. They are ignored when direction is
+  !+                ``full`` because that option represents the entire circle.
+  !+   direction  : ``ccw``, ``cw``, or ``full`` (with common capitalization).
+  !+   u          : Uniform random value in the interval [0, 1).
+  !+
+  !+ Output:
+  !+   t : Sampled angle normalized to [0, 2*pi) [rad].
+  !+
+  !+ A full circle is handled explicitly. Treating 0 to 2*pi as an ordinary
+  !+ directed interval would give a zero span after the modulo operation.
   real(Float64), intent(in) :: tmin, tmax
   character(len=*), intent(in) :: direction
   real(Float64), intent(in) :: u
@@ -17539,6 +17552,8 @@ function sample_angle_between_dir(tmin, tmax, direction, u) result(t)
   case ("CW", "cw")
     span = modulo(tmin - tmax, 2.0d0*pi)
     t = modulo(tmin - u*span, 2.0d0*pi)
+  case ("FULL", "Full", "full")
+    t = modulo(u*2.0d0*pi, 2.0d0*pi)
   case default
     stop "sample_angle_between_dir: unknown direction"
   end select

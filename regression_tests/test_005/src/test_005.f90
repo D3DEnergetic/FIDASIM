@@ -1,5 +1,5 @@
 program test_005
-  !+ Verify the mesh ray-triangle primitive and mesh collision dispatch.
+  !+ Verify surface geometry helpers and mesh collision dispatch.
   !+
   !+ The primitive cases cover ordinary interior and boundary hits, misses,
   !+ flight-time scaling, and robustness for very small and very large
@@ -7,8 +7,9 @@ program test_005
   !+ nearest-wall selection within one synthetic voxel. This test does not
   !+ exercise voxel traversal or end-to-end particle tracking.
   use iso_fortran_env,only:real64
-  use libfida,only:ray_type,ray_collision_type,vessel, &
-    solve_ray_triangle_intersection,find_ray_surface_intersection
+  use libfida,only:pi,ray_type,ray_collision_type,vessel, &
+    solve_ray_triangle_intersection,find_ray_surface_intersection, &
+    sample_angle_between_dir
   implicit none
   integer,parameter::max_results=32
   character(len=*),parameter::report_path= &
@@ -84,6 +85,11 @@ program test_005
   ! behavior filtering and nearest-hit selection within a synthetic voxel.
   call test_mesh_dispatch()
 
+  ! Exercise the angle sampler used to place analytic wall-source particles.
+  ! In particular, protect the explicit full-circle branch so a 360-degree
+  ! source cannot collapse to a zero-width directed interval.
+  call test_directed_angle_sampling()
+
   ! Persist every result before returning a failing process status. This keeps
   ! the diagnostic evidence available to both people and automated runners.
   call write_comparison_report(report_path,all_passed)
@@ -91,6 +97,42 @@ program test_005
   print *,'test_005: all ray-triangle and mesh-dispatch checks passed'
 
 contains
+
+  subroutine test_directed_angle_sampling()
+    !+ Verify full-circle, clockwise, and counter-clockwise angle sampling.
+    !+
+    !+ The full-circle case uses equal input and output bounds deliberately:
+    !+ ``full`` must ignore those bounds and map the unit random coordinate
+    !+ uniformly over [0, 2*pi). Four deterministic quantiles establish the
+    !+ complete mapping. The two directed checks protect the existing paths.
+    real(real64),parameter::tol=1.d-12
+    real(real64),parameter::unit_samples(4)=[0.d0,0.25d0,0.5d0,0.75d0]
+    real(real64),parameter::expected_angles(4)=[0.d0,0.5d0*pi,pi,1.5d0*pi]
+    real(real64)::actual_angles(4),ccw_angle,cw_angle
+    character(len=256)::detail
+    integer::sample_index
+
+    do sample_index=1,size(unit_samples)
+      actual_angles(sample_index)=sample_angle_between_dir( &
+        1.234d0,1.234d0,'full',unit_samples(sample_index))
+    enddo
+    write(detail,'(a,es12.4)') 'maximum angular error [rad]: ', &
+      maxval(abs(actual_angles-expected_angles))
+    call record_result('full-circle angle sampling', &
+      maxval(abs(actual_angles-expected_angles))<tol,detail)
+
+    call record_result('full-circle capitalization', &
+      abs(sample_angle_between_dir(0.d0,0.d0,'FULL',0.125d0) &
+      -0.25d0*pi)<tol, &
+      'uppercase FULL maps the unit sample over the complete circle')
+
+    ccw_angle=sample_angle_between_dir(1.5d0*pi,0.5d0*pi,'ccw',0.5d0)
+    cw_angle=sample_angle_between_dir(1.5d0*pi,0.5d0*pi,'cw',0.5d0)
+    write(detail,'(a,es12.4,a,es12.4)') 'ccw midpoint: ',ccw_angle, &
+      '; cw midpoint: ',cw_angle
+    call record_result('directed angle sampling unchanged', &
+      abs(ccw_angle)<tol .and. abs(cw_angle-pi)<tol,detail)
+  end subroutine test_directed_angle_sampling
 
   subroutine set_triangle(scale)
     !+ Configure the reusable fixture as a right triangle in the XY plane.

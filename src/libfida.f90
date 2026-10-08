@@ -11314,6 +11314,19 @@ subroutine get_vn_thermal_wall_emission(vT,nhat,v_lab)
 end subroutine get_vn_thermal_wall_emission
 !! <<< [JFCM, 2025-07-04] <<<
 
+pure function thermal_speed_from_temperature(temp,mass) result(vT)
+    !+ Convert a source temperature and particle mass to sqrt(2*k*T/m).
+    real(Float64), intent(in) :: temp
+        !+ Source temperature [keV]
+    real(Float64), intent(in) :: mass
+        !+ Particle mass [amu]
+    real(Float64) :: vT
+        !+ Thermal speed [cm/s]
+
+    vT = sqrt(temp/(v2_to_E_per_amu*mass))
+
+end function thermal_speed_from_temperature
+
 !! >>> [JFCM, 2025-07-04] >>>
 subroutine get_velocity_sign(sgn,vn)
     !+ Description
@@ -17602,7 +17615,10 @@ subroutine mc_wall_source(ss,rr,rp,vp,err)
   !! GET source parameters:
   source = vessel%surface(ss)%region(rr)%source
   mass = source%mass_amu ! [AMU]
-  vT = sqrt(source%temp*0.5/(v2_to_E_per_amu*mass)) ! [cm/s]
+  ! get_vn_thermal_wall_emission samples a flux-weighted Maxwellian using
+  ! v = vT*sqrt(x), x ~ Gamma(2,1), so vT must be sqrt(2*k*T/m).
+  ! v2_to_E_per_amu already contains the kinetic-energy factor 1/2.
+  vT = thermal_speed_from_temperature(source%temp,mass) ! [cm/s]
   v_drift = sqrt(source%energy/(v2_to_E_per_amu*mass)) ! [cm/s]
   normal_dir = source%normal_direction
 

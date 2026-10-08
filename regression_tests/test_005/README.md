@@ -33,8 +33,8 @@ The test uses the following terms deliberately:
   nearest accepted wall.
 
 Implemented coverage includes full-circle and directed-angle sampling,
-ray-triangle geometry, boundary and tolerance behavior, scale robustness,
-opening transparency, and nearest-wall selection.
+thermal wall-emission scaling, ray-triangle geometry, boundary and tolerance
+behavior, scale robustness, opening transparency, and nearest-wall selection.
 The test does not cover artifact loading, voxel traversal, full particle
 tracking, or validation that a vessel mesh is watertight and consistently
 oriented.
@@ -44,6 +44,8 @@ oriented.
 | Module | Procedure | Responsibility |
 | --- | --- | --- |
 | `libfida` | `sample_angle_between_dir` | Maps a unit random coordinate onto a full, clockwise, or counter-clockwise angular interval. |
+| `libfida` | `thermal_speed_from_temperature` | Converts source temperature and particle mass to the thermal speed used by wall emission. |
+| `libfida` | `get_vn_thermal_wall_emission` | Samples the flux-weighted Maxwellian velocity emitted by a surface. |
 | `libfida` | `solve_ray_triangle_intersection` | Computes the geometric intersection between one directed ray and one triangle. |
 | `libfida` | `find_ray_surface_intersection` | Dispatches mesh candidates, rejects openings, and returns the nearest accepted wall collision. |
 
@@ -89,6 +91,7 @@ by collision time rather than accepting the first candidate in the list.
 | Group | Named checks | Purpose |
 | --- | --- | --- |
 | Angular sampling | `full-circle angle sampling`, `full-circle capitalization`, `directed angle sampling unchanged` | Confirm uniform full-circle quantiles, accepted capitalization, and preservation of the clockwise and counter-clockwise paths. |
+| Thermal emission | `wall-source thermal-speed scale`, `flux-weighted wall-source mean energy` | Confirm the exact `sqrt(2*k*T/m)` scale and the expected sampled mean kinetic energy of `2*T`. |
 | Ordinary hits | `interior hit`, `back-side hit` | Confirm interior intersections from both triangle faces. |
 | Boundaries and tolerance | `edge hit`, `barycentric-tolerance hit`, `vertex hit`, `zero-time hit` | Exercise exact boundaries, the accepted near-edge tolerance, and a ray beginning on the triangle. |
 | Time scaling | `velocity-scaled hit` | Confirm that doubling ray speed halves collision time while preserving the collision point. |

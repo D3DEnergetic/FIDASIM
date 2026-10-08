@@ -6,10 +6,12 @@ program test_005
   !+ triangles. The dispatch cases then verify transparent openings and
   !+ nearest-wall selection within one synthetic voxel. This test does not
   !+ exercise voxel traversal or end-to-end particle tracking.
-  use iso_fortran_env,only:real64
+  use iso_fortran_env,only:int32,real64
   use libfida,only:pi,ray_type,ray_collision_type,vessel, &
     solve_ray_triangle_intersection,find_ray_surface_intersection, &
-    sample_angle_between_dir
+    sample_angle_between_dir,get_vn_thermal_wall_emission, &
+    thermal_speed_from_temperature,v2_to_E_per_amu
+  use utilities,only:rng,rng_init
   implicit none
   integer,parameter::max_results=32
   character(len=*),parameter::report_path= &
@@ -90,6 +92,10 @@ program test_005
   ! source cannot collapse to a zero-width directed interval.
   call test_directed_angle_sampling()
 
+  ! Protect the temperature scale used by analytic wall sources and the
+  ! corresponding flux-weighted Maxwellian speed distribution.
+  call test_thermal_wall_emission()
+
   ! Persist every result before returning a failing process status. This keeps
   ! the diagnostic evidence available to both people and automated runners.
   call write_comparison_report(report_path,all_passed)
@@ -97,6 +103,44 @@ program test_005
   print *,'test_005: all ray-triangle and mesh-dispatch checks passed'
 
 contains
+
+  subroutine test_thermal_wall_emission()
+    !+ Verify the source thermal-speed scale and emitted mean kinetic energy.
+    integer,parameter::number_of_samples=50000
+    real(real64),parameter::source_temperature=2.d-3
+    real(real64),parameter::particle_mass=2.013553212745d0
+    real(real64),parameter::relative_tolerance=2.d-2
+    real(real64)::vT,recovered_temperature,mean_energy,velocity(3)
+    character(len=256)::detail
+    integer::sample_index
+
+    vT=thermal_speed_from_temperature(source_temperature,particle_mass)
+    recovered_temperature= &
+      vT*vT*v2_to_E_per_amu*particle_mass
+    write(detail,'(a,es12.4,a,es12.4)') &
+      'expected temperature [keV]: ',source_temperature, &
+      '; recovered: ',recovered_temperature
+    call record_result('wall-source thermal-speed scale', &
+      abs(recovered_temperature/source_temperature-1.d0)<1.d-12,detail)
+
+    allocate(rng(1))
+    call rng_init(rng(1),24680_int32)
+    mean_energy=0.d0
+    do sample_index=1,number_of_samples
+      call get_vn_thermal_wall_emission(vT,[0.d0,0.d0,1.d0],velocity)
+      mean_energy=mean_energy+particle_mass*v2_to_E_per_amu* &
+        dot_product(velocity,velocity)
+    enddo
+    mean_energy=mean_energy/real(number_of_samples,real64)
+    deallocate(rng)
+
+    write(detail,'(a,es12.4,a,es12.4)') &
+      'expected mean energy [keV]: ',2.d0*source_temperature, &
+      '; sampled: ',mean_energy
+    call record_result('flux-weighted wall-source mean energy', &
+      abs(mean_energy/(2.d0*source_temperature)-1.d0)<relative_tolerance, &
+      detail)
+  end subroutine test_thermal_wall_emission
 
   subroutine test_directed_angle_sampling()
     !+ Verify full-circle, clockwise, and counter-clockwise angle sampling.

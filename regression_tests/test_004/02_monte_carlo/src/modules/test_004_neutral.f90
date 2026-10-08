@@ -110,6 +110,9 @@ contains
     integer :: marker_index, stored_markers
     real(Float64) :: center_density(number_of_atomic_levels)
     real(Float64) :: center_total, off_center_total, stored_weight
+    real(Float64) :: expected_moment_1(3), expected_moment_2(6)
+    real(Float64) :: moment_1_tolerance, moment_2_tolerance
+    real(Float64) :: off_center_moment_1, off_center_moment_2
     real(Float64) :: maximum_velocity_difference
     real(Float64) :: tolerance
     real(Float64), allocatable :: off_center_density(:,:,:,:)
@@ -121,6 +124,18 @@ contains
     allocate(off_center_density, source=neut%full%dens)
     off_center_density(:,2,2,2) = 0.0_Float64
     off_center_total = sum(abs(off_center_density))
+    expected_moment_1 = center_total * neutral%velocity
+    expected_moment_2 = center_total * [ &
+      neutral%velocity(1)*neutral%velocity(1), &
+      neutral%velocity(2)*neutral%velocity(2), &
+      neutral%velocity(3)*neutral%velocity(3), &
+      neutral%velocity(1)*neutral%velocity(2), &
+      neutral%velocity(1)*neutral%velocity(3), &
+      neutral%velocity(2)*neutral%velocity(3)]
+    off_center_moment_1 = sum(abs(neut%full%velocity_moment_1)) - &
+      sum(abs(neut%full%velocity_moment_1(:,2,2,2)))
+    off_center_moment_2 = sum(abs(neut%full%velocity_moment_2)) - &
+      sum(abs(neut%full%velocity_moment_2(:,2,2,2)))
     stored_weight = sum( &
       neut%full%res(2,2,2)%R(1:stored_markers)%w)
     maximum_velocity_difference = 0.0_Float64
@@ -132,6 +147,10 @@ contains
     end do
     tolerance = 100.0_Float64 * epsilon(1.0_Float64) * &
       max(1.0_Float64, sum(neutral%level_density))
+    moment_1_tolerance = 100.0_Float64 * epsilon(1.0_Float64) * &
+      max(1.0_Float64, maxval(abs(expected_moment_1)))
+    moment_2_tolerance = 100.0_Float64 * epsilon(1.0_Float64) * &
+      max(1.0_Float64, maxval(abs(expected_moment_2)))
 
     if (stored_markers /= config%reservoir_size) then
       error stop 'The central-cell neutral reservoir is not full'
@@ -148,6 +167,21 @@ contains
     if (maximum_velocity_difference > 0.0_Float64) then
       error stop 'Neutral reservoir velocities are inconsistent'
     end if
+    if (.not. neut%full%moments_available) then
+      error stop 'Neutral raw velocity moments are not marked available'
+    end if
+    if (maxval(abs(neut%full%velocity_moment_1(:,2,2,2) - &
+        expected_moment_1)) > moment_1_tolerance) then
+      error stop 'Neutral first raw velocity moment is incorrect'
+    end if
+    if (maxval(abs(neut%full%velocity_moment_2(:,2,2,2) - &
+        expected_moment_2)) > moment_2_tolerance) then
+      error stop 'Neutral second raw velocity moment is incorrect'
+    end if
+    if (abs(off_center_moment_1) > moment_1_tolerance .or. &
+        abs(off_center_moment_2) > moment_2_tolerance) then
+      error stop 'Neutral raw velocity moments were populated outside the central cell'
+    end if
 
     write(output_unit, '(a)') '  type-1 neutral population:'
     write(output_unit, '(a,i0)') '    stored central-cell markers: ', &
@@ -158,6 +192,8 @@ contains
       '    summed reservoir weight [cm^-3]: ', stored_weight
     write(output_unit, '(a,es14.6)') &
       '    density outside central cell [cm^-3]: ', off_center_total
+    write(output_unit, '(a)') &
+      '    raw first and second velocity moments: validated'
   end subroutine print_neutral_population
 
   subroutine release_neutral_population()

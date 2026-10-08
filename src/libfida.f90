@@ -1250,6 +1250,12 @@ end type NeutralParticleReservoir
 type NeutralPopulation
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Neutral density: dens(lev,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: velocity_moment_1
+        !+ State-summed first raw velocity moment: (x,y,z,xcell,ycell,zcell)
+    real(Float64), dimension(:,:,:,:), allocatable :: velocity_moment_2
+        !+ State-summed second raw velocity moment: (xx,yy,zz,xy,xz,yz,xcell,ycell,zcell)
+    logical :: moments_available = .false.
+        !+ Whether the raw velocity moments are available for this population
     type(NeutralParticleReservoir), dimension(:,:,:), allocatable :: res
         !+ Neutral particle reservoir
 end type NeutralPopulation
@@ -1765,9 +1771,14 @@ subroutine np_assign(n1, n2)
     if(.not.allocated(n1%dens)) then
         nx = size(n2%dens,2); ny = size(n2%dens,3); nz = size(n2%dens,4)
         allocate(n1%dens(nlevs,nx,ny,nz), source=n2%dens)
+        allocate(n1%velocity_moment_1(3,nx,ny,nz), source=n2%velocity_moment_1)
+        allocate(n1%velocity_moment_2(6,nx,ny,nz), source=n2%velocity_moment_2)
     else
         n1%dens = n2%dens
+        n1%velocity_moment_1 = n2%velocity_moment_1
+        n1%velocity_moment_2 = n2%velocity_moment_2
     endif
+    n1%moments_available = n2%moments_available
 
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -7530,6 +7541,7 @@ subroutine write_neutral_population(id, pop, error)
     integer(HID_T) :: gid
     integer(HSIZE_T), dimension(1) :: d
     integer(HSIZE_T), dimension(4) :: dims4
+    integer(HSIZE_T), dimension(4) :: moment1_dims4, moment2_dims4
     integer(HSIZE_T), dimension(5) :: dims5
 
     real(Float64), dimension(:,:,:,:,:), allocatable :: v
@@ -7552,6 +7564,36 @@ subroutine write_neutral_population(id, pop, error)
     call h5ltset_attribute_string_f(id,"dens","units","neutrals*cm^-3",error)
     call h5ltset_attribute_string_f(id,"dens","description", &
          "Neutral density dens(level,x,y,z)", error)
+
+    if(pop%moments_available) then
+        moment1_dims4 = [3, nx, ny, nz]
+        call h5ltmake_compressed_dataset_double_f(id, "velocity_moment_1", 4, &
+             moment1_dims4, pop%velocity_moment_1, error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_1","units", &
+             "neutrals*cm^-2*s^-1",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_1","description", &
+             "State-summed raw first velocity moment: sum(density*velocity)",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_1","component_order", &
+             "x,y,z",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_1","coordinate_system", &
+             "Beam-grid Cartesian (X,Y,Z)",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_1","excitation_states", &
+             "Summed over all atomic excitation levels",error)
+
+        moment2_dims4 = [6, nx, ny, nz]
+        call h5ltmake_compressed_dataset_double_f(id, "velocity_moment_2", 4, &
+             moment2_dims4, pop%velocity_moment_2, error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_2","units", &
+             "neutrals*cm^-1*s^-2",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_2","description", &
+             "State-summed raw second velocity moment: sum(density*velocity_i*velocity_j)",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_2","component_order", &
+             "xx,yy,zz,xy,xz,yz",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_2","coordinate_system", &
+             "Beam-grid Cartesian (X,Y,Z)",error)
+        call h5ltset_attribute_string_f(id,"velocity_moment_2","excitation_states", &
+             "Summed over all atomic excitation levels",error)
+    endif
 
     dims5 = [3, reservoir_size, nx, ny, nz]
     allocate(v(3,reservoir_size, nx, ny, nz))
@@ -9056,6 +9098,7 @@ subroutine read_neutral_population(id, pop, error)
 
     integer(HID_T) :: gid
     integer(HSIZE_T), dimension(4) :: dims4
+    integer(HSIZE_T), dimension(4) :: moment1_dims4, moment2_dims4
     integer(HSIZE_T), dimension(5) :: dims5
 
     integer :: k, nx, ny, nz, ic, ind(3), ii, jj, kk, ir
@@ -9063,6 +9106,7 @@ subroutine read_neutral_population(id, pop, error)
     integer(Int32), dimension(:,:,:), allocatable :: n
     real(Float64), dimension(:,:,:,:), allocatable :: w
     real(Float64), dimension(:,:,:,:,:), allocatable :: v
+    logical :: has_moment_1, has_moment_2
 
     call init_neutral_population(pop)
 
@@ -9070,6 +9114,20 @@ subroutine read_neutral_population(id, pop, error)
 
     dims4 = [nlevs, nx, ny, nz]
     call h5ltread_dataset_double_f(id, "dens", pop%dens, dims4, error)
+
+    call h5ltpath_valid_f(id, "velocity_moment_1", .True., has_moment_1, error)
+    call h5ltpath_valid_f(id, "velocity_moment_2", .True., has_moment_2, error)
+    pop%moments_available = has_moment_1 .and. has_moment_2
+    if(pop%moments_available) then
+        moment1_dims4 = [3, nx, ny, nz]
+        moment2_dims4 = [6, nx, ny, nz]
+        call h5ltread_dataset_double_f(id, "velocity_moment_1", &
+             pop%velocity_moment_1, moment1_dims4, error)
+        call h5ltread_dataset_double_f(id, "velocity_moment_2", &
+             pop%velocity_moment_2, moment2_dims4, error)
+    else if(inputs%verbose.ge.1) then
+        write(*,'(a)') 'READ_NEUTRAL_POPULATION: Raw velocity moments are unavailable in this legacy file'
+    endif
 
     call h5gopen_f(id, "reservoir", gid, error)
     k = reservoir_size
@@ -12201,6 +12259,12 @@ subroutine init_neutral_population(pop)
     if(.not.allocated(pop%dens)) then
         allocate(pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     endif
+    if(.not.allocated(pop%velocity_moment_1)) then
+        allocate(pop%velocity_moment_1(3,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    if(.not.allocated(pop%velocity_moment_2)) then
+        allocate(pop%velocity_moment_2(6,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
     if(.not.allocated(pop%res)) then
         allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
 
@@ -12227,6 +12291,9 @@ subroutine init_neutral_population(pop)
 
     endif
     pop%dens = 0.d0
+    pop%velocity_moment_1 = 0.d0
+    pop%velocity_moment_2 = 0.d0
+    pop%moments_available = .true.
     pop%res%n = 0
 
 end subroutine init_neutral_population
@@ -12241,6 +12308,13 @@ subroutine free_neutral_population(pop)
     if(allocated(pop%dens)) then
         deallocate(pop%dens)
     endif
+    if(allocated(pop%velocity_moment_1)) then
+        deallocate(pop%velocity_moment_1)
+    endif
+    if(allocated(pop%velocity_moment_2)) then
+        deallocate(pop%velocity_moment_2)
+    endif
+    pop%moments_available = .false.
     if(allocated(pop%res)) then
         deallocate(pop%res)
     endif
@@ -12259,11 +12333,20 @@ subroutine update_neutrals(pop, ind, vn, dens)
         !+ Neutral density [neutrals/cm^3]
 
     integer :: i, j, k
+    real(Float64) :: density_total
+    real(Float64), dimension(6) :: velocity_products
 
     i = ind(1) ; j = ind(2) ; k = ind(3)
+    density_total = sum(dens)
+    velocity_products = [vn(1)*vn(1), vn(2)*vn(2), vn(3)*vn(3), &
+                         vn(1)*vn(2), vn(1)*vn(3), vn(2)*vn(3)]
 
     !$OMP CRITICAL(update_neutrals_1)
     pop%dens(:,i,j,k) = pop%dens(:,i,j,k) + dens
+    pop%velocity_moment_1(:,i,j,k) = pop%velocity_moment_1(:,i,j,k) + &
+                                      density_total*vn
+    pop%velocity_moment_2(:,i,j,k) = pop%velocity_moment_2(:,i,j,k) + &
+                                      density_total*velocity_products
     !$OMP END CRITICAL(update_neutrals_1)
 
     if (allocated(pop%res(i,j,k)%R)) then
@@ -12315,6 +12398,9 @@ subroutine merge_neutral_populations(pop1, pop2)
     integer :: i, j, k, ic, ind(3)
 
     pop1%dens = pop1%dens + pop2%dens
+    pop1%velocity_moment_1 = pop1%velocity_moment_1 + pop2%velocity_moment_1
+    pop1%velocity_moment_2 = pop1%velocity_moment_2 + pop2%velocity_moment_2
+    pop1%moments_available = pop1%moments_available .and. pop2%moments_available
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -12400,6 +12486,8 @@ subroutine parallel_merge_populations(pop)
     integer :: i, j, k, ic, ind(3)
 
     call parallel_sum(pop%dens)
+    call parallel_sum(pop%velocity_moment_1)
+    call parallel_sum(pop%velocity_moment_2)
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)

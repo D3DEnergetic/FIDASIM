@@ -154,6 +154,7 @@ After a few iterations the halo density converges and the calculation ends.
 * `neutrals_file`: Optional neutrals file
 * `n_nbi`: Number of NBI MC particles
 * `n_halo`: Number of HALO MC particles
+* `n_halo_gen`: Number of halo-neutral generations (default: 3)
 * `n_dcx`: Number of DCX MC particles
 * `calc_birth`: Calculate birth profile (density & birth position and velocity)
 * `n_birth`: Number of birth particles outputed

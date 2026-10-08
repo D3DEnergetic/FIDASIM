@@ -364,7 +364,6 @@ program fidasim
 
                 !! >>> [JFCM, 2025-07-02] >>>
                 !! TODO: need switches for user to enable this
-                !! TODO: consider using n_halo_gen = 0 for nbi + dcx only, n_halo_gen > 0 for nbi + dcx + halo
                 !! TODO: Incorporate write_<src>_profile into calculate_dcx_process
                 !! TODO: Fix the photon accumulation in dcx and halo process subroutines to mimic orignal dcx and halo subroutines, then add switch to skip or enable calc_spec so what we can move dcx and halo process subroutines to where dcx and halo are located.
                 !! TODO: Bring the wall condition inputs to the user interface

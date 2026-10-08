@@ -1409,6 +1409,8 @@ type SimulationInputs
         !+ Calculate ion sink profile: 0 = off, 1=on
     integer(Int32) :: enable_halo
         !+ Enable calculation of halo process
+    integer(Int32) :: n_halo_gen
+        !+ Number of halo-neutral generations to calculate (default: 3)
     integer(Int32) :: full_f
         !+ Describes how the f4d data is interpreted. 0: fast correction, 1: full distribution
     integer(Int32) :: non_thermal_beam_stopping
@@ -2364,7 +2366,7 @@ subroutine read_inputs
     real(Float64)      :: split_tol
     logical            :: exis, error
     ! iCompX variables:
-    integer            :: calc_sink, enable_halo, reservoir_size
+    integer            :: calc_sink, enable_halo, n_halo_gen, reservoir_size
     integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
     logical :: vessel_enabled, enable_wall_interactions, enable_external_sources
     character(charlim) :: vessel_geometry_type, vessel_geometry_file
@@ -2384,7 +2386,7 @@ subroutine read_inputs
         nlambda_wght,lambdamin_wght,lambdamax_wght, &
         adaptive, max_cell_splits, split_tol, &
         ! CompX variables:
-        calc_sink, enable_halo, reservoir_size, &
+        calc_sink, enable_halo, n_halo_gen, reservoir_size, &
         non_thermal_beam_stopping, non_thermal_cx_sampling, full_f, &
         vessel_enabled, enable_wall_interactions, enable_external_sources, &
         vessel_geometry_type, vessel_geometry_file, vessel_behavior_file
@@ -2473,6 +2475,7 @@ subroutine read_inputs
     non_thermal_cx_sampling=1
     calc_sink=0
     enable_halo=0
+    n_halo_gen=3
     reservoir_size = 50
     vessel_enabled = .FALSE.
     enable_wall_interactions = .FALSE.
@@ -2572,6 +2575,11 @@ subroutine read_inputs
       write(*,*) "calc_sink == 0, setting enable_halo = 0"
     end if
 
+    if (n_halo_gen < 0 .or. (enable_halo >= 1 .and. n_halo_gen == 0)) then
+      write(*,*) "READ_INPUTS: n_halo_gen must be nonnegative and at least 1 when enable_halo is enabled"
+      stop
+    end if
+
     if (.not. vessel_enabled) then
       enable_wall_interactions = .false.
       enable_external_sources = .false.
@@ -2590,6 +2598,7 @@ subroutine read_inputs
     inputs%non_thermal_cx_sampling = non_thermal_cx_sampling
     inputs%calc_sink = calc_sink
     inputs%enable_halo = enable_halo
+    inputs%n_halo_gen = n_halo_gen
     inputs%reservoir_size = reservoir_size
     inputs%vessel_enabled = vessel_enabled
     inputs%vessel_geometry_type = vessel_geometry_type
@@ -18089,7 +18098,7 @@ subroutine calculate_halo_process
   integer :: prev_type = 1 ! Previous iteration
   integer :: cur_type = 2 ! current iteration
   integer(Int64) :: n_halo
-  integer :: ncell, ntrack, n_iter
+  integer :: ncell, ntrack
   type(NeutralPopulation) :: cur_pop, prev_pop
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -18138,12 +18147,8 @@ subroutine calculate_halo_process
   !! this is importnat if we happen to reduce the number of iterations from one run to another
   !! This will prevent carrying old source point files incorrecly
 
-  !! >>> [JFCM, 2025-10-20] >>>
-  !! n_iter = 4
-  n_iter = 3
-  !! <<< [JFCM, 2025-10-20] <<<
   seed_dcx = 1.0
-  iterations: do hh = 1,n_iter
+  iterations: do hh = 1,inputs%n_halo_gen
 
     ! DEBUG:
     write(*,*) "HALO ITERATION START:", hh

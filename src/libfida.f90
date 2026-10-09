@@ -17972,10 +17972,22 @@ subroutine calculate_dcx_process
   integer(Int64) :: pid
   integer(Int32) :: num_tracks_save
   logical :: inp, res_valid
+  integer :: dcx_attempted, dcx_accepted
+  integer :: dcx_skip_velocity, dcx_skip_rate
+  integer :: dcx_skip_zero_density, dcx_skip_other_state
+  integer :: dcx_skipped
+  logical :: print_dcx_summary
 
   !! INIT:
   num_tracks_save = 1000
   pid = 1
+  dcx_attempted = 0
+  dcx_accepted = 0
+  dcx_skip_velocity = 0
+  dcx_skip_rate = 0
+  dcx_skip_zero_density = 0
+  dcx_skip_other_state = 0
+  print_dcx_summary = .True.
 
   !! Initialized Neutral Population
   call init_neutral_population(neut%dcx)
@@ -18028,7 +18040,9 @@ subroutine calculate_dcx_process
   !$OMP& rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
   !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,absorbed, &
-  !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp)
+  !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp) &
+  !$OMP& reduction(+:dcx_attempted,dcx_accepted,dcx_skip_velocity,dcx_skip_rate, &
+  !$OMP& dcx_skip_zero_density,dcx_skip_other_state)
   loop_over_cells: do ic = istart, ncell, istep
 
       ! Convert linear index "ic" to 3D index "ind"
@@ -18038,15 +18052,14 @@ subroutine calculate_dcx_process
       loop_over_species: do is=1, n_thermal !This loop has to come first
           loop_over_dcx: do idcx=1, nlaunch(i,j,k) !! Loop over the markers
 
+              dcx_attempted = dcx_attempted + 1
+
               ! Sample ion GC distribution function:
               ! input: ind, is
               ! output: rgc, deni_gc, fields, rp, vp, ind_p
               call mc_sample_ion_f4d_gc(ind,is,rgc,deni_gc,fields,rp,vp,ind_p,denf4d,f4d_defined)
               if(dot_product(vp,vp).eq.0.) then
-                write (*,*) "vp .eq. 0 skipping marker ..."
-                write (*,*) "vp:", vp
-                write (*,*) "ind: ", ind
-                write (*,*) "rp: ", rp
+                dcx_skip_velocity = dcx_skip_velocity + 1
                 cycle loop_over_dcx
               endif
 
@@ -18076,7 +18089,7 @@ subroutine calculate_dcx_process
               !! output: rates (dim nlevs)
               call get_total_cx_rate(ind_res,rp,vp,neut_types,rates)
               if(sum(rates).le.0.) then
-                write (*,*) "sum(rates) .le. 0 (get_total_cx_rate)"
+                dcx_skip_rate = dcx_skip_rate + 1
                 cycle loop_over_dcx
               endif
 
@@ -18084,9 +18097,15 @@ subroutine calculate_dcx_process
               !! Represents the rate at which ions are CXd into neutrals per unit volume:
               states = deni_gc*rates !  flux per unit volume [p/s cm^-3]
               if(sum(states).le.0.) then
-                write (*,*) "sum(states) .le. 0 (states)"
+                if (deni_gc .le. 0.d0) then
+                  dcx_skip_zero_density = dcx_skip_zero_density + 1
+                else
+                  dcx_skip_other_state = dcx_skip_other_state + 1
+                end if
                 cycle loop_over_dcx
               endif
+
+              dcx_accepted = dcx_accepted + 1
 
               !! Store ion sink data:
               !! Ion sink flux per unit volume in [[beam_grid]]:
@@ -18174,6 +18193,37 @@ subroutine calculate_dcx_process
       enddo loop_over_species
   enddo loop_over_cells
   !$OMP END PARALLEL DO
+
+#ifdef _MPI
+  call parallel_sum(dcx_attempted)
+  call parallel_sum(dcx_accepted)
+  call parallel_sum(dcx_skip_velocity)
+  call parallel_sum(dcx_skip_rate)
+  call parallel_sum(dcx_skip_zero_density)
+  call parallel_sum(dcx_skip_other_state)
+  print_dcx_summary = my_rank() .eq. 0
+#endif
+
+  dcx_skipped = dcx_skip_velocity + dcx_skip_rate + &
+                dcx_skip_zero_density + dcx_skip_other_state
+
+  if (print_dcx_summary .and. (inputs%verbose.ge.1 .or. dcx_skipped.gt.0)) then
+    write(*,'(a)') "---- DCX marker summary ----"
+    write(*,'(T2,"Attempted: ",i12)') dcx_attempted
+    write(*,'(T2,"Accepted:  ",i12)') dcx_accepted
+    write(*,'(T2,"Skipped:   ",i12)') dcx_skipped
+    if (dcx_skipped .gt. 0) then
+      write(*,'(T4,"Zero velocity:            ",i12)') dcx_skip_velocity
+      write(*,'(T4,"Non-positive CX rate:     ",i12)') dcx_skip_rate
+      write(*,'(T4,"Zero ion density:         ",i12)') dcx_skip_zero_density
+      write(*,'(T4,"Other non-positive state: ",i12)') dcx_skip_other_state
+    end if
+  end if
+
+  if (print_dcx_summary .and. &
+      dcx_attempted.ne.dcx_accepted + dcx_skipped) then
+    write(*,'(a)') "WARNING: DCX marker accounting is inconsistent."
+  end if
 end subroutine calculate_dcx_process
 !! <<<<<<<<<<< [jfcm, 2024_11_23] <<<<<<<<<<<<
 

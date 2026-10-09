@@ -7,11 +7,12 @@ program test_006
   !+ particle into a deterministic absorbing wall.
 
   use iso_fortran_env,only:int32,real64
-  use libfida,only:ParticleTrack,beam_grid,inputs,setup_vessel_mesh, track_to_wall,vessel
+  use libfida,only:ParticleTrack,beam_grid,inputs,setup_vessel_mesh, &
+    track_to_wall,track_exit_grid,track_exit_path_limit,vessel
   use utilities,only:rng,rng_init
   implicit none
 
-  integer,parameter::max_results=16
+  integer,parameter::max_results=24
   character(len=*),parameter::report_path='output_data/comparison_report.txt'
 
   type::test_result_type
@@ -23,7 +24,7 @@ program test_006
   type(test_result_type)::results(max_results)
   type(ParticleTrack),allocatable::tracks(:)
   character(len=512)::artifact_path,behavior_path,detail
-  integer::argument_status,i,j,k,reference_index
+  integer::argument_status,i,j,k,reference_index,exit_reason,periodic_wraps
   integer::number_of_results=0,active_references,inactive_references
   integer(int32)::ntrack
   logical::absorbed,all_passed
@@ -141,6 +142,45 @@ program test_006
       'no track segment was returned')
   endif
 
+  ! Periodicity changes only grid-face behavior. A physical wall intersected
+  ! before that face must therefore retain priority.
+  beam_grid%periodic_axes=[.false.,.false.,.true.]
+  call track_to_wall( &
+    [0.25d0,0.10d0,0.25d0], &
+    [0.d0,0.d0,-1.d0], &
+    tracks,ntrack,absorbed,exit_reason,periodic_wraps)
+  call record_result('physical wall precedes periodic boundary', &
+    absorbed .and. ntrack==1 .and. periodic_wraps==0, &
+    'expected the absorbing wall before the periodic Z face')
+
+  ! With wall interactions disabled, the unchanged default exits at the
+  ! nonperiodic Z face and records no wraps.
+  inputs%enable_wall_interactions=.false.
+  beam_grid%periodic_axes=.false.
+  call track_to_wall( &
+    [0.25d0,0.10d0,0.25d0], &
+    [0.d0,0.d0,1.d0], &
+    tracks,ntrack,absorbed,exit_reason,periodic_wraps)
+  call record_result('default grid boundary remains nonperiodic', &
+    .not.absorbed .and. exit_reason==track_exit_grid .and. &
+    periodic_wraps==0 .and. ntrack==2, &
+    'expected two Z-cell segments followed by a grid exit')
+
+  ! A Z-periodic ray wraps between the paired faces until the configured
+  ! segment capacity is exhausted.
+  beam_grid%periodic_axes=[.false.,.false.,.true.]
+  beam_grid%ntrack=5
+  call track_to_wall( &
+    [0.25d0,0.10d0,0.25d0], &
+    [0.d0,0.d0,1.d0], &
+    tracks,ntrack,absorbed,exit_reason,periodic_wraps)
+  call record_result('periodic Z boundary wraps the track', &
+    .not.absorbed .and. exit_reason==track_exit_path_limit .and. &
+    periodic_wraps==2 .and. ntrack==5 .and. &
+    all([tracks(1)%ind(3),tracks(2)%ind(3),tracks(3)%ind(3), &
+      tracks(4)%ind(3),tracks(5)%ind(3)]==[1,2,1,2,1]), &
+    'expected two wraps and termination at the five-segment path limit')
+
   call write_comparison_report(all_passed)
   if(.not.all_passed) error stop 'test_006: one or more checks failed'
   print *,'test_006: self-contained mesh acceptance passed'
@@ -176,6 +216,8 @@ contains
     beam_grid%inv_basis=beam_grid%basis
     beam_grid%dr=[1.d0,1.d0,1.d0]
     beam_grid%ds=1.d0
+    beam_grid%lwh=[2.d0,2.d0,2.d0]
+    beam_grid%periodic_axes=.false.
     allocate(beam_grid%xc(2),beam_grid%yc(2),beam_grid%zc(2))
     beam_grid%xc=[0.d0,1.d0]
     beam_grid%yc=[0.d0,1.d0]

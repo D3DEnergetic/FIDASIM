@@ -106,6 +106,20 @@ integer :: final_state = 0
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
+integer, parameter :: track_exit_wall = 1
+    !+ Track terminated at an absorbing physical wall
+integer, parameter :: track_exit_grid = 2
+    !+ Track left the beam grid through a nonperiodic face
+integer, parameter :: track_exit_path_limit = 3
+    !+ Track exhausted the configured segment capacity
+integer, parameter :: diag_wall_absorbed = 1
+integer, parameter :: diag_grid_exit = 2
+integer, parameter :: diag_path_limit = 3
+integer, parameter :: diag_survival_cutoff = 4
+integer, parameter :: diag_periodic_wrap = 5
+integer, parameter :: diag_significant_path_limit = 6
+integer(Int64), dimension(6) :: neutral_track_diagnostics = 0_Int64
+    !+ Compact counters for wall-aware neutral tracking
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
 
@@ -451,6 +465,8 @@ type BeamGrid
         !+ Grid volume [\(cm^3\)]
     integer(Int32) :: ntrack
         !+ Maximum number of cell for particle tracking
+    logical, dimension(3) :: periodic_axes = .FALSE.
+        !+ Periodic-boundary selectors in local beam-grid X, Y and Z
     integer(Int32) :: ngrid
         !+ Number of cells
     integer(Int32), dimension(3)  :: dims
@@ -1417,6 +1433,12 @@ type SimulationInputs
         !+ Enable calculation of halo process
     integer(Int32) :: n_halo_gen
         !+ Number of halo-neutral generations to calculate (default: 3)
+    integer(Int32) :: max_grid_traversals
+        !+ Maximum approximate complete-grid traversals per neutral track (default: 50)
+    real(Float64) :: neutral_survival_cutoff
+        !+ Stop neutral transport below this remaining source fraction (default: 1e-3)
+    logical, dimension(3) :: periodic_axes
+        !+ Periodic-boundary selectors in local beam-grid X, Y and Z
     integer(Int32) :: full_f
         !+ Describes how the f4d data is interpreted. 0: fast correction, 1: full distribution
     integer(Int32) :: non_thermal_beam_stopping
@@ -2380,6 +2402,9 @@ subroutine read_inputs
     logical            :: exis, error
     ! iCompX variables:
     integer            :: calc_sink, enable_halo, n_halo_gen, reservoir_size
+    integer            :: max_grid_traversals
+    real(Float64)      :: neutral_survival_cutoff
+    logical, dimension(3) :: periodic_axes
     integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
     logical :: vessel_enabled, enable_wall_interactions, enable_external_sources, enable_nbi
     character(charlim) :: vessel_geometry_type, vessel_geometry_file
@@ -2400,6 +2425,7 @@ subroutine read_inputs
         adaptive, max_cell_splits, split_tol, &
         ! CompX variables:
         calc_sink, enable_halo, n_halo_gen, reservoir_size, &
+        max_grid_traversals, neutral_survival_cutoff, periodic_axes, &
         non_thermal_beam_stopping, non_thermal_cx_sampling, full_f, &
         vessel_enabled, enable_wall_interactions, enable_external_sources, enable_nbi, &
         vessel_geometry_type, vessel_geometry_file, vessel_behavior_file
@@ -2489,6 +2515,9 @@ subroutine read_inputs
     calc_sink=0
     enable_halo=0
     n_halo_gen=3
+    max_grid_traversals=50
+    neutral_survival_cutoff=1.d-3
+    periodic_axes=.FALSE.
     reservoir_size = 50
     vessel_enabled = .FALSE.
     enable_wall_interactions = .FALSE.
@@ -2594,6 +2623,16 @@ subroutine read_inputs
       stop
     end if
 
+    if (max_grid_traversals < 1) then
+      write(*,*) "READ_INPUTS: max_grid_traversals must be at least 1"
+      stop
+    end if
+
+    if (neutral_survival_cutoff <= 0.d0 .or. neutral_survival_cutoff >= 1.d0) then
+      write(*,*) "READ_INPUTS: neutral_survival_cutoff must be greater than 0 and less than 1"
+      stop
+    end if
+
     if (enable_external_sources .and. .not.vessel_enabled) then
       write(*,*) "READ_INPUTS: enable_external_sources requires vessel_enabled = .true."
       stop
@@ -2624,6 +2663,9 @@ subroutine read_inputs
     inputs%calc_sink = calc_sink
     inputs%enable_halo = enable_halo
     inputs%n_halo_gen = n_halo_gen
+    inputs%max_grid_traversals = max_grid_traversals
+    inputs%neutral_survival_cutoff = neutral_survival_cutoff
+    inputs%periodic_axes = periodic_axes
     inputs%reservoir_size = reservoir_size
     inputs%vessel_enabled = vessel_enabled
     inputs%vessel_geometry_type = vessel_geometry_type
@@ -3009,8 +3051,8 @@ subroutine make_beam_grid
     beam_grid%drmin  = minval(beam_grid%dr)
     beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
     !! >>> [JFCM, 2025_07_04] >>>
-    ! beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*inputs%max_cell_splits
-    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*50
+    beam_grid%ntrack = (beam_grid%nx+beam_grid%ny+beam_grid%nz)*inputs%max_grid_traversals
+    beam_grid%periodic_axes = inputs%periodic_axes
     !! >>> [JFCM, 2025_07_04] >>>
     beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
 
@@ -11088,7 +11130,7 @@ end function apply_collision_padding
 !! <<< [JFCM, 2026-05-16] <<<
 
 !! >>> [JFCM, 2025-07-04] >>>
-subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
+subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed,exit_reason,periodic_wraps)
     !+ Description:
     real(Float64), dimension(3), intent(in) :: rin
         !+ Initial position of particle
@@ -11100,10 +11142,14 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
         !+ Number of cells that a particle crosses
     logical, intent(out) :: absorbed
         !+ logical flag indicating if particle was absorbed at a surface
+    integer(Int32), intent(out), optional :: exit_reason
+        !+ Geometrical endpoint: wall, nonperiodic grid face, or path limit
+    integer(Int32), intent(out), optional :: periodic_wraps
+        !+ Number of periodic grid-boundary crossings
 
     real(Float64), dimension(3) :: rn, vn, ri_cell, dr, dt_arr
     integer, dimension(3) :: ind, sgn, gdims
-    integer :: cc, mind
+    integer :: cc, mind, local_exit_reason, local_periodic_wraps
     real(Float64) :: T_wall, v_thermal, p_specular, p_absorb, p_thermal, p_reflect
     real(Float64), dimension(1) :: randomu
     logical :: in_grid, collision_in_cell, surface_in_voxel, has_surface_collision
@@ -11117,7 +11163,11 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
     character(len=16) :: behavior_type
     type(wall_type) :: wall
 
-    vn = vin; rn = rin; sgn = 0;
+    vn = vin; rn = rin; sgn = 0
+    local_exit_reason = 0
+    local_periodic_wraps = 0
+    if (present(exit_reason)) exit_reason = 0
+    if (present(periodic_wraps)) periodic_wraps = 0
 
     ! CHECK: avoid zero velocity
     ! --------------------------
@@ -11272,6 +11322,7 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
       ! --------------------------------------------------
       if (cc > beam_grid%ntrack) then
           ! print *, "WARNING: track buffer full at cc =", cc
+          local_exit_reason = track_exit_path_limit
           exit
       end if
 
@@ -11298,7 +11349,10 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
 
           !! COMPPUTE new vn based on wall interaction:
           call apply_wall_interaction(vn, event, wall, absorbed)
-          if (absorbed) exit !! If particle absorbed, exit while loop:
+          if (absorbed) then
+            local_exit_reason = track_exit_wall
+            exit
+          endif
 
         case DEFAULT
           write(*,*) "This behavior_type is not defined: ", behavior_type
@@ -11312,9 +11366,23 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
 
       !! CHECK if ray has crossed beam grid boundaries:
       ! ----------------------------------------------
-      if (any(ind > gdims) .or. any(ind < 1)) then
-        ! Ray has reached limit of grid:
-        in_grid = .FALSE.
+      if (ind(mind) > gdims(mind) .or. ind(mind) < 1) then
+        if (beam_grid%periodic_axes(mind)) then
+          if (ind(mind) > gdims(mind)) then
+            ind(mind) = 1
+            rn(mind) = rn(mind) - beam_grid%lwh(mind)
+            ri_cell(mind) = ri_cell(mind) - beam_grid%lwh(mind)
+          else
+            ind(mind) = gdims(mind)
+            rn(mind) = rn(mind) + beam_grid%lwh(mind)
+            ri_cell(mind) = ri_cell(mind) + beam_grid%lwh(mind)
+          endif
+          local_periodic_wraps = local_periodic_wraps + 1
+        else
+          ! Ray has reached a nonperiodic limit of the grid.
+          in_grid = .FALSE.
+          local_exit_reason = track_exit_grid
+        endif
       end if
 
     end do !! WHILE
@@ -11322,8 +11390,55 @@ subroutine track_to_wall(rin,vin,tracks,ntrack,absorbed)
     !! SET number of steps taken:
     ! --------------------------
     ntrack = cc - 1
+    if (present(exit_reason)) exit_reason = local_exit_reason
+    if (present(periodic_wraps)) periodic_wraps = local_periodic_wraps
+
+    select case(local_exit_reason)
+    case(track_exit_wall)
+      call record_neutral_track_diagnostic(diag_wall_absorbed)
+    case(track_exit_grid)
+      call record_neutral_track_diagnostic(diag_grid_exit)
+    case(track_exit_path_limit)
+      call record_neutral_track_diagnostic(diag_path_limit)
+    end select
+    if (local_periodic_wraps > 0) &
+      call record_neutral_track_diagnostic(diag_periodic_wrap,local_periodic_wraps)
 
 end subroutine track_to_wall
+
+subroutine record_neutral_track_diagnostic(index,increment)
+    !+ Add one thread-safe contribution to the compact tracking diagnostics.
+    integer, intent(in) :: index
+    integer, intent(in), optional :: increment
+    integer(Int64) :: amount
+
+    amount = 1_Int64
+    if (present(increment)) amount = int(increment,Int64)
+    !$OMP ATOMIC UPDATE
+    neutral_track_diagnostics(index) = neutral_track_diagnostics(index) + amount
+end subroutine record_neutral_track_diagnostic
+
+subroutine report_neutral_track_diagnostics()
+    !+ Print one MPI-safe summary of neutral geometrical and attenuation exits.
+    integer(Int64), dimension(6) :: counts
+    logical :: print_summary
+
+    counts = neutral_track_diagnostics
+    print_summary = .TRUE.
+#ifdef _MPI
+    call parallel_sum(counts)
+    print_summary = my_rank() .eq. 0
+#endif
+    if (.not.print_summary .or. sum(counts) == 0_Int64) return
+
+    write(*,'(a)') "---- Neutral track summary ----"
+    write(*,'(T2,"Absorbed at physical wall:       ",i12)') counts(diag_wall_absorbed)
+    write(*,'(T2,"Exited nonperiodic grid face:    ",i12)') counts(diag_grid_exit)
+    write(*,'(T2,"Reached path limit:              ",i12)') counts(diag_path_limit)
+    write(*,'(T2,"Reached survival cutoff:         ",i12)') counts(diag_survival_cutoff)
+    write(*,'(T2,"Periodic boundary crossings:     ",i12)') counts(diag_periodic_wrap)
+    write(*,'(T2,"Path limit with surviving weight:",i12)') counts(diag_significant_path_limit)
+end subroutine report_neutral_track_diagnostics
 !! <<< [JFCM, 2025-07-04] <<<
 
 !! >>> [JFCM, 2025-07-04] >>>
@@ -17864,13 +17979,14 @@ subroutine calculate_wall_source_process(ss,rr)
   integer(Int32) :: ii, jj
   real(Float64), dimension(3) :: rp, vp
   logical :: absorbed
-  integer :: ntrack, err
+  integer :: ntrack, err, track_exit_reason, periodic_wraps
   type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
   real(Float64) :: rate, mass
   real(Float64) :: tot_flux_dep, starting_flux, initial_flux, final_flux
   real(Float64), dimension(nlevs) :: states, denn
   type(LocalProfiles) :: plasma
   real(Float64) :: photons, weight
+  logical :: survival_cutoff_reached
   integer :: neut_type
   character(len=charlim) :: filename
   integer(Int64) :: pid = 1
@@ -17902,7 +18018,7 @@ subroutine calculate_wall_source_process(ss,rr)
   !$OMP PARALLEL DO schedule(dynamic,1) &
   !$OMP& private(ii,jj,rp,vp,err,tracks,ntrack,tot_flux_dep,states,denn, &
   !$OMP& starting_flux,absorbed,initial_flux,final_flux,plasma,photons, &
-  !$OMP& weight)
+  !$OMP& weight,track_exit_reason,periodic_wraps,survival_cutoff_reached)
   loop_over_markers: do ii=istart,nlaunch,istep
 
     !! SAMPLE neutral from source:
@@ -17914,12 +18030,13 @@ subroutine calculate_wall_source_process(ss,rr)
 
     !! COMPUTE neutral trajectory:
     absorbed = .FALSE.
-    call track_to_wall(rp,vp,tracks,ntrack,absorbed)
+    call track_to_wall(rp,vp,tracks,ntrack,absorbed,track_exit_reason,periodic_wraps)
 
     tot_flux_dep = 0.d0
     states = 0.d0
     states(1) = rate/beam_grid%dv ! [p/s cm^-3]
     starting_flux = sum(states)
+    survival_cutoff_reached = .FALSE.
 
     !! LOOP over tracks:
     loop_along_track: do jj=1,ntrack
@@ -17949,11 +18066,18 @@ subroutine calculate_wall_source_process(ss,rr)
        !! STORE photons: see NDMC for details
 
        !! CHECK ray attenuation:
-       if (final_flux/starting_flux .lt. 1E-3) then
+       if (final_flux/starting_flux .lt. inputs%neutral_survival_cutoff) then
+         survival_cutoff_reached = .TRUE.
          exit loop_along_track
        endif
 
     enddo loop_along_track
+
+    if (survival_cutoff_reached) then
+      call record_neutral_track_diagnostic(diag_survival_cutoff)
+    else if (track_exit_reason == track_exit_path_limit) then
+      call record_neutral_track_diagnostic(diag_significant_path_limit)
+    endif
 
     !! WRITE tracks data:
 #ifdef _OPENMP
@@ -17992,6 +18116,7 @@ subroutine calculate_dcx_process
   !+ Calculates the DCX process and stores sink and birth points from the DCX neutrals.
   use omp_lib
   integer :: ic,i,j,k,ncell,is,ib,ntrack,jj
+  integer :: track_exit_reason, periodic_wraps
   integer(Int64) :: idcx !! counter
   real(Float64), dimension(3) :: rp    !! Ion particle position vector
   real(Float64), dimension(3) :: vp  !! Ion particle velocity vector
@@ -18026,6 +18151,7 @@ subroutine calculate_dcx_process
   integer :: dcx_skip_zero_density, dcx_skip_other_state
   integer :: dcx_skipped
   logical :: print_dcx_summary
+  logical :: survival_cutoff_reached
 
   !! INIT:
   num_tracks_save = 1000
@@ -18089,7 +18215,8 @@ subroutine calculate_dcx_process
   !$OMP& rates,states,plasma,fields,f4d_defined,denn,denn_per_marker, &
   !$OMP& tracks,ntrack,photons,initial_flux,final_flux,tot_flux_dep,weight, &
   !$OMP& starting_flux,flux_per_marker,denf4d_per_marker,denf4d,absorbed, &
-  !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp) &
+  !$OMP& rgc,deni_gc,ind_p,inp,ind_res,res_valid,rp,vp,track_exit_reason, &
+  !$OMP& periodic_wraps,survival_cutoff_reached) &
   !$OMP& reduction(+:dcx_attempted,dcx_accepted,dcx_skip_velocity,dcx_skip_rate, &
   !$OMP& dcx_skip_zero_density,dcx_skip_other_state)
   loop_over_cells: do ic = istart, ncell, istep
@@ -18114,7 +18241,7 @@ subroutine calculate_dcx_process
 
               ! Compute neutral particle track across beam_grid:
               absorbed = .FALSE.
-              call track_to_wall(rp,vp,tracks,ntrack,absorbed)
+              call track_to_wall(rp,vp,tracks,ntrack,absorbed,track_exit_reason,periodic_wraps)
               if (ntrack .eq. 0) then
                 write (*,*) "ntrack .eq. 0 (calculate_dcx_process)"
                 stop
@@ -18166,6 +18293,7 @@ subroutine calculate_dcx_process
 
               ! Initialize deposition accumulator for current marker:
               tot_flux_dep = 0.d0
+              survival_cutoff_reached = .FALSE.
 
               ! Attenuate neutral marker long track trajectory:
               loop_along_track: do jj = 1,ntrack
@@ -18198,21 +18326,19 @@ subroutine calculate_dcx_process
 
                 ! >>> [JFCM, 2025-07-04] >>>
                 !! Stop advancing ray if flux has dropped by more than 3 orders of magnitude
-                if (final_flux/starting_flux .lt. 1E-3) then
+                if (final_flux/starting_flux .lt. inputs%neutral_survival_cutoff) then
+                  survival_cutoff_reached = .TRUE.
                   exit loop_along_track
                 endif
                 ! <<< [JFCM, 2025-07-04] <<<
 
               enddo loop_along_track
 
-              ! >>> [JFCM, 2025-07-04] >>>
-              !! Check if end of tracks has been reached and attenuation is poor
-              if ( .FALSE. .AND. (.not. absorbed) .AND. (final_flux/starting_flux .gt. 1E-2) ) then
-                print *, "This particle did not reach pump and has poor atteuation, rel attenuation: ", final_flux/starting_flux
-                print *, "jj : ", jj
-                print *, "ntrack: ", ntrack
+              if (survival_cutoff_reached) then
+                call record_neutral_track_diagnostic(diag_survival_cutoff)
+              else if (track_exit_reason == track_exit_path_limit) then
+                call record_neutral_track_diagnostic(diag_significant_path_limit)
               endif
-              ! <<< [JFCM, 2025-07-04] <<<
 
               ! >>> [JFCM, 2025-07-04] >>>
               !$OMP CRITICAL
@@ -18285,7 +18411,7 @@ subroutine calculate_halo_process
   integer :: prev_type = 1 ! Previous iteration
   integer :: cur_type = 2 ! current iteration
   integer(Int64) :: n_halo
-  integer :: ncell, ntrack
+  integer :: ncell, ntrack, track_exit_reason, periodic_wraps
   type(NeutralPopulation) :: cur_pop, prev_pop
   real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
   integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -18304,6 +18430,7 @@ subroutine calculate_halo_process
   real(Float64) :: deni_gc
   integer, dimension(3) :: ind_p, ind_res
   logical :: inp, res_valid
+  logical :: survival_cutoff_reached
 
   !! Initialize halo neutral population container:
   call init_neutral_population(neut%halo)
@@ -18413,7 +18540,7 @@ subroutine calculate_halo_process
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,absorbed,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
     !$OMP& ntrack,ii,jj,kk,rates,states,denn,starting_flux,denf4d_per_marker,it,tot_flux_dep,initial_flux,weight, &
     !$OMP& photons,final_flux,plasma,flux_per_marker,denn_per_marker,fields,rgc,deni_gc,ind_p,ind_res,inp, &
-    !$OMP& res_valid)
+    !$OMP& res_valid,track_exit_reason,periodic_wraps,survival_cutoff_reached)
     loop_over_cells: do ic = istart,ncell,istep
 
       !! Convert linear index ic to 3D vector indices:
@@ -18433,7 +18560,7 @@ subroutine calculate_halo_process
 
           !! Compute neutral particle track accross the beam grid:
           absorbed = .FALSE.
-          call track_to_wall(ri,vi,tracks,ntrack,absorbed)
+          call track_to_wall(ri,vi,tracks,ntrack,absorbed,track_exit_reason,periodic_wraps)
           if (ntrack .eq. 0) then
               write (*,*) "ntrack .eq. 0 (calculate_halo_process)"
               stop
@@ -18476,6 +18603,7 @@ subroutine calculate_halo_process
 
           !! Loop along neutral trajectory:
           tot_flux_dep = 0.d0
+          survival_cutoff_reached = .FALSE.
           loop_along_track: do it = 1,ntrack
 
             !! Initial flux of neutral:
@@ -18502,11 +18630,18 @@ subroutine calculate_halo_process
             !! Photon quantities:
 
             !! Stop advancing ray when flux drops by more than 3 orders of magnitude:
-            if (final_flux/starting_flux .lt. 1E-3) then
+            if (final_flux/starting_flux .lt. inputs%neutral_survival_cutoff) then
+                survival_cutoff_reached = .TRUE.
                 exit loop_along_track
             end if
 
           end do loop_along_track
+
+          if (survival_cutoff_reached) then
+            call record_neutral_track_diagnostic(diag_survival_cutoff)
+          else if (track_exit_reason == track_exit_path_limit) then
+            call record_neutral_track_diagnostic(diag_significant_path_limit)
+          endif
 
           !! Record ion birth particle:
           !! *************************************************************************************************

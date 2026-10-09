@@ -429,6 +429,7 @@ program fidasim
             endif
 
             !! ---------- WRITE NEUTRALS ---------- !!
+            call report_neutral_track_diagnostics()
             if(inputs%verbose.ge.1) then
                 write(*,*) 'write neutrals:    ' , time_string(time_start)
             endif

@@ -1431,6 +1431,8 @@ type SimulationInputs
         !+ Enable ray-wall interation processes: reflection, absorption, thermal emission
     logical :: enable_external_sources
         !+ Enable the use of externally defined neutral gas sources on surface regions
+    logical :: enable_nbi
+        !+ Enable injected neutral-beam transport (default: true)
     character(charlim) :: vessel_geometry_type
         !+ Define how the vacuum vessel is to be described: analytic surfaces or mesh
     character(charlim) :: vessel_geometry_file
@@ -2379,7 +2381,7 @@ subroutine read_inputs
     ! iCompX variables:
     integer            :: calc_sink, enable_halo, n_halo_gen, reservoir_size
     integer            :: non_thermal_beam_stopping, non_thermal_cx_sampling, full_f
-    logical :: vessel_enabled, enable_wall_interactions, enable_external_sources
+    logical :: vessel_enabled, enable_wall_interactions, enable_external_sources, enable_nbi
     character(charlim) :: vessel_geometry_type, vessel_geometry_file
     character(charlim) :: vessel_behavior_file
 
@@ -2399,7 +2401,7 @@ subroutine read_inputs
         ! CompX variables:
         calc_sink, enable_halo, n_halo_gen, reservoir_size, &
         non_thermal_beam_stopping, non_thermal_cx_sampling, full_f, &
-        vessel_enabled, enable_wall_interactions, enable_external_sources, &
+        vessel_enabled, enable_wall_interactions, enable_external_sources, enable_nbi, &
         vessel_geometry_type, vessel_geometry_file, vessel_behavior_file
 
     inquire(file=namelist_file,exist=exis)
@@ -2491,6 +2493,7 @@ subroutine read_inputs
     vessel_enabled = .FALSE.
     enable_wall_interactions = .FALSE.
     enable_external_sources = .FALSE.
+    enable_nbi = .TRUE.
     vessel_geometry_type = "analytic"
     vessel_geometry_file = "vacuum_vessel.nml"
     vessel_behavior_file = ""
@@ -2591,6 +2594,11 @@ subroutine read_inputs
       stop
     end if
 
+    if (enable_external_sources .and. .not.vessel_enabled) then
+      write(*,*) "READ_INPUTS: enable_external_sources requires vessel_enabled = .true."
+      stop
+    end if
+
     if (.not. vessel_enabled) then
       enable_wall_interactions = .false.
       enable_external_sources = .false.
@@ -2600,6 +2608,12 @@ subroutine read_inputs
       write(*,*) "Setting the following:"
       write(*,*) "enable_wall_interactions = .false."
       write(*,*) "enable_external_sources = .false."
+    end if
+
+    if (.not.enable_nbi .and. .not.enable_external_sources .and. &
+        inputs%calc_beam.ge.1) then
+      write(*,*) "READ_INPUTS: primary-neutral transport requires NBI or an external gas source."
+      stop
     end if
 
 
@@ -2617,6 +2631,7 @@ subroutine read_inputs
     inputs%vessel_behavior_file = vessel_behavior_file
     inputs%enable_wall_interactions = enable_wall_interactions
     inputs%enable_external_sources = enable_external_sources
+    inputs%enable_nbi = enable_nbi
         !! <<< [JFCM, 2025-10-27] <<<
 
     !! Misc. Settings
@@ -7687,6 +7702,29 @@ subroutine write_neutrals
         call h5gclose_f(gid, error)
         call h5ltset_attribute_string_f(fid,"/third","description", &
              "Third Energy Neutral Population", error)
+
+        if (.not.inputs%enable_nbi) then
+            call h5ltset_attribute_string_f(fid, "/", "primary_neutral_mode", &
+                 "gas_puff_compatibility", error)
+            call h5ltset_attribute_string_f(fid, "/full", "population_origin", &
+                 "gas_puff", error)
+            call h5ltset_attribute_string_f(fid, "/full", "description", &
+                 "Gas-puff Neutral Population (temporary full-population compatibility storage)", error)
+            call h5ltset_attribute_string_f(fid, "/half", "population_origin", &
+                 "disabled_nbi_zero_population", error)
+            call h5ltset_attribute_string_f(fid, "/third", "population_origin", &
+                 "disabled_nbi_zero_population", error)
+        else if (inputs%enable_external_sources) then
+            call h5ltset_attribute_string_f(fid, "/", "primary_neutral_mode", &
+                 "nbi_and_gas_puff", error)
+            call h5ltset_attribute_string_f(fid, "/full", "population_origin", &
+                 "nbi_and_gas_puff", error)
+        else
+            call h5ltset_attribute_string_f(fid, "/", "primary_neutral_mode", &
+                 "nbi", error)
+            call h5ltset_attribute_string_f(fid, "/full", "population_origin", &
+                 "nbi", error)
+        endif
 
         !! >>>>>>>>>>> [jfcm, 2024-11-23] >>>>>>>>>>>
         if (inputs%calc_sink.ge.1 .and. allocated(neut%dcx%dens)) then
@@ -17837,6 +17875,13 @@ subroutine calculate_wall_source_process(ss,rr)
   character(len=charlim) :: filename
   integer(Int64) :: pid = 1
 
+  ! TODO(MPI): Gas-source markers are distributed across MPI ranks, but their
+  ! density, reservoirs and birth outputs are not yet safely merged. Do not
+  ! all-reduce the shared neut%full population after ndmc(), because its NBI
+  ! contribution has already been globally merged and would be multiplied by
+  ! the number of ranks. The compatibility mode is supported with one MPI rank
+  ! until gas uses a separate accumulator or population with tested MPI merging.
+
   !! Initialize Neutral Population
   if (.not.allocated(neut%full%dens)) then
     call init_neutral_population(neut%full)
@@ -17897,7 +17942,9 @@ subroutine calculate_wall_source_process(ss,rr)
        tot_flux_dep = tot_flux_dep + tracks(jj)%flux*beam_grid%dv ! [p/s]
 
        !! STORE new ion birth flux on beam_grid:
-       call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
+       if (inputs%calc_birth.ge.1) then
+         call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
+       endif
 
        !! STORE photons: see NDMC for details
 
@@ -17926,9 +17973,11 @@ subroutine calculate_wall_source_process(ss,rr)
 #endif
 
     !! STORE birth particles:
-    !$OMP CRITICAL
-    call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
-    !$OMP END CRITICAL
+    if (inputs%calc_birth.ge.1) then
+      !$OMP CRITICAL
+      call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
+      !$OMP END CRITICAL
+    endif
 
   enddo loop_over_markers
   !$OMP END PARALLEL DO

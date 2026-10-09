@@ -59,6 +59,24 @@ program fidasim
     write(*,*) ""
     !! <<< [JFCM, 2025-10-27] <<<
 
+    if(inputs%verbose.ge.1) then
+        write(*,*) "---- Primary neutral source settings ----"
+        write(*,*) "Injected NBI transport enabled: ", inputs%enable_nbi
+        write(*,*) "External gas sources enabled:  ", inputs%enable_external_sources
+        write(*,*) ""
+    endif
+
+#ifdef _MPI
+    if ((.not.inputs%enable_nbi) .and. inputs%enable_external_sources .and. &
+        num_ranks().ne.1) then
+        if (my_rank().eq.0) then
+            write(*,*) "FIDASIM: NBI-disabled gas-source compatibility mode requires exactly one MPI rank."
+        endif
+        call cleanup_mpi()
+        stop
+    endif
+#endif
+
 #ifdef _OMP
     max_threads = OMP_get_num_procs()
     if(narg.ge.2) then
@@ -119,7 +137,7 @@ program fidasim
     ! >>> [JFCM, 2025_07_23] >>>
     if (inputs%vessel_enabled) call define_vacuum_vessel()
     ! <<< [JFCM, 2025_07_23] <<<
-    if(inputs%calc_beam.ge.1) call read_beam()
+    if(inputs%calc_beam.ge.1 .and. inputs%enable_nbi) call read_beam()
     call read_distribution()
 
     call quasineutrality_check()
@@ -170,7 +188,11 @@ program fidasim
 
         !! >>> [JFCM, 2025-09-02] >>>
         ! allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
-        n_birth_nbi = int(3*inputs%n_birth*inputs%n_nbi)
+        if (inputs%enable_nbi) then
+          n_birth_nbi = int(3*inputs%n_birth*inputs%n_nbi)
+        else
+          n_birth_nbi = 0
+        endif
         allocate(birth%part(n_birth_nbi + n_birth_wall))
         !! <<< [JFCM, 2025-09-02] <<<
 
@@ -315,13 +337,23 @@ program fidasim
                 call SYSTEM_CLOCK(time_0,count_rate)
                 ! <<< [JFCM, 2025-03-14] <<<
 
-                ! NBI calculation:
-                call ndmc()
+                ! Primary-neutral initialization:
+                if (inputs%enable_nbi) then
+                    call ndmc()
+                else
+                    call init_neutral_population(neut%full)
+                    call init_neutral_population(neut%half)
+                    call init_neutral_population(neut%third)
+                    if(inputs%verbose.ge.1) then
+                        write(*,*) "NBI transport disabled."
+                        write(*,*) "Gas-puff neutrals use neut%full compatibility storage; neut%half and neut%third remain zero."
+                    endif
+                endif
 
                 ! >>> [JFCM, 2025-03-14] >>>
                 call SYSTEM_CLOCK(time_1)
                 elapsed_time = real(time_1 - time_0) / real(count_rate)  ! Convert to seconds
-                print *, "NDMC elapsed time: ", elapsed_time, " seconds"
+                print *, "Primary-neutral initialization elapsed time: ", elapsed_time, " seconds"
                 ! <<< [JFCM, 2025-03-14] <<<
 
                 ! >>> [JFCM, 2025-09-02] >>>

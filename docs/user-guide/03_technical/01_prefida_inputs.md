@@ -65,7 +65,6 @@ The following settings provide a good balance between runtime and Monte Carlo no
 * `n_pnpa` = 50000000L
 * `n_nbi` = 50000L
 * `n_halo` = 500000L
-* `n_halo_gen` = 3
 * `n_dcx` = 500000L
 * `n_birth` = 10000L
 
@@ -77,7 +76,6 @@ The following settings provide a good balance between runtime and Monte Carlo no
 | `n_pnpa`            | Int32   | 0    | NA         | NA    | Number of passive NPA MC particles       |
 | `n_nbi`             | Int32   | 0    | NA         | NA    | Number of NBI MC particles               |
 | `n_halo`            | Int32   | 0    | NA         | NA    | Number of HALO MC particles              |
-| `n_halo_gen`        | Int32   | 0    | NA         | NA    | Number of halo-neutral generations. Defaults to 3, must be nonnegative, and must be at least 1 when `enable_halo` is enabled. |
 | `n_dcx`             | Int32   | 0    | NA         | NA    | Number of DCX MC particles               |
 | `n_birth`           | Int32   | 0    | NA         | NA    | Number of Birth particles outputed       |
 

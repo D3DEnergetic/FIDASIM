@@ -145,12 +145,6 @@ FIDASIM uses the following scheme to calculate the DCX+Halo contribution.
 
 After a few iterations the halo density converges and the calculation ends.
 
-Each calculated neutral population also accumulates state-summed raw first
-and second velocity moments. The first moment is stored in Cartesian
-component order `(x,y,z)`. The symmetric second moment uses
-`(xx,yy,zz,xy,xz,yz)`. These raw moments can be summed between populations
-before deriving particle flux, bulk velocity and central-moment temperature.
-
 #Relevent Namelist Settings
 * `ab`: Beam/Fast-ion mass [amu]
 * `pinj`: Beam power [MW]
@@ -160,7 +154,6 @@ before deriving particle flux, bulk velocity and central-moment temperature.
 * `neutrals_file`: Optional neutrals file
 * `n_nbi`: Number of NBI MC particles
 * `n_halo`: Number of HALO MC particles
-* `n_halo_gen`: Number of halo-neutral generations (default: 3)
 * `n_dcx`: Number of DCX MC particles
 * `calc_birth`: Calculate birth profile (density & birth position and velocity)
 * `n_birth`: Number of birth particles outputed

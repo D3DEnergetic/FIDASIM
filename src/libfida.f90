@@ -17652,12 +17652,18 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
       !+ Field values at ri position
 
   !! Local variables:
-  real(Float64), dimension(3) :: r_gyro
+  real(Float64), dimension(3) :: r_gyro, ri_gc
+  real(Float64) :: energy, pitch
 
-  !$OMP CRITICAL
+  energy = dot_product(vion,vion)*v2_to_E_per_amu*thermal_mass(is)
+  pitch = dot_product(fields%b_norm,vion/norm2(vion))
+  call gyro_step(vion,fields,thermal_mass(is),r_gyro)
+  ri_gc = ri + r_gyro
+
+  !$OMP CRITICAL(store_sink_particle_lock)
   sink%part(sink%cnt)%neut_type = -1
   sink%part(sink%cnt)%atomic_mass = thermal_mass(is)
-  sink%part(sink%cnt)%energy = dot_product(vion,vion)*v2_to_E_per_amu*thermal_mass(is)
+  sink%part(sink%cnt)%energy = energy
   sink%part(sink%cnt)%weight = flux*beam_grid%dv ! flux per marker [p/s]
   sink%part(sink%cnt)%ind = ind
   sink%part(sink%cnt)%vi = vion
@@ -17666,19 +17672,10 @@ subroutine store_sink_particle(ind,ri,vion,is,flux,denf4d,denf4d_per_marker,fiel
   sink%part(sink%cnt)%denf4d = denf4d
   sink%part(sink%cnt)%denf4d_per_marker = denf4d_per_marker
 
-  !! Ion pitch at GC position:
-  sink%part(sink%cnt)%pitch = dot_product(fields%b_norm,vion/norm2(vion))
-
-  !! Get position vector pointing from ri to GC position:
-  !! input: vion, fields, thermal_mass(is)
-  !! output: r_gyro (dim 3)
-  !! r_gyro is a vector from actual particle position "ri" to GC position:
-  call gyro_step(vion,fields,thermal_mass(is),r_gyro)
-
-  !! Calculate particle's GC position:
-  sink%part(sink%cnt)%ri_gc = ri + r_gyro
+  sink%part(sink%cnt)%pitch = pitch
+  sink%part(sink%cnt)%ri_gc = ri_gc
   sink%cnt = sink%cnt + 1
-  !$OMP END CRITICAL
+  !$OMP END CRITICAL(store_sink_particle_lock)
 
 end subroutine store_sink_particle
 
@@ -18207,9 +18204,9 @@ subroutine calculate_wall_source_process(ss,rr)
 
     !! STORE birth particles:
     if (inputs%calc_birth.ge.1) then
-      !$OMP CRITICAL
+      !$OMP CRITICAL(store_birth_particle_lock)
       call store_birth_particle(tracks,ntrack,mass,tot_flux_dep,neut_type)
-      !$OMP END CRITICAL
+      !$OMP END CRITICAL(store_birth_particle_lock)
     endif
 
   enddo loop_over_markers
@@ -18468,7 +18465,7 @@ subroutine calculate_dcx_process
               endif
 
               ! >>> [JFCM, 2025-07-04] >>>
-              !$OMP CRITICAL
+              !$OMP CRITICAL(dcx_track_output_lock)
               if (pid .le. num_tracks_save) then
                   filename = "tracks_dcx.dat"
                   filename = trim(adjustl(inputs%result_dir)) // '/' // trim(adjustl(filename))
@@ -18480,16 +18477,16 @@ subroutine calculate_dcx_process
 #endif
                   pid = pid + 1
               endif
-              !$OMP END CRITICAL
+              !$OMP END CRITICAL(dcx_track_output_lock)
               ! <<< [JFCM, 2025-07-04] <<<
 
               ! Record ion birth particle:
-              !$OMP CRITICAL
               ! >>> [JFCM, 2025-06-30] >>>
               weight = tot_flux_dep
               ! <<< [JFCM, 2025-06-30] <<<
+              !$OMP CRITICAL(store_birth_particle_lock)
               call store_birth_particle(tracks,ntrack,thermal_mass(is),weight,dcx_type)
-              !$OMP END CRITICAL
+              !$OMP END CRITICAL(store_birth_particle_lock)
 
           enddo loop_over_dcx
       enddo loop_over_species
@@ -18790,10 +18787,10 @@ subroutine calculate_halo_process
 
           !! Record ion birth particle:
           !! *************************************************************************************************
-          !$OMP CRITICAL
           weight = tot_flux_dep
+          !$OMP CRITICAL(store_birth_particle_lock)
           call store_birth_particle(tracks,ntrack,thermal_mass(is),weight,halo_type)
-          !$OMP END CRITICAL
+          !$OMP END CRITICAL(store_birth_particle_lock)
 
         end do loop_over_halos
       end do loop_over_species

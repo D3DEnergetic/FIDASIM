@@ -421,6 +421,28 @@ assertions, conditional output, and sink-array cleanup. The production writer
 owns cleanup when saving is enabled; otherwise `finalize_ion_sink` releases
 the arrays directly.
 
+The module performs the following focused checks:
+
+1. one production sink particle is stored for every requested Monte Carlo
+   marker;
+2. the complete sink-rate density is deposited in the known central cell and
+   no rate is deposited elsewhere;
+3. the sum of stored particle weights reproduces the central-cell
+   particle-rate density;
+4. the sum of particle weight times kinetic energy reproduces the
+   central-cell kinetic-power density;
+5. the central-cell contribution count equals the marker count in this
+   one-contribution-per-marker test geometry;
+6. the particle-rate and kinetic-power squared-contribution sums are positive;
+7. the production sink HDF5 file is created when output is enabled; and
+8. every production sink array is released after writing or explicit cleanup.
+
+The contribution-count assertion is specific to this controlled sink test. In
+general FIDASIM calculations, a contribution count is a tally count and must
+not be interpreted as a unique-marker count. The squared sums are checked for
+correct population only; Test 004 does not currently validate an uncertainty
+estimator derived from them.
+
 ### Main-program lifecycle
 
 `test_004.f90` performs the following orchestration:

@@ -170,6 +170,15 @@ program fidasim
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
+        allocate(birth%power_dens(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        allocate(birth%contribution_count(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        allocate(birth%rate_squared_sum(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        allocate(birth%power_squared_sum(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        birth%dens = 0.d0
+        birth%power_dens = 0.d0
+        birth%contribution_count = 0.d0
+        birth%rate_squared_sum = 0.d0
+        birth%power_squared_sum = 0.d0
         !! >>> [jfcm, 2024-11-23] >>>
 
         !! >>> [JFCM, 2025-09-02] >>>

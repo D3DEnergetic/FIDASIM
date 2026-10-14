@@ -44,7 +44,7 @@ and final comparison in that order. It stops immediately if a stage fails.
 | --- | --- | --- |
 | `libfida` | `mc_sample_ion_f4d_gc` | Samples ion position and velocity from the configured distribution. |
 | `libfida` | `get_total_cx_rate` | Evaluates the reservoir-averaged, level-resolved CX rate. |
-| `libfida` | `store_sinks` | Accumulates the cell-resolved sink-rate density. |
+| `libfida` | `store_sinks` | Accumulates cell-resolved sink rate, kinetic power, contribution count, and squared contributions. |
 | `libfida` | `store_sink_particle` | Records each weighted ion-sink particle. |
 | `libfida` | `write_sink_profile` | Writes the normal FIDASIM sink HDF5 result. |
 

@@ -1148,6 +1148,14 @@ type BirthProfile
         !+ Array of birth particles
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
+    real(Float64), dimension(:,:,:,:), allocatable :: power_dens
+        !+ Birth kinetic-power density [W/cm^3]
+    real(Float64), dimension(:,:,:,:), allocatable :: contribution_count
+        !+ Number of Monte Carlo contributions accumulated in each cell
+    real(Float64), dimension(:,:,:,:), allocatable :: rate_squared_sum
+        !+ Sum of squared particle-rate-density contributions
+    real(Float64), dimension(:,:,:,:), allocatable :: power_squared_sum
+        !+ Sum of squared kinetic-power-density contributions
 end type BirthProfile
 
 !! >>>>>>>>> [JFCM. 2024-??-??] >>>>>>>>>
@@ -1171,6 +1179,14 @@ type SinkProfile
         !+ Array of Sink particles
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Sink density: dens(species,x,y,z) [fast-ions/(s*cm^3)]
+    real(Float64), dimension(:,:,:,:), allocatable :: power_dens
+        !+ Sink kinetic-power density [W/cm^3]
+    real(Float64), dimension(:,:,:,:), allocatable :: contribution_count
+        !+ Number of Monte Carlo contributions accumulated in each cell
+    real(Float64), dimension(:,:,:,:), allocatable :: rate_squared_sum
+        !+ Sum of squared particle-rate-density contributions
+    real(Float64), dimension(:,:,:,:), allocatable :: power_squared_sum
+        !+ Sum of squared kinetic-power-density contributions
 end type SinkProfile
 !! <<<<<<<<< [JFCM. 2024-??-??] <<<<<<<<<<<<<
 
@@ -7243,6 +7259,11 @@ subroutine write_birth_profile(gen)
 
     do_write = .True.
 #ifdef _MPI
+    call parallel_sum(birth%dens)
+    call parallel_sum(birth%power_dens)
+    call parallel_sum(birth%contribution_count)
+    call parallel_sum(birth%rate_squared_sum)
+    call parallel_sum(birth%power_squared_sum)
     call parallel_sum(ri_gc)
     call parallel_sum(energy)
     call parallel_sum(pitch)
@@ -7267,6 +7288,13 @@ subroutine write_birth_profile(gen)
         call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [npart], error)
         dim4 = shape(birth%dens)
         call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/power_dens", 4, dim4, birth%power_dens, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/contribution_count", 4, dim4, &
+             birth%contribution_count, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/rate_squared_sum", 4, dim4, &
+             birth%rate_squared_sum, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/power_squared_sum", 4, dim4, &
+             birth%power_squared_sum, error)
         dim2 = [3, npart]
         call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
@@ -7284,6 +7312,19 @@ subroutine write_birth_profile(gen)
              "Birth density: dens(beam_component,x,y,z)", error)
         call h5ltset_attribute_string_f(fid, "/dens", "units", &
              "fast-ions/(s*cm^3)", error)
+        call h5ltset_attribute_string_f(fid, "/power_dens", "description", &
+             "Birth kinetic-power density: power_dens(beam_component,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid, "/power_dens", "units", "W/cm^3", error)
+        call h5ltset_attribute_string_f(fid, "/contribution_count", "description", &
+             "Number of Monte Carlo birth contributions accumulated in each cell", error)
+        call h5ltset_attribute_string_f(fid, "/contribution_count", "units", "1", error)
+        call h5ltset_attribute_string_f(fid, "/rate_squared_sum", "description", &
+             "Sum of squared birth particle-rate-density contributions", error)
+        call h5ltset_attribute_string_f(fid, "/rate_squared_sum", "units", &
+             "fast-ions^2/(s^2*cm^6)", error)
+        call h5ltset_attribute_string_f(fid, "/power_squared_sum", "description", &
+             "Sum of squared birth kinetic-power-density contributions", error)
+        call h5ltset_attribute_string_f(fid, "/power_squared_sum", "units", "W^2/cm^6", error)
         call h5ltset_attribute_string_f(fid, "/ri_gc", "description", &
              "Fast-ion guiding-center birth position in R-Z-Phi: ri_gc([r,z,phi],particle)", error)
         call h5ltset_attribute_string_f(fid, "/ri_gc", "units", "cm, radians", error)
@@ -7329,7 +7370,8 @@ subroutine write_birth_profile(gen)
     ! >>> [JFCM, 2025-07-01] >>>
     birth%cnt = 1
     deallocate(birth%part)
-    deallocate(birth%dens)
+    deallocate(birth%dens,birth%power_dens,birth%contribution_count)
+    deallocate(birth%rate_squared_sum,birth%power_squared_sum)
     ! print *, "Deallocating birth%part and dens, birth%cnt = ", birth%cnt
     ! <<< [JFCM, 2025-07-01] <<<
 
@@ -7475,6 +7517,11 @@ subroutine write_sink_profile(gen)
 
   do_write = .True.
 #ifdef _MPI
+  call parallel_sum(sink%dens)
+  call parallel_sum(sink%power_dens)
+  call parallel_sum(sink%contribution_count)
+  call parallel_sum(sink%rate_squared_sum)
+  call parallel_sum(sink%power_squared_sum)
   call parallel_sum(ri_gc)
   call parallel_sum(energy)
   call parallel_sum(pitch)
@@ -7502,6 +7549,13 @@ subroutine write_sink_profile(gen)
       call h5ltmake_dataset_int_f(fid, "/n_sink", 0, d, [npart], error)
       dim4 = shape(sink%dens)
       call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, sink%dens, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/power_dens", 4, dim4, sink%power_dens, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/contribution_count", 4, dim4, &
+           sink%contribution_count, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/rate_squared_sum", 4, dim4, &
+           sink%rate_squared_sum, error)
+      call h5ltmake_compressed_dataset_double_f(fid,"/power_squared_sum", 4, dim4, &
+           sink%power_squared_sum, error)
       dim2 = [3, npart]
       call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
       call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
@@ -7523,6 +7577,19 @@ subroutine write_sink_profile(gen)
            "Ion sink density: dens(beam_component,x,y,z)", error)
       call h5ltset_attribute_string_f(fid, "/dens", "units", &
            "Ions/(s*cm^3)", error)
+      call h5ltset_attribute_string_f(fid, "/power_dens", "description", &
+           "Ion sink kinetic-power density: power_dens(species,x,y,z)", error)
+      call h5ltset_attribute_string_f(fid, "/power_dens", "units", "W/cm^3", error)
+      call h5ltset_attribute_string_f(fid, "/contribution_count", "description", &
+           "Number of Monte Carlo sink contributions accumulated in each cell", error)
+      call h5ltset_attribute_string_f(fid, "/contribution_count", "units", "1", error)
+      call h5ltset_attribute_string_f(fid, "/rate_squared_sum", "description", &
+           "Sum of squared sink particle-rate-density contributions", error)
+      call h5ltset_attribute_string_f(fid, "/rate_squared_sum", "units", &
+           "ions^2/(s^2*cm^6)", error)
+      call h5ltset_attribute_string_f(fid, "/power_squared_sum", "description", &
+           "Sum of squared sink kinetic-power-density contributions", error)
+      call h5ltset_attribute_string_f(fid, "/power_squared_sum", "units", "W^2/cm^6", error)
       call h5ltset_attribute_string_f(fid, "/ri_gc", "description", &
            "Ion guiding-center birth position in R-Z-Phi: ri_gc([r,z,phi],particle)", error)
       call h5ltset_attribute_string_f(fid, "/ri_gc", "units", "cm, radians", error)
@@ -7580,7 +7647,8 @@ subroutine write_sink_profile(gen)
   ! >>> [JFCM, 2025-07-01] >>>
   sink%cnt = 1
   deallocate(sink%part)
-  deallocate(sink%dens)
+  deallocate(sink%dens,sink%power_dens,sink%contribution_count)
+  deallocate(sink%rate_squared_sum,sink%power_squared_sum)
   ! print *, "Deallocating sink%part and dens, sink%cnt = ", sink%cnt
   ! <<< [JFCM, 2025-07-01] <<<
 
@@ -12655,33 +12723,75 @@ end subroutine parallel_merge_populations
 
 #endif
 
-subroutine store_births(ind, neut_type, dflux)
-    !+ Store birth particles/density in [[libfida:birth]]
+subroutine store_births(ind, neut_type, dflux, energy)
+    !+ Accumulate ion-birth particle-rate and kinetic-power moments on the beam grid.
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in)               :: neut_type
         !+ Neutral type
     real(Float64), intent(in)                :: dflux
-        !+ Deposited flux
+        !+ Deposited particle-rate density [fast-ions/(s*cm^3)]
+    real(Float64), intent(in)                :: energy
+        !+ Kinetic energy carried by the deposited neutral [keV]
+    real(Float64) :: power_dens
+
+    power_dens = dflux*energy*e0*1.d3
 
     !$OMP ATOMIC UPDATE
     birth%dens( neut_type,ind(1),ind(2),ind(3))= &
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
     !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    birth%power_dens(neut_type,ind(1),ind(2),ind(3)) = &
+         birth%power_dens(neut_type,ind(1),ind(2),ind(3)) + power_dens
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    birth%contribution_count(neut_type,ind(1),ind(2),ind(3)) = &
+         birth%contribution_count(neut_type,ind(1),ind(2),ind(3)) + 1.d0
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    birth%rate_squared_sum(neut_type,ind(1),ind(2),ind(3)) = &
+         birth%rate_squared_sum(neut_type,ind(1),ind(2),ind(3)) + dflux*dflux
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    birth%power_squared_sum(neut_type,ind(1),ind(2),ind(3)) = &
+         birth%power_squared_sum(neut_type,ind(1),ind(2),ind(3)) + power_dens*power_dens
+    !$OMP END ATOMIC
 end subroutine store_births
 
-subroutine store_sinks(ind, is, flux_per_marker)
-    !+ Store sink particles/density in [[libfida:sink]]
+subroutine store_sinks(ind, is, flux_per_marker, energy)
+    !+ Accumulate ion-sink particle-rate and kinetic-power moments on the beam grid.
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in) :: is
         !+ Ion species index
     real(Float64), intent(in) :: flux_per_marker
-        !+ Particle flux [p/s /m3]
+        !+ Particle-rate density [ions/(s*cm^3)]
+    real(Float64), intent(in) :: energy
+        !+ Kinetic energy of the removed ion [keV]
+    real(Float64) :: power_dens
+
+    power_dens = flux_per_marker*energy*e0*1.d3
 
     !$OMP ATOMIC UPDATE
     sink%dens(is,ind(1),ind(2),ind(3))= &
      sink%dens(is,ind(1),ind(2),ind(3)) + flux_per_marker
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    sink%power_dens(is,ind(1),ind(2),ind(3)) = &
+         sink%power_dens(is,ind(1),ind(2),ind(3)) + power_dens
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    sink%contribution_count(is,ind(1),ind(2),ind(3)) = &
+         sink%contribution_count(is,ind(1),ind(2),ind(3)) + 1.d0
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    sink%rate_squared_sum(is,ind(1),ind(2),ind(3)) = &
+         sink%rate_squared_sum(is,ind(1),ind(2),ind(3)) + flux_per_marker*flux_per_marker
+    !$OMP END ATOMIC
+    !$OMP ATOMIC UPDATE
+    sink%power_squared_sum(is,ind(1),ind(2),ind(3)) = &
+         sink%power_squared_sum(is,ind(1),ind(2),ind(3)) + power_dens*power_dens
     !$OMP END ATOMIC
 end subroutine store_sinks
 
@@ -14875,7 +14985,8 @@ subroutine ndmc
                 flux_tot = flux_tot + tracks(jj)%flux*beam_grid%dv
 
                 if(inputs%calc_birth.ge.1) then
-                    call store_births(ind,neut_type,tracks(jj)%flux)
+                    call store_births(ind,neut_type,tracks(jj)%flux, &
+                         beam_mass*v2_to_E_per_amu*dot_product(vnbi,vnbi))
                 endif
 
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
@@ -14916,9 +15027,6 @@ subroutine ndmc
     call parallel_merge_populations(neut%third)
 
     call parallel_sum(nbi_outside)
-    if(inputs%calc_birth.ge.1) then
-        call parallel_sum(birth%dens)
-    endif
     !! Combine spectra
     if(inputs%calc_bes.ge.1) then
         call parallel_sum(spec%full)
@@ -18060,7 +18168,8 @@ subroutine calculate_wall_source_process(ss,rr)
 
        !! STORE new ion birth flux on beam_grid:
        if (inputs%calc_birth.ge.1) then
-         call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux)
+         call store_births(tracks(jj)%ind,neut_type,tracks(jj)%flux, &
+              mass*v2_to_E_per_amu*dot_product(tracks(jj)%vn,tracks(jj)%vn))
        endif
 
        !! STORE photons: see NDMC for details
@@ -18205,10 +18314,26 @@ subroutine calculate_dcx_process
   ! Allocate birth particles for the DCX process:
   allocate(birth%part(inputs%n_dcx))
   allocate(birth%dens(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(birth%power_dens(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(birth%contribution_count(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(birth%rate_squared_sum(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(birth%power_squared_sum(4,beam_grid%nx,beam_grid%ny,beam_grid%nz))
   allocate(sink%part(inputs%n_dcx))
   allocate(sink%dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(sink%power_dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(sink%contribution_count(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(sink%rate_squared_sum(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+  allocate(sink%power_squared_sum(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
   birth%dens=0.d0
+  birth%power_dens=0.d0
+  birth%contribution_count=0.d0
+  birth%rate_squared_sum=0.d0
+  birth%power_squared_sum=0.d0
   sink%dens=0.d0
+  sink%power_dens=0.d0
+  sink%contribution_count=0.d0
+  sink%rate_squared_sum=0.d0
+  sink%power_squared_sum=0.d0
   !! <<< [JFCM, 2025-07-01] <<<
 
   !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,jj, &
@@ -18288,7 +18413,8 @@ subroutine calculate_dcx_process
               starting_flux = sum(states) !! [ion/s 1/cm^3]
               flux_per_marker = starting_flux/nlaunch(i,j,k)
               denf4d_per_marker = denf4d/nlaunch(i,j,k)
-              call store_sinks(ind_p,is,flux_per_marker)
+              call store_sinks(ind_p,is,flux_per_marker, &
+                   thermal_mass(is)*v2_to_E_per_amu*dot_product(vp,vp))
               call store_sink_particle(ind_p,rp,vp,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
 
               ! Initialize deposition accumulator for current marker:
@@ -18319,7 +18445,8 @@ subroutine calculate_dcx_process
                 tot_flux_dep = tot_flux_dep + tracks(jj)%flux*beam_grid%dv ! [p/s]
 
                 !! Store new ion birth flux on beam_grid:
-                call store_births(tracks(jj)%ind,dcx_type,tracks(jj)%flux)
+                call store_births(tracks(jj)%ind,dcx_type,tracks(jj)%flux, &
+                     thermal_mass(is)*v2_to_E_per_amu*dot_product(tracks(jj)%vn,tracks(jj)%vn))
 
                 ! Photon quantities:
                 ! photons = fi_correction*photons ! Need to remove this later
@@ -18532,10 +18659,26 @@ subroutine calculate_halo_process
     allocate(birth%part(n_halo))
     allocate(sink%part(n_halo))
     allocate(birth%dens(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(birth%power_dens(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(birth%contribution_count(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(birth%rate_squared_sum(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(birth%power_squared_sum(5,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     allocate(sink%dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(sink%power_dens(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(sink%contribution_count(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(sink%rate_squared_sum(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(sink%power_squared_sum(n_thermal,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     write(*,*) "Finished allocating birth/sink containers"
     birth%dens=0.d0
+    birth%power_dens=0.d0
+    birth%contribution_count=0.d0
+    birth%rate_squared_sum=0.d0
+    birth%power_squared_sum=0.d0
     sink%dens=0.d0
+    sink%power_dens=0.d0
+    sink%contribution_count=0.d0
+    sink%rate_squared_sum=0.d0
+    sink%power_squared_sum=0.d0
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,is,ihalo,absorbed,ind,i,j,k,ri,vi,denf4d,f4d_defined,tracks, &
     !$OMP& ntrack,ii,jj,kk,rates,states,denn,starting_flux,denf4d_per_marker,it,tot_flux_dep,initial_flux,weight, &
@@ -18598,7 +18741,8 @@ subroutine calculate_halo_process
           starting_flux = sum(states)
           flux_per_marker = starting_flux/nlaunch(i,j,k)
           denf4d_per_marker = denf4d/nlaunch(i,j,k)
-          call store_sinks(ind_p,is,flux_per_marker)
+          call store_sinks(ind_p,is,flux_per_marker, &
+               thermal_mass(is)*v2_to_E_per_amu*dot_product(vi,vi))
           call store_sink_particle(ind_p,ri,vi,is,flux_per_marker,denf4d,denf4d_per_marker,fields)
 
           !! Loop along neutral trajectory:
@@ -18625,7 +18769,8 @@ subroutine calculate_halo_process
             tot_flux_dep = tot_flux_dep + tracks(it)%flux*beam_grid%dv ! [p/s]
 
             !! Accumulate ion birth flux on beam grid: (OMP critical)
-            call store_births(tracks(it)%ind,halo_type,tracks(it)%flux)
+            call store_births(tracks(it)%ind,halo_type,tracks(it)%flux, &
+                 thermal_mass(is)*v2_to_E_per_amu*dot_product(tracks(it)%vn,tracks(it)%vn))
 
             !! Photon quantities:
 

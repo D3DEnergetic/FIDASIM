@@ -1,6 +1,8 @@
 # Test 006: surface-mesh setup and tracking
 
-Test 006 verifies FIDASIM's surface-mesh loading, setup, and particle-tracking path using its maintained test inputs. It has no runtime dependency on Surface Mesh Tools or any other project.
+Test 006 verifies FIDASIM's surface-mesh loading, setup, particle-tracking,
+and elastic-diffuse wall-sampling paths using its maintained test inputs. It
+has no runtime dependency on Surface Mesh Tools or any other project.
 
 ## What the test checks
 
@@ -12,7 +14,11 @@ FIDASIM:
 3. loads the deterministic absorbing-wall parameters;
 4. reconstructs grid-cell triangle candidates for the active region;
 5. excludes the inactive region from those candidates; and
-6. tracks one particle into the active wall and absorbs it.
+6. tracks one particle into the active wall and absorbs it;
+7. treats an omitted `wall_p_elastic_diffuse` field as zero; and
+8. dispatches a pure elastic-diffuse wall process and verifies exact speed
+   preservation, inward orientation, cosine-law mean, unbiased azimuth, and
+   an arbitrary wall-normal orientation.
 
 Test 005 separately checks detailed ray-triangle cases, candidate ordering,
 and an active transparent opening. Test 006 checks file loading and the
@@ -145,6 +151,11 @@ case.
 
 Every artifact region has an explicit behavior block. A missing, duplicate,
 or unknown region name is an input error; omission does not mean inactive.
+
+The fixture deliberately omits `wall_p_elastic_diffuse`. Its absorbing wall
+therefore also verifies the backward-compatible default of zero. The focused
+sampler checks construct a pure elastic-diffuse wall directly in the native
+test executable.
 
 ## Grid and voxel index
 

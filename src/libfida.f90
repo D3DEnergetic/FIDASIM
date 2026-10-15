@@ -238,6 +238,8 @@ type wall_type
     !+ Absorption probability of region
   real(Float64) :: p_specular = 0.0
     !+ Specular reflection probability of region
+  real(Float64) :: p_elastic_diffuse = 0.0
+    !+ Energy-preserving diffuse reflection probability of region
   real(Float64) :: p_thermal = 0.0
     !+ Thermal emission probability of region
 end type wall_type
@@ -3496,14 +3498,16 @@ end subroutine read_vessel_mesh_artifact
 subroutine read_vessel_mesh_behavior_config()
   !+ Read run-specific behavior and resolve each block by artifact region name.
   integer::schema_version,num_regions,unit,ios,rr,artifact_region_id,candidate_region_id
-  real(Float64)::surface_padding_epsilon,wall_temp,wall_p_absorb,wall_p_specular
+  real(Float64)::surface_padding_epsilon,wall_temp,wall_p_absorb,wall_p_specular, &
+    wall_p_elastic_diffuse
   character(len=64)::name
   character(len=16)::behavior_type
   logical::is_active,enable_source
   logical,allocatable::matched(:)
   character(len=512)::iomsg
   namelist /config/ schema_version,num_regions,surface_padding_epsilon
-  namelist /region/ name,is_active,behavior_type,enable_source,wall_temp,wall_p_absorb,wall_p_specular
+  namelist /region/ name,is_active,behavior_type,enable_source,wall_temp,wall_p_absorb, &
+    wall_p_specular,wall_p_elastic_diffuse
 
   ! Initialize required config fields to invalid values. If a field is omitted
   ! from the namelist, the validation below rejects it explicitly.
@@ -3532,6 +3536,7 @@ subroutine read_vessel_mesh_behavior_config()
     ! Invalid defaults make omitted required region fields fail validation.
     name=''; behavior_type=''; is_active=.true.; enable_source=.false.
     wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
+    wall_p_elastic_diffuse=0.d0
     read(unit,nml=region,iostat=ios,iomsg=iomsg)
     if(ios/=0) then
       write(*,'(a,a)') 'mesh behavior: cannot read region: ',trim(iomsg)
@@ -3556,8 +3561,10 @@ subroutine read_vessel_mesh_behavior_config()
     if(enable_source) stop 'mesh behavior: surface sources are deferred and must be disabled'
     if(behavior_type=='wall') then
       if(wall_temp<=0.d0) stop 'mesh behavior: wall temperature must be positive'
-      if(wall_p_absorb<0.d0 .or. wall_p_absorb>1.d0 .or. wall_p_specular<0.d0 .or. &
-         wall_p_specular>1.d0 .or. wall_p_absorb+wall_p_specular>1.d0) &
+      if(wall_p_absorb<0.d0 .or. wall_p_absorb>1.d0 .or. &
+         wall_p_specular<0.d0 .or. wall_p_specular>1.d0 .or. &
+         wall_p_elastic_diffuse<0.d0 .or. wall_p_elastic_diffuse>1.d0 .or. &
+         wall_p_absorb+wall_p_specular+wall_p_elastic_diffuse>1.d0) &
          stop 'mesh behavior: invalid wall probabilities'
     endif
     vessel%mesh%region(artifact_region_id)%is_active=is_active
@@ -3566,8 +3573,9 @@ subroutine read_vessel_mesh_behavior_config()
     vessel%mesh%region(artifact_region_id)%wall%temp=wall_temp
     vessel%mesh%region(artifact_region_id)%wall%p_absorb=wall_p_absorb
     vessel%mesh%region(artifact_region_id)%wall%p_specular=wall_p_specular
+    vessel%mesh%region(artifact_region_id)%wall%p_elastic_diffuse=wall_p_elastic_diffuse
     vessel%mesh%region(artifact_region_id)%wall%p_thermal= &
-      1.d0-wall_p_absorb-wall_p_specular
+      1.d0-wall_p_absorb-wall_p_specular-wall_p_elastic_diffuse
   enddo
 
   ! Confirm that the expected region blocks are followed by a clean end of
@@ -3575,6 +3583,7 @@ subroutine read_vessel_mesh_behavior_config()
   ! malformed trailing input must not be mistaken for normal end of file.
   name=''; behavior_type=''; is_active=.true.; enable_source=.false.
   wall_temp=-huge(1.d0); wall_p_absorb=1.d0; wall_p_specular=0.d0
+  wall_p_elastic_diffuse=0.d0
   read(unit,nml=region,iostat=ios,iomsg=iomsg)
   if(ios==0) stop 'mesh behavior: more region blocks than declared'
   if(.not.is_iostat_end(ios)) then
@@ -3783,6 +3792,7 @@ subroutine read_vacuum_vessel_namelist
   real(Float64) :: wall_temp(max_regions)
   real(Float64) :: wall_p_absorb(max_regions)
   real(Float64) :: wall_p_specular(max_regions)
+  real(Float64) :: wall_p_elastic_diffuse(max_regions)
   real(Float64) :: source_temp(max_regions)
   real(Float64) :: source_energy(max_regions)
   real(Float64) :: source_mass_amu(max_regions)
@@ -3803,7 +3813,8 @@ subroutine read_vacuum_vessel_namelist
   namelist /surface/ is_active, primitive_type, num_regions, origin, frame_type, alpha, beta, gamma, &
   basis, cyl_radius, region_type, behavior_type, enable_source, xmin, xmax, ymin, ymax, zmin, zmax, &
   phimin, phimax, phi_direction, x0, y0, phi0, z0, rmin, rmax, thetamin, thetamax, theta_direction, &
-  wall_temp, wall_p_absorb, wall_p_specular, source_temp, source_energy, source_mass_amu, source_rate, &
+  wall_temp, wall_p_absorb, wall_p_specular, wall_p_elastic_diffuse, source_temp, source_energy, &
+  source_mass_amu, source_rate, &
   source_normal_direction, source_num_markers, source_births_per_marker
 
   ! Read config namelist:
@@ -3912,8 +3923,15 @@ subroutine read_vacuum_vessel_namelist
             stop
           end if
 
-          if (wall_p_absorb(rr) + wall_p_specular(rr) > 1.d0) then
-            write(*,*) "ERROR: surface ", ss, " region ", rr, ": wall_p_absorb + wall_p_specular must be <= 1"
+          if (wall_p_elastic_diffuse(rr) < 0.d0 .or. wall_p_elastic_diffuse(rr) > 1.d0) then
+            write(*,*) "ERROR: surface ", ss, " region ", rr, &
+              ": wall_p_elastic_diffuse must be between 0 and 1"
+            stop
+          end if
+
+          if (wall_p_absorb(rr) + wall_p_specular(rr) + wall_p_elastic_diffuse(rr) > 1.d0) then
+            write(*,*) "ERROR: surface ", ss, " region ", rr, &
+              ": wall_p_absorb + wall_p_specular + wall_p_elastic_diffuse must be <= 1"
             stop
           end if
         end if
@@ -4028,7 +4046,9 @@ subroutine read_vacuum_vessel_namelist
         vessel%surface(ss)%region(rr)%wall%temp = wall_temp(rr)
         vessel%surface(ss)%region(rr)%wall%p_absorb = wall_p_absorb(rr)
         vessel%surface(ss)%region(rr)%wall%p_specular = wall_p_specular(rr)
-        vessel%surface(ss)%region(rr)%wall%p_thermal = 1 - wall_p_absorb(rr) - wall_p_specular(rr)
+        vessel%surface(ss)%region(rr)%wall%p_elastic_diffuse = wall_p_elastic_diffuse(rr)
+        vessel%surface(ss)%region(rr)%wall%p_thermal = &
+          1 - wall_p_absorb(rr) - wall_p_specular(rr) - wall_p_elastic_diffuse(rr)
 
         vessel%surface(ss)%region(rr)%source%temp = source_temp(rr)
         vessel%surface(ss)%region(rr)%source%energy = source_energy(rr)
@@ -4119,6 +4139,7 @@ contains
     wall_temp       = unset_real
     wall_p_absorb   = 1.0
     wall_p_specular = 0.0
+    wall_p_elastic_diffuse = 0.0
 
     source_temp       = unset_real
     source_energy     = 0.0_Float64
@@ -11074,8 +11095,9 @@ subroutine apply_wall_interaction(vn, event, wall, absorbed)
     !+
     !+ Possible outcomes:
     !+   1. specular reflection
-    !+   2. thermal wall emission
-    !+   3. absorption
+    !+   2. energy-preserving diffuse reflection
+    !+   3. thermal wall emission
+    !+   4. absorption
 
     real(Float64), dimension(3), intent(inout) :: vn
         !+ Particle velocity [cm/s]. Updated if reflected or thermally emitted.
@@ -11087,7 +11109,8 @@ subroutine apply_wall_interaction(vn, event, wall, absorbed)
         !+ True if particle is absorbed at the wall.
 
     real(Float64) :: T_wall, v_thermal
-    real(Float64) :: p_absorb, p_specular, p_thermal, p_reflect
+    real(Float64) :: p_absorb, p_specular, p_elastic_diffuse, p_thermal
+    real(Float64) :: p_elastic_threshold, p_reflect
     real(Float64), dimension(1) :: randomu
     real(Float64), dimension(3) :: nhat, vhat
 
@@ -11104,14 +11127,18 @@ subroutine apply_wall_interaction(vn, event, wall, absorbed)
     T_wall    = wall%temp      ! [keV]
     p_absorb  = wall%p_absorb
     p_specular = wall%p_specular
-    p_thermal = 1.d0 - (p_absorb + p_specular)
-    p_reflect = p_specular + p_thermal
+    p_elastic_diffuse = wall%p_elastic_diffuse
+    p_thermal = 1.d0 - (p_absorb + p_specular + p_elastic_diffuse)
+    p_elastic_threshold = p_specular + p_elastic_diffuse
+    p_reflect = p_elastic_threshold + p_thermal
 
     !! Optional sanity check:
-    if (p_absorb < 0.d0 .or. p_specular < 0.d0 .or. p_thermal < 0.d0) then
+    if (p_absorb < 0.d0 .or. p_specular < 0.d0 .or. &
+        p_elastic_diffuse < 0.d0 .or. p_thermal < 0.d0) then
         write(*,*) "ERROR(apply_wall_interaction): invalid wall probabilities"
         write(*,*) "p_absorb   = ", p_absorb
         write(*,*) "p_specular = ", p_specular
+        write(*,*) "p_elastic_diffuse = ", p_elastic_diffuse
         write(*,*) "p_thermal  = ", p_thermal
         stop
     endif
@@ -11120,6 +11147,8 @@ subroutine apply_wall_interaction(vn, event, wall, absorbed)
     call randu(randomu)
     if (randomu(1) < p_specular) then
         call specular_reflection(vn, nhat)
+    elseif (randomu(1) < p_elastic_threshold) then
+        call elastic_diffuse_reflection(vn, nhat)
     elseif (randomu(1) < p_reflect) then
         v_thermal = sqrt(T_wall/(v2_to_E_per_amu*thermal_mass(1)))
         call get_vn_thermal_wall_emission(v_thermal, nhat, vn)
@@ -11561,6 +11590,31 @@ subroutine rotation_matrix_local_to_lab(nhat,R)
 end subroutine rotation_matrix_local_to_lab
 !! <<< [JFCM, 2025-07-04] <<<
 
+subroutine sample_cosine_direction(nhat,vhat_lab)
+    !+ Sample a unit vector from a cosine-law distribution about nhat.
+    real(Float64), intent(in) :: nhat(3)
+        !+ Unit vector defining the centre of the emission hemisphere
+    real(Float64), intent(out) :: vhat_lab(3)
+        !+ Sampled unit direction in the lab frame
+
+    real(Float64), dimension(2) :: randomu
+    real(Float64) :: phi, theta
+    real(Float64) :: vhat_local(3)
+    real(Float64) :: R(3,3)
+
+    call randu(randomu)
+    phi = 2*pi*randomu(1)           ! phi in [0, 2*pi]
+    theta = asin(sqrt(randomu(2)))  ! p(theta) proportional to cos(theta)*sin(theta)
+
+    vhat_local(1) = sin(theta)*cos(phi)
+    vhat_local(2) = sin(theta)*sin(phi)
+    vhat_local(3) = cos(theta)
+
+    call rotation_matrix_local_to_lab(nhat,R)
+    vhat_lab = matmul(R,vhat_local)
+
+end subroutine sample_cosine_direction
+
 !! >>> [JFCM, 2025-07-04] >>>
 subroutine get_vn_thermal_wall_emission(vT,nhat,v_lab)
     !+ Samples a velocity vector from a flux-weighted Maxwellian
@@ -11576,31 +11630,34 @@ subroutine get_vn_thermal_wall_emission(vT,nhat,v_lab)
     ! Local variables
     real(Float64), dimension(2) :: randomu
     real(Float64) :: x, v
-    real(Float64) :: theta, phi
-    real(Float64) :: v_local(3)
-    real(Float64) :: R(3,3)
+    real(Float64) :: vhat_lab(3)
 
     ! Step 1: Sample speed from Gamma(2,1)
     call randu(randomu)
     x = -log(randomu(1)) - log(randomu(2))
     v = vT*sqrt(x) ! [cm/s]
 
-    ! Step 2: Sample emission angles
-    call randu(randomu)
-    phi = 2*pi*randomu(1)      ! phi ∈ [0, 2π]
-    theta = asin(sqrt(randomu(2))) ! p(θ) ∝ cosθ·sinθ
-
-    ! Step 3: Convert to local velocity components
-    v_local(1) = v * sin(theta) * cos(phi)   ! vx'
-    v_local(2) = v * sin(theta) * sin(phi)   ! vy'
-    v_local(3) = v * cos(theta)              ! vz'
-
-    ! --- Step 4: Rotate into lab frame
-    call rotation_matrix_local_to_lab(nhat, R)
-    v_lab = matmul(R, v_local)
+    call sample_cosine_direction(nhat,vhat_lab)
+    v_lab = v*vhat_lab
 
 end subroutine get_vn_thermal_wall_emission
 !! <<< [JFCM, 2025-07-04] <<<
+
+subroutine elastic_diffuse_reflection(vi,nhat)
+    !+ Preserve incident speed while sampling a new cosine-law direction.
+    real(Float64), intent(inout) :: vi(3)
+        !+ Incident velocity on entry and reflected velocity on return [cm/s]
+    real(Float64), intent(in) :: nhat(3)
+        !+ Unit normal pointing into the reflection hemisphere
+
+    real(Float64) :: speed
+    real(Float64) :: vhat(3)
+
+    speed = norm2(vi)
+    call sample_cosine_direction(nhat,vhat)
+    vi = speed*vhat
+
+end subroutine elastic_diffuse_reflection
 
 pure function thermal_speed_from_temperature(temp,mass) result(vT)
     !+ Convert a source temperature and particle mass to sqrt(2*k*T/m).

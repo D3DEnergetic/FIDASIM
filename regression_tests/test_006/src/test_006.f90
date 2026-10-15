@@ -7,12 +7,14 @@ program test_006
   !+ particle into a deterministic absorbing wall.
 
   use iso_fortran_env,only:int32,real64
-  use libfida,only:ParticleTrack,beam_grid,inputs,setup_vessel_mesh, &
-    track_to_wall,track_exit_grid,track_exit_path_limit,vessel
+  use libfida,only:ParticleTrack,apply_wall_interaction,beam_grid, &
+    collision_event_type,cross_product,inputs,setup_vessel_mesh,track_to_wall, &
+    track_exit_grid,track_exit_path_limit,vessel,wall_type
   use utilities,only:rng,rng_init
   implicit none
 
-  integer,parameter::max_results=24
+  integer,parameter::max_results=32
+  integer,parameter::number_of_samples=100000
   character(len=*),parameter::report_path='output_data/comparison_report.txt'
 
   type::test_result_type
@@ -25,9 +27,14 @@ program test_006
   type(ParticleTrack),allocatable::tracks(:)
   character(len=512)::artifact_path,behavior_path,detail
   integer::argument_status,i,j,k,reference_index,exit_reason,periodic_wraps
-  integer::number_of_results=0,active_references,inactive_references
+  integer::number_of_results=0,active_references,inactive_references,sample_index
   integer(int32)::ntrack
   logical::absorbed,all_passed
+  real(real64)::incident_speed,maximum_speed_error,minimum_mu,mean_mu
+  real(real64)::mean_azimuth_x,mean_azimuth_y,mu,azimuth_x,azimuth_y
+  real(real64)::normal(3),tangent_x(3),tangent_y(3),velocity(3),direction(3)
+  type(collision_event_type)::event
+  type(wall_type)::elastic_wall
 
   ! Read the command-line fixture paths supplied by run.sh. Normal regression
   ! runs use the maintained files under fixtures/, while explicit arguments
@@ -81,8 +88,9 @@ program test_006
       'expected active wall followed by inactive opening')
     call record_result('absorbing wall parameters loaded', &
       abs(vessel%mesh%region(1)%wall%p_absorb-1.d0)<1.d-15 .and. &
-      abs(vessel%mesh%region(1)%wall%p_specular)<1.d-15, &
-      'expected deterministic absorption probability one')
+      abs(vessel%mesh%region(1)%wall%p_specular)<1.d-15 .and. &
+      abs(vessel%mesh%region(1)%wall%p_elastic_diffuse)<1.d-15, &
+      'expected absorption one and omitted reflection probabilities zero')
   else
     call record_result('behavior resolved by physical name',.false., &
       'region catalogue is unavailable')
@@ -180,6 +188,58 @@ program test_006
     all([tracks(1)%ind(3),tracks(2)%ind(3),tracks(3)%ind(3), &
       tracks(4)%ind(3),tracks(5)%ind(3)]==[1,2,1,2,1]), &
     'expected two wraps and termination at the five-segment path limit')
+
+  ! Exercise pure elastic-diffuse dispatch and its shared cosine sampler with
+  ! an arbitrary normal. This direct native regression is the isolated planar
+  ! validation: it avoids a separate simulation fixture while checking the
+  ! physical sampling contract over a large deterministic ensemble.
+  call rng_init(rng(1),24680_int32)
+  normal=[1.d0,2.d0,3.d0]/sqrt(14.d0)
+  tangent_x=[-2.d0,1.d0,0.d0]/sqrt(5.d0)
+  tangent_y=cross_product(normal,tangent_x)
+  incident_speed=7.5d0
+  event%normal=normal
+  elastic_wall%temp=1.d-3
+  elastic_wall%p_absorb=0.d0
+  elastic_wall%p_specular=0.d0
+  elastic_wall%p_elastic_diffuse=1.d0
+  elastic_wall%p_thermal=0.d0
+  maximum_speed_error=0.d0
+  minimum_mu=1.d0
+  mean_mu=0.d0
+  mean_azimuth_x=0.d0
+  mean_azimuth_y=0.d0
+
+  do sample_index=1,number_of_samples
+    velocity=-incident_speed*normal
+    call apply_wall_interaction(velocity,event,elastic_wall,absorbed)
+    if(absorbed) error stop 'test_006: pure elastic-diffuse wall absorbed a particle'
+    maximum_speed_error=max(maximum_speed_error,abs(norm2(velocity)-incident_speed))
+    direction=velocity/norm2(velocity)
+    mu=dot_product(direction,normal)
+    minimum_mu=min(minimum_mu,mu)
+    mean_mu=mean_mu+mu
+    azimuth_x=dot_product(direction,tangent_x)
+    azimuth_y=dot_product(direction,tangent_y)
+    mean_azimuth_x=mean_azimuth_x+azimuth_x
+    mean_azimuth_y=mean_azimuth_y+azimuth_y
+  enddo
+  mean_mu=mean_mu/number_of_samples
+  mean_azimuth_x=mean_azimuth_x/number_of_samples
+  mean_azimuth_y=mean_azimuth_y/number_of_samples
+
+  write(detail,'(a,es12.4)') 'maximum speed error: ',maximum_speed_error
+  call record_result('elastic diffuse preserves speed', &
+    maximum_speed_error<1.d-12,detail)
+  write(detail,'(a,es12.4)') 'minimum direction cosine: ',minimum_mu
+  call record_result('elastic diffuse points inward',minimum_mu>=0.d0,detail)
+  write(detail,'(a,f10.6)') 'mean direction cosine: ',mean_mu
+  call record_result('elastic diffuse has cosine-law mean', &
+    abs(mean_mu-2.d0/3.d0)<5.d-3,detail)
+  write(detail,'(a,2(es12.4,1x))') 'mean tangent components: ', &
+    mean_azimuth_x,mean_azimuth_y
+  call record_result('elastic diffuse has unbiased azimuth', &
+    abs(mean_azimuth_x)<5.d-3 .and. abs(mean_azimuth_y)<5.d-3,detail)
 
   call write_comparison_report(all_passed)
   if(.not.all_passed) error stop 'test_006: one or more checks failed'
